@@ -1,0 +1,10 @@
+language: csharp
+mono: none
+dotnet: 1.1.1
+solution: microservice-template-dotnet-ws.sln
+script:
+- projects/scripts/build.sh
+notifications:
+  slack:
+    rooms:
+    - secure: kWVnUDNT3y0APWpo9+oJk0iBn6/kcWKNeMyM4E7QSrJqvGBmsDrmch/pau8tbBzjVlvFGSqHC6pfgdEaTshYeBDDBb02GQJIXGr5Qo31sb+iwq6uOD9HN+aqj2Db8w+sDZUXwwa8T273lF+CArCNmrJriUitPhPHIyiismI86Qehns+3mhyWxp27zFbB6TG59TqUsmMQoezXNjh9gHpPcKt7SK2RPMQS+lEQ3gAnKkZCX2Eq73LOWd4mJY4Gpn0+MINROtQvragwiHg0DWzudx7T33dbEegEyH5a60+KesosDcfsOY8ZvEsmtNq+9biUCfyEgh1TrP0+3n6A/K7LPUiphP+jGxX4/D5lERnBSD4Al9TCmUoqiCVV8gcd2gDclziIL1OK7VZC3NeIdmW6Fou2oZRQ3cX5xHfKtRchZzD5Xiq2rewc0qtC24s24Y/UPP98VjOUp6RF2kMyScPkFZyXD3RG3iNLTxuv5iZZ5OB0dCF06lI59nom1vyLG4XjGs+ocbiFlkafH4wcXoNHFjPZPXK4kPX+1KIcAWjHZWBSWcN0TRm7lu+VJJk1QwK3NSk++bYRS21nPz96zPKj1KPbG/c1vvNy/MZt5s9kymQIo0Ko7i/mPi3FF1ea8sglb/+NyzTWYyEq0vuvRo2xJI22H5RjaHCgkkchePa2H90=

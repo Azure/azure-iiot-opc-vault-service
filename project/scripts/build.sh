@@ -11,7 +11,7 @@ failed() {
     exit 1
 }
 
-build() {
+compile() {
     for PROJ in $PROJECTS; do
         PROJ=$(dirname "$PROJ")
 
@@ -37,6 +37,6 @@ run_tests() {
     done
 }
 
-build
+compile
 run_tests
 

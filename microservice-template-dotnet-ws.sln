@@ -9,6 +9,14 @@ Project("{DD7AA677-BEC9-4028-AA6A-1BD9F49D0029}") = "WebService.Test", "WebServi
 EndProject
 Project("{B988F9B2-9A2B-4469-95BD-8395C41C6B04}") = "project", "project\project.csproj", "{4372B2F7-2DDC-425A-83D1-E5F9AA03F09C}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "solution", "solution", "{8289AFAE-0933-40EF-9D19-6FFA2DB04837}"
+ProjectSection(SolutionItems) = preProject
+	LICENSE = LICENSE
+	README.md = README.md
+	.travis.yml = .travis.yml
+	.gitignore = .gitignore
+EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
