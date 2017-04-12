@@ -1,6 +1,6 @@
 language: csharp
 mono: none
-dotnet: 1.1.1
+dotnet: 1.0.1
 solution: microservice-template-dotnet-ws.sln
 script:
 - projects/scripts/build.sh
