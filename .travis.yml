@@ -3,7 +3,7 @@ mono: none
 dotnet: 1.0.1
 solution: microservice-template-dotnet-ws.sln
 script:
-- projects/scripts/build.sh
+- ./project/scripts/build.sh
 notifications:
   slack:
     rooms:
