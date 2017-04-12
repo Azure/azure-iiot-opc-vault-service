@@ -4,7 +4,6 @@
     <TargetFramework>netcoreapp1.1</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <Folder Include="docs" />
     <Folder Include="scripts\git" />
     <Folder Include="scripts\iothub" />
   </ItemGroup>
