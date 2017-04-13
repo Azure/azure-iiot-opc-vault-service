@@ -17,6 +17,10 @@ ProjectSection(SolutionItems) = preProject
 	.gitignore = .gitignore
 EndProjectSection
 EndProject
+Project("{3F6C594D-6A75-41FA-9B7F-C3D2C452CE5B}") = "Services", "Services\Services.csproj", "{786A5B9B-98EE-4B73-9FE3-2080B70007AF}"
+EndProject
+Project("{0C2980CF-5F3F-4F23-B373-C03671AC9364}") = "Services.Test", "Services.Test\Services.Test.csproj", "{1BC54189-1DF9-448E-AE5F-66EB2EF51D82}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +39,14 @@ Global
 		{4372B2F7-2DDC-425A-83D1-E5F9AA03F09C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4372B2F7-2DDC-425A-83D1-E5F9AA03F09C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4372B2F7-2DDC-425A-83D1-E5F9AA03F09C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{786A5B9B-98EE-4B73-9FE3-2080B70007AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{786A5B9B-98EE-4B73-9FE3-2080B70007AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{786A5B9B-98EE-4B73-9FE3-2080B70007AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{786A5B9B-98EE-4B73-9FE3-2080B70007AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1BC54189-1DF9-448E-AE5F-66EB2EF51D82}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1BC54189-1DF9-448E-AE5F-66EB2EF51D82}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1BC54189-1DF9-448E-AE5F-66EB2EF51D82}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1BC54189-1DF9-448E-AE5F-66EB2EF51D82}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -36,21 +36,21 @@ In Travis, go to the build settings:
 
 ### Enable Slack notifications
 
-There is already an active integration to send notifications to #pcs-notifications, see 
-the configuration file included in the template. You can add more channels adding 
-more `room` lines to the list. Note that the integration key is encrypted, to avoid 
-external spam. The non-encrypted tokens can be found on Slack.
+Slack already has an active token to accept notifications and forward them to 
+\#pcs-notifications Slack channel.
 
-To generate the encrypted token:
+To activate Travis-Slack integration, run the following command from the root of the 
+project and check in `.travis.yml`:
 
 ```
-travis login
+travis login --auto
 travis encrypt "azureiot:...key...#pcs-notifications --add notifications.slack"
 ```
 
-The key can be found via Slack integrations.
+Note that the integration key is encrypted, to avoid external spam. 
+The non-encrypted tokens can be found in Slack, starting the channel integrations.
 
 ### Microsoft Teams notifications
 
-Microsoft Teams doesn't support encrypted keys, so we cannot enable notifications on 
-public repositories.
+Microsoft Teams doesn't support encrypted keys, so we cannot enable notifications 
+on public repositories.

@@ -2,14 +2,13 @@
 
 using Xunit;
 
-namespace WebService.Test
+namespace Microsoft.Azure.IoT.WebService.Services.Test.Models
 {
-    public class UnitTest1
+    public class BuildingTest
     {
         [Fact]
         public void Test1()
         {
-            Assert.True(true);
         }
     }
 }
