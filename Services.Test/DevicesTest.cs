@@ -2,7 +2,7 @@
 
 using Xunit;
 
-namespace Microsoft.Azure.IoT.WebService.Services.Test
+namespace Services.Test
 {
     public class DevicesTest
     {

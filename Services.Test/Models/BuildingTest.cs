@@ -2,7 +2,7 @@
 
 using Xunit;
 
-namespace Microsoft.Azure.IoT.WebService.Services.Test.Models
+namespace Services.Test.Models
 {
     public class BuildingTest
     {
