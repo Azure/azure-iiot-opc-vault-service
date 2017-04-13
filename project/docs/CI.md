@@ -45,7 +45,7 @@ To generate the encrypted token:
 
 ```
 travis login
-travis encrypt "azureiot:...key...#pcs-notifications"
+travis encrypt "azureiot:...key...#pcs-notifications --add notifications.slack"
 ```
 
 The key can be found via Slack integrations.
