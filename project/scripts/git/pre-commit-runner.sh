@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && cd .. && pwd )/"
-source "$DIR/project/scripts/git/pre-commit.sh"
+# Path relative to .git/hooks/
+APP_HOME="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && cd .. && pwd )/"
+source "$APP_HOME/project/scripts/git/pre-commit.sh"

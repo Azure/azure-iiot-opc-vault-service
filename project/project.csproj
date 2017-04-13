@@ -5,7 +5,9 @@
     <WarningLevel>0</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Folder Include="scripts\git" />
     <Folder Include="scripts\iothub" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove=".DS_Store" />
   </ItemGroup>
 </Project>

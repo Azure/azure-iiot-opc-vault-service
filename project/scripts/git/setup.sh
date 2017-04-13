@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && cd .. && cd .. && pwd )/"
+APP_HOME="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && cd .. && cd .. && pwd )/"
 
 failed() {
-    echo "Git setup failed"
+    echo "Git hooks setup failed"
     exit 1
 }
 
-cd $DIR/.git || failed
+cd $APP_HOME/.git || failed
 mkdir -p hooks || failed
 cd hooks || failed
 
 echo "Adding pre-commit hook..."
 rm -f pre-commit
-ln -s ../../project/scripts/git/pre-commit-runner.sh pre-commit || failed
+cp -p $APP_HOME/project/scripts/git/pre-commit-runner.sh ./pre-commit || failed
 
 echo "Done."

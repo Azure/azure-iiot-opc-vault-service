@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/"
-source "$DIR/.functions.sh"
-cd $DIR/../../../
+APP_HOME="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && cd .. && cd .. && pwd )/"
+source "$APP_HOME/project/scripts/git/.functions.sh"
+
+cd $APP_HOME
 echo "Current folder: `pwd`"
 
 if git rev-parse --verify HEAD >/dev/null 2>&1 ; then
