@@ -13,7 +13,7 @@ call dotnet restore *.sln
 call dotnet build --configuration %CONFIGURATION% *.sln
 
 for /r %%i in (*.Test.csproj) do (
-  call dotnet test --no-build %%i
+  call dotnet test --configuration %CONFIGURATION% --no-build %%i
 )
 
 endlocal
