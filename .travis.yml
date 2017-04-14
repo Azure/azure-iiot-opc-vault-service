@@ -4,7 +4,7 @@ dotnet: 1.0.1
 dist: trusty
 solution: microservice-template-dotnet-ws.sln
 script:
-- "./project/scripts/build.sh"
+- "./project/scripts/build"
 notifications:
   slack:
     rooms:
