@@ -1,4 +1,5 @@
 @ECHO off
+setlocal
 
 :: strlen("\project\scripts\git\") => 21
 SET APP_HOME=%~dp0
@@ -13,3 +14,5 @@ del /F .git\hooks\pre-commit 2> nul
 copy project\scripts\git\pre-commit-runner.sh .git\hooks\pre-commit
 
 echo Done.
+
+endlocal

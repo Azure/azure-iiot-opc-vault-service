@@ -1,9 +1,9 @@
 @ECHO off
 setlocal
 
-# quiet|minimal|normal|detailed|diagnostic
+:: quiet|minimal|normal|detailed|diagnostic
 SET VERBOSITY=normal
-# Debug|Release
+:: Debug|Release
 SET CONFIGURATION=Release
 
 :: strlen("\project\scripts\") => 17
