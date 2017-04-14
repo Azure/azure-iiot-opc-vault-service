@@ -24,7 +24,7 @@ compile() {
 run_tests() {
     PROJECTS=$(dotnet sln list | grep 'csproj$' | grep '\.Test')
     for PROJ in $PROJECTS; do
-        dotnet test --no-build --verbosity $VERBOSITY $PROJ
+        dotnet test --configuration $CONFIGURATION --no-build --verbosity $VERBOSITY $PROJ
     done
 }
 
