@@ -25,8 +25,8 @@ build
 otherwise you can do it manually:
 
 ```
-dotnet restore *.sln
-dotnet build *.sln
+dotnet restore microservice-template-dotnet-ws.sln
+dotnet build microservice-template-dotnet-ws.sln
 dotnet test Services.Test/Services.Test.csproj
 dotnet test WebService.Test/WebService.Test.csproj
 ```
@@ -38,4 +38,10 @@ To run the project from the command line:
 ```
 cd WebService
 dotnet run
+```
+
+or
+
+```
+project/scripts/run
 ```

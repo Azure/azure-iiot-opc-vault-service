@@ -30,4 +30,3 @@ run_tests() {
 
 compile
 run_tests
-

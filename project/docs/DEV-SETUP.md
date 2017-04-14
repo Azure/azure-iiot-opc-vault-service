@@ -30,7 +30,7 @@ setup
 Some scripts are included for Windows/Linux/MacOS, to execute common steps:
 
 * Build: `project/scripts/build`
-* Run: @TODO
+* Run: `project/scripts/run`
 * Create Docker container: @TODO
 
 IoT Hub setup
