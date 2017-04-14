@@ -14,26 +14,21 @@ find information about .NET Core CLI
 
 ### Compile
 
-To compile the solution
-
-The following bash script takes care of building all the projects and running the tests:
+The following script takes care of building all the projects and running the tests:
 
 ```
-./project/scripts/build.sh
+cd PROJECT-FOLDER
+cd project/scripts
+build
 ```
 
 otherwise you can do it manually:
 
 ```
-cd WebService
-dotnet restore
-dotnet build
-cd ..
-
-cd WebService.Test
-dotnet restore
-dotnet build
-dotnet vstest ./bin/Debug/netcoreapp1.1/WebService.Test.dll
+dotnet restore *.sln
+dotnet build *.sln
+dotnet test Services.Test/Services.Test.csproj
+dotnet test WebService.Test/WebService.Test.csproj
 ```
 
 ### Run

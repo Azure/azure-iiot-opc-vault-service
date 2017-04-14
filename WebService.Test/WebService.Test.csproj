@@ -8,9 +8,9 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\WebService\WebService.csproj">
-      <Project>{f305cad5-be38-4391-a692-580c526a0cb1}</Project>
-      <Name>WebService</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\WebService\WebService.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove=".DS_Store" />
   </ItemGroup>
 </Project>

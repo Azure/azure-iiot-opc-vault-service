@@ -7,6 +7,9 @@
   <ItemGroup>
     <None Remove=".DS_Store" />
     <None Remove="docs\.DS_Store" />
+    <None Remove="manager\.DS_Store" />
+    <None Remove="manager\bin\.DS_Store" />
+    <None Remove="manager\lib\.DS_Store" />
     <None Remove="scripts\.DS_Store" />
   </ItemGroup>
 </Project>

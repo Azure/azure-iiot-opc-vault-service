@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+# quiet|minimal|normal|detailed|diagnostic
+VERBOSITY=$1
+# Debug|Release
+CONFIGURATION=Release
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && cd .. && pwd )/"
+source "$DIR/project/scripts/.functions.sh"
+cd $DIR
+
+if [[ -z "$VERBOSITY" ]]; then VERBOSITY="normal"; fi
+
+failed() {
+    echo "Build failed"
+    exit 1
+}
+
+compile() {
+    dotnet restore --verbosity $VERBOSITY *.sln
+    dotnet build --configuration $CONFIGURATION --verbosity $VERBOSITY *.sln
+}
+
+run_tests() {
+    PROJECTS=$(dotnet sln list | grep 'csproj$' | grep '\.Test')
+    for PROJ in $PROJECTS; do
+        dotnet test --no-build --verbosity $VERBOSITY $PROJ
+    done
+}
+
+compile
+run_tests
+

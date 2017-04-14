@@ -14,9 +14,9 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="1.1.1" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Services\Services.csproj">
-      <Project>{786a5b9b-98ee-4b73-9fe3-2080b70007af}</Project>
-      <Name>Services</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\Services\Services.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove=".DS_Store" />
   </ItemGroup>
 </Project>

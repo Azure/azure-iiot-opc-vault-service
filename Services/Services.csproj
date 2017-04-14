@@ -4,4 +4,10 @@
     <AssemblyName>Microsoft.Azure.IoT.WebService.Services</AssemblyName>
     <RootNamespace>Microsoft.Azure.IoT.WebService.Services</RootNamespace>
   </PropertyGroup>
+  <ItemGroup>
+    <None Remove=".DS_Store" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Models\" />
+  </ItemGroup>
 </Project>

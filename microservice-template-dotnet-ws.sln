@@ -1,13 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.0.0
-MinimumVisualStudioVersion = 10.0.0.1
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebService", "WebService\WebService.csproj", "{F305CAD5-BE38-4391-A692-580C526A0CB1}"
 EndProject
-Project("{DD7AA677-BEC9-4028-AA6A-1BD9F49D0029}") = "WebService.Test", "WebService.Test\WebService.Test.csproj", "{6A4D86AD-56D0-421B-B9B2-2EBB34A5BBBC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebService.Test", "WebService.Test\WebService.Test.csproj", "{6A4D86AD-56D0-421B-B9B2-2EBB34A5BBBC}"
 EndProject
-Project("{B988F9B2-9A2B-4469-95BD-8395C41C6B04}") = "project", "project\project.csproj", "{4372B2F7-2DDC-425A-83D1-E5F9AA03F09C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "project", "project\project.csproj", "{4372B2F7-2DDC-425A-83D1-E5F9AA03F09C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "solution", "solution", "{8289AFAE-0933-40EF-9D19-6FFA2DB04837}"
 ProjectSection(SolutionItems) = preProject
@@ -17,9 +15,9 @@ ProjectSection(SolutionItems) = preProject
 	.gitignore = .gitignore
 EndProjectSection
 EndProject
-Project("{3F6C594D-6A75-41FA-9B7F-C3D2C452CE5B}") = "Services", "Services\Services.csproj", "{786A5B9B-98EE-4B73-9FE3-2080B70007AF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Services", "Services\Services.csproj", "{786A5B9B-98EE-4B73-9FE3-2080B70007AF}"
 EndProject
-Project("{0C2980CF-5F3F-4F23-B373-C03671AC9364}") = "Services.Test", "Services.Test\Services.Test.csproj", "{1BC54189-1DF9-448E-AE5F-66EB2EF51D82}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Services.Test", "Services.Test\Services.Test.csproj", "{1BC54189-1DF9-448E-AE5F-66EB2EF51D82}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -50,5 +48,15 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		Policies = $0
+		$0.DotNetNamingPolicy = $1
+		$0.TextStylePolicy = $2
+		$2.inheritsSet = null
+		$2.scope = text/x-csharp
+		$0.CSharpFormattingPolicy = $3
+		$3.scope = text/x-csharp
+		$0.VersionControlPolicy = $4
 	EndGlobalSection
 EndGlobal
