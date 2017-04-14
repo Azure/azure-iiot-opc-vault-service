@@ -47,7 +47,7 @@ check_donotcommit() {
 run_tests() {
     header "Checking code..."
 
-    ./project/scripts/build.sh
+    ./project/scripts/build
 
     if [ $? -ne 0 ]; then
         error "Some unit tests failed."
