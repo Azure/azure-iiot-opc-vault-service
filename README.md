@@ -70,5 +70,5 @@ a pull-request.
 [build-url]: https://travis-ci.com/Azure/microservice-template-dotnet-ws
 [issues-badge]: https://img.shields.io/github/issues/azure/microservice-template-dotnet-ws.svg
 [issues-url]: https://github.com/azure/microservice-template-dotnet-ws/issues
-[gitter-badge]: https://img.shields.io/gitter/room/azure-iot/pcs.js.svg
-[gitter-url]: https://gitter.im/azure-iot/pcs
+[gitter-badge]: https://img.shields.io/gitter/room/azure/iot-pcs.js.svg
+[gitter-url]: https://gitter.im/azure/iot-pcs
