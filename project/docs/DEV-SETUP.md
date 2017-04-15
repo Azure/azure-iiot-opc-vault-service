@@ -29,10 +29,10 @@ setup
    
 Some scripts are included for Windows/Linux/MacOS, to execute common steps:
 
-* Build: `project/scripts/build`
-* Run: `project/scripts/run`
-* Create Docker container: `project/scripts/docker-build`
-* Run Docker container: `project/scripts/docker-run`
+* Build: `project\scripts\build`
+* Run: `project\scripts\run`
+* Create Docker container: `project\scripts\docker-build`
+* Run Docker container: `project\scripts\docker-run`
 
 IoT Hub setup
 =============
