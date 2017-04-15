@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && cd .. && pwd )/"
-source "$DIR/project/scripts/.functions.sh"
-cd $DIR
+APP_HOME="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && cd .. && pwd )/"
+source "$APP_HOME/project/scripts/.functions.sh"
+cd $APP_HOME
 
 PROJECTS=$(dotnet sln list | grep 'csproj$')
 
@@ -11,5 +11,5 @@ for PROJ in $PROJECTS; do
     cd $PROJ
     rm -fR bin/
     rm -fR obj/
-    cd $DIR
+    cd $APP_HOME
 done

@@ -31,7 +31,8 @@ Some scripts are included for Windows/Linux/MacOS, to execute common steps:
 
 * Build: `project/scripts/build`
 * Run: `project/scripts/run`
-* Create Docker container: @TODO
+* Create Docker container: `project/scripts/docker-build`
+* Run Docker container: `project/scripts/docker-run`
 
 IoT Hub setup
 =============
@@ -52,5 +53,6 @@ and in case you had multiple Azure subscriptions:
 Other documents
 ===============
 
-* [Continuous Integration](CI.md)
 * [Build and Run](BUILD.md)
+* [Docker](DOCKER.md)
+* [Continuous Integration](CI.md)

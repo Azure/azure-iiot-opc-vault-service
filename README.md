@@ -17,6 +17,7 @@ Other documents
 ===============
 
 * [Build and Run](project/docs/BUILD.md)
+* [Docker](project/docs/DOCKER.md)
 * [Development setup](project/docs/DEV-SETUP.md)
 
 How to use it
@@ -63,6 +64,7 @@ a pull-request.
 * [Build and Run](project/docs/BUILD.md)
 * [Docker](project/docs/DOCKER.md)
 * [Development setup](project/docs/DEV-SETUP.md)
+* [Continuous Integration](project/docs/CI.md)
 
 [maven-badge]: https://img.shields.io/maven-central/v/com.microsoft.azure.iot/[ABCDEFG].svg
 [maven-url]: http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22[ABCDEFG]%22

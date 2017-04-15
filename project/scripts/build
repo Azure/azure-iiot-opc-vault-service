@@ -5,9 +5,9 @@ VERBOSITY=$1
 # Debug|Release
 CONFIGURATION=Release
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && cd .. && pwd )/"
-source "$DIR/project/scripts/.functions.sh"
-cd $DIR
+APP_HOME="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && cd .. && pwd )/"
+source "$APP_HOME/project/scripts/.functions.sh"
+cd $APP_HOME
 
 if [[ -z "$VERBOSITY" ]]; then VERBOSITY="normal"; fi
 

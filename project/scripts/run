@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && cd .. && pwd )/"
-cd $DIR
+APP_HOME="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && cd .. && pwd )/"
+cd $APP_HOME
 
 cd WebService
+echo "Starting web service at: http://localhost:5000/api/values"
 dotnet run
