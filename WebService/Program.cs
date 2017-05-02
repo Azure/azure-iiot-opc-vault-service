@@ -1,22 +1,27 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
-using System.IO;
-using Microsoft.AspNetCore.Hosting;
+using System;
+using Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.Runtime;
+using Microsoft.Owin.Hosting;
 
-namespace Microsoft.Azure.IoT.WebService
+namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService
 {
+    /// <summary>Application entry point</summary>
     public class Program
     {
-        public static void Main(string[] args)
-        {
-            var host = new WebHostBuilder()
-                .UseKestrel()
-                .UseContentRoot(Directory.GetCurrentDirectory())
-                .UseIISIntegration()
-                .UseStartup<Startup>()
-                .Build();
+        static readonly IConfig config = new Config();
 
-            host.Run();
+        static void Main(string[] args)
+        {
+            // TODO: remove workaround and support all versions
+            var options = new StartOptions("http://*:" + config.Port + "/" + v1.Version.Name);
+            using (WebApp.Start<Startup>(options))
+            {
+                Console.WriteLine("Server listening at http://*:" + config.Port);
+                Console.WriteLine("Health check: http://127.0.0.1:" + config.Port + "/v1/status");
+                Console.WriteLine("Press [Enter] to quit...");
+                Console.ReadLine();
+            }
         }
     }
 }

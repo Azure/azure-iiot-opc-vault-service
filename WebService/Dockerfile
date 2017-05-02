@@ -1,10 +1,10 @@
-FROM microsoft/aspnetcore:1.1
+FROM mono:latest
 
 MAINTAINER Devis Lucato (https://github.com/dluc)
 
-EXPOSE 80
+EXPOSE 8080
 
-ENTRYPOINT ["dotnet", "Microsoft.Azure.IoT.WebService.dll"]
+ENTRYPOINT ["mono", "Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.exe"]
 
 COPY . /app/
 WORKDIR /app

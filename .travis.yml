@@ -1,10 +1,15 @@
-language: csharp
-mono: none
+anguage: csharp
+mono: beta
 dotnet: 1.0.1
 dist: trusty
-solution: microservice-template-dotnet-ws.sln
+sudo: false
+cache:
+  directories:
+  - "$HOME/.nuget/"
+before_install:
+- set -e
 script:
-- "./project/scripts/build"
+- "./$CODEBASE/scripts/build"
 notifications:
   slack:
     rooms:
