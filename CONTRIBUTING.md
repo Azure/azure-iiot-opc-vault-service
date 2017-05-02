@@ -42,7 +42,8 @@ Some scripts also require .NET Core, where we are migrating the solution.
 * [Mono 5](http://www.mono-project.com/download/beta)
 * [.NET Core](https://dotnet.github.io/)
 
-We provide also a [Java version here](https://github.com/Azure/PROJECT-NAME-HERE-java).
+We provide also a [Java version](https://github.com/Azure/PROJECT-NAME-HERE-java)
+of this project and other Azure IoT PCS components.
 
 ## IDE
 
