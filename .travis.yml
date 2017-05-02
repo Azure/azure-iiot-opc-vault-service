@@ -1,4 +1,4 @@
-anguage: csharp
+language: csharp
 mono: beta
 dotnet: 1.0.1
 dist: trusty
