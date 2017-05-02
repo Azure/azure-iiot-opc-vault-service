@@ -42,7 +42,8 @@ Some scripts also require .NET Core, where we are migrating the solution.
 * [Mono 5](http://www.mono-project.com/download/beta)
 * [.NET Core](https://dotnet.github.io/)
 
-We provide also a [Java version](https://github.com/Azure/PROJECT-NAME-HERE-java)
+We provide also a 
+[Java version](https://github.com/Azure/PROJECT-NAME-HERE-java)
 of this project and other Azure IoT PCS components.
 
 ## IDE
@@ -80,6 +81,16 @@ under `.git/hooks`. You can also bypass the pre-commit hook using the
 If you use ReSharper or Rider, you can load the code style settings from
 the repository, stored in
 [solution.sln.DotSettings](solution.sln.DotSettings)
+
+Some quick notes about the project code style:
+
+1. Where reasonable, lines length is limited to 80 chars max, to help code 
+   reviews and command line editors.
+2. Code blocks indentation with 4 spaces. The tab char should be avoided.
+3. Text files use Unix end of line format (LF).
+4. Dependency Injection is managed with 
+   [Unity](https://msdn.microsoft.com/library/dn223671.aspx).
+5. Web service APIs fields are CamelCased (except for metadata).
 
 Build, Run locally and with Docker
 ==================================
