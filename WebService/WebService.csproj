@@ -101,6 +101,8 @@
     <Content Include=".dockerignore">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="v1\Controllers\conventions.md" />
+    <Content Include="v1\Models\conventions.md" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Services\Services.csproj">
