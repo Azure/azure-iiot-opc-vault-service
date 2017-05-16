@@ -3,6 +3,7 @@
 using System;
 using System.Collections;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using Akka.Configuration;
 
@@ -42,20 +43,28 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.Runtime
         public Services.Runtime.IConfig ServicesConfig { get; }
 
         /// <summary>
-        /// Read the `application.conf` HOCON file, enabling substitutions of
-        /// ${NAME} placeholders with environment variables values.
+        /// Read the `application.conf` HOCON file, enabling substitutions
+        /// of ${NAME} placeholders with environment variables values.
+        /// TODO: remove workaround when [1] is fixed.
+        ///       [1] https://github.com/akkadotnet/HOCON/issues/40
         /// </summary>
         /// <returns>Configuration text content</returns>
         private static string GetHoconConfiguration()
         {
-            var hocon = File.ReadAllText("application.conf");
+            // Pattern of env. vars in the configuration, e.g. ${VAR_NAME}
+            var pattern = @"\${(?'key'[a-zA-Z_][a-zA-Z0-9_]*)}";
+            var hocon = File.ReadAllText("application.conf") + "\n";
 
-            // Append environment variables to allow Hocon substitutions on them
-            var filter = new Regex(@"^[a-zA-Z0-9_/.,:;#(){}^=+~| !@$%&*'[\\\]-]*$");
-            hocon += "\n";
+            // Extract the name of all the substitutions required
+            var keys = (from Match m
+                             in Regex.Matches(hocon, pattern)
+                             select m.Groups[1].Value).ToArray();
+
+            // Foreach substitution inject the env. var if available
             foreach (DictionaryEntry x in Environment.GetEnvironmentVariables())
             {
-                if (filter.IsMatch(x.Value.ToString())) hocon += x.Key + " : \"" + x.Value + "\"\n";
+                if (keys.Contains(x.Key))
+                    hocon += x.Key + " : \"" + x.Value + "\"\n";
             }
 
             return hocon;
