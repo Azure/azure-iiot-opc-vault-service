@@ -9,7 +9,7 @@ cache:
 before_install:
 - set -e
 script:
-- "./$CODEBASE/scripts/build"
+- "bash ./$CODEBASE/scripts/build"
 notifications:
   slack:
     rooms:

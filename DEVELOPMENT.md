@@ -17,6 +17,23 @@ The [scripts](scripts) folder includes some scripts for frequent tasks:
 * `docker-run`: run the Docker container from the image stored in the local
   registry.
 
+### Sandbox
+
+Most of the scripts assume you have configured your development environment,
+with tools like MSBuild, Nuget, .NET Core, Mono and Docker. You can avoid
+installing all of these tools, and install only Docker, and use the scripts
+with `-in-sandbox` suffix:
+
+* `build-in-sandbox`: like `build` but executes the task inside of a Docker
+   container.
+* `compile-in-sandbox`: like `compile` but executes the task inside of a
+   Docker container.
+* `run-in-sandbox`: like `run` but executes the task inside of a Docker
+   container.
+
+The Docker images used for the sandbox is hosted on Docker Hub
+[here](https://hub.docker.com/r/azureiotpcs/code-builder-dotnet).
+
 Configuration
 =============
 
@@ -57,10 +74,13 @@ The project workflow is managed via .NET Framework 4.6.2+ and Mono 5.x.
 We recommend to install Mono also in Windows, where Mono is used for the
 Git pre-commit hook.
 
+On the other hand you can install just Docker and rely on the builder
+sandbox if you don't want to install all these dependencies.
+
 Some scripts also require .NET Core, where we are migrating the solution.
 
 * [.NET for Windows](https://support.microsoft.com/help/3151802/the-.net-framework-4.6.2-web-installer-for-windows)
-* [Mono 5](http://www.mono-project.com/download/beta)
+* [Mono 5](http://www.mono-project.com/download)
 * [.NET Core](https://dotnet.github.io/)
 
 We provide also a
@@ -83,19 +103,32 @@ code change. You can run the tests manually, or let the CI platform to run
 the tests. We use the following Git hook to automatically run all the tests
 before sending code changes to GitHub and speed up the development workflow.
 
-Note: the hook requires [Mono 5](http://www.mono-project.com/download/beta).
+If at any point you want to remove the hook, simply delete the file installed
+under `.git/hooks`. You can also bypass the pre-commit hook using the
+`--no-verify` option.
+
+#### Pre-commit hook with sandbox
 
 To setup the included hooks, open a Windows/Linux/MacOS console and execute:
 
 ```
 cd PROJECT-FOLDER
 cd scripts/git
-setup
+setup --with-sandbox
 ```
 
-If at any point you want to remove the hook, simply delete the file installed
-under `.git/hooks`. You can also bypass the pre-commit hook using the
-`--no-verify` option.
+#### Pre-commit hook without sandbox
+
+Note: the hook requires [Mono 5](http://www.mono-project.com/download),
+Nuget and MSBuild in the system PATH.
+
+To setup the included hooks, open a Windows/Linux/MacOS console and execute:
+
+```
+cd PROJECT-FOLDER
+cd scripts/git
+setup --no-sandbox
+```
 
 ## Code style
 

@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+set -e
+APP_HOME="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )/"
+source "$APP_HOME/scripts/.functions.sh"
+
+setup_cache() {
+    cd $APP_HOME
+    mkdir -p .cache/sandbox/.config
+    mkdir -p .cache/sandbox/.dotnet
+    mkdir -p .cache/sandbox/.nuget
+}
+
+compile_in_sandbox() {
+    check_dependency_docker
+
+    docker run -it \
+        -v $APP_HOME/.cache/sandbox/.config:/root/.config \
+        -v $APP_HOME/.cache/sandbox/.dotnet:/root/.dotnet \
+        -v $APP_HOME/.cache/sandbox/.nuget:/root/.nuget \
+        -v $APP_HOME:/opt/code \
+        azureiotpcs/code-builder-dotnet:1.0 /opt/scripts/compile
+}
+
+setup_cache
+compile_in_sandbox
+
+set +e

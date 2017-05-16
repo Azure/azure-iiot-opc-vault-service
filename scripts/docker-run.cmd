@@ -1,7 +1,25 @@
 @ECHO off
 
-SET DOCKER_IMAGE="azureiotpcs/PROJECT-NAME-HERE-dotnet:0.1-SNAPSHOT"
+:: Note: use lowercase names for the Docker images
+SET DOCKER_IMAGE="azureiotpcs/project-name-here-dotnet:0.1-SNAPSHOT"
+SET EXT_PORT=8080
 
-echo Starting web service at: http://localhost:8080
+:: Check dependencies
+docker version > NUL
+IF NOT ERRORLEVEL 0 GOTO MISSING_DOCKER
 
-docker run -it -p 8080:8080 -e PCS_IOTHUB_CONN_STRING=%PCS_IOTHUB_CONN_STRING% %DOCKER_IMAGE%
+:: Start the application
+echo Starting microservice...
+docker run -it -p %EXT_PORT%:8080 -e PCS_IOTHUB_CONN_STRING=%PCS_IOTHUB_CONN_STRING% %DOCKER_IMAGE%
+
+:: - - - - - - - - - - - - - -
+goto :END
+
+:MISSING_DOCKER
+    echo ERROR: 'docker' command not found.
+    echo Install Docker and make sure the 'docker' command is in the PATH.
+    echo Docker installation: https://store.docker.com/editions/community/docker-ce-desktop-windows
+    exit /B 1
+
+:END
+endlocal

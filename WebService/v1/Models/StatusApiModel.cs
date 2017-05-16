@@ -7,11 +7,18 @@ using Newtonsoft.Json;
 
 namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Models
 {
-    public class StatusModel
+    public class StatusApiModel
     {
+        [JsonProperty(PropertyName = "Message")]
         public string Message { get; set; }
+
+        [JsonProperty(PropertyName = "CurrentTime")]
         public DateTime CurrentTime => DateTime.UtcNow;
+
+        [JsonProperty(PropertyName = "StartTime")]
         public DateTime StartTime => Uptime.Start;
+
+        [JsonProperty(PropertyName = "UpTime")]
         public TimeSpan UpTime => Uptime.Duration;
 
         [JsonProperty(PropertyName = "$metadata")]

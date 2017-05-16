@@ -14,17 +14,17 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Controllers
         private static readonly IConfig config = new Config();
         private readonly IDevices devices = new Devices(config.ServicesConfig);
 
-        /// <summary>Get a list of devices</summary>
+        /// <summary>GetAsync a list of devices</summary>
         /// <returns>List of devices</returns>
-        public async Task<DeviceListApiModel> Get()
+        public async Task<DeviceListApiModel> GetAsync()
         {
             return new DeviceListApiModel(await this.devices.GetListAsync());
         }
 
-        /// <summary>Get one device</summary>
+        /// <summary>GetAsync one device</summary>
         /// <param name="id">Device Id</param>
         /// <returns>Device information</returns>
-        public async Task<DeviceApiModel> Get(string id)
+        public async Task<DeviceApiModel> GetAsync(string id)
         {
             return new DeviceApiModel(await this.devices.GetAsync(id));
         }
@@ -32,7 +32,7 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Controllers
         /// <summary>Create one device</summary>
         /// <param name="device">Device information</param>
         /// <returns>Device information</returns>
-        public async Task<DeviceApiModel> Post(DeviceApiModel device)
+        public async Task<DeviceApiModel> PostAsync(DeviceApiModel device)
         {
             return new DeviceApiModel(await this.devices.CreateAsync(device.ToServiceModel()));
         }

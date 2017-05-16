@@ -15,6 +15,7 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Models
             { "$uri", "/" + Version.Name + "/devices" }
         };
 
+        [JsonProperty(PropertyName = "Items")]
         public List<DeviceApiModel> Items { get; set; }
 
         public DeviceListApiModel(IEnumerable<DeviceServiceModel> devices)

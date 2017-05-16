@@ -9,11 +9,22 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Models
 {
     public class DeviceTwinApiModel
     {
+        [JsonProperty(PropertyName = "Etag")]
         public string Etag { get; set; }
+
+        [JsonProperty(PropertyName = "DeviceId")]
         public string DeviceId { get; set; }
+
+        [JsonProperty(PropertyName = "ReportedProperties")]
         public Dictionary<string, JToken> ReportedProperties { get; set; }
+
+        [JsonProperty(PropertyName = "DesiredProperties")]
         public Dictionary<string, JToken> DesiredProperties { get; set; }
+
+        [JsonProperty(PropertyName = "Tags")]
         public Dictionary<string, JToken> Tags { get; set; }
+
+        [JsonProperty(PropertyName = "IsSimulated")]
         public bool IsSimulated { get; set; }
 
         [JsonProperty(PropertyName = "$metadata")]

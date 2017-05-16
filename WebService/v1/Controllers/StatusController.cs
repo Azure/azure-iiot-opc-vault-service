@@ -10,9 +10,9 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Controllers
     {
         /// <summary>Return the service status</summary>
         /// <returns>Status object</returns>
-        public StatusModel Get()
+        public StatusApiModel Get()
         {
-            return new StatusModel { Message = "OK" };
+            return new StatusApiModel { Message = "OK" };
         }
     }
 }

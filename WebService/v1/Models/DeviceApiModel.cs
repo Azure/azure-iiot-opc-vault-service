@@ -9,12 +9,25 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Models
 {
     public class DeviceApiModel
     {
+        [JsonProperty(PropertyName = "Etag")]
         public string Etag { get; set; }
+
+        [JsonProperty(PropertyName = "Id")]
         public string Id { get; set; }
+
+        [JsonProperty(PropertyName = "C2DMessageCount")]
         public int C2DMessageCount { get; set; }
+
+        [JsonProperty(PropertyName = "LastActivity")]
         public DateTime LastActivity { get; set; }
-        public bool Connected { get; set; }
-        public bool Enabled { get; set; }
+
+        [JsonProperty(PropertyName = "IsConnected")]
+        public bool IsConnected { get; set; }
+
+        [JsonProperty(PropertyName = "IsEnabled")]
+        public bool IsEnabled { get; set; }
+
+        [JsonProperty(PropertyName = "LastStatusUpdated")]
         public DateTime LastStatusUpdated { get; set; }
 
         [JsonProperty(PropertyName = "$metadata")]
@@ -38,8 +51,8 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Models
             this.Etag = device.Etag;
             this.C2DMessageCount = device.C2DMessageCount;
             this.LastActivity = device.LastActivity;
-            this.Connected = device.Connected;
-            this.Enabled = device.Enabled;
+            this.IsConnected = device.Connected;
+            this.IsEnabled = device.Enabled;
             this.LastStatusUpdated = device.LastStatusUpdated;
             this.Twin = new DeviceTwinApiModel(device.Id,device.Twin);
         }
@@ -52,8 +65,8 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Models
                 id: this.Id,
                 c2DMessageCount: this.C2DMessageCount,
                 lastActivity: this.LastActivity,
-                connected: this.Connected,
-                enabled: this.Enabled,
+                connected: this.IsConnected,
+                enabled: this.IsEnabled,
                 lastStatusUpdated: this.LastStatusUpdated,
                 twin: this.Twin?.ToServiceModel()
             );
