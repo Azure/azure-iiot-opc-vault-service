@@ -12,9 +12,9 @@ The [scripts](scripts) folder includes some scripts for frequent tasks:
 * `compile`: compile all the projects.
 * `run`: compile the projects and run the service. This will prompt for
   elevated privileges in Windows to run the web service.
-* `docker-build`: build a Docker container and store the image in the local
+* `docker/build`: build a Docker container and store the image in the local
   registry.
-* `docker-run`: run the Docker container from the image stored in the local
+* `docker/run`: run the Docker container from the image stored in the local
   registry.
 
 ### Sandbox

@@ -25,15 +25,6 @@ rmdir /s /q .\WebService.Test\obj
 
 :: Clean up .cache
 rmdir /s /q .\cache
-mkdir .cache\sandbox\.config
-mkdir .cache\sandbox\.dotnet
-mkdir .cache\sandbox\.nuget
-echo * > .cache\sandbox\.config\.gitignore
-echo * > .cache\sandbox\.dotnet\.gitignore
-echo * > .cache\sandbox\.nuget\.gitignore
-echo !.gitignore >> .cache\sandbox\.config\.gitignore
-echo !.gitignore >> .cache\sandbox\.dotnet\.gitignore
-echo !.gitignore >> .cache\sandbox\.nuget\.gitignore
 
 echo Done.
 

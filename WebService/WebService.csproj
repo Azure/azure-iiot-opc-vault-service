@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{2834A1FA-8D60-4BA4-9155-E318608B1C4F}</ProjectGuid>
+    <ProjectGuid>{F305CAD5-BE38-4391-A692-580C526A0CB1}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService</RootNamespace>
     <AssemblyName>Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService</AssemblyName>
@@ -93,9 +93,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="application.conf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Dockerfile">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include=".dockerignore">

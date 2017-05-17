@@ -11,20 +11,10 @@ fi
 
 reset_cache() {
     cd $APP_HOME
-
     rm -fR .cache
-
     mkdir -p .cache/sandbox/.config
-    echo "*" > .cache/sandbox/.config/.gitignore
-    echo "!.gitignore" >> .cache/sandbox/.config/.gitignore
-
     mkdir -p .cache/sandbox/.dotnet
-    echo "*" > .cache/sandbox/.dotnet/.gitignore
-    echo "!.gitignore" >> .cache/sandbox/.dotnet/.gitignore
-
     mkdir -p .cache/sandbox/.nuget
-    echo "*" > .cache/sandbox/.nuget/.gitignore
-    echo "!.gitignore" >> .cache/sandbox/.nuget/.gitignore
 }
 
 cleanup_tmp_files() {

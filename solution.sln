@@ -30,10 +30,6 @@ ProjectSection(SolutionItems) = preProject
 	scripts\clean-up.cmd = scripts\clean-up.cmd
 	scripts\compile = scripts\compile
 	scripts\compile.cmd = scripts\compile.cmd
-	scripts\docker-build = scripts\docker-build
-	scripts\docker-build.cmd = scripts\docker-build.cmd
-	scripts\docker-run = scripts\docker-run
-	scripts\docker-run.cmd = scripts\docker-run.cmd
 	scripts\run = scripts\run
 	scripts\run.cmd = scripts\run.cmd
 	scripts\run.vbs = scripts\run.vbs
@@ -63,6 +59,15 @@ ProjectSection(SolutionItems) = preProject
 	scripts\iothub\list-subscriptions.sh = scripts\iothub\list-subscriptions.sh
 	scripts\iothub\select-subscription.sh = scripts\iothub\select-subscription.sh
 	scripts\iothub\show-hub.sh = scripts\iothub\show-hub.sh
+EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docker", "docker", "{DB8AF4E5-71A1-4650-A881-9F08FCB53DAA}"
+ProjectSection(SolutionItems) = preProject
+	scripts\docker\Dockerfile = scripts\docker\Dockerfile
+	scripts\docker\build = scripts\docker\build
+	scripts\docker\build.cmd = scripts\docker\build.cmd
+	scripts\docker\run = scripts\docker\run
+	scripts\docker\run.cmd = scripts\docker\run.cmd
 EndProjectSection
 EndProject
 Global
@@ -105,5 +110,6 @@ Global
 		{7357A079-B54D-490F-AA91-1B7BDAFE5E3F} = {8289AFAE-0933-40EF-9D19-6FFA2DB04837}
 		{FE64576E-E29D-4463-ABDA-93DB429A5F2F} = {7357A079-B54D-490F-AA91-1B7BDAFE5E3F}
 		{62782BA5-0E78-4354-9962-B5F2CF3B5204} = {7357A079-B54D-490F-AA91-1B7BDAFE5E3F}
+		{DB8AF4E5-71A1-4650-A881-9F08FCB53DAA} = {7357A079-B54D-490F-AA91-1B7BDAFE5E3F}
 	EndGlobalSection
 EndGlobal

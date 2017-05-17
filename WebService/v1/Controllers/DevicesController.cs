@@ -14,14 +14,14 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Controllers
         private static readonly IConfig config = new Config();
         private readonly IDevices devices = new Devices(config.ServicesConfig);
 
-        /// <summary>GetAsync a list of devices</summary>
+        /// <summary>Get a list of devices</summary>
         /// <returns>List of devices</returns>
         public async Task<DeviceListApiModel> GetAsync()
         {
             return new DeviceListApiModel(await this.devices.GetListAsync());
         }
 
-        /// <summary>GetAsync one device</summary>
+        /// <summary>Get one device</summary>
         /// <param name="id">Device Id</param>
         /// <returns>Device information</returns>
         public async Task<DeviceApiModel> GetAsync(string id)
