@@ -16,14 +16,14 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.Services
         Task<DeviceTwinServiceModel> GetAsync(string deviceId);
     }
 
-    public class DeviceTwins : IDeviceTwins
+    public sealed class DeviceTwins : IDeviceTwins
     {
         // Max is 1000
         private const int PageSize = 1000;
 
         private readonly RegistryManager registry;
 
-        public DeviceTwins(IConfig config)
+        public DeviceTwins(IServicesConfig config)
         {
             this.registry = RegistryManager.CreateFromConnectionString(config.HubConnString);
         }

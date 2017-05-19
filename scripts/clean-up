@@ -34,7 +34,7 @@ cleanup_tmp_files() {
         cd $APP_HOME
     done
 
-    echo "Done"
+    echo -e "\nDone"
 }
 
 cleanup_tmp_files

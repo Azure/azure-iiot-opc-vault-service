@@ -23,7 +23,7 @@ namespace WebService.Test.Controllers
             Assert.True(true);
         }
 
-        [Fact(Skip="work in progress"), Trait(Constants.Type, Constants.UnitTest)]
+        [Fact(Skip = "work in progress"), Trait(Constants.Type, Constants.UnitTest)]
         public void IncompleteTestNotReadyToRun()
         {
             Assert.True(false);

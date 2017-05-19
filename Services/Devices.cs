@@ -8,6 +8,10 @@ using Microsoft.Azure.Devices.Shared;
 using Microsoft.Azure.IoTSolutions.ProjectNameHere.Services.Models;
 using Microsoft.Azure.IoTSolutions.ProjectNameHere.Services.Runtime;
 
+// TODO: handle exceptions
+// TODO: logging
+// TODO: documentation
+
 namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.Services
 {
     public interface IDevices
@@ -17,13 +21,13 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.Services
         Task<DeviceServiceModel> CreateAsync(DeviceServiceModel toServiceModel);
     }
 
-    public class Devices : IDevices
+    public sealed class Devices : IDevices
     {
         private const int MaxGetList = 1000;
         private readonly RegistryManager registry;
         private readonly IDeviceTwins deviceTwins;
 
-        public Devices(IConfig config)
+        public Devices(IServicesConfig config)
         {
             this.registry = RegistryManager.CreateFromConnectionString(config.HubConnString);
             this.deviceTwins = new DeviceTwins(config);
@@ -50,8 +54,8 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.Services
             // TODO: do we need to fetch the twin and return it?
             if (device.Twin == null) return new DeviceServiceModel(azureDevice, (Twin)null);
 
-            // TODO: do we need to fetch the twin Etag first?
-            var azureTwin = await this.registry.UpdateTwinAsync(device.Id, device.Twin.ToAzureModel(), device.Twin.Etag);
+            // TODO: do we need to fetch the twin ETag first?
+            var azureTwin = await this.registry.UpdateTwinAsync(device.Id, device.Twin.ToAzureModel(), device.Twin.ETag);
             return new DeviceServiceModel(azureDevice, azureTwin);
         }
     }

@@ -7,25 +7,53 @@ using Newtonsoft.Json;
 
 namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Models
 {
-    public class StatusApiModel
+    public sealed class StatusApiModel
     {
-        [JsonProperty(PropertyName = "Message")]
-        public string Message { get; set; }
+        [JsonProperty(PropertyName = "Status", Order = 10)]
+        public string Status { get; set; }
 
-        [JsonProperty(PropertyName = "CurrentTime")]
-        public DateTime CurrentTime => DateTime.UtcNow;
+        [JsonProperty(PropertyName = "CurrentTime", Order = 20)]
+        public string CurrentTime => DateTimeOffset.UtcNow.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-        [JsonProperty(PropertyName = "StartTime")]
-        public DateTime StartTime => Uptime.Start;
+        [JsonProperty(PropertyName = "StartTime", Order = 30)]
+        public string StartTime => Uptime.Start.UtcDateTime.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-        [JsonProperty(PropertyName = "UpTime")]
-        public TimeSpan UpTime => Uptime.Duration;
+        [JsonProperty(PropertyName = "UpTime", Order = 40)]
+        public long UpTime => Convert.ToInt64(Uptime.Duration.TotalSeconds);
 
-        [JsonProperty(PropertyName = "$metadata")]
+        /// <summary>A property bag with details about the service</summary>
+        [JsonProperty(PropertyName = "Properties", Order = 50)]
+        public Dictionary<string, string> Properties => new Dictionary<string, string>
+        {
+            { "Foo", "Bar" },
+            { "Simulation", "on" },
+            { "Region", "US" },
+            { "DebugMode", "off" }
+        };
+
+        /// <summary>A property bag with details about the internal dependencies</summary>
+        [JsonProperty(PropertyName = "Dependencies", Order = 60)]
+        public Dictionary<string, string> Dependencies => new Dictionary<string, string>
+        {
+            { "IoTHub", "OK:...msg..." },
+            { "Storage", "OK:timeout after 3 secs" },
+            { "Auth", "ERROR:certificate expired" }
+        };
+
+        [JsonProperty(PropertyName = "$metadata", Order = 1000)]
         public Dictionary<string, string> Metadata => new Dictionary<string, string>
         {
             { "$type", "Status;" + Version.Name },
             { "$uri", "/" + Version.Name + "/status" }
         };
+
+        public StatusApiModel(bool isOk, string msg)
+        {
+            this.Status = isOk ? "OK" : "ERROR";
+            if (!string.IsNullOrEmpty(msg))
+            {
+                this.Status += ":" + msg;
+            }
+        }
     }
 }

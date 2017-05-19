@@ -38,7 +38,7 @@ goto :END
 :MISSING_DOCKER
     echo ERROR: 'docker' command not found.
     echo Install Docker and make sure the 'docker' command is in the PATH.
-    echo Docker installation: https://store.docker.com/editions/community/docker-ce-desktop-windows
+    echo Docker installation: https://www.docker.com/community-edition#/download
     exit /B 1
 
 :FAIL

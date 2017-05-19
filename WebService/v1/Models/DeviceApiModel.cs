@@ -7,9 +7,9 @@ using Newtonsoft.Json;
 
 namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Models
 {
-    public class DeviceApiModel
+    public sealed class DeviceApiModel
     {
-        [JsonProperty(PropertyName = "Etag")]
+        [JsonProperty(PropertyName = "ETag")]
         public string Etag { get; set; }
 
         [JsonProperty(PropertyName = "Id")]
@@ -19,7 +19,7 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Models
         public int C2DMessageCount { get; set; }
 
         [JsonProperty(PropertyName = "LastActivity")]
-        public DateTime LastActivity { get; set; }
+        public string LastActivity { get; set; }
 
         [JsonProperty(PropertyName = "IsConnected")]
         public bool IsConnected { get; set; }
@@ -28,7 +28,7 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Models
         public bool IsEnabled { get; set; }
 
         [JsonProperty(PropertyName = "LastStatusUpdated")]
-        public DateTime LastStatusUpdated { get; set; }
+        public string LastStatusUpdated { get; set; }
 
         [JsonProperty(PropertyName = "$metadata")]
         public Dictionary<string, string> Metadata => new Dictionary<string, string>
@@ -48,26 +48,26 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Models
         public DeviceApiModel(DeviceServiceModel device)
         {
             this.Id = device.Id;
-            this.Etag = device.Etag;
+            this.Etag = device.ETag;
             this.C2DMessageCount = device.C2DMessageCount;
-            this.LastActivity = device.LastActivity;
+            this.LastActivity = device.LastActivity.UtcDateTime.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'");
             this.IsConnected = device.Connected;
             this.IsEnabled = device.Enabled;
-            this.LastStatusUpdated = device.LastStatusUpdated;
-            this.Twin = new DeviceTwinApiModel(device.Id,device.Twin);
+            this.LastStatusUpdated = device.LastStatusUpdated.UtcDateTime.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'");
+            this.Twin = new DeviceTwinApiModel(device.Id, device.Twin);
         }
 
         public DeviceServiceModel ToServiceModel()
         {
             return new DeviceServiceModel
             (
-                etag: this.Etag,
+                eTag: this.Etag,
                 id: this.Id,
                 c2DMessageCount: this.C2DMessageCount,
-                lastActivity: this.LastActivity,
+                lastActivity: DateTimeOffset.Parse(this.LastActivity),
                 connected: this.IsConnected,
                 enabled: this.IsEnabled,
-                lastStatusUpdated: this.LastStatusUpdated,
+                lastStatusUpdated: DateTimeOffset.Parse(this.LastStatusUpdated),
                 twin: this.Twin?.ToServiceModel()
             );
         }

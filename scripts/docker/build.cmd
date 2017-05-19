@@ -27,6 +27,7 @@ call msbuild /m /p:Configuration=%CONFIGURATION%;Platform="Any CPU"
 IF NOT ERRORLEVEL 0 GOTO FAIL
 
 :: Build the container image
+copy scripts\docker\.dockerignore WebService\bin\%CONFIGURATION%\
 copy scripts\docker\Dockerfile WebService\bin\%CONFIGURATION%\
 cd WebService\bin\%CONFIGURATION%
 docker build --tag %DOCKER_IMAGE% --squash --compress --label "Tags=azure,iot,pcs,.NET" .
@@ -51,7 +52,7 @@ goto :END
 :MISSING_DOCKER
     echo ERROR: 'docker' command not found.
     echo Install Docker and make sure the 'docker' command is in the PATH.
-    echo Docker installation: https://store.docker.com/editions/community/docker-ce-desktop-windows
+    echo Docker installation: https://www.docker.com/community-edition#/download
     exit /B 1
 
 :FAIL

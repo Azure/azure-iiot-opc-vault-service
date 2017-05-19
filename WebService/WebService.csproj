@@ -95,11 +95,9 @@
     <Content Include="application.conf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include=".dockerignore">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="v1\Controllers\conventions.md" />
-    <Content Include="v1\Models\conventions.md" />
+    <Content Include="README.md" />
+    <Content Include="v1\Controllers\README.md" />
+    <Content Include="v1\Models\README.md" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Services\Services.csproj">

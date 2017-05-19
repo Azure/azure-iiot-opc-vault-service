@@ -3,6 +3,7 @@
 using System;
 using Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.Runtime;
 using Microsoft.Owin.Hosting;
+using Version = Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Version;
 
 namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService
 {
@@ -14,7 +15,7 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService
         static void Main(string[] args)
         {
             // TODO: remove workaround and support all versions
-            var options = new StartOptions("http://*:" + config.Port + "/" + v1.Version.Name);
+            var options = new StartOptions("http://*:" + config.Port + "/" + Version.Name);
             using (WebApp.Start<Startup>(options))
             {
                 Console.WriteLine("Server listening at http://*:" + config.Port);

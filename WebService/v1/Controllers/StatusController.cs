@@ -6,11 +6,11 @@ using Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Models;
 namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Controllers
 {
     [RoutePrefix(Version.Name)]
-    public class StatusController : ApiController
+    public sealed class StatusController : ApiController
     {
         public StatusApiModel Get()
         {
-            return new StatusApiModel { Message = "OK" };
+            return new StatusApiModel(true, "Alive and well");
         }
     }
 }

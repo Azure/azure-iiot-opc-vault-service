@@ -6,17 +6,17 @@ using Newtonsoft.Json;
 
 namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Models
 {
-    public class DeviceListApiModel
+    public sealed class DeviceListApiModel
     {
+        [JsonProperty(PropertyName = "Items")]
+        public List<DeviceApiModel> Items { get; set; }
+
         [JsonProperty(PropertyName = "$metadata")]
         public Dictionary<string, string> Metadata => new Dictionary<string, string>
         {
             { "$type", "DeviceList;" + Version.Name },
             { "$uri", "/" + Version.Name + "/devices" }
         };
-
-        [JsonProperty(PropertyName = "Items")]
-        public List<DeviceApiModel> Items { get; set; }
 
         public DeviceListApiModel(IEnumerable<DeviceServiceModel> devices)
         {

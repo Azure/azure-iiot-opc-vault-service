@@ -7,10 +7,10 @@ using Newtonsoft.Json.Linq;
 
 namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Models
 {
-    public class DeviceTwinApiModel
+    public sealed class DeviceTwinApiModel
     {
-        [JsonProperty(PropertyName = "Etag")]
-        public string Etag { get; set; }
+        [JsonProperty(PropertyName = "ETag")]
+        public string ETag { get; set; }
 
         [JsonProperty(PropertyName = "DeviceId")]
         public string DeviceId { get; set; }
@@ -38,7 +38,7 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Models
         {
             if (deviceTwin != null)
             {
-                this.Etag = deviceTwin.Etag;
+                this.ETag = deviceTwin.ETag;
                 this.DeviceId = deviceId;
                 this.DesiredProperties = deviceTwin.DesiredProperties;
                 this.ReportedProperties = deviceTwin.ReportedProperties;
@@ -51,7 +51,7 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Models
         {
             return new DeviceTwinServiceModel
             (
-                etag: this.Etag,
+                eTag: this.ETag,
                 deviceId: this.DeviceId,
                 desiredProperties: this.DesiredProperties,
                 reportedProperties: this.ReportedProperties,

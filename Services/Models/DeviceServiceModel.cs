@@ -6,46 +6,46 @@ using Microsoft.Azure.Devices.Shared;
 
 namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.Services.Models
 {
-    public class DeviceServiceModel
+    public sealed class DeviceServiceModel
     {
-        public string Etag { get; set; }
+        public string ETag { get; set; }
         public string Id { get; set; }
         public int C2DMessageCount { get; set; }
-        public DateTime LastActivity { get; set; }
+        public DateTimeOffset LastActivity { get; set; }
         public bool Connected { get; set; }
         public bool Enabled { get; set; }
-        public DateTime LastStatusUpdated { get; set; }
+        public DateTimeOffset LastStatusUpdated { get; set; }
         public DeviceTwinServiceModel Twin { get; set; }
 
         public DeviceServiceModel(
-            string etag,
+            string eTag,
             string id,
             int c2DMessageCount,
-            DateTime lastActivity,
+            DateTimeOffset lastActivity,
             bool connected,
             bool enabled,
-            DateTime lastStatusUpdated,
+            DateTimeOffset lastStatusUpdated,
             DeviceTwinServiceModel twin)
         {
-            this.Etag = etag;
+            this.ETag = eTag;
             this.Id = id;
             this.C2DMessageCount = c2DMessageCount;
-            this.LastActivity = lastActivity;
+            this.LastActivity = lastActivity.UtcDateTime;
             this.Connected = connected;
             this.Enabled = enabled;
-            this.LastStatusUpdated = lastStatusUpdated;
+            this.LastStatusUpdated = lastStatusUpdated.UtcDateTime;
             this.Twin = twin;
         }
 
         public DeviceServiceModel(Device azureDevice, DeviceTwinServiceModel twin) :
             this(
-                etag: azureDevice.ETag,
+                eTag: azureDevice.ETag,
                 id: azureDevice.Id,
                 c2DMessageCount: azureDevice.CloudToDeviceMessageCount,
-                lastActivity: azureDevice.LastActivityTime,
+                lastActivity: azureDevice.LastActivityTime.ToUniversalTime(),
                 connected: azureDevice.ConnectionState.Equals(DeviceConnectionState.Connected),
                 enabled: azureDevice.Status.Equals(DeviceStatus.Enabled),
-                lastStatusUpdated: azureDevice.StatusUpdatedTime,
+                lastStatusUpdated: azureDevice.StatusUpdatedTime.ToUniversalTime(),
                 twin: twin)
         {
         }
@@ -59,7 +59,7 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.Services.Models
         {
             return new Device(this.Id)
             {
-                ETag = this.Etag
+                ETag = this.ETag
             };
         }
     }

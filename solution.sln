@@ -33,13 +33,15 @@ ProjectSection(SolutionItems) = preProject
 	scripts\run = scripts\run
 	scripts\run.cmd = scripts\run.cmd
 	scripts\run.vbs = scripts\run.vbs
-	scripts\fix-perms.sh = scripts\fix-perms.sh
 	scripts\build-in-sandbox = scripts\build-in-sandbox
 	scripts\build-in-sandbox.cmd = scripts\build-in-sandbox.cmd
 	scripts\compile-in-sandbox = scripts\compile-in-sandbox
 	scripts\compile-in-sandbox.cmd = scripts\compile-in-sandbox.cmd
 	scripts\run-in-sandbox = scripts\run-in-sandbox
 	scripts\run-in-sandbox.cmd = scripts\run-in-sandbox.cmd
+	scripts\setup-env-vars = scripts\setup-env-vars
+	scripts\setup-env-vars.cmd = scripts\setup-env-vars.cmd
+	scripts\setup-env-vars.ps1 = scripts\setup-env-vars.ps1
 EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "git", "git", "{FE64576E-E29D-4463-ABDA-93DB429A5F2F}"
@@ -49,6 +51,7 @@ ProjectSection(SolutionItems) = preProject
 	scripts\git\pre-commit.sh = scripts\git\pre-commit.sh
 	scripts\git\setup = scripts\git\setup
 	scripts\git\setup.cmd = scripts\git\setup.cmd
+	scripts\git\fix-perms.sh = scripts\git\fix-perms.sh
 EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "iothub", "iothub", "{62782BA5-0E78-4354-9962-B5F2CF3B5204}"
@@ -63,6 +66,7 @@ EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docker", "docker", "{DB8AF4E5-71A1-4650-A881-9F08FCB53DAA}"
 ProjectSection(SolutionItems) = preProject
+	scripts\docker\.dockerignore = scripts\docker\.dockerignore
 	scripts\docker\Dockerfile = scripts\docker\Dockerfile
 	scripts\docker\build = scripts\docker\build
 	scripts\docker\build.cmd = scripts\docker\build.cmd

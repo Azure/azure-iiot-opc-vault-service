@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Akka.Configuration;
+using Microsoft.Azure.IoTSolutions.ProjectNameHere.Services.Runtime;
 
 namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.Runtime
 {
@@ -15,7 +16,7 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.Runtime
         int Port { get; }
 
         /// <summary>Service layer configuration</summary>
-        Services.Runtime.IConfig ServicesConfig { get; }
+        IServicesConfig ServicesConfig { get; }
     }
 
     /// <summary>Web service configuration</summary>
@@ -26,11 +27,11 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.Runtime
 
         public Config()
         {
-            var config = ConfigurationFactory.ParseString(GetHoconConfiguration());
+            var config = ConfigurationFactory.ParseString(GetHoconConfiguration("application.conf"));
 
             this.Port = config.GetInt(Namespace + Application + "webservice-port");
 
-            this.ServicesConfig = new Services.Runtime.Config
+            this.ServicesConfig = new ServicesConfig
             {
                 HubConnString = config.GetString(Namespace + Application + "iothub.connstring")
             };
@@ -40,7 +41,7 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.Runtime
         public int Port { get; }
 
         /// <summary>Service layer configuration</summary>
-        public Services.Runtime.IConfig ServicesConfig { get; }
+        public IServicesConfig ServicesConfig { get; }
 
         /// <summary>
         /// Read the `application.conf` HOCON file, enabling substitutions
@@ -49,22 +50,23 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.Runtime
         ///       [1] https://github.com/akkadotnet/HOCON/issues/40
         /// </summary>
         /// <returns>Configuration text content</returns>
-        private static string GetHoconConfiguration()
+        private static string GetHoconConfiguration(String file)
         {
-            // Pattern of env. vars in the configuration, e.g. ${VAR_NAME}
-            var pattern = @"\${(?'key'[a-zA-Z_][a-zA-Z0-9_]*)}";
-            var hocon = File.ReadAllText("application.conf") + "\n";
+            var hocon = File.ReadAllText(file);
 
             // Extract the name of all the substitutions required
+            // using the following pattern, e.g. ${VAR_NAME}
+            var pattern = @"\${(?'key'[a-zA-Z_][a-zA-Z0-9_]*)}";
             var keys = (from Match m
                              in Regex.Matches(hocon, pattern)
                              select m.Groups[1].Value).ToArray();
 
-            // Foreach substitution inject the env. var if available
+            // Foreach substitution inject the env. var if available, so that
+            // Akka substitution logic will use the value.
             foreach (DictionaryEntry x in Environment.GetEnvironmentVariables())
             {
                 if (keys.Contains(x.Key))
-                    hocon += x.Key + " : \"" + x.Value + "\"\n";
+                    hocon += "\n" + x.Key + " : \"" + x.Value + "\"";
             }
 
             return hocon;
