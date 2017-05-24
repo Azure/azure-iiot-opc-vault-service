@@ -5,10 +5,11 @@ using System.Web.Http;
 using Microsoft.Azure.IoTSolutions.ProjectNameHere.Services;
 using Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.Runtime;
 using Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Models;
+using Microsoft.Web.Http;
 
 namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Controllers
 {
-    [RoutePrefix(Version.Name)]
+    [ApiVersion(Version.Number)]
     public sealed class DevicesController : ApiController
     {
         private static readonly IConfig config = new Config();

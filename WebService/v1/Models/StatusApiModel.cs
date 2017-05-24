@@ -11,6 +11,9 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Models
     {
         private const string DateFormat = "yyyy-MM-dd'T'HH:mm:sszzz";
 
+        [JsonProperty(PropertyName = "Name", Order = 5)]
+        public string Name => "ProjectNameHere";
+
         [JsonProperty(PropertyName = "Status", Order = 10)]
         public string Status { get; set; }
 
@@ -37,16 +40,18 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Models
         [JsonProperty(PropertyName = "Dependencies", Order = 60)]
         public Dictionary<string, string> Dependencies => new Dictionary<string, string>
         {
+            { "IoTHubManagerAPI", "OK:...msg..." },
+            { "StorageAPI", "OK:timeout after 3 secs" },
+            { "AuthAPI", "ERROR:certificate expired" },
             { "IoTHub", "OK:...msg..." },
-            { "Storage", "OK:timeout after 3 secs" },
-            { "Auth", "ERROR:certificate expired" }
+            { "AAD", "ERROR:certificate expired" }
         };
 
         [JsonProperty(PropertyName = "$metadata", Order = 1000)]
         public Dictionary<string, string> Metadata => new Dictionary<string, string>
         {
-            { "$type", "Status;" + Version.Name },
-            { "$uri", "/" + Version.Name + "/status" }
+            { "$type", "Status;" + Version.Number },
+            { "$uri", "/" + Version.Path + "/status" }
         };
 
         public StatusApiModel(bool isOk, string msg)

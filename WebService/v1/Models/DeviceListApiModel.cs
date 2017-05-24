@@ -14,8 +14,8 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Models
         [JsonProperty(PropertyName = "$metadata")]
         public Dictionary<string, string> Metadata => new Dictionary<string, string>
         {
-            { "$type", "DeviceList;" + Version.Name },
-            { "$uri", "/" + Version.Name + "/devices" }
+            { "$type", "DeviceList;" + Version.Number },
+            { "$uri", "/" + Version.Path + "/devices" }
         };
 
         public DeviceListApiModel(IEnumerable<DeviceServiceModel> devices)

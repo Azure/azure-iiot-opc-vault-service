@@ -35,9 +35,9 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Models
         [JsonProperty(PropertyName = "$metadata")]
         public Dictionary<string, string> Metadata => new Dictionary<string, string>
         {
-            { "$type", "Device;" + Version.Name },
-            { "$uri", "/" + Version.Name + "/devices/" + this.Id },
-            { "$twin_uri", "/" + Version.Name + "/devices/" + this.Id + "/twin" }
+            { "$type", "Device;" + Version.Number },
+            { "$uri", "/" + Version.Path + "/devices/" + this.Id },
+            { "$twin_uri", "/" + Version.Path + "/devices/" + this.Id + "/twin" }
         };
 
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
