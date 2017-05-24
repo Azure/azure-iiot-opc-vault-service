@@ -9,14 +9,16 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Models
 {
     public sealed class StatusApiModel
     {
+        private const string DateFormat = "yyyy-MM-dd'T'HH:mm:sszzz";
+
         [JsonProperty(PropertyName = "Status", Order = 10)]
         public string Status { get; set; }
 
         [JsonProperty(PropertyName = "CurrentTime", Order = 20)]
-        public string CurrentTime => DateTimeOffset.UtcNow.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        public string CurrentTime => DateTimeOffset.UtcNow.ToString(DateFormat);
 
         [JsonProperty(PropertyName = "StartTime", Order = 30)]
-        public string StartTime => Uptime.Start.UtcDateTime.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        public string StartTime => Uptime.Start.ToString(DateFormat);
 
         [JsonProperty(PropertyName = "UpTime", Order = 40)]
         public long UpTime => Convert.ToInt64(Uptime.Duration.TotalSeconds);

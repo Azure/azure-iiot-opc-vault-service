@@ -9,6 +9,8 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Models
 {
     public sealed class DeviceApiModel
     {
+        private const string DateFormat = "yyyy-MM-dd'T'HH:mm:sszzz";
+
         [JsonProperty(PropertyName = "ETag")]
         public string Etag { get; set; }
 
@@ -50,10 +52,10 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Models
             this.Id = device.Id;
             this.Etag = device.ETag;
             this.C2DMessageCount = device.C2DMessageCount;
-            this.LastActivity = device.LastActivity.UtcDateTime.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'");
+            this.LastActivity = device.LastActivity.ToString(DateFormat);
             this.IsConnected = device.Connected;
             this.IsEnabled = device.Enabled;
-            this.LastStatusUpdated = device.LastStatusUpdated.UtcDateTime.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'");
+            this.LastStatusUpdated = device.LastStatusUpdated.ToString(DateFormat);
             this.Twin = new DeviceTwinApiModel(device.Id, device.Twin);
         }
 

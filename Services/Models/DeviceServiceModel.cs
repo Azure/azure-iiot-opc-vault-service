@@ -42,10 +42,10 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.Services.Models
                 eTag: azureDevice.ETag,
                 id: azureDevice.Id,
                 c2DMessageCount: azureDevice.CloudToDeviceMessageCount,
-                lastActivity: azureDevice.LastActivityTime.ToUniversalTime(),
+                lastActivity: new DateTimeOffset(azureDevice.LastActivityTime, TimeSpan.Zero),
                 connected: azureDevice.ConnectionState.Equals(DeviceConnectionState.Connected),
                 enabled: azureDevice.Status.Equals(DeviceStatus.Enabled),
-                lastStatusUpdated: azureDevice.StatusUpdatedTime.ToUniversalTime(),
+                lastStatusUpdated: new DateTimeOffset(azureDevice.StatusUpdatedTime, TimeSpan.Zero),
                 twin: twin)
         {
         }

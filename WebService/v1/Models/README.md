@@ -16,4 +16,5 @@ Web service models
 * Hard code JSON property names using an explicit JsonProperty attribute
   to avoid breaking the API contract in case of refactoring.
 * Use CamelCase for the API property names.
-* Format DateTime fields to UTC with format "yyyy-MM-dd'T'HH:mm:ss'Z'"
+* For DateTime fields use System.DateTimeOffset.
+* Format DateTime fields to UTC with format "yyyy-MM-dd'T'HH:mm:sszzz".
