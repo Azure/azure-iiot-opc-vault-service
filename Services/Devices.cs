@@ -27,10 +27,10 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.Services
         private readonly RegistryManager registry;
         private readonly IDeviceTwins deviceTwins;
 
-        public Devices(IServicesConfig config)
+        public Devices(IServicesConfig config, IDeviceTwins deviceTwins)
         {
             this.registry = RegistryManager.CreateFromConnectionString(config.HubConnString);
-            this.deviceTwins = new DeviceTwins(config);
+            this.deviceTwins = deviceTwins;
         }
 
         public async Task<IEnumerable<DeviceServiceModel>> GetListAsync()

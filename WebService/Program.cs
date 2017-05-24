@@ -9,9 +9,9 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService
     /// <summary>Application entry point</summary>
     public class Program
     {
-        static readonly IConfig config = new Config();
+        private static readonly IConfig config = new Config();
 
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             var options = new StartOptions("http://*:" + config.Port);
             using (WebApp.Start<Startup>(options))

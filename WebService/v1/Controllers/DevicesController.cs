@@ -12,8 +12,12 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Controllers
     [ApiVersion(Version.Number)]
     public sealed class DevicesController : ApiController
     {
-        private static readonly IConfig config = new Config();
-        private readonly IDevices devices = new Devices(config.ServicesConfig);
+        private readonly IDevices devices;
+
+        public DevicesController(IDevices devices)
+        {
+            this.devices = devices;
+        }
 
         /// <returns>List of devices</returns>
         public async Task<DeviceListApiModel> GetAsync()
