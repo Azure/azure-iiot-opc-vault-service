@@ -74,6 +74,11 @@ ProjectSection(SolutionItems) = preProject
 	scripts\docker\run.cmd = scripts\docker\run.cmd
 EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "content", "content", "{8BAA54A8-9C80-4446-83DD-CEBBC7B7BCD2}"
+ProjectSection(SolutionItems) = preProject
+	scripts\docker\content\run.sh = scripts\docker\content\run.sh
+EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -115,5 +120,6 @@ Global
 		{FE64576E-E29D-4463-ABDA-93DB429A5F2F} = {7357A079-B54D-490F-AA91-1B7BDAFE5E3F}
 		{62782BA5-0E78-4354-9962-B5F2CF3B5204} = {7357A079-B54D-490F-AA91-1B7BDAFE5E3F}
 		{DB8AF4E5-71A1-4650-A881-9F08FCB53DAA} = {7357A079-B54D-490F-AA91-1B7BDAFE5E3F}
+		{8BAA54A8-9C80-4446-83DD-CEBBC7B7BCD2} = {DB8AF4E5-71A1-4650-A881-9F08FCB53DAA}
 	EndGlobalSection
 EndGlobal

@@ -19,7 +19,7 @@ run() {
 
     echo "Starting web service..."
     cd $APP_HOME/WebService/bin/$CONFIGURATION/
-    mono Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.exe
+    mono Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.exe --background
 }
 
 run_in_sandbox() {

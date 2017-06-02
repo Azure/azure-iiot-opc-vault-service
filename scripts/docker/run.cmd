@@ -5,11 +5,11 @@ SET DOCKER_IMAGE="azureiotpcs/project-name-here-dotnet:0.1-SNAPSHOT"
 SET EXT_PORT=8080
 
 :: Check dependencies
-docker version > NUL
-IF NOT ERRORLEVEL 0 GOTO MISSING_DOCKER
+docker version > NUL 2>&1
+IF %ERRORLEVEL% NEQ 0 GOTO MISSING_DOCKER
 
 :: Start the application
-echo Starting microservice...
+echo Web service listening on port %EXT_PORT%
 docker run -it -p %EXT_PORT%:8080 -e PCS_IOTHUB_CONN_STRING=%PCS_IOTHUB_CONN_STRING% %DOCKER_IMAGE%
 
 :: - - - - - - - - - - - - - -

@@ -23,9 +23,15 @@ build_docker_image() {
     check_dependency_docker
 
     cd $APP_HOME
-    cp scripts/docker/.dockerignore WebService/bin/$CONFIGURATION/
-    cp scripts/docker/Dockerfile WebService/bin/$CONFIGURATION/
-    cd WebService/bin/$CONFIGURATION
+    rm -fR out/docker
+    mkdir -p out/docker/webservice
+
+    cp -pR WebService/bin/$CONFIGURATION/*       out/docker/webservice/
+    cp scripts/docker/.dockerignore              out/docker/
+    cp scripts/docker/Dockerfile                 out/docker/
+    cp scripts/docker/content/run.sh             out/docker/
+
+    cd out/docker/
     docker build --tag "$DOCKER_IMAGE" --squash --compress --label "Tags=azure,iot,pcs,.NET" .
 }
 

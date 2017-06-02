@@ -1,12 +1,13 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
 using System.Web.Http;
+using Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Filters;
 using Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Models;
 using Microsoft.Web.Http;
 
 namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Controllers
 {
-    [ApiVersion(Version.Number)]
+    [ApiVersion(Version.Number), ExceptionsFilter]
     public sealed class StatusController : ApiController
     {
         public StatusApiModel Get()

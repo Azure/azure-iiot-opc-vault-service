@@ -11,6 +11,19 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Models
     {
         private const string DateFormat = "yyyy-MM-dd'T'HH:mm:sszzz";
 
+        // Entity version number, maintained by the service, e.g. with
+        // a dedicated property in the storage entity schema.
+        // TODO: use the correct value, this is just a sample
+        private readonly long version = new Random().Next();
+
+        // When the entity was created (if supported by the storage)
+        // TODO: use the correct value, this is just a sample
+        private DateTimeOffset created = DateTimeOffset.MinValue;
+
+        // Last time the entity was modified (if supported by the storage)
+        // TODO: use the correct value, this is just a sample
+        private DateTimeOffset modified = DateTimeOffset.UtcNow;
+
         [JsonProperty(PropertyName = "ETag")]
         public string Etag { get; set; }
 
@@ -37,7 +50,10 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Models
         {
             { "$type", "Device;" + Version.Number },
             { "$uri", "/" + Version.Path + "/devices/" + this.Id },
-            { "$twin_uri", "/" + Version.Path + "/devices/" + this.Id + "/twin" }
+            { "$twin_uri", "/" + Version.Path + "/devices/" + this.Id + "/twin" },
+            { "$version", this.version.ToString() },
+            { "$created", this.created.ToString(DateFormat) },
+            { "$modified", this.modified.ToString(DateFormat) }
         };
 
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
@@ -47,7 +63,7 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Models
         {
         }
 
-        public DeviceApiModel(DeviceServiceModel device)
+        public DeviceApiModel(Device device)
         {
             this.Id = device.Id;
             this.Etag = device.ETag;
@@ -59,9 +75,9 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Models
             this.Twin = new DeviceTwinApiModel(device.Id, device.Twin);
         }
 
-        public DeviceServiceModel ToServiceModel()
+        public Device ToServiceModel()
         {
-            return new DeviceServiceModel
+            return new Device
             (
                 eTag: this.Etag,
                 id: this.Id,

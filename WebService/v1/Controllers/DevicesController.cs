@@ -3,13 +3,13 @@
 using System.Threading.Tasks;
 using System.Web.Http;
 using Microsoft.Azure.IoTSolutions.ProjectNameHere.Services;
-using Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.Runtime;
+using Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Filters;
 using Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Models;
 using Microsoft.Web.Http;
 
 namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Controllers
 {
-    [ApiVersion(Version.Number)]
+    [ApiVersion(Version.Number), ExceptionsFilter]
     public sealed class DevicesController : ApiController
     {
         private readonly IDevices devices;

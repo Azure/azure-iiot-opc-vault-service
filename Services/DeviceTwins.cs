@@ -11,9 +11,9 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.Services
 {
     public interface IDeviceTwins
     {
-        Task<IEnumerable<DeviceTwinServiceModel>> GetListAsync();
+        Task<IEnumerable<DeviceTwin>> GetListAsync();
 
-        Task<DeviceTwinServiceModel> GetAsync(string deviceId);
+        Task<DeviceTwin> GetAsync(string deviceId);
     }
 
     public sealed class DeviceTwins : IDeviceTwins
@@ -28,23 +28,23 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.Services
             this.registry = RegistryManager.CreateFromConnectionString(config.HubConnString);
         }
 
-        public async Task<IEnumerable<DeviceTwinServiceModel>> GetListAsync()
+        public async Task<IEnumerable<DeviceTwin>> GetListAsync()
         {
-            var result = new List<DeviceTwinServiceModel>();
+            var result = new List<DeviceTwin>();
             var query = this.registry.CreateQuery("SELECT * FROM devices", PageSize);
             while (query.HasMoreResults)
             {
                 var page = await query.GetNextAsTwinAsync();
-                result.AddRange(page.Select(x => new DeviceTwinServiceModel(x)));
+                result.AddRange(page.Select(x => new DeviceTwin(x)));
             }
 
             return result;
         }
 
-        public async Task<DeviceTwinServiceModel> GetAsync(string id)
+        public async Task<DeviceTwin> GetAsync(string id)
         {
             var twin = await this.registry.GetTwinAsync(id);
-            return twin == null ? null : new DeviceTwinServiceModel(twin);
+            return twin == null ? null : new DeviceTwin(twin);
         }
     }
 }

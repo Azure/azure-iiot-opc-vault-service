@@ -7,7 +7,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.Services.Models
 {
-    public sealed class DeviceTwinServiceModel
+    public sealed class DeviceTwin
     {
         public string ETag { get; set; }
         public string DeviceId { get; set; }
@@ -16,7 +16,7 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.Services.Models
         public Dictionary<string, JToken> ReportedProperties { get; set; }
         public Dictionary<string, JToken> Tags { get; set; }
 
-        public DeviceTwinServiceModel(
+        public DeviceTwin(
             string eTag,
             string deviceId,
             Dictionary<string, JToken> desiredProperties,
@@ -32,7 +32,7 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.Services.Models
             this.IsSimulated = isSimulated;
         }
 
-        public DeviceTwinServiceModel(Twin twin)
+        public DeviceTwin(Twin twin)
         {
             if (twin != null)
             {
@@ -83,7 +83,7 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.Services.Models
             {
                 try
                 {
-                    result.Add(foo.Key, (JToken)foo.Value);
+                    result.Add(foo.Key, (JToken) foo.Value);
                 }
                 catch (Exception e)
                 {

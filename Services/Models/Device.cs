@@ -6,7 +6,7 @@ using Microsoft.Azure.Devices.Shared;
 
 namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.Services.Models
 {
-    public sealed class DeviceServiceModel
+    public sealed class Device
     {
         public string ETag { get; set; }
         public string Id { get; set; }
@@ -15,9 +15,9 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.Services.Models
         public bool Connected { get; set; }
         public bool Enabled { get; set; }
         public DateTimeOffset LastStatusUpdated { get; set; }
-        public DeviceTwinServiceModel Twin { get; set; }
+        public DeviceTwin Twin { get; set; }
 
-        public DeviceServiceModel(
+        public Device(
             string eTag,
             string id,
             int c2DMessageCount,
@@ -25,7 +25,7 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.Services.Models
             bool connected,
             bool enabled,
             DateTimeOffset lastStatusUpdated,
-            DeviceTwinServiceModel twin)
+            DeviceTwin twin)
         {
             this.ETag = eTag;
             this.Id = id;
@@ -37,7 +37,7 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.Services.Models
             this.Twin = twin;
         }
 
-        public DeviceServiceModel(Device azureDevice, DeviceTwinServiceModel twin) :
+        public Device(Azure.Devices.Device azureDevice, DeviceTwin twin) :
             this(
                 eTag: azureDevice.ETag,
                 id: azureDevice.Id,
@@ -50,14 +50,14 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.Services.Models
         {
         }
 
-        public DeviceServiceModel(Device azureDevice, Twin azureTwin) :
-            this(azureDevice, new DeviceTwinServiceModel(azureTwin))
+        public Device(Azure.Devices.Device azureDevice, Twin azureTwin) :
+            this(azureDevice, new DeviceTwin(azureTwin))
         {
         }
 
-        public Device ToAzureModel()
+        public Azure.Devices.Device ToAzureModel()
         {
-            return new Device(this.Id)
+            return new Azure.Devices.Device(this.Id)
             {
                 ETag = this.ETag
             };
