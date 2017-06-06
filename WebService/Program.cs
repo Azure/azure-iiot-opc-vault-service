@@ -9,7 +9,7 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService
     /// <summary>Application entry point</summary>
     public class Program
     {
-        private static readonly IConfig config = new Config();
+        private static readonly IConfig config = new Config(new ConfigData());
 
         public static void Main(string[] args)
         {

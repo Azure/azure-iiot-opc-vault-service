@@ -134,7 +134,7 @@ setup --no-sandbox
 
 If you use ReSharper or Rider, you can load the code style settings from
 the repository, stored in
-[solution.sln.DotSettings](solution.sln.DotSettings)
+[project-name-here.sln.DotSettings](project-name-here.sln.DotSettings)
 
 Some quick notes about the project code style:
 
