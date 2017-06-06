@@ -8,3 +8,6 @@
 
 # see: Shared access policies => key name => Connection string
 $env:IOTHUB_CONN_STRING = '...'
+
+# The port where IoT Hub Manager web service is listening
+$env:PCS_PROJECTNAMEHERE_WEBSERVICE_PORT = '900X'

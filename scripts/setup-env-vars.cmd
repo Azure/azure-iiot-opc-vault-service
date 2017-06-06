@@ -8,3 +8,6 @@
 
 :: see: Shared access policies => key name => Connection string
 SET IOTHUB_CONN_STRING = "..."
+
+:: The port where IoT Hub Manager web service is listening
+SET PCS_PROJECTNAMEHERE_WEBSERVICE_PORT = "900X"
