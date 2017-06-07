@@ -17,6 +17,8 @@ run() {
     nuget restore
     msbuild /m /p:Configuration=$CONFIGURATION /verbosity:quiet
 
+    ./scripts/env-vars-check
+
     echo "Starting web service..."
     cd $APP_HOME/WebService/bin/$CONFIGURATION/
     mono Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.exe --background

@@ -30,7 +30,9 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.Runtime
 
             this.ServicesConfig = new ServicesConfig
             {
-                HubConnString = configData.GetString(Application + "iothub.connstring")
+                HubConnString = configData.GetString(Application + "iothub.connstring"),
+                IoTHubManagerHost = configData.GetString("iothubmanager.webservice.host"),
+                IoTHubManagerPort = configData.GetInt("iothubmanager.webservice.port")
             };
         }
     }

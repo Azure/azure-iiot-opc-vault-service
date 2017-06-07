@@ -15,8 +15,21 @@ mkdir .cache\sandbox\.config 2>NUL
 mkdir .cache\sandbox\.dotnet 2>NUL
 mkdir .cache\sandbox\.nuget 2>NUL
 
+:: Check settings
+call .\scripts\env-vars-check.cmd
+IF %ERRORLEVEL% NEQ 0 GOTO FAIL
+
 :: Start the sandbox and run the application
+:: Note: the ports used must be exposed by `code-builder-dotnet`
+::       see https://hub.docker.com/r/azureiotpcs/code-builder-dotnet
+:: Some settings are used to connect to an external dependency, e.g. Azure IoT Hub and IoT Hub Manager API
+:: Depending on which settings and which dependencies are needed, edit the list of variables
 docker run -it ^
+    -p %PCS_PROJECTNAMEHERE_WEBSERVICE_PORT%:8080 ^
+    -e "PCS_PROJECTNAMEHERE_WEBSERVICE_PORT=8080" ^
+    -e "PCS_IOTHUB_CONN_STRING=%PCS_IOTHUB_CONN_STRING%" ^
+    -e "PCS_IOTHUBMANAGER_WEBSERVICE_HOST=%PCS_IOTHUBMANAGER_WEBSERVICE_HOST%" ^
+    -e "PCS_IOTHUBMANAGER_WEBSERVICE_PORT=%PCS_IOTHUBMANAGER_WEBSERVICE_PORT%" ^
     -v %APP_HOME%\.cache\sandbox\.config:/root/.config ^
     -v %APP_HOME%\.cache\sandbox\.dotnet:/root/.dotnet ^
     -v %APP_HOME%\.cache\sandbox\.nuget:/root/.nuget ^

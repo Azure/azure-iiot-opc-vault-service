@@ -5,6 +5,7 @@ using System.Collections;
 using System.Configuration;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Microsoft.Azure.IoTSolutions.ProjectNameHere.Services.Exceptions;
 
 namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.Runtime
 {
@@ -24,7 +25,14 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.Runtime
 
         public int GetInt(string key)
         {
-            return Convert.ToInt32(this.GetString(key));
+            try
+            {
+                return Convert.ToInt32(this.GetString(key));
+            }
+            catch (Exception e)
+            {
+                throw new InvalidConfigurationException($"Unable to load configuration value for '{key}'", e);
+            }
         }
 
         private static string ReplaceEnvironmentVariables(string value)

@@ -15,6 +15,7 @@ ProjectSection(SolutionItems) = preProject
 	LICENSE = LICENSE
 	README.md = README.md
 	DEVELOPMENT.md = DEVELOPMENT.md
+	project-name-here.sln.DotSettings = project-name-here.sln.DotSettings
 EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Services", "Services\Services.csproj", "{786A5B9B-98EE-4B73-9FE3-2080B70007AF}"
@@ -39,9 +40,9 @@ ProjectSection(SolutionItems) = preProject
 	scripts\compile-in-sandbox.cmd = scripts\compile-in-sandbox.cmd
 	scripts\run-in-sandbox = scripts\run-in-sandbox
 	scripts\run-in-sandbox.cmd = scripts\run-in-sandbox.cmd
-	scripts\setup-env-vars = scripts\setup-env-vars
-	scripts\setup-env-vars.cmd = scripts\setup-env-vars.cmd
-	scripts\setup-env-vars.ps1 = scripts\setup-env-vars.ps1
+	scripts\env-vars-check = scripts\env-vars-check
+	scripts\env-vars-check.cmd = scripts\env-vars-check.cmd
+	scripts\env-vars-setup = scripts\env-vars-setup
 EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "git", "git", "{FE64576E-E29D-4463-ABDA-93DB429A5F2F}"

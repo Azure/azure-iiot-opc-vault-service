@@ -16,9 +16,10 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService
             var options = new StartOptions("http://*:" + config.Port);
             using (WebApp.Start<Startup>(options))
             {
-                Console.WriteLine("Web service started, process ID: " + Uptime.ProcessId);
-                Console.WriteLine($"[{Uptime.ProcessId}] Listening at http://*:" + config.Port);
-                Console.WriteLine($"[{Uptime.ProcessId}] Health check: http://127.0.0.1:" + config.Port + "/" + v1.Version.Path + "/status");
+                Console.WriteLine($"[{Uptime.ProcessId}] Web service started, process ID: " + Uptime.ProcessId);
+                Console.WriteLine($"[{Uptime.ProcessId}] Web service listening on port " + config.Port);
+                Console.WriteLine($"[{Uptime.ProcessId}] Web service health check at: http://127.0.0.1:" + config.Port + "/" + v1.Version.Path + "/status");
+                Console.WriteLine($"[{Uptime.ProcessId}] IoT Hub manager API at " + config.ServicesConfig.IoTHubManagerHost +":"+ config.ServicesConfig.IoTHubManagerPort);
 
                 // Production mode: keep the service alive until killed
                 if (args.Length > 0 && args[0] == "--background")
