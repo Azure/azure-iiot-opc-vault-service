@@ -2,10 +2,10 @@
 
 using System;
 using System.Collections;
-using System.Configuration;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Microsoft.Azure.IoTSolutions.ProjectNameHere.Services.Exceptions;
+using Microsoft.Extensions.Configuration;
 
 namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.Runtime
 {
@@ -17,9 +17,22 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.Runtime
 
     public class ConfigData : IConfigData
     {
+        private readonly IConfigurationRoot configuration;
+
+        public ConfigData()
+        {
+            // More info about configuration at
+            // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration
+
+            var configurationBuilder = new ConfigurationBuilder();
+            configurationBuilder.AddIniFile("appsettings.ini", optional: true, reloadOnChange: true);
+
+            this.configuration = configurationBuilder.Build();
+        }
+
         public string GetString(string key)
         {
-            var value = ConfigurationManager.AppSettings[key];
+            var value = this.configuration.GetValue<string>(key);
             return ReplaceEnvironmentVariables(value);
         }
 

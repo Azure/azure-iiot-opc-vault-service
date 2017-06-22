@@ -7,6 +7,7 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.Services.Runtime
         string HubConnString { get; set; }
         string IoTHubManagerHost { get; set; }
         int IoTHubManagerPort { get; set; }
+        int IoTHubManagerTimeout { get; set; }
     }
 
     public class ServicesConfig : IServicesConfig
@@ -14,5 +15,6 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.Services.Runtime
         public string HubConnString { get; set; }
         public string IoTHubManagerHost { get; set; }
         public int IoTHubManagerPort { get; set; }
+        public int IoTHubManagerTimeout { get; set; }
     }
 }

@@ -17,11 +17,14 @@ mkdir .cache\sandbox\.nuget > NUL 2>&1
 
 :: Start the sandbox and execute the build script
 docker run ^
+    -e "PCS_IOTHUBMANAGER_WEBSERVICE_HOST=127.0.0.1" ^
+    -e "PCS_IOTHUBMANAGER_WEBSERVICE_PORT=8080" ^
+    -e "PCS_IOTHUB_CONN_STRING=%PCS_IOTHUB_CONN_STRING%" ^
     -v %APP_HOME%\.cache\sandbox\.config:/root/.config ^
     -v %APP_HOME%\.cache\sandbox\.dotnet:/root/.dotnet ^
     -v %APP_HOME%\.cache\sandbox\.nuget:/root/.nuget ^
     -v %APP_HOME%:/opt/code ^
-    azureiotpcs/code-builder-dotnet:1.0 /opt/scripts/build
+    azureiotpcs/code-builder-dotnet:1.0-dotnetcore /opt/scripts/build
 
 :: Error 125 typically triggers on Windows if the drive is not shared
 IF %ERRORLEVEL% EQU 125 GOTO DOCKER_SHARE

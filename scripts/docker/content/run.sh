@@ -4,4 +4,4 @@ cd /app/
 
 cd webservice
 
-mono Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.exe --background
+dotnet Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.dll

@@ -1,16 +1,17 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Net;
-using System.Net.Http;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Web.Http;
-using System.Web.Http.Filters;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.Azure.IoTSolutions.ProjectNameHere.Services.Diagnostics;
 using Microsoft.Azure.IoTSolutions.ProjectNameHere.Services.Exceptions;
 using Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Exceptions;
+using Microsoft.Extensions.DependencyModel;
 using Newtonsoft.Json;
 
 namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Filters
@@ -24,41 +25,49 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Filters
     /// </summary>
     public class ExceptionsFilterAttribute : ExceptionFilterAttribute
     {
-        public override void OnException(HttpActionExecutedContext context)
+        private readonly ILogger log;
+
+        public ExceptionsFilterAttribute(ILogger logger)
+        {
+            this.log = logger;
+        }
+
+        public override void OnException(ExceptionContext context)
         {
             if (context.Exception is ResourceNotFoundException)
             {
-                context.Response = this.GetResponse(HttpStatusCode.NotFound, context.Exception);
+                context.Result = this.GetResponse(HttpStatusCode.NotFound, context.Exception);
             }
             else if (context.Exception is ConflictingResourceException
                      || context.Exception is ResourceOutOfDateException)
             {
-                context.Response = this.GetResponse(HttpStatusCode.Conflict, context.Exception);
+                context.Result = this.GetResponse(HttpStatusCode.Conflict, context.Exception);
             }
             else if (context.Exception is BadRequestException
                      || context.Exception is InvalidInputException)
             {
-                context.Response = this.GetResponse(HttpStatusCode.BadRequest, context.Exception);
+                context.Result = this.GetResponse(HttpStatusCode.BadRequest, context.Exception);
             }
             else if (context.Exception is InvalidConfigurationException)
             {
-                context.Response = this.GetResponse(HttpStatusCode.InternalServerError, context.Exception);
-            }
-            else if (context.Exception is HttpResponseException)
-            {
-                context.Response = ((HttpResponseException) context.Exception).Response;
+                context.Result = this.GetResponse(HttpStatusCode.InternalServerError, context.Exception);
             }
             else if (context.Exception != null)
             {
-                context.Response = this.GetResponse(HttpStatusCode.InternalServerError, context.Exception, true);
+                context.Result = this.GetResponse(HttpStatusCode.InternalServerError, context.Exception, true);
             }
             else
             {
+                this.log.Error("Unknown exception", () => new
+                {
+                    ExceptionType = context.Exception.GetType().FullName,
+                    context.Exception.Message
+                });
                 base.OnException(context);
             }
         }
 
-        public override Task OnExceptionAsync(HttpActionExecutedContext context, CancellationToken token)
+        public override Task OnExceptionAsync(ExceptionContext context)
         {
             try
             {
@@ -66,17 +75,13 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Filters
             }
             catch (Exception)
             {
-                return base.OnExceptionAsync(context, token);
+                return base.OnExceptionAsync(context);
             }
 
-            return Task.FromResult(new VoidTask());
+            return Task.FromResult(new object());
         }
 
-        private struct VoidTask
-        {
-        }
-
-        private HttpResponseMessage GetResponse(
+        private ObjectResult GetResponse(
             HttpStatusCode code,
             Exception e,
             bool stackTrace = false)
@@ -101,13 +106,13 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Filters
                 }
             }
 
-            return new HttpResponseMessage(code)
-            {
-                Content = new StringContent(
-                    JsonConvert.SerializeObject(error),
-                    Encoding.UTF8,
-                    "application/json")
-            };
+            var result = new ObjectResult(error);
+            result.StatusCode = (int) code;
+            result.Formatters.Add(new JsonOutputFormatter(new JsonSerializerSettings(), ArrayPool<char>.Shared));
+
+            this.log.Error(e.Message, () => new { result.StatusCode });
+
+            return result;
         }
     }
 }

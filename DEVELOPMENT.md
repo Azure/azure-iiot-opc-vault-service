@@ -20,9 +20,9 @@ The [scripts](scripts) folder includes some scripts for frequent tasks:
 ### Sandbox
 
 Most of the scripts assume you have configured your development environment,
-with tools like MSBuild, Nuget, .NET Core, Mono and Docker. You can avoid
-installing all of these tools, and install only Docker, and use the scripts
-with `-in-sandbox` suffix:
+with tools like .NET Core and Docker. You can avoid installing .NET Core,
+and install only Docker, and use the scripts with `-in-sandbox` suffix,
+for example:
 
 * `build-in-sandbox`: like `build` but executes the task inside of a Docker
    container.
@@ -37,16 +37,10 @@ The Docker images used for the sandbox is hosted on Docker Hub
 Configuration
 =============
 
-The service configuration is stored using Akka's
-[HOCON](http://getakka.net/docs/concepts/configuration)
-format in `application.conf`.
-
-The HOCON format is a human readable format, very close to JSON, with some
-useful features:
-
-* Ability to write comments
-* Support for substitutions, e.g. referencing environment variables
-* Supports JSON notation
+The service configuration is stored using ASP.NET Core configuration
+adapters, in `appsettings.ini`. The INI format allows to store values in a
+readable format, with comments. The application also supports inserting
+environment variables, such as credentials and networking details.
 
 Azure IoT Hub setup
 ===================
@@ -70,18 +64,11 @@ Development setup
 
 ## .NET setup
 
-The project workflow is managed via .NET Framework 4.6.2+ and Mono 5.x.
-We recommend to install Mono also in Windows, where Mono is used for the
-Git pre-commit hook.
+The project workflow is managed via .NET Core 1.0.4, which you need
+to install in your environment, so that you can run all the scripts
+and ensure that your IDE works as expected.
 
-On the other hand you can install just Docker and rely on the builder
-sandbox if you don't want to install all these dependencies.
-
-Some scripts also require .NET Core, where we are migrating the solution.
-
-* [.NET for Windows](https://support.microsoft.com/help/3151802/the-.net-framework-4.6.2-web-installer-for-windows)
-* [Mono 5](http://www.mono-project.com/download)
-* [.NET Core](https://dotnet.github.io/)
+* [.NET Core](https://dotnet.github.io)
 
 We provide also a
 [Java version](https://github.com/Azure/PROJECT-NAME-HERE-java)
@@ -91,10 +78,10 @@ of this project and other Azure IoT PCS components.
 
 Here are some IDE that you can use to work on Azure IoT PCS:
 
-* [Visual Studio](https://www.visualstudio.com/)
-* [IntelliJ Rider](https://www.jetbrains.com/rider)
-* [Visual Studio Code](https://code.visualstudio.com/)
+* [Visual Studio](https://www.visualstudio.com)
 * [Visual Studio for Mac](https://www.visualstudio.com/vs/visual-studio-mac)
+* [IntelliJ Rider](https://www.jetbrains.com/rider)
+* [Visual Studio Code](https://code.visualstudio.com)
 
 ## Git setup
 
@@ -117,10 +104,14 @@ cd scripts/git
 setup --with-sandbox
 ```
 
+With this configuration, when checking in files, git will verify that the
+application passes all the tests, running the build and the tests inside
+a Docker container configured with all the development requirements.
+
 #### Pre-commit hook without sandbox
 
-Note: the hook requires [Mono 5](http://www.mono-project.com/download),
-Nuget and MSBuild in the system PATH.
+Note: the hook without sandbox requires [.NET Core](https://dotnet.github.io)
+in the system PATH.
 
 To setup the included hooks, open a Windows/Linux/MacOS console and execute:
 
@@ -129,6 +120,10 @@ cd PROJECT-FOLDER
 cd scripts/git
 setup --no-sandbox
 ```
+
+With this configuration, when checking in files, git will verify that the
+application passes all the tests, running the build and the tests in your
+workstation, using the tools installed in your OS.
 
 ## Code style
 

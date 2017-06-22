@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Azure.Devices;
+using Microsoft.Azure.IoTSolutions.ProjectNameHere.Services.Diagnostics;
 using Microsoft.Azure.IoTSolutions.ProjectNameHere.Services.Models;
 using Microsoft.Azure.IoTSolutions.ProjectNameHere.Services.Runtime;
 
@@ -22,10 +23,16 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.Services
         private const int PageSize = 1000;
 
         private readonly RegistryManager registry;
+        private readonly ILogger log;
 
-        public DeviceTwins(IServicesConfig config)
+        public DeviceTwins(
+            IServicesConfig config,
+            ILogger logger)
         {
             this.registry = RegistryManager.CreateFromConnectionString(config.HubConnString);
+            this.log = logger;
+
+            this.log.Debug("Creating new instance of `DeviceTwins` service", () => { });
         }
 
         public async Task<IEnumerable<DeviceTwin>> GetListAsync()

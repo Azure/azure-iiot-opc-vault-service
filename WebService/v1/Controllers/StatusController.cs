@@ -1,18 +1,29 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
-using System.Web.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.IoTSolutions.ProjectNameHere.Services.Diagnostics;
 using Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Filters;
 using Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Models;
-using Microsoft.Web.Http;
 
 namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Controllers
 {
-    [ApiVersion(Version.Number), ExceptionsFilter]
-    public sealed class StatusController : ApiController
+    [Route(Version.Path + "/[controller]"), TypeFilter(typeof(ExceptionsFilterAttribute))]
+    public sealed class StatusController : Controller
     {
+        private readonly ILogger log;
+
+        public StatusController(ILogger logger)
+        {
+            this.log = logger;
+        }
+
         public StatusApiModel Get()
         {
-            return new StatusApiModel(true, "Alive and well");
+            // TODO: calculate the actual service status
+            var isOk = true;
+
+            this.log.Info("Service status request", () => new { Healthy = isOk });
+            return new StatusApiModel(isOk, "Alive and well");
         }
     }
 }
