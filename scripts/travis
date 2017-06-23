@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Example usage (see "travis help" for more information:
+# Example usage (see "travis help" for more information):
 #  travis help
 #  travis login --pro
 #  travis whoami --pro
