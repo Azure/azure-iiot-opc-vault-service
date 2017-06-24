@@ -3,13 +3,13 @@ Web service
 
 ## ASP.NET Web API 2 and OWIN
 
-The web service is built on ASP.NET Web API 2, and hosted via OWIN, i.e. IIS is
+The web service is built on ASP.NET Web API and hosted via Kestrel, i.e. IIS is
 not strictly required to run the service, although it would be possible if required.
 More information can be found here:
 
-* [Getting Started with ASP.NET Web API 2](https://docs.microsoft.com/en-us/aspnet/web-api/overview/getting-started-with-aspnet-web-api/tutorial-your-first-web-api)
-* [Routing in ASP.NET Web API](https://docs.microsoft.com/en-us/aspnet/web-api/overview/web-api-routing-and-actions/routing-in-aspnet-web-api)
-* [Use OWIN to Self-Host ASP.NET Web API 2](https://docs.microsoft.com/en-us/aspnet/web-api/overview/hosting-aspnet-web-api/use-owin-to-self-host-web-api)
+* [Building Web APIs](https://docs.microsoft.com/en-us/aspnet/core/mvc/web-api)
+* [Routing in ASP.NET Core](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/routing)
+* [Introduction to Kestrel web server implementation in ASP.NET Core](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/servers/kestrel)
 
 ## Guidelines
 
