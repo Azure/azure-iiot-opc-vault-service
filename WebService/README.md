@@ -1,7 +1,7 @@
 Web service
 ===========
 
-## ASP.NET Web API 2 and OWIN
+## ASP.NET Web API and Kestrel
 
 The web service is built on ASP.NET Web API and hosted via Kestrel, i.e. IIS is
 not strictly required to run the service, although it would be possible if required.
