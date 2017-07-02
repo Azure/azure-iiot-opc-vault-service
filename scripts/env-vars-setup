@@ -3,6 +3,7 @@
 #  Prepare the environment variables used by the application.
 
 # The port where this project's web service is listening
+# See https://github.com/Azure/azure-iot-pcs-team/wiki/Architecture-draft
 export PCS_PROJECTNAMEHERE_WEBSERVICE_PORT="900X"
 
 # Some settings are used to connect to an external dependency, e.g. Azure IoT Hub and IoT Hub Manager API
@@ -11,8 +12,5 @@ export PCS_PROJECTNAMEHERE_WEBSERVICE_PORT="900X"
 # see: Shared access policies => key name => Connection string
 export IOTHUB_CONN_STRING="..."
 
-# The host where IoT Hub Manager web service is listening
-export PCS_IOTHUBMANAGER_WEBSERVICE_HOST="127.0.0.1"
-
-# The port where IoT Hub Manager web service is listening
-export PCS_IOTHUBMANAGER_WEBSERVICE_PORT="9001"
+# The URL where IoT Hub Manager web service is listening
+export PCS_IOTHUBMANAGER_WEBSERVICE_ADDRESS="http://127.0.0.1:9001/v1"

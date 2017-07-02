@@ -13,12 +13,7 @@ if [[ -z "$PCS_IOTHUB_CONN_STRING" ]]; then
     exit -1
 fi
 
-if [[ -z "$PCS_IOTHUBMANAGER_WEBSERVICE_HOST" ]]; then
-    echo "Error: the PCS_IOTHUBMANAGER_WEBSERVICE_HOST environment variable is not defined."
-    exit -1
-fi
-
-if [[ -z "$PCS_IOTHUBMANAGER_WEBSERVICE_PORT" ]]; then
-    echo "Error: the PCS_IOTHUBMANAGER_WEBSERVICE_PORT environment variable is not defined."
+if [[ -z "$PCS_IOTHUBMANAGER_WEBSERVICE_ADDRESS" ]]; then
+    echo "Error: the PCS_IOTHUBMANAGER_WEBSERVICE_ADDRESS environment variable is not defined."
     exit -1
 fi

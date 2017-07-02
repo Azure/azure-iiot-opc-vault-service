@@ -21,7 +21,16 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.Runtime
     /// <summary>Web service configuration</summary>
     public class Config : IConfig
     {
-        private const string Application = "projectnamehere:";
+        private const string ApplicationKey = "projectnamehere:";
+        private const string PortKey = ApplicationKey + "webservice_port";
+        private const string SomeFolderKey = ApplicationKey + "some_folder_path";
+
+        private const string IoTHubKey = "iothub:";
+        private const string IoTHubConnStringKey = IoTHubKey + "connstring";
+
+        private const string IoTHubManagerKey = "iothubmanager:";
+        private const string IoTHubManagerApiUrlKey = IoTHubManagerKey + "webservice_url";
+        private const string IoTHubManagerApiTimeoutKey = IoTHubManagerKey + "webservice_timeout";
 
         /// <summary>Web service listening port</summary>
         public int Port { get; }
@@ -34,15 +43,14 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.Runtime
 
         public Config(IConfigData configData)
         {
-            this.Port = configData.GetInt(Application + "webservice_port");
-            this.SomeFolder = MapRelativePath(configData.GetString(Application + "some_folder_path"));
+            this.Port = configData.GetInt(PortKey);
+            this.SomeFolder = MapRelativePath(configData.GetString(SomeFolderKey));
 
             this.ServicesConfig = new ServicesConfig
             {
-                HubConnString = configData.GetString("iothub:connstring"),
-                IoTHubManagerHost = configData.GetString("iothubmanager:webservice_host"),
-                IoTHubManagerPort = configData.GetInt("iothubmanager:webservice_port"),
-                IoTHubManagerTimeout = configData.GetInt("iothubmanager:webservice_timeout")
+                HubConnString = configData.GetString(IoTHubConnStringKey),
+                IoTHubManagerApiUrl = configData.GetString(IoTHubManagerApiUrlKey),
+                IoTHubManagerTimeout = configData.GetInt(IoTHubManagerApiTimeoutKey)
             };
         }
 

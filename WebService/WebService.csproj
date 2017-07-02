@@ -11,20 +11,16 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Services\Services.csproj">
-      <Project>{bcb952c1-c952-480c-b387-6e06fa82e3f8}</Project>
-      <Name>Services</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Services\Services.csproj">
-      <Project>{786a5b9b-98ee-4b73-9fe3-2080b70007af}</Project>
-      <Name>Services</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="Autofac" Version="4.6.0" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.1.0" />
     <PackageReference Include="Microsoft.AspNetCore" Version="1.1.2" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="1.1.3" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Ini" Version="1.1.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Services\Services.csproj">
+      <Project>{786a5b9b-98ee-4b73-9fe3-2080b70007af}</Project>
+      <Name>Services</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>

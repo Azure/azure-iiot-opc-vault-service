@@ -52,6 +52,7 @@ ProjectSection(SolutionItems) = preProject
 	scripts\git\setup = scripts\git\setup
 	scripts\git\setup.cmd = scripts\git\setup.cmd
 	scripts\git\fix-perms.sh = scripts\git\fix-perms.sh
+	scripts\git\.functions.sh = scripts\git\.functions.sh
 EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "iothub", "iothub", "{62782BA5-0E78-4354-9962-B5F2CF3B5204}"
