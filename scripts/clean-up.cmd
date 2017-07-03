@@ -28,9 +28,6 @@ rmdir /s /q .\WebService\obj
 rmdir /s /q .\WebService.Test\bin
 rmdir /s /q .\WebService.Test\obj
 
-:: Clean up .cache
-rmdir /s /q .\.cache
-
 echo Done.
 
 :: - - - - - - - - - - - - - -

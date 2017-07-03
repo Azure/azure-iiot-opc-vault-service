@@ -18,9 +18,7 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\WebService\WebService.csproj">
-      <Project>{1e925f63-0c63-4b78-ac97-40ce4f1aefe1}</Project>
-      <Name>WebService</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\WebService\WebService.csproj" />
+    <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>
 </Project>
