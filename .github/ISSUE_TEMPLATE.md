@@ -40,22 +40,19 @@
 ```
 using Xunit;
 
-namespace Services.Test
+public class MyTest
 {
-    public class MyTest
+    [Fact]
+    public void TestToReproduceIssue()
     {
-        [Fact]
-        public void TestToReproduceIssue()
-        {
-            // Arrange
-            ...
+        // Arrange
+        ...
 
-            // Act
-            ...
+        // Act
+        ...
 
-            // Assert
-            ...
-        }
+        // Assert
+        ...
     }
 }
 ```
