@@ -3,7 +3,7 @@
 #  Prepare the environment variables used by the application.
 
 # The port where this project's web service is listening
-# See https://github.com/Azure/azure-iot-pcs-team/wiki/Architecture-draft
+# See https://github.com/Azure/azure-iot-pcs-remote-monitoring-dotnet/wiki/Infrastructure
 export PCS_PROJECTNAMEHERE_WEBSERVICE_PORT="900X"
 
 # Some settings are used to connect to an external dependency, e.g. Azure IoT Hub and IoT Hub Manager API
