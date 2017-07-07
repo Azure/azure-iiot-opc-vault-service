@@ -19,7 +19,8 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.Services.Exceptions
         {
         }
 
-        public InvalidConfigurationException(string message, Exception innerException) : base(message, innerException)
+        public InvalidConfigurationException(string message, Exception innerException)
+            : base(message, innerException)
         {
         }
     }

@@ -1,11 +1,9 @@
-@ECHO off
+@ECHO off & setlocal enableextensions enabledelayedexpansion
 
 :: Usage:
 :: Run the service in the local environment:  scripts\run
 :: Run the service inside a Docker container: scripts\run -s
 :: Run the service inside a Docker container: scripts\run --in-sandbox
-
-setlocal
 
 :: Debug|Release
 SET CONFIGURATION=Release
@@ -61,8 +59,8 @@ IF "%1"=="--in-sandbox" GOTO :RunInSandbox
 
     :: Start the sandbox and run the application
     docker run -it ^
-        -p %PCS_PROJECTNAMEHERE_WEBSERVICE_PORT%:8080 ^
-        -e "PCS_PROJECTNAMEHERE_WEBSERVICE_PORT=8080" ^
+        -p %PCS_PROJECTNAMEHERE_WEBSERVICE_PORT%:%PCS_PROJECTNAMEHERE_WEBSERVICE_PORT% ^
+        -e "PCS_PROJECTNAMEHERE_WEBSERVICE_PORT=%PCS_PROJECTNAMEHERE_WEBSERVICE_PORT%" ^
         -e "PCS_IOTHUB_CONN_STRING=%PCS_IOTHUB_CONN_STRING%" ^
         -e "PCS_IOTHUBMANAGER_WEBSERVICE_URL=%PCS_IOTHUBMANAGER_WEBSERVICE_URL%" ^
         -v %PCS_CACHE%\sandbox\.config:/root/.config ^

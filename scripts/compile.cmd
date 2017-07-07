@@ -1,11 +1,9 @@
-@ECHO off
+@ECHO off & setlocal enableextensions enabledelayedexpansion
 
 :: Usage:
 :: Compile the project in the local environment:  scripts\compile
 :: Compile the project inside a Docker container: scripts\compile -s
 :: Compile the project inside a Docker container: scripts\compile --in-sandbox
-
-setlocal enableextensions enabledelayedexpansion
 
 :: strlen("\scripts\") => 9
 SET APP_HOME=%~dp0

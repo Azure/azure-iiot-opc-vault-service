@@ -1,5 +1,4 @@
-@ECHO off
-setlocal
+@ECHO off & setlocal enableextensions enabledelayedexpansion
 
 :: strlen("\scripts\git\") => 13
 SET APP_HOME=%~dp0

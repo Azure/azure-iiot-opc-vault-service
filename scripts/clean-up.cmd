@@ -1,5 +1,4 @@
-@ECHO off
-setlocal
+@ECHO off & setlocal enableextensions enabledelayedexpansion
 
 :: strlen("\scripts\") => 9
 SET APP_HOME=%~dp0

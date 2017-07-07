@@ -15,6 +15,7 @@ ProjectSection(SolutionItems) = preProject
 	README.md = README.md
 	DEVELOPMENT.md = DEVELOPMENT.md
 	project-name-here.sln.DotSettings = project-name-here.sln.DotSettings
+	version = version
 EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Services", "Services\Services.csproj", "{786A5B9B-98EE-4B73-9FE3-2080B70007AF}"
@@ -35,6 +36,8 @@ ProjectSection(SolutionItems) = preProject
 	scripts\env-vars-check = scripts\env-vars-check
 	scripts\env-vars-check.cmd = scripts\env-vars-check.cmd
 	scripts\env-vars-setup = scripts\env-vars-setup
+	scripts\travis = scripts\travis
+	scripts\travis.cmd = scripts\travis.cmd
 EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "git", "git", "{FE64576E-E29D-4463-ABDA-93DB429A5F2F}"
@@ -66,6 +69,9 @@ ProjectSection(SolutionItems) = preProject
 	scripts\docker\build.cmd = scripts\docker\build.cmd
 	scripts\docker\run = scripts\docker\run
 	scripts\docker\run.cmd = scripts\docker\run.cmd
+	scripts\docker\publish = scripts\docker\publish
+	scripts\docker\publish.cmd = scripts\docker\publish.cmd
+	scripts\docker\docker-compose.yml = scripts\docker\docker-compose.yml
 EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "content", "content", "{8BAA54A8-9C80-4446-83DD-CEBBC7B7BCD2}"

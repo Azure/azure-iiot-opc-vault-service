@@ -1,11 +1,9 @@
-@ECHO off
+@ECHO off & setlocal enableextensions enabledelayedexpansion
 
 :: Usage:
 :: Build the project in the local environment:  scripts\build
 :: Build the project inside a Docker container: scripts\build -s
 :: Build the project inside a Docker container: scripts\build --in-sandbox
-
-setlocal enableextensions enabledelayedexpansion
 
 :: Debug|Release
 SET CONFIGURATION=Release

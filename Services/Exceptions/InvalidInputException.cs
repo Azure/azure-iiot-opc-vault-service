@@ -19,7 +19,8 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.Services.Exceptions
         {
         }
 
-        public InvalidInputException(string message, Exception innerException) : base(message, innerException)
+        public InvalidInputException(string message, Exception innerException)
+            : base(message, innerException)
         {
         }
     }
