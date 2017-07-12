@@ -6,7 +6,7 @@ source "$APP_HOME/scripts/.functions.sh"
 
 if [[ ${#APP_HOME} -lt 20 ]]; then
     error "Unable to detect current folder. Aborting."
-    exit 1
+    exit -1
 fi
 
 cleanup_tmp_files() {

@@ -38,6 +38,7 @@ ProjectSection(SolutionItems) = preProject
 	scripts\env-vars-setup = scripts\env-vars-setup
 	scripts\travis = scripts\travis
 	scripts\travis.cmd = scripts\travis.cmd
+	scripts\env-vars-setup.cmd = scripts\env-vars-setup.cmd
 EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "git", "git", "{FE64576E-E29D-4463-ABDA-93DB429A5F2F}"

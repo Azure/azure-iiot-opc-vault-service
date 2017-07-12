@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+# Usage: source ./scripts/env-vars-setup
+#
+# IMPORTANT NOTES:
+# * use "source" in front of the script path, so that variables are exported in your shell
+# * the variables are set only in the current shell, run this script every time, or automate
+#   the setup using your `~/.bash_profile`.
+
 #  Prepare the environment variables used by the application.
 
 # The port where this project's web service is listening
@@ -13,4 +20,4 @@ export PCS_PROJECTNAMEHERE_WEBSERVICE_PORT="900X"
 export IOTHUB_CONN_STRING="..."
 
 # The URL where IoT Hub Manager web service is listening
-export PCS_IOTHUBMANAGER_WEBSERVICE_URL="http://127.0.0.1:9001/v1"
+export PCS_IOTHUBMANAGER_WEBSERVICE_URL="http://127.0.0.1:9002/v1"

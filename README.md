@@ -20,6 +20,11 @@ How to use it
 
 [Development, debugging, configuration, etc.](DEVELOPMENT.md)
 
+Configuration
+=============
+
+... how to customize the service, settings, etc. ...
+
 Special notes
 =============
 

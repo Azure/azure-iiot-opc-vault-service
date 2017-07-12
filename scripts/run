@@ -17,10 +17,22 @@ source "$APP_HOME/scripts/.functions.sh"
 # Use PCS_CACHE="$APP_HOME/.cache" to cache inside the project folder
 PCS_CACHE="/tmp/azure/iotpcs/.cache"
 
+run() {
+    check_dependency_dotnet
+    ./scripts/env-vars-check
+
+    cd $APP_HOME
+    dotnet restore --verbosity=quiet
+
+    echo "Starting project name here..."
+    dotnet run --configuration $CONFIGURATION --project WebService/*.csproj
+}
+
 setup_sandbox_cache() {
     mkdir -p $PCS_CACHE/sandbox/.config
     mkdir -p $PCS_CACHE/sandbox/.dotnet
     mkdir -p $PCS_CACHE/sandbox/.nuget
+    echo "Note: caching build files in $PCS_CACHE"
 }
 
 run_in_sandbox() {
@@ -29,7 +41,7 @@ run_in_sandbox() {
 
     cd $APP_HOME
 
-    # On Windows this script should use docker.exe, in which case
+    # In Windows this script should use docker.exe, in which case
     # the parameters syntax is different, e.g. volumes path
     # (i.e. C:\path\path\... vs /c/path/path/...).
     set +e
@@ -55,22 +67,12 @@ run_in_sandbox() {
             -v "$PCS_CACHE/sandbox/.dotnet:/root/.dotnet" \
             -v "$PCS_CACHE/sandbox/.nuget:/root/.nuget" \
             -v "$APP_HOME:/opt/code" \
-            azureiotpcs/code-builder-dotnet:1.0-dotnetcore /opt/scripts/run
+            azureiotpcs/code-builder-dotnet:1.0-dotnetcore /opt/code/scripts/run
     else
         # Note 'winpty' is required to provide a TTY to Docker
-        cmd.exe /c "winpty .\scripts\run.cmd" --in-sandbox
+        echo "Launching cmd.exe /c winpty ..."
+        cmd.exe /c "winpty .\scripts\run.cmd --in-sandbox"
     fi
-}
-
-run() {
-    check_dependency_dotnet
-    ./scripts/env-vars-check
-
-    cd $APP_HOME
-    dotnet restore --verbosity=quiet
-
-    echo "Starting project name here..."
-    dotnet run --configuration $CONFIGURATION --project WebService/*.csproj
 }
 
 if [[ "$1" == "--in-sandbox" || "$1" == "-s" ]]; then

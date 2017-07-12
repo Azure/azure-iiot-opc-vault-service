@@ -49,6 +49,10 @@ The [scripts](scripts) folder contains some scripts for frequent tasks:
 * `run`: compile the projects and run the service. This will prompt for
   elevated privileges in Windows to run the web service.
 
+The scripts check for the environment variables setup. You can set the
+environment variables globally in your OS, or use the "env-vars-setup"
+script in the scrips folder.
+
 ### Sandbox
 
 The scripts assume that you configured your development environment,

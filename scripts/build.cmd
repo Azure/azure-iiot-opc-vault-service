@@ -56,18 +56,20 @@ IF "%1"=="--in-sandbox" GOTO :RunInSandbox
     mkdir %PCS_CACHE%\sandbox\.config > NUL 2>&1
     mkdir %PCS_CACHE%\sandbox\.dotnet > NUL 2>&1
     mkdir %PCS_CACHE%\sandbox\.nuget > NUL 2>&1
+    echo Note: caching build files in %PCS_CACHE%
 
     :: Start the sandbox and execute the build script
-    docker run ^
+    docker run -it ^
+        -e "PCS_PROJECTNAMEHERE_WEBSERVICE_PORT=%PCS_PROJECTNAMEHERE_WEBSERVICE_PORT%" ^
         -e "PCS_IOTHUBMANAGER_WEBSERVICE_URL=http://127.0.0.1:9002/v1" ^
         -e "PCS_IOTHUB_CONN_STRING=%PCS_IOTHUB_CONN_STRING%" ^
         -v %PCS_CACHE%\sandbox\.config:/root/.config ^
         -v %PCS_CACHE%\sandbox\.dotnet:/root/.dotnet ^
         -v %PCS_CACHE%\sandbox\.nuget:/root/.nuget ^
         -v %APP_HOME%:/opt/code ^
-        azureiotpcs/code-builder-dotnet:1.0-dotnetcore /opt/scripts/build
+        azureiotpcs/code-builder-dotnet:1.0-dotnetcore /opt/code/scripts/build
 
-    :: Error 125 typically triggers on Windows if the drive is not shared
+    :: Error 125 typically triggers in Windows if the drive is not shared
     IF %ERRORLEVEL% EQU 125 GOTO DOCKER_SHARE
     IF %ERRORLEVEL% NEQ 0 GOTO FAIL
 
@@ -83,15 +85,15 @@ goto :END
     echo Nuget installation: https://dotnet.github.io/
     exit /B 1
 
-:DOCKER_SHARE
-    echo ERROR: the drive containing the source code cannot be mounted.
-    echo Open Docker settings from the tray icon, and fix the settings under 'Shared Drives'.
-    exit /B 1
-
 :MISSING_DOCKER
     echo ERROR: 'docker' command not found.
     echo Install Docker and make sure the 'docker' command is in the PATH.
     echo Docker installation: https://www.docker.com/community-edition#/download
+    exit /B 1
+
+:DOCKER_SHARE
+    echo ERROR: the drive containing the source code cannot be mounted.
+    echo Open Docker settings from the tray icon, and fix the settings under 'Shared Drives'.
     exit /B 1
 
 :FAIL
