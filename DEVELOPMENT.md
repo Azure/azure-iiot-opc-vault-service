@@ -1,4 +1,6 @@
-* [Build, Run locally and with Docker](#build-run-locally-and-with-docker)
+* [Run and Debug with Visual Studio](#run-and-debug-with-visual-studio)
+* [Run and Debug with IntelliJ Rider](#build-and-run-from-the-command-line)
+* [Package the application to a Docker image](#package-the-application-to-a-docker-image)
 * [Service configuration](#configuration)
 * [Azure IoT Hub setup](#azure-iot-hub-setup)
 * [Development setup](#development-setup)
