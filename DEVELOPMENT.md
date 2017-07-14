@@ -51,12 +51,12 @@ The [scripts](scripts) folder contains some scripts for frequent tasks:
 
 The scripts check for the environment variables setup. You can set the
 environment variables globally in your OS, or use the "env-vars-setup"
-script in the scrips folder.
+script in the scripts folder.
 
 ### Sandbox
 
 The scripts assume that you configured your development environment,
-with tools like .NET Core and Docker. You can avoid installing .NET Core,
+with .NET Core and Docker. You can avoid installing .NET Core,
 and install only Docker, and use the command line parameter `--in-sandbox`
 (or the short form `-s`), for example:
 
@@ -93,7 +93,7 @@ environment variables, such as credentials and networking details.
 Azure IoT Hub setup
 ===================
 
-At some point you will probably want to setup your Azure IoT Hub, for
+To use the Hub Manager you will need to setup your Azure IoT Hub, for
 development and integration tests.
 
 The project includes some Bash scripts to help you with this setup:
@@ -118,13 +118,13 @@ and ensure that your IDE works as expected.
 
 * [.NET Core](https://dotnet.github.io)
 
-We provide also a
+We also provide a
 [Java version](https://github.com/Azure/PROJECT-NAME-HERE-java)
 of this project and other Azure IoT PCS components.
 
 ## IDE
 
-Here are some IDE that you can use to work on Azure IoT PCS:
+Here are some of the IDEs that you can use to work on Azure IoT PCS:
 
 * [Visual Studio](https://www.visualstudio.com)
 * [Visual Studio for Mac](https://www.visualstudio.com/vs/visual-studio-mac)
