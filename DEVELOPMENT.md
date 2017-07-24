@@ -1,9 +1,39 @@
+* [Service configuration](#configuration-and-environment-variables)
 * [Run and Debug with Visual Studio](#run-and-debug-with-visual-studio)
 * [Run and Debug with IntelliJ Rider](#build-and-run-from-the-command-line)
+* [Build and Run from the command line](#build-and-run-from-the-command-line)
 * [Package the application to a Docker image](#package-the-application-to-a-docker-image)
-* [Service configuration](#configuration)
 * [Azure IoT Hub setup](#azure-iot-hub-setup)
 * [Development setup](#development-setup)
+
+Configuration and Environment variables
+=======================================
+
+The service configuration is stored using ASP.NET Core configuration
+adapters, in [appsettings.ini](WebService/appsettings.ini). The INI
+format allows to store values in a readable format, with comments.
+The application also supports inserting environment variables, such as
+credentials and networking details.
+
+The configuration file in the repository references some environment
+variables that need to created at least once. Depending on your OS and
+the IDE, there are several ways to manage environment variables:
+
+* For Windows users, the [env-vars-setup.cmd](scripts/env-vars-setup.cmd)
+  script needs to be prepared and executed just once. When executed, the
+  settings will persist across terminal sessions and reboots.
+* For Linux and OSX environments, the [env-vars-setup](scripts/env-vars-setup)
+  script needs to be executed every time a new console is opened.
+  Depending on the OS and terminal, there are ways to persist values
+  globally, for more information these pages should help:
+  * https://stackoverflow.com/questions/13046624/how-to-permanently-export-a-variable-in-linux
+  * https://stackoverflow.com/questions/135688/setting-environment-variables-in-os-x
+  * https://help.ubuntu.com/community/EnvironmentVariables
+* Visual Studio: env. vars can be set also from Visual Studio, under Project
+  Properties, in the left pane select "Configuration Properties" and
+  "Environment", to get to a section where you can add multiple variables.
+* IntelliJ Rider: env. vars can be set in each Run Configuration, similarly to
+  IntelliJ IDEA (https://www.jetbrains.com/help/idea/run-debug-configuration-application.html)
 
 Run and Debug with Visual Studio
 ================================
@@ -84,19 +114,11 @@ files required to package the service into a Docker image:
 * `content`: a folder with files copied into the image, including the entry
   point script
 
-Configuration
-=============
-
-The service configuration is stored using ASP.NET Core configuration
-adapters, in `appsettings.ini`. The INI format allows to store values in a
-readable format, with comments. The application also supports inserting
-environment variables, such as credentials and networking details.
-
 Azure IoT Hub setup
 ===================
 
-To use the Hub Manager you will need to setup your Azure IoT Hub, for
-development and integration tests.
+To use the microservice you will need to setup your Azure IoT Hub,
+for development and integration tests.
 
 The project includes some Bash scripts to help you with this setup:
 
@@ -114,11 +136,9 @@ Development setup
 
 ## .NET setup
 
-The project workflow is managed via .NET Core 1.0.4, which you need
-to install in your environment, so that you can run all the scripts
-and ensure that your IDE works as expected.
-
-* [.NET Core](https://dotnet.github.io)
+The project workflow is managed via [.NET Core](https://dotnet.github.io)
+1.x, which you need to install in your environment, so that you can run
+all the scripts and ensure that your IDE works as expected.
 
 We also provide a
 [Java version](https://github.com/Azure/PROJECT-NAME-HERE-java)
