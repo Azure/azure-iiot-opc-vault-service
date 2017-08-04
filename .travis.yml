@@ -10,7 +10,7 @@ before_install:
 addons:
   apt:
     packages:
-    - dotnet-sharedframework-microsoft.netcore.app-1.1.3
+    - dotnet-sharedframework-microsoft.netcore.app-1.1.2
 script:
 - "bash ./$CODEBASE/scripts/build"
 notifications:
