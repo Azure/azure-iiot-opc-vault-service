@@ -60,9 +60,8 @@ IF "%1"=="--in-sandbox" GOTO :RunInSandbox
 
     :: Start the sandbox and run the service
     docker run -it ^
-        -p %PCS_PROJECTNAMEHERE_WEBSERVICE_PORT%:%PCS_PROJECTNAMEHERE_WEBSERVICE_PORT% ^
-        -e "PCS_PROJECTNAMEHERE_WEBSERVICE_PORT=%PCS_PROJECTNAMEHERE_WEBSERVICE_PORT%" ^
-        -e "PCS_IOTHUB_CONN_STRING=%PCS_IOTHUB_CONN_STRING%" ^
+        -p 54321:54321 ^
+        -e "PCS_IOTHUB_CONNSTRING=%PCS_IOTHUB_CONNSTRING%" ^
         -e "PCS_IOTHUBMANAGER_WEBSERVICE_URL=%PCS_IOTHUBMANAGER_WEBSERVICE_URL%" ^
         -v %PCS_CACHE%\sandbox\.config:/root/.config ^
         -v %PCS_CACHE%\sandbox\.dotnet:/root/.dotnet ^

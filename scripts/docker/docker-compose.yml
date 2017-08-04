@@ -14,33 +14,27 @@ services:
     image: azureiotpcs/dependencyone:0.x.y
     ports:
       - "9001:9001"
-    environment:
-      - PCS_DEPENDENCYONE_WEBSERVICE_PORT=9002
   dependencytwo:
     image: azureiotpcs/dependencytwo:0.x.y
     ports:
       - "9002:9002"
     environment:
-      - PCS_DEPENDENCYTWO_WEBSERVICE_PORT=9002
-      - PCS_IOTHUB_CONN_STRING
+      - PCS_IOTHUB_CONNSTRING
   dependencythree:
     image: azureiotpcs/dependencythree:0.x.y
     depends_on:
       - dependencyone
     ports:
       - "9003:9003"
-    environment:
-      - PCS_DEPENDENCYTHREE_WEBSERVICE_PORT=9003
-  devicesimulation:
+  projectnamehere:
     image: azureiotpcs/project-name-here-dotnet:0.x.y
     depends_on:
       - dependencyone
       - dependencytwo
       - dependencythree
     ports:
-      - "900X:900X"
+      - "54321:54321"
     environment:
-      - PCS_PROJECTNAMEHERE_WEBSERVICE_PORT=900X
       - PCS_DEPENDENCYONE_WEBSERVICE_URL=http://dependencyone:9001/v1
       - PCS_DEPENDENCYTWO_WEBSERVICE_URL=http://dependencytwo:9002/v1
       - PCS_DEPENDENCYTHREE_WEBSERVICE_URL=http://dependencythree:9003/v1

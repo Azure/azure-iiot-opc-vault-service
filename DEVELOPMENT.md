@@ -46,13 +46,7 @@ Steps using Visual Studio 2017:
 1. Open the solution using the `project-name-here.sln` file.
 1. When the solution is loaded, right click on the `WebService` project,
    select `Properties` and go to the `Debug` section.
-1. Add a new environment variable with name
-   `PCS_PROJECTNAMEHERE_WEBSERVICE_PORT` and value `900X`.
-1. In the same section set the `App URL` to
-   `http://localhost:900X/v1/status`
-1. Right click on the "WebService" project and "Set as StartUp Project".
-1. The toolbar should switch automatically to "WebService" and "IIS Express",
-   otherwise change these manually.
+1. In the same section define the environment variables required.
 1. Press F5, or the Run icon. VisualStudio should open your browser showing
    the service status in JSON format.
 
@@ -63,8 +57,6 @@ Run and Debug with IntelliJ Rider
 1. When the solution is loaded, got to `Run -> Edit Configurations` and
    create a new `.NET Project` configuration.
 1. In the configuration select the WebService project
-1. Add a new environment variable with name
-   `PCS_PROJECTNAMEHERE_WEBSERVICE_PORT` and value `900X`.
 1. Save the settings and run the configuration just created, from the IDE
    toolbar.
 1. You should see the service bootstrap messages in IntelliJ Run window,
