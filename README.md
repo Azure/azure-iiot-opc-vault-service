@@ -46,5 +46,5 @@ Other documents
 [build-url]: https://travis-ci.org/Azure/PROJECT-ID-HERE-dotnet
 [issues-badge]: https://img.shields.io/github/issues/azure/PROJECT-ID-HERE-dotnet.svg
 [issues-url]: https://github.com/azure/PROJECT-ID-HERE-dotnet/issues
-[gitter-badge]: https://img.shields.io/gitter/room/azure/iot-pcs.js.svg
-[gitter-url]: https://gitter.im/azure/iot-pcs
+[gitter-badge]: https://img.shields.io/gitter/room/azure/iot-solutions.js.svg
+[gitter-url]: https://gitter.im/azure/iot-solutions
