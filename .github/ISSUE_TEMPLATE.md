@@ -1,11 +1,15 @@
 # Type of issue
+
 <!-- Please put an `x` (e.g. [x]) in all the boxes that apply: -->
+
 - [ ] Bug
 - [ ] New feature
 - [ ] Enhancement
 
 # Description
+
 <!-- Please provide a succinct description -->
+
 ...
 
 # Steps to reproduce

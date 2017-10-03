@@ -1,21 +1,25 @@
-# Types of changes
+# Change type
+
 <!-- Please put an `x` (e.g. [x]) in all the boxes that apply: -->
-- [ ] Bug fix (non-breaking change which fixes an issue)
-- [ ] New feature (non-breaking change which adds functionality)
-- [ ] Enhancement (non-breaking change which improves the solution)
-- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
 
-# Checklist:
-<!-- Please put an `x` (e.g. [x]) in all the boxes that apply: -->
-- [ ] All new and existing tests passed.
-- [ ] The code follows the code style and conventions of this project.
-- [ ] The change requires a change to the documentation.
-- [ ] I have updated the documentation accordingly.
+- [ ] Bug fix
+- [ ] New feature
+- [ ] Enhancement
+- [ ] Breaking change (breaks backward compatibility)
 
-# Description of the change
-<!-- Please provide enough information so others can review your pull request -->
-...
+**Checklist:**
 
-# Motivation for the change
-<!-- Please explain the motivation for making this change -->
+- [ ] All tests passed
+- [ ] The code follows the code style and conventions of this project
+- [ ] The change requires a change to the documentation
+- [ ] I have updated the documentation accordingly
+
+# Description and Motivation
+
+<!--
+  Please provide enough information so others can review your pull request
+  Explain the motivation for making this change
+  Provide links if there are Github issues tracking this work
+-->
+
 ...
