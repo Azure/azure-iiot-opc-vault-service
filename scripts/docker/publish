@@ -21,6 +21,8 @@ confirm_version() {
 }
 
 publish() {
+    check_dependency_docker
+
     if [[ $UPDATE_LATEST == "no" ]]; then
         docker push $DOCKER_IMAGE:$APP_VERSION
     else
