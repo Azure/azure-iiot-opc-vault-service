@@ -122,6 +122,26 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.Services.Http
                         Content = errorMessage
                     };
                 }
+                catch (TaskCanceledException e)
+                {
+                    this.log.Error("Request failed", () => new { Message = e.Message + " The endpoint might be unreachable.", e });
+
+                    return new HttpResponse
+                    {
+                        StatusCode = 0,
+                        Content = e.Message + " The endpoint might be unreachable."
+                    };
+                }
+                catch (Exception e)
+                {
+                    this.log.Error("Request failed", () => new { e.Message, e });
+
+                    return new HttpResponse
+                    {
+                        StatusCode = 0,
+                        Content = e.Message
+                    };
+                }
             }
         }
 
