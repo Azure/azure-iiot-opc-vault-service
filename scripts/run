@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env bash -e
 
 # Usage:
 # Run the service in the local environment:  ./scripts/run
@@ -10,7 +10,6 @@
 # Debug|Release
 CONFIGURATION=Release
 
-set -e
 APP_HOME="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )/"
 source "$APP_HOME/scripts/.functions.sh"
 
@@ -68,8 +67,8 @@ run_in_sandbox() {
         # edit the list of variables.
         docker run -it \
             -p 54321:54321 \
-            -e "PCS_IOTHUB_CONNSTRING=$PCS_IOTHUB_CONNSTRING" \
-            -e "PCS_IOTHUBMANAGER_WEBSERVICE_URL=$PCS_IOTHUBMANAGER_WEBSERVICE_URL" \
+            -e PCS_IOTHUB_CONNSTRING \
+            -e PCS_IOTHUBMANAGER_WEBSERVICE_URL=http://127.0.0.1:9002/v1 \
             -v "$PCS_CACHE/sandbox/.config:/root/.config" \
             -v "$PCS_CACHE/sandbox/.dotnet:/root/.dotnet" \
             -v "$PCS_CACHE/sandbox/.nuget:/root/.nuget" \

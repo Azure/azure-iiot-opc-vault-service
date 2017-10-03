@@ -1,12 +1,13 @@
-#!/usr/bin/env bash
+#!/usr/bin/env bash -e
 
 # Sometimes when creating bash scripts in Windows, bash scripts will not have
 # the +x flag carried over to Linux/MacOS. This script should help setting the
 # permission flags right.
 
-set -e
 APP_HOME="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && cd .. && pwd )/"
 cd $APP_HOME
+
+set +e
 
 chmod ugo+x ./scripts/build
 chmod ugo+x ./scripts/compile
@@ -37,5 +38,3 @@ git update-index --chmod=+x ./scripts/docker/content/*.sh
 git update-index --chmod=+x ./scripts/git/setup
 git update-index --chmod=+x ./scripts/git/*.sh
 git update-index --chmod=+x ./scripts/iothub/*.sh
-
-set +e
