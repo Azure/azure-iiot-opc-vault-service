@@ -2,9 +2,9 @@
 
 using System;
 using System.IO;
-using Microsoft.Azure.IoTSolutions.ProjectNameHere.Services.Runtime;
+using Microsoft.Azure.IoTSolutions.OpcGds.Services.Runtime;
 
-namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.Runtime
+namespace Microsoft.Azure.IoTSolutions.OpcGds.WebService.Runtime
 {
     public interface IConfig
     {
@@ -21,7 +21,7 @@ namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.Runtime
     /// <summary>Web service configuration</summary>
     public class Config : IConfig
     {
-        private const string ApplicationKey = "projectnamehere:";
+        private const string ApplicationKey = "opcgds:";
         private const string PortKey = ApplicationKey + "webservice_port";
         private const string SomeFolderKey = ApplicationKey + "some_folder_path";
 

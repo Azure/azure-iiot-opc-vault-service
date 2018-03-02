@@ -2,7 +2,7 @@
 
 using System;
 
-namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.Services.Concurrency
+namespace Microsoft.Azure.IoTSolutions.OpcGds.Services.Concurrency
 {
     public class TimerNotInitializedException : Exception
     {

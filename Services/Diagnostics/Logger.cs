@@ -4,7 +4,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 
-namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.Services.Diagnostics
+namespace Microsoft.Azure.IoTSolutions.OpcGds.Services.Diagnostics
 {
     public enum LogLevel
     {

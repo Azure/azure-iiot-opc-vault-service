@@ -43,7 +43,7 @@ prompt, without configuring anything outside of the IDE.
 
 Steps using Visual Studio 2017:
 
-1. Open the solution using the `project-name-here.sln` file.
+1. Open the solution using the `iot-opc-gds-service.sln` file.
 1. When the solution is loaded, right click on the `WebService` project,
    select `Properties` and go to the `Debug` section.
 1. In the same section define the environment variables required.
@@ -53,7 +53,7 @@ Steps using Visual Studio 2017:
 Run and Debug with IntelliJ Rider
 =================================
 
-1. Open the solution using the `project-name-here.sln` file.
+1. Open the solution using the `iot-opc-gds-service.sln` file.
 1. When the solution is loaded, got to `Run -> Edit Configurations` and
    create a new `.NET Project` configuration.
 1. In the configuration select the WebService project
@@ -133,7 +133,7 @@ The project workflow is managed via [.NET Core](https://dotnet.github.io)
 all the scripts and ensure that your IDE works as expected.
 
 We also provide a
-[Java version](https://github.com/Azure/PROJECT-NAME-HERE-java)
+[Java version](https://github.com/Azure/iot-opc-gds-service-dotnet)
 of this project and other Azure IoT PCS components.
 
 ## IDE
@@ -191,7 +191,7 @@ workstation, using the tools installed in your OS.
 
 If you use ReSharper or Rider, you can load the code style settings from
 the repository, stored in
-[project-name-here.sln.DotSettings](project-name-here.sln.DotSettings)
+[iot-opc-gds-service.sln.DotSettings](iot-opc-gds-service.sln.DotSettings)
 
 Some quick notes about the project code style:
 

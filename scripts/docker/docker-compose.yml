@@ -26,8 +26,8 @@ services:
       - dependencyone
     ports:
       - "9003:9003"
-  projectnamehere:
-    image: azureiotpcs/project-name-here-dotnet:0.x.y
+  opcgds:
+    image: azureiotpcs/opc-gds-dotnet:0.x.y
     depends_on:
       - dependencyone
       - dependencytwo

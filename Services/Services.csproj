@@ -1,11 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard1.6</TargetFramework>
-    <LangVersion>6</LangVersion>
-    <AssemblyName>Microsoft.Azure.IoTSolutions.ProjectNameHere.Services</AssemblyName>
-    <RootNamespace>Microsoft.Azure.IoTSolutions.ProjectNameHere.Services</RootNamespace>
+    <AssemblyName>Microsoft.Azure.IoTSolutions.OpcGds.Services</AssemblyName>
+    <RootNamespace>Microsoft.Azure.IoTSolutions.OpcGds.Services</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.Devices" Version="1.2.9" />
+    <PackageReference Include="Microsoft.Azure.Devices" Version="1.5.1" />
   </ItemGroup>
 </Project>

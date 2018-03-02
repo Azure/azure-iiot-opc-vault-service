@@ -4,7 +4,7 @@ using System;
 using Microsoft.Azure.Devices;
 using Microsoft.Azure.Devices.Shared;
 
-namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.Services.Models
+namespace Microsoft.Azure.IoTSolutions.OpcGds.Services.Models
 {
     public sealed class Device
     {

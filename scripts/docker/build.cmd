@@ -1,7 +1,7 @@
 @ECHO off & setlocal enableextensions enabledelayedexpansion
 
 :: Note: use lowercase names for the Docker images
-SET DOCKER_IMAGE="azureiotpcs/project-name-here-dotnet"
+SET DOCKER_IMAGE="azureiotpcs/iot-opc-gds-service-dotnet"
 
 :: Debug|Release
 SET CONFIGURATION=Release

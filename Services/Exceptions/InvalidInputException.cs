@@ -2,7 +2,7 @@
 
 using System;
 
-namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.Services.Exceptions
+namespace Microsoft.Azure.IoTSolutions.OpcGds.Services.Exceptions
 {
     /// <summary>
     /// This exception is thrown when a client sends a request badly formatted

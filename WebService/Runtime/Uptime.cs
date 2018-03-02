@@ -2,7 +2,7 @@
 
 using System;
 
-namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.Runtime
+namespace Microsoft.Azure.IoTSolutions.OpcGds.WebService.Runtime
 {
     /// <summary>Helper capturing runtime information.</summary>
     public static class Uptime

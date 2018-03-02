@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
-namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1
+namespace Microsoft.Azure.IoTSolutions.OpcGds.WebService.v1
 {
     /// <summary>Web service API version 1 information</summary>
     public static class Version

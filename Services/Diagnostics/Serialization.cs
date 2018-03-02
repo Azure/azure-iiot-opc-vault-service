@@ -6,7 +6,7 @@ using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
 
-namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.Services.Diagnostics
+namespace Microsoft.Azure.IoTSolutions.OpcGds.Services.Diagnostics
 {
     public class Serialization
     {

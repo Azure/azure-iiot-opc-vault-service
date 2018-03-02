@@ -6,9 +6,9 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Azure.IoTSolutions.ProjectNameHere.Services.Diagnostics;
+using Microsoft.Azure.IoTSolutions.OpcGds.Services.Diagnostics;
 
-namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.Services.Http
+namespace Microsoft.Azure.IoTSolutions.OpcGds.Services.Http
 {
     public class Example
     {

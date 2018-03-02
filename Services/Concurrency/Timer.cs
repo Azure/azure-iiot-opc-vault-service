@@ -2,9 +2,9 @@
 
 using System;
 using System.Threading;
-using Microsoft.Azure.IoTSolutions.ProjectNameHere.Services.Diagnostics;
+using Microsoft.Azure.IoTSolutions.OpcGds.Services.Diagnostics;
 
-namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.Services.Concurrency
+namespace Microsoft.Azure.IoTSolutions.OpcGds.Services.Concurrency
 {
     public interface ITimer
     {

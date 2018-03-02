@@ -2,10 +2,10 @@
 
 using System;
 using System.Collections.Generic;
-using Microsoft.Azure.IoTSolutions.ProjectNameHere.Services.Models;
+using Microsoft.Azure.IoTSolutions.OpcGds.Services.Models;
 using Newtonsoft.Json;
 
-namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Models
+namespace Microsoft.Azure.IoTSolutions.OpcGds.WebService.v1.Models
 {
     public sealed class DeviceApiModel
     {

@@ -3,7 +3,7 @@
 using System.Net;
 using System.Net.Http.Headers;
 
-namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.Services.Http
+namespace Microsoft.Azure.IoTSolutions.OpcGds.Services.Http
 {
     public interface IHttpResponse
     {

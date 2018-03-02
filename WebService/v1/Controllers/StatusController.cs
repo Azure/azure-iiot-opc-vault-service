@@ -1,11 +1,11 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.IoTSolutions.ProjectNameHere.Services.Diagnostics;
-using Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Filters;
-using Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Models;
+using Microsoft.Azure.IoTSolutions.OpcGds.Services.Diagnostics;
+using Microsoft.Azure.IoTSolutions.OpcGds.WebService.v1.Filters;
+using Microsoft.Azure.IoTSolutions.OpcGds.WebService.v1.Models;
 
-namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Controllers
+namespace Microsoft.Azure.IoTSolutions.OpcGds.WebService.v1.Controllers
 {
     [Route(Version.Path + "/[controller]"), TypeFilter(typeof(ExceptionsFilterAttribute))]
     public sealed class StatusController : Controller

@@ -2,9 +2,9 @@
 
 using System;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.Runtime;
+using Microsoft.Azure.IoTSolutions.OpcGds.WebService.Runtime;
 
-namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService
+namespace Microsoft.Azure.IoTSolutions.OpcGds.WebService
 {
     /// <summary>Application entry point</summary>
     public class Program

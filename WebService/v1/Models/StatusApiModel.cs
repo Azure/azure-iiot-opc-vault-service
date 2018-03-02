@@ -2,17 +2,17 @@
 
 using System;
 using System.Collections.Generic;
-using Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.Runtime;
+using Microsoft.Azure.IoTSolutions.OpcGds.WebService.Runtime;
 using Newtonsoft.Json;
 
-namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.WebService.v1.Models
+namespace Microsoft.Azure.IoTSolutions.OpcGds.WebService.v1.Models
 {
     public sealed class StatusApiModel
     {
         private const string DateFormat = "yyyy-MM-dd'T'HH:mm:sszzz";
 
         [JsonProperty(PropertyName = "Name", Order = 10)]
-        public string Name => "ProjectNameHere";
+        public string Name => "OpcGds";
 
         [JsonProperty(PropertyName = "Status", Order = 20)]
         public string Status { get; set; }

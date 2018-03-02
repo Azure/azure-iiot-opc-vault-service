@@ -5,14 +5,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Azure.Devices;
 using Microsoft.Azure.Devices.Shared;
-using Microsoft.Azure.IoTSolutions.ProjectNameHere.Services.Diagnostics;
-using Microsoft.Azure.IoTSolutions.ProjectNameHere.Services.Runtime;
+using Microsoft.Azure.IoTSolutions.OpcGds.Services.Diagnostics;
+using Microsoft.Azure.IoTSolutions.OpcGds.Services.Runtime;
 
 // TODO: handle exceptions
 // TODO: logging
 // TODO: documentation
 
-namespace Microsoft.Azure.IoTSolutions.ProjectNameHere.Services
+namespace Microsoft.Azure.IoTSolutions.OpcGds.Services
 {
     public interface IDevices
     {

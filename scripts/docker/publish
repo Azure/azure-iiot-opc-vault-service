@@ -1,7 +1,7 @@
 #!/usr/bin/env bash -e
 
 # Note: use lowercase names for the Docker images
-DOCKER_IMAGE="azureiotpcs/project-name-here-dotnet"
+DOCKER_IMAGE="azureiotpcs/iot-opc-gds-service-dotnet"
 
 APP_HOME="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && cd .. && pwd )/"
 source "$APP_HOME/scripts/.functions.sh"
