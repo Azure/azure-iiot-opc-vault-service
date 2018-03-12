@@ -14,6 +14,9 @@ namespace Microsoft.Azure.IoTSolutions.OpcGds.Services
 
     public class KeyVaultServiceClient
     {
+        // see RFC 2585
+        const string ContentTypeCert = "application/pkix-cert";
+        const string ContentTypeCrl = "application/pkix-crl";
         string _vaultBaseUrl;
         string _appId;
         IKeyVaultClient _keyVaultClient;
@@ -205,7 +208,11 @@ namespace Microsoft.Azure.IoTSolutions.OpcGds.Services
 
         public async Task UploadCACertificate(string name, X509Certificate2 certificate)
         {
-            CertificateAttributes attributes = new CertificateAttributes { Enabled = true };
+            CertificateAttributes attributes = new CertificateAttributes {
+                Enabled = true,
+                Expires = certificate.NotAfter,
+                NotBefore = certificate.NotBefore,
+            };
 
             var policy = new CertificatePolicy
             {
@@ -237,6 +244,42 @@ namespace Microsoft.Azure.IoTSolutions.OpcGds.Services
                 attributes);
         }
 
+        public async Task UploadCACrl(string name, X509Certificate2 certificate, Opc.Ua.X509CRL crl)
+        {
+            try
+            {
+                string secretIdentifier = CrlSecretName(name, certificate);
+                SecretAttributes secretAttributes = new SecretAttributes()
+                {
+                    Enabled = true,
+                    Expires = crl.NextUpdateTime,
+                    NotBefore = crl.UpdateTime
+                };
+
+                var result = await _keyVaultClient.SetSecretAsync(_vaultBaseUrl, secretIdentifier, Convert.ToBase64String(crl.RawData), null, ContentTypeCrl, secretAttributes);
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+
+        public async Task<Opc.Ua.X509CRL> LoadCACrl(string name, X509Certificate2 certificate)
+        {
+            string secretIdentifier = CrlSecretName(name, certificate);
+            var secret = await _keyVaultClient.GetSecretAsync(_vaultBaseUrl, secretIdentifier);
+            if (secret.ContentType == ContentTypeCrl)
+            {
+                var crlBlob = Convert.FromBase64String(secret.Value);
+                return new Opc.Ua.X509CRL(crlBlob);
+            }
+            return null;
+        }
+
+        private string CrlSecretName(string name, X509Certificate2 certificate)
+        {
+            return name + "Crl" + certificate.Thumbprint;
+        }
     }
 }
 

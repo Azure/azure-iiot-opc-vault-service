@@ -126,7 +126,7 @@ namespace Microsoft.Azure.IoTSolutions.OpcGds.Services
             ApplicationRecordDataType app = new ApplicationRecordDataType();
             app.ApplicationNames = new Opc.Ua.LocalizedTextCollection();
             app.ApplicationUri = applicationUri;
-            return await certificateGroup.NewKeyPairRequestAsync(app, subjectName, domainNames, privateKeyFormat, privateKeyPassword).ConfigureAwait(false); ;
+            return await certificateGroup.NewKeyPairRequestAsync(app, subjectName, domainNames).ConfigureAwait(false); ;
         }
 
         public async Task<string[]> GetCertificateGroupIds()
@@ -139,9 +139,16 @@ namespace Microsoft.Azure.IoTSolutions.OpcGds.Services
             return await KeyVaultCertificateGroupProvider.GetCertificateGroupConfiguration(_keyVaultServiceClient, id).ConfigureAwait(false);
         }
 
-        public async Task<CertificateBundle> GetCertificateAsync(string id)
+        public async Task<X509Certificate2> GetCACertificateAsync(string id)
         {
-            return await _keyVaultServiceClient.GetCertificateAsync(id).ConfigureAwait(false);
+            var certificateGroup = await KeyVaultCertificateGroupProvider.Create(_keyVaultServiceClient, id).ConfigureAwait(false); ;
+            return await certificateGroup.GetCACertificateAsync(id).ConfigureAwait(false);
+        }
+
+        public async Task<X509CRL> GetCACrlAsync(string id)
+        {
+            var certificateGroup = await KeyVaultCertificateGroupProvider.Create(_keyVaultServiceClient, id).ConfigureAwait(false); ;
+            return await certificateGroup.GetCACrlAsync(id).ConfigureAwait(false);
         }
 
         private async Task<string> GetIotHubSecretAsync()

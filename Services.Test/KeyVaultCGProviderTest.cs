@@ -89,10 +89,13 @@ namespace Services.Test
             var groups = await keyVault.GetCertificateGroupIds();
             foreach (var group in groups)
             {
-                var result = await keyVault.GetCertificateAsync(group);
-                Assert.NotNull(result);
-                var cert = new X509Certificate2(result.Cer);
-                Assert.False(cert.HasPrivateKey);
+                var caCert = await keyVault.GetCACertificateAsync(group);
+                Assert.NotNull(caCert);
+                Assert.False(caCert.HasPrivateKey);
+                var crl = await keyVault.GetCACrlAsync(group);
+                Assert.NotNull(crl);
+                crl.VerifySignature(caCert, true);
+                Assert.True(Utils.CompareDistinguishedName(crl.Issuer, caCert.Issuer));
             }
         }
 
@@ -105,9 +108,12 @@ namespace Services.Test
             var groups = await keyVault.GetCertificateGroupIds();
             foreach (var group in groups)
             {
-                var result = await keyVault.CreateCACertificateAsync(group);
-                Assert.NotNull(result);
-                Assert.False(result.HasPrivateKey);
+                for (int i = 0; i < 10; i++)
+                {
+                    var result = await keyVault.CreateCACertificateAsync(group);
+                    Assert.NotNull(result);
+                    Assert.False(result.HasPrivateKey);
+                }
             }
         }
 
@@ -195,9 +201,13 @@ namespace Services.Test
                 Assert.True(Utils.CompareDistinguishedName(randomApp.Subject, newCert.Subject));
                 Assert.False(Utils.CompareDistinguishedName(newCert.Issuer, newCert.Subject));
                 var cert = new X509Certificate2(newCert.RawData);
-                // TODO: implement revoke
-                //var crl = await keyVault.RevokeCertificateAsync(group, cert);
-                //Assert.NotNull(crl);
+                var crl = await keyVault.RevokeCertificateAsync(group, cert);
+                Assert.NotNull(crl);
+                var caCert = await keyVault.GetCACertificateAsync(group);
+                Assert.NotNull(caCert);
+                Assert.False(caCert.HasPrivateKey);
+                crl.VerifySignature(caCert, true);
+                Assert.True(Utils.CompareDistinguishedName(crl.Issuer, caCert.Issuer));
             }
         }
 

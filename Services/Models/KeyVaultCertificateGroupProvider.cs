@@ -6,7 +6,6 @@ using Opc.Ua;
 using Opc.Ua.Gds.Server;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
@@ -20,11 +19,12 @@ namespace Microsoft.Azure.IoTSolutions.OpcGds.Services.Models
         private KeyVaultCertificateGroupProvider(
             KeyVaultServiceClient keyVaultServiceClient,
             CertificateGroupConfiguration certificateGroupConfiguration
-            ) 
+            )
             :
-            base (Path.GetTempPath() + "authorities" + Path.DirectorySeparatorChar + certificateGroupConfiguration.Id, certificateGroupConfiguration)
+            base(null, certificateGroupConfiguration)
         {
             _keyVaultServiceClient = keyVaultServiceClient;
+            Certificate = null;
             Crl = null;
         }
 
@@ -43,7 +43,7 @@ namespace Microsoft.Azure.IoTSolutions.OpcGds.Services.Models
             return new KeyVaultCertificateGroupProvider(keyVaultServiceClient, certificateGroupConfiguration);
         }
 
-        public static async Task<string []> GetCertificateGroupIds(
+        public static async Task<string[]> GetCertificateGroupIds(
             KeyVaultServiceClient keyVaultServiceClient)
         {
             string json = await keyVaultServiceClient.GetCertificateConfigurationGroupsAsync().ConfigureAwait(false);
@@ -64,17 +64,27 @@ namespace Microsoft.Azure.IoTSolutions.OpcGds.Services.Models
         #region ICertificateGroupProvider
         public override async Task Init()
         {
-            Utils.Trace(Utils.TraceMasks.Information, "InitializeCertificateGroup: {0}", m_subjectName);
-            var result = await _keyVaultServiceClient.GetCertificateAsync(Configuration.Id).ConfigureAwait(false);
-            Certificate = new X509Certificate2(result.Cer);
-            if (Opc.Ua.Utils.CompareDistinguishedName(Certificate.Subject, Configuration.SubjectName))
+            try
             {
-                _caCertSecretIdentifier = result.SecretIdentifier.Identifier;
+                Utils.Trace(Utils.TraceMasks.Information, "InitializeCertificateGroup: {0}", m_subjectName);
+                var result = await _keyVaultServiceClient.GetCertificateAsync(Configuration.Id).ConfigureAwait(false);
+                Certificate = new X509Certificate2(result.Cer);
+                if (Opc.Ua.Utils.CompareDistinguishedName(Certificate.Subject, Configuration.SubjectName))
+                {
+                    _caCertSecretIdentifier = result.SecretIdentifier.Identifier;
+                    Crl = await _keyVaultServiceClient.LoadCACrl(Configuration.Id, Certificate);
+                }
+                else
+                {
+                    throw new InvalidConfigurationException("Key Vault certificate subject(" + Certificate.Subject + ") does not match cert group subject " + Configuration.SubjectName);
+                }
             }
-            else
+            catch (Exception e)
             {
+                _caCertSecretIdentifier = null;
                 Certificate = null;
-                throw new InvalidConfigurationException("Key Vault certificate subject(" + Certificate.Subject + ") does not match cert group subject " + Configuration.SubjectName);
+                Crl = null;
+                throw e;
             }
         }
 
@@ -84,8 +94,8 @@ namespace Microsoft.Azure.IoTSolutions.OpcGds.Services.Models
             try
             {
                 var caCert = CertificateFactory.CreateCertificate(
-                    CertificateStoreType.Directory,
-                    m_authoritiesStorePath,
+                    null,
+                    null,
                     null,
                     null,
                     null,
@@ -103,42 +113,63 @@ namespace Microsoft.Azure.IoTSolutions.OpcGds.Services.Models
                 Certificate = new X509Certificate2(caCert.RawData);
 
                 // initialize revocation list
-                Crl = await CertificateFactory.RevokeCertificateAsync(m_authoritiesStorePath, Certificate, null).ConfigureAwait(false);
+                Crl = CertificateFactory.RevokeCertificate(caCert, null, null);
 
                 // upload ca cert with private key
                 await _keyVaultServiceClient.UploadCACertificate(Configuration.Id, caCert).ConfigureAwait(false);
-                //await this.keyVaultServiceClient.UploadCACrl(certificateGroup.Id, certificateGroup.Crl);
+                await _keyVaultServiceClient.UploadCACrl(Configuration.Id, Certificate, Crl).ConfigureAwait(false);
 
             }
-            catch 
+            catch
             {
                 return false;
             }
-            finally
-            {
-                using (ICertificateStore store = CertificateStoreIdentifier.OpenStore(m_authoritiesStorePath))
-                {
-                    store.DeleteCRL(Crl);
-                    await store.Delete(Certificate.Thumbprint);
-                }
-            }
             return true;
+        }
+
+        public override async Task RevokeCertificateAsync(
+            X509Certificate2 certificate)
+        {
+            await LoadPublicAssets().ConfigureAwait(false);
+            var issuerCert = await LoadSigningKeyAsync(null, null).ConfigureAwait(false);
+            var certificates = new X509Certificate2Collection() { certificate };
+            var crls = new List<X509CRL>() { Crl };
+            Crl = CertificateFactory.RevokeCertificate(issuerCert, crls, certificates);
+            await _keyVaultServiceClient.UploadCACrl(Configuration.Id, Certificate, Crl).ConfigureAwait(false);
+        }
+
+        public async Task<X509Certificate2> GetCACertificateAsync(string id)
+        {
+            await LoadPublicAssets().ConfigureAwait(false);
+            return Certificate;
+        }
+
+        public async Task<X509CRL> GetCACrlAsync(string id)
+        {
+            await LoadPublicAssets().ConfigureAwait(false);
+            return Crl;
         }
 
         #endregion
 
         #region Public Overrides
         public override async Task<X509Certificate2> LoadSigningKeyAsync(
-            X509Certificate2 signingCertificate, 
+            X509Certificate2 signingCertificate,
             string signingKeyPassword)
+        {
+            await LoadPublicAssets();
+            return await _keyVaultServiceClient.LoadSigningCertificateAsync(
+                _caCertSecretIdentifier,
+                Certificate);
+        }
+        #endregion
+        #region Private Methods
+        private async Task LoadPublicAssets()
         {
             if (Certificate == null || _caCertSecretIdentifier == null)
             {
                 await Init();
             }
-            return await _keyVaultServiceClient.LoadSigningCertificateAsync(
-                _caCertSecretIdentifier,
-                Certificate);
         }
         #endregion
         #region Private Fields
