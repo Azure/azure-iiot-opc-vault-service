@@ -8,7 +8,7 @@ using Microsoft.Azure.IoTSolutions.GdsVault.WebService.v1.Models;
 
 namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.v1.Controllers
 {
-    [Route(Version.Path + "/[controller]"), TypeFilter(typeof(ExceptionsFilterAttribute))]
+    [Route(Version.Path + "/groups"), TypeFilter(typeof(ExceptionsFilterAttribute))]
     public sealed class CertificateGroupsController : Controller
     {
         private readonly ICertificateGroups certificateGroups;
@@ -32,15 +32,41 @@ namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.v1.Controllers
         {
             return new CertificateGroupConfigurationApiModel(id, await this.certificateGroups.GetCertificateGroupConfiguration(id));
         }
-#if mist
-        /// <summary>Create one device</summary>
-        /// <param name="device">Device information</param>
-        /// <returns>Device information</returns>
-        [HttpPost]
-        public async Task<DeviceApiModel> PostAsync([FromBody] DeviceApiModel device)
+
+        /// <summary>Create new CA Certificate</summary>
+        [HttpGet("create/{id}")]
+        public async Task<X509Certificate2ApiModel> GetCACertificateAsync(string id)
         {
-            return new DeviceApiModel(await this.certificateGroups.CreateAsync(device.ToServiceModel()));
+            return new X509Certificate2ApiModel(await this.certificateGroups.CreateCACertificateAsync(id));
         }
-#endif
+
+        /// <summary>Create new CA Certificate</summary>
+        [HttpPost("create/{id}")]
+        public async Task<X509Certificate2ApiModel> PostCreateAsync(string id)
+        {
+            return new X509Certificate2ApiModel(await this.certificateGroups.CreateCACertificateAsync(id));
+        }
+
+        /// <summary>Revoke Certificate</summary>
+        [HttpPost("revoke/{id}")]
+        public async Task<X509CRLApiModel> PostRevokeAsync(string id, [FromBody] X509Certificate2ApiModel cert)
+        {
+            return new X509CRLApiModel(await this.certificateGroups.RevokeCertificateAsync(id, cert.ToServiceModel()));
+        }
+
+        /// <summary>Revoke Certificate</summary>
+        [HttpPost("sign/{id}")]
+        public async Task<X509Certificate2ApiModel> PostSignAsync(string id, [FromBody] SigningRequestApiModel sr)
+        {
+            return new X509Certificate2ApiModel(await this.certificateGroups.SigningRequestAsync(id, sr.ApplicationURI, sr.ToServiceModel()));
+        }
+
+        /// <summary>Revoke Certificate</summary>
+        [HttpPost("newkey/{id}")]
+        public async Task<PfxCertificateApiModel> PostNewKeyAsync(string id, [FromBody] NewKeyPairRequestApiModel nkpr)
+        {
+            return new PfxCertificateApiModel(await this.certificateGroups.NewKeyPairRequestAsync(id, nkpr.ApplicationURI, nkpr.SubjectName, nkpr.DomainNames));
+        }
+
     }
 }

@@ -15,6 +15,8 @@ namespace Microsoft.Azure.IoTSolutions.GdsVault.Services
     {
         Task<string[]> GetCertificateGroupIds();
         Task<Opc.Ua.Gds.Server.CertificateGroupConfiguration> GetCertificateGroupConfiguration(string id);
+        Task<Opc.Ua.Gds.Server.CertificateGroupConfigurationCollection> GetCertificateGroupConfigurationCollection();
+
         Task<X509Certificate2> SigningRequestAsync(
             string id,
             string applicationUri,
@@ -50,9 +52,7 @@ namespace Microsoft.Azure.IoTSolutions.GdsVault.Services
 
         public async Task Init()
         {
-            string json = await _keyVaultServiceClient.GetCertificateConfigurationGroupsAsync();
-            List<Opc.Ua.Gds.Server.CertificateGroupConfiguration> certificateGroupCollection = JsonConvert.DeserializeObject<List<Opc.Ua.Gds.Server.CertificateGroupConfiguration>>(json);
-
+            var certificateGroupCollection = await GetCertificateGroupConfigurationCollection().ConfigureAwait(false);
             foreach (var certificateGroupConfiguration in certificateGroupCollection)
             {
                 KeyVaultCertificateGroup certificateGroup = null;
@@ -86,6 +86,12 @@ namespace Microsoft.Azure.IoTSolutions.GdsVault.Services
         public async Task<Opc.Ua.Gds.Server.CertificateGroupConfiguration> GetCertificateGroupConfiguration(string id)
         {
             return await KeyVaultCertificateGroup.GetCertificateGroupConfiguration(_keyVaultServiceClient, id).ConfigureAwait(false);
+        }
+
+        public async Task<Opc.Ua.Gds.Server.CertificateGroupConfigurationCollection> GetCertificateGroupConfigurationCollection()
+        {
+            string json = await _keyVaultServiceClient.GetCertificateConfigurationGroupsAsync().ConfigureAwait(false);
+            return JsonConvert.DeserializeObject<Opc.Ua.Gds.Server.CertificateGroupConfigurationCollection>(json);
         }
 
         public async Task<Opc.Ua.X509CRL> RevokeCertificateAsync(string id, X509Certificate2 certificate)

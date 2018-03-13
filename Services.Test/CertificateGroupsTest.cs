@@ -81,6 +81,17 @@ namespace Services.Test
         }
 
         [Fact, Trait(Constants.Type, Constants.UnitTest)]
+        public async Task KeyVaultGroupConfigurationCollection()
+        {
+            var config = new ServicesConfig();
+            var logger = new Logger("Services.Test", LogLevel.Debug);
+            var keyVault = new CertificateGroups(config, logger);
+            var groupCollection = await keyVault.GetCertificateGroupConfigurationCollection();
+            Assert.NotNull(groupCollection);
+            Assert.NotEmpty(groupCollection);
+        }
+
+        [Fact, Trait(Constants.Type, Constants.UnitTest)]
         public async Task KeyVaultGetCertificateAsync()
         {
             var config = new ServicesConfig();
