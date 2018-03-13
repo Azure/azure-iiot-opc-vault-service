@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
-using Microsoft.Azure.IoTSolutions.OpcGds.Services.Exceptions;
+using Microsoft.Azure.IoTSolutions.GdsVault.Services.Exceptions;
 using Newtonsoft.Json;
 using Opc.Ua;
 using Opc.Ua.Gds.Server;
@@ -10,7 +10,7 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
-namespace Microsoft.Azure.IoTSolutions.OpcGds.Services.Models
+namespace Microsoft.Azure.IoTSolutions.GdsVault.Services.Models
 {
     public class KeyVaultTrustList
     {
@@ -170,7 +170,6 @@ namespace Microsoft.Azure.IoTSolutions.OpcGds.Services.Models
         }
         #endregion
 
-        #region Public Overrides
         public override async Task<X509Certificate2> LoadSigningKeyAsync(
             X509Certificate2 signingCertificate,
             string signingKeyPassword)
@@ -180,8 +179,6 @@ namespace Microsoft.Azure.IoTSolutions.OpcGds.Services.Models
                 _caCertSecretIdentifier,
                 Certificate);
         }
-        #endregion
-        #region Private Methods
         private async Task LoadPublicAssets()
         {
             if (Certificate == null || _caCertSecretIdentifier == null)
@@ -189,11 +186,8 @@ namespace Microsoft.Azure.IoTSolutions.OpcGds.Services.Models
                 await Init();
             }
         }
-        #endregion
-        #region Private Fields
+
         private KeyVaultServiceClient _keyVaultServiceClient;
         private string _caCertSecretIdentifier;
-        #endregion
-
     }
 }

@@ -2,9 +2,9 @@
 
 using System;
 using System.Threading;
-using Microsoft.Azure.IoTSolutions.OpcGds.Services.Diagnostics;
+using Microsoft.Azure.IoTSolutions.GdsVault.Services.Diagnostics;
 
-namespace Microsoft.Azure.IoTSolutions.OpcGds.Services.Concurrency
+namespace Microsoft.Azure.IoTSolutions.GdsVault.Services.Concurrency
 {
     public interface ITimer
     {

@@ -2,7 +2,7 @@
 
 using System;
 
-namespace Microsoft.Azure.IoTSolutions.OpcGds.Services.Exceptions
+namespace Microsoft.Azure.IoTSolutions.GdsVault.Services.Exceptions
 {
     /// <summary>
     /// This exception is thrown when a client attempts to create a resource

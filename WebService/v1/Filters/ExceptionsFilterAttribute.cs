@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Formatters;
-using Microsoft.Azure.IoTSolutions.OpcGds.Services.Diagnostics;
-using Microsoft.Azure.IoTSolutions.OpcGds.Services.Exceptions;
-using Microsoft.Azure.IoTSolutions.OpcGds.WebService.v1.Exceptions;
+using Microsoft.Azure.IoTSolutions.GdsVault.Services.Diagnostics;
+using Microsoft.Azure.IoTSolutions.GdsVault.Services.Exceptions;
+using Microsoft.Azure.IoTSolutions.GdsVault.WebService.v1.Exceptions;
 using Microsoft.Extensions.DependencyModel;
 using Newtonsoft.Json;
 
-namespace Microsoft.Azure.IoTSolutions.OpcGds.WebService.v1.Filters
+namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.v1.Filters
 {
     /// <summary>
     /// Detect all the unhandled exceptions returned by the API controllers

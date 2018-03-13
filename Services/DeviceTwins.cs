@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Azure.Devices;
-using Microsoft.Azure.IoTSolutions.OpcGds.Services.Diagnostics;
-using Microsoft.Azure.IoTSolutions.OpcGds.Services.Models;
-using Microsoft.Azure.IoTSolutions.OpcGds.Services.Runtime;
+using Microsoft.Azure.IoTSolutions.GdsVault.Services.Diagnostics;
+using Microsoft.Azure.IoTSolutions.GdsVault.Services.Models;
+using Microsoft.Azure.IoTSolutions.GdsVault.Services.Runtime;
 
-namespace Microsoft.Azure.IoTSolutions.OpcGds.Services
+namespace Microsoft.Azure.IoTSolutions.GdsVault.Services
 {
     public interface IDeviceTwins
     {

@@ -2,10 +2,10 @@
 
 using System;
 using System.Collections.Generic;
-using Microsoft.Azure.IoTSolutions.OpcGds.Services;
-using Microsoft.Azure.IoTSolutions.OpcGds.Services.Models;
-using Microsoft.Azure.IoTSolutions.OpcGds.WebService.v1.Controllers;
-using Microsoft.Azure.IoTSolutions.OpcGds.WebService.v1.Models;
+using Microsoft.Azure.IoTSolutions.GdsVault.Services;
+using Microsoft.Azure.IoTSolutions.GdsVault.Services.Models;
+using Microsoft.Azure.IoTSolutions.GdsVault.WebService.v1.Controllers;
+using Microsoft.Azure.IoTSolutions.GdsVault.WebService.v1.Models;
 using Moq;
 using Newtonsoft.Json.Linq;
 using WebService.Test.helpers;

@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard1.6</TargetFramework>
+    <AssemblyName>Microsoft.Azure.IoTSolutions.OpcGds.Services</AssemblyName>
+    <RootNamespace>Microsoft.Azure.IoTSolutions.OpcGds.Services</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Azure.Devices" Version="1.16.0-preview-001" />
+    <PackageReference Include="Microsoft.Azure.KeyVault" Version="2.4.0-preview" />
+    <PackageReference Include="Microsoft.Azure.Services.AppAuthentication" Version="1.1.0-preview" />
+    <PackageReference Include="Opc.Ua.Gds.Server.Common" Version="1.3.351" />
+    <PackageReference Include="OPCFoundation.NetStandard.Opc.Ua.Symbols" Version="1.3.351.7" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="PKI\own\certs\Cloud Global Discovery Server [0E8AE68C817AA37C75E5A886645BF6844655345D].der">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="PKI\own\private\Cloud Global Discovery Server [0E8AE68C817AA37C75E5A886645BF6844655345D].pfx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+</Project>

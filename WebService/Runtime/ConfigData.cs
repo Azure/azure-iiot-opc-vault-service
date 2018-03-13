@@ -4,10 +4,10 @@ using System;
 using System.Collections;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Microsoft.Azure.IoTSolutions.OpcGds.Services.Exceptions;
+using Microsoft.Azure.IoTSolutions.GdsVault.Services.Exceptions;
 using Microsoft.Extensions.Configuration;
 
-namespace Microsoft.Azure.IoTSolutions.OpcGds.WebService.Runtime
+namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.Runtime
 {
     public interface IConfigData
     {

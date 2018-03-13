@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using Microsoft.Azure.Devices.Shared;
 using Newtonsoft.Json.Linq;
 
-namespace Microsoft.Azure.IoTSolutions.OpcGds.Services.Models
+namespace Microsoft.Azure.IoTSolutions.GdsVault.Services.Models
 {
     public sealed class DeviceTwin
     {

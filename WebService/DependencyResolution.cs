@@ -3,13 +3,13 @@
 using System.Reflection;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
-using Microsoft.Azure.IoTSolutions.OpcGds.Services;
-using Microsoft.Azure.IoTSolutions.OpcGds.Services.Diagnostics;
-using Microsoft.Azure.IoTSolutions.OpcGds.Services.Runtime;
-using Microsoft.Azure.IoTSolutions.OpcGds.WebService.Runtime;
+using Microsoft.Azure.IoTSolutions.GdsVault.Services;
+using Microsoft.Azure.IoTSolutions.GdsVault.Services.Diagnostics;
+using Microsoft.Azure.IoTSolutions.GdsVault.Services.Runtime;
+using Microsoft.Azure.IoTSolutions.GdsVault.WebService.Runtime;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Microsoft.Azure.IoTSolutions.OpcGds.WebService
+namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService
 {
     public class DependencyResolution
     {

@@ -2,7 +2,7 @@
 
 using System;
 
-namespace Microsoft.Azure.IoTSolutions.OpcGds.Services.Concurrency
+namespace Microsoft.Azure.IoTSolutions.GdsVault.Services.Concurrency
 {
     public class TimerNotInitializedException : Exception
     {

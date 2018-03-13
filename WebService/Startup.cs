@@ -9,7 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace Microsoft.Azure.IoTSolutions.OpcGds.WebService
+namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService
 {
     public class Startup
     {

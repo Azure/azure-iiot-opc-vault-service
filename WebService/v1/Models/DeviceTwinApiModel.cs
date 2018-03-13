@@ -2,11 +2,11 @@
 
 using System;
 using System.Collections.Generic;
-using Microsoft.Azure.IoTSolutions.OpcGds.Services.Models;
+using Microsoft.Azure.IoTSolutions.GdsVault.Services.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace Microsoft.Azure.IoTSolutions.OpcGds.WebService.v1.Models
+namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.v1.Models
 {
     public sealed class DeviceTwinApiModel
     {

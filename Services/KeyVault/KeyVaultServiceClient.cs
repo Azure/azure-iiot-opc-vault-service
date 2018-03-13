@@ -14,7 +14,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Microsoft.Azure.IoTSolutions.OpcGds.Services
+namespace Microsoft.Azure.IoTSolutions.GdsVault.Services
 {
 
     public class KeyVaultServiceClient
@@ -343,7 +343,6 @@ namespace Microsoft.Azure.IoTSolutions.OpcGds.Services
             return trustList;
         }
 
-        #region Private Methods
         private string CrlSecretName(string name, X509Certificate2 certificate)
         {
             return name + "Crl" + certificate.Thumbprint;
@@ -370,12 +369,10 @@ namespace Microsoft.Azure.IoTSolutions.OpcGds.Services
             }
             return null;
         }
-        #endregion
 
         private string _vaultBaseUrl;
         private IKeyVaultClient _keyVaultClient;
         private ClientAssertionCertificate _assertionCert;
-
     }
 }
 
