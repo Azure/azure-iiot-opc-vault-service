@@ -11,8 +11,10 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Azure.IoTSolutions.GdsVault.Services
 {
-    public interface ICertificateGroupProvider
+    public interface ICertificateGroups
     {
+        Task<string[]> GetCertificateGroupIds();
+        Task<Opc.Ua.Gds.Server.CertificateGroupConfiguration> GetCertificateGroupConfiguration(string id);
         Task<X509Certificate2> SigningRequestAsync(
             string id,
             string applicationUri,
@@ -33,9 +35,9 @@ namespace Microsoft.Azure.IoTSolutions.GdsVault.Services
             );
     }
 
-    public sealed class CertificateGroupProvider : ICertificateGroupProvider
+    public sealed class CertificateGroups : ICertificateGroups
     {
-        public CertificateGroupProvider(
+        public CertificateGroups(
             IServicesConfig config,
             ILogger logger)
         {
@@ -74,6 +76,16 @@ namespace Microsoft.Azure.IoTSolutions.GdsVault.Services
 
                 }
             }
+        }
+
+        public async Task<string[]> GetCertificateGroupIds()
+        {
+            return await KeyVaultCertificateGroup.GetCertificateGroupIds(_keyVaultServiceClient).ConfigureAwait(false); ;
+        }
+
+        public async Task<Opc.Ua.Gds.Server.CertificateGroupConfiguration> GetCertificateGroupConfiguration(string id)
+        {
+            return await KeyVaultCertificateGroup.GetCertificateGroupConfiguration(_keyVaultServiceClient, id).ConfigureAwait(false);
         }
 
         public async Task<Opc.Ua.X509CRL> RevokeCertificateAsync(string id, X509Certificate2 certificate)
@@ -120,16 +132,6 @@ namespace Microsoft.Azure.IoTSolutions.GdsVault.Services
             app.ApplicationNames = new Opc.Ua.LocalizedTextCollection();
             app.ApplicationUri = applicationUri;
             return await certificateGroup.NewKeyPairRequestAsync(app, subjectName, domainNames).ConfigureAwait(false); ;
-        }
-
-        public async Task<string[]> GetCertificateGroupIds()
-        {
-            return await KeyVaultCertificateGroup.GetCertificateGroupIds(_keyVaultServiceClient).ConfigureAwait(false); ;
-        }
-
-        public async Task<Opc.Ua.Gds.Server.CertificateGroupConfiguration> GetCertificateGroupConfiguration(string id)
-        {
-            return await KeyVaultCertificateGroup.GetCertificateGroupConfiguration(_keyVaultServiceClient, id).ConfigureAwait(false);
         }
 
         public async Task<X509Certificate2> GetCACertificateAsync(string id)

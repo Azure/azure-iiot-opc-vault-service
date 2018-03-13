@@ -51,10 +51,10 @@ namespace Services.Test
         public byte[][] IssuerCertificates;
     }
 
-    public class CertificateGroupProviderTest
+    public class CertificateGroupsTest
     {
 
-        public CertificateGroupProviderTest(ITestOutputHelper log)
+        public CertificateGroupsTest(ITestOutputHelper log)
         {
             this._log = log;
             _randomSource = new RandomSource(randomStart);
@@ -67,7 +67,7 @@ namespace Services.Test
         {
             var config = new ServicesConfig();
             var logger = new Logger("Services.Test", LogLevel.Debug);
-            var keyVault = new CertificateGroupProvider(config, logger);
+            var keyVault = new CertificateGroups(config, logger);
             await keyVault.Init();
         }
 
@@ -76,7 +76,7 @@ namespace Services.Test
         {
             var config = new ServicesConfig();
             var logger = new Logger("Services.Test", LogLevel.Debug);
-            var keyVault = new CertificateGroupProvider(config, logger);
+            var keyVault = new CertificateGroups(config, logger);
             var groups = await keyVault.GetCertificateGroupIds();
         }
 
@@ -85,7 +85,7 @@ namespace Services.Test
         {
             var config = new ServicesConfig();
             var logger = new Logger("Services.Test", LogLevel.Debug);
-            var keyVault = new CertificateGroupProvider(config, logger);
+            var keyVault = new CertificateGroups(config, logger);
             var groups = await keyVault.GetCertificateGroupIds();
             foreach (var group in groups)
             {
@@ -104,7 +104,7 @@ namespace Services.Test
         {
             var config = new ServicesConfig();
             var logger = new Logger("Services.Test", LogLevel.Debug);
-            var keyVault = new CertificateGroupProvider(config, logger);
+            var keyVault = new CertificateGroups(config, logger);
             var groups = await keyVault.GetCertificateGroupIds();
             foreach (var group in groups)
             {
@@ -122,7 +122,7 @@ namespace Services.Test
         {
             var config = new ServicesConfig();
             var logger = new Logger("Services.Test", LogLevel.Debug);
-            var keyVault = new CertificateGroupProvider(config, logger);
+            var keyVault = new CertificateGroups(config, logger);
             var groups = await keyVault.GetCertificateGroupIds();
             foreach (var group in groups)
             {
@@ -144,7 +144,7 @@ namespace Services.Test
         {
             var config = new ServicesConfig();
             var logger = new Logger("Services.Test", LogLevel.Debug);
-            var keyVault = new CertificateGroupProvider(config, logger);
+            var keyVault = new CertificateGroups(config, logger);
             var groups = await keyVault.GetCertificateGroupIds();
             foreach (var group in groups)
             {
@@ -182,7 +182,7 @@ namespace Services.Test
         {
             var config = new ServicesConfig();
             var logger = new Logger("Services.Test", LogLevel.Debug);
-            var keyVault = new CertificateGroupProvider(config, logger);
+            var keyVault = new CertificateGroups(config, logger);
             var groups = await keyVault.GetCertificateGroupIds();
             foreach (var group in groups)
             {
@@ -213,7 +213,7 @@ namespace Services.Test
         {
             var config = new ServicesConfig();
             var logger = new Logger("Services.Test", LogLevel.Debug);
-            var keyVault = new CertificateGroupProvider(config, logger);
+            var keyVault = new CertificateGroups(config, logger);
             var groups = await keyVault.GetCertificateGroupIds();
             foreach (var group in groups)
             {
