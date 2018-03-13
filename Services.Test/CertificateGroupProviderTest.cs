@@ -51,10 +51,10 @@ namespace Services.Test
         public byte[][] IssuerCertificates;
     }
 
-    public class KeyVaultCGProviderTest
+    public class CertificateGroupProviderTest
     {
 
-        public KeyVaultCGProviderTest(ITestOutputHelper log)
+        public CertificateGroupProviderTest(ITestOutputHelper log)
         {
             this._log = log;
             _randomSource = new RandomSource(randomStart);
@@ -131,9 +131,7 @@ namespace Services.Test
                     group,
                     randomApp.ApplicationRecord.ApplicationUri,
                     randomApp.Subject,
-                    randomApp.DomainNames.ToArray(),
-                    randomApp.PrivateKeyFormat,
-                    null);
+                    randomApp.DomainNames.ToArray());
                 Assert.NotNull(newCert);
                 Assert.True(newCert.HasPrivateKey);
                 Assert.True(Utils.CompareDistinguishedName(randomApp.Subject, newCert.Subject));
@@ -193,9 +191,8 @@ namespace Services.Test
                     group,
                     randomApp.ApplicationRecord.ApplicationUri,
                     randomApp.Subject,
-                    randomApp.DomainNames.ToArray(),
-                    randomApp.PrivateKeyFormat,
-                    null);
+                    randomApp.DomainNames.ToArray()
+                    );
                 Assert.NotNull(newCert);
                 Assert.True(newCert.HasPrivateKey);
                 Assert.True(Utils.CompareDistinguishedName(randomApp.Subject, newCert.Subject));
@@ -210,6 +207,20 @@ namespace Services.Test
                 Assert.True(Utils.CompareDistinguishedName(crl.Issuer, caCert.Issuer));
             }
         }
+
+        [Fact, Trait(Constants.Type, Constants.UnitTest)]
+        public async Task GetTrustListAsync()
+        {
+            var config = new ServicesConfig();
+            var logger = new Logger("Services.Test", LogLevel.Debug);
+            var keyVault = new CertificateGroupProvider(config, logger);
+            var groups = await keyVault.GetCertificateGroupIds();
+            foreach (var group in groups)
+            {
+                await keyVault.GetTrustListAsync(group);
+            }
+        }
+
 
         private ApplicationTestData RandomApplicationTestData()
         {

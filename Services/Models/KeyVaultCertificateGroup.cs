@@ -12,11 +12,30 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Azure.IoTSolutions.OpcGds.Services.Models
 {
-    public sealed class KeyVaultCertificateGroupProvider : Opc.Ua.Gds.Server.CertificateGroup
+    public class KeyVaultTrustList
+    {
+        public readonly string Id;
+        public X509Certificate2Collection IssuerCertificates;
+        public ICollection<X509CRL> IssuerCrls;
+        public X509Certificate2Collection TrustedCertificates;
+        public ICollection<X509CRL> TrustedCrls;
+
+        public KeyVaultTrustList(string id)
+        {
+            Id = id;
+            IssuerCertificates = new X509Certificate2Collection();
+            IssuerCrls = new List<X509CRL>();
+            TrustedCertificates = new X509Certificate2Collection();
+            TrustedCrls = new List<X509CRL>();
+        }
+    }
+
+
+    public sealed class KeyVaultCertificateGroup : Opc.Ua.Gds.Server.CertificateGroup
     {
         public X509CRL Crl;
 
-        private KeyVaultCertificateGroupProvider(
+        private KeyVaultCertificateGroup(
             KeyVaultServiceClient keyVaultServiceClient,
             CertificateGroupConfiguration certificateGroupConfiguration
             )
@@ -28,19 +47,19 @@ namespace Microsoft.Azure.IoTSolutions.OpcGds.Services.Models
             Crl = null;
         }
 
-        public static KeyVaultCertificateGroupProvider Create(
+        public static KeyVaultCertificateGroup Create(
             KeyVaultServiceClient keyVaultServiceClient,
             CertificateGroupConfiguration certificateGroupConfiguration)
         {
-            return new KeyVaultCertificateGroupProvider(keyVaultServiceClient, certificateGroupConfiguration);
+            return new KeyVaultCertificateGroup(keyVaultServiceClient, certificateGroupConfiguration);
         }
 
-        public static async Task<KeyVaultCertificateGroupProvider> Create(
+        public static async Task<KeyVaultCertificateGroup> Create(
             KeyVaultServiceClient keyVaultServiceClient,
             string id)
         {
             var certificateGroupConfiguration = await GetCertificateGroupConfiguration(keyVaultServiceClient, id);
-            return new KeyVaultCertificateGroupProvider(keyVaultServiceClient, certificateGroupConfiguration);
+            return new KeyVaultCertificateGroup(keyVaultServiceClient, certificateGroupConfiguration);
         }
 
         public static async Task<string[]> GetCertificateGroupIds(
@@ -116,8 +135,8 @@ namespace Microsoft.Azure.IoTSolutions.OpcGds.Services.Models
                 Crl = CertificateFactory.RevokeCertificate(caCert, null, null);
 
                 // upload ca cert with private key
-                await _keyVaultServiceClient.UploadCACertificate(Configuration.Id, caCert).ConfigureAwait(false);
-                await _keyVaultServiceClient.UploadCACrl(Configuration.Id, Certificate, Crl).ConfigureAwait(false);
+                await _keyVaultServiceClient.ImportCACertificate(Configuration.Id, caCert, true).ConfigureAwait(false);
+                await _keyVaultServiceClient.ImportCACrl(Configuration.Id, Certificate, Crl).ConfigureAwait(false);
 
             }
             catch
@@ -135,7 +154,7 @@ namespace Microsoft.Azure.IoTSolutions.OpcGds.Services.Models
             var certificates = new X509Certificate2Collection() { certificate };
             var crls = new List<X509CRL>() { Crl };
             Crl = CertificateFactory.RevokeCertificate(issuerCert, crls, certificates);
-            await _keyVaultServiceClient.UploadCACrl(Configuration.Id, Certificate, Crl).ConfigureAwait(false);
+            await _keyVaultServiceClient.ImportCACrl(Configuration.Id, Certificate, Crl).ConfigureAwait(false);
         }
 
         public async Task<X509Certificate2> GetCACertificateAsync(string id)
@@ -149,7 +168,6 @@ namespace Microsoft.Azure.IoTSolutions.OpcGds.Services.Models
             await LoadPublicAssets().ConfigureAwait(false);
             return Crl;
         }
-
         #endregion
 
         #region Public Overrides
