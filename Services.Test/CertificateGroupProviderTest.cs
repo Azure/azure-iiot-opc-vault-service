@@ -1,8 +1,8 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
-using Microsoft.Azure.IoTSolutions.OpcGds.Services;
-using Microsoft.Azure.IoTSolutions.OpcGds.Services.Diagnostics;
-using Microsoft.Azure.IoTSolutions.OpcGds.Services.Runtime;
+using Microsoft.Azure.IoTSolutions.GdsVault.Services;
+using Microsoft.Azure.IoTSolutions.GdsVault.Services.Diagnostics;
+using Microsoft.Azure.IoTSolutions.GdsVault.Services.Runtime;
 using Opc.Ua;
 using Opc.Ua.Gds;
 using Opc.Ua.Test;
