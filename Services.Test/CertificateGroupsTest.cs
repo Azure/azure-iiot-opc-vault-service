@@ -138,15 +138,17 @@ namespace Services.Test
             foreach (var group in groups)
             {
                 var randomApp = RandomApplicationTestData();
-                var newCert = await keyVault.NewKeyPairRequestAsync(
+                var newKeyPair = await keyVault.NewKeyPairRequestAsync(
                     group,
                     randomApp.ApplicationRecord.ApplicationUri,
                     randomApp.Subject,
-                    randomApp.DomainNames.ToArray());
-                Assert.NotNull(newCert);
-                Assert.True(newCert.HasPrivateKey);
-                Assert.True(Utils.CompareDistinguishedName(randomApp.Subject, newCert.Subject));
-                Assert.False(Utils.CompareDistinguishedName(newCert.Issuer, newCert.Subject));
+                    randomApp.DomainNames.ToArray(),
+                    randomApp.PrivateKeyFormat,
+                    randomApp.PrivateKeyPassword);
+                Assert.NotNull(newKeyPair);
+                Assert.False(newKeyPair.Certificate.HasPrivateKey);
+                Assert.True(Utils.CompareDistinguishedName(randomApp.Subject, newKeyPair.Certificate.Subject));
+                Assert.False(Utils.CompareDistinguishedName(newKeyPair.Certificate.Issuer, newKeyPair.Certificate.Subject));
             }
         }
 
@@ -202,13 +204,15 @@ namespace Services.Test
                     group,
                     randomApp.ApplicationRecord.ApplicationUri,
                     randomApp.Subject,
-                    randomApp.DomainNames.ToArray()
+                    randomApp.DomainNames.ToArray(),
+                    randomApp.PrivateKeyFormat,
+                    randomApp.PrivateKeyPassword
                     );
                 Assert.NotNull(newCert);
-                Assert.True(newCert.HasPrivateKey);
-                Assert.True(Utils.CompareDistinguishedName(randomApp.Subject, newCert.Subject));
-                Assert.False(Utils.CompareDistinguishedName(newCert.Issuer, newCert.Subject));
-                var cert = new X509Certificate2(newCert.RawData);
+                Assert.False(newCert.Certificate.HasPrivateKey);
+                Assert.True(Utils.CompareDistinguishedName(randomApp.Subject, newCert.Certificate.Subject));
+                Assert.False(Utils.CompareDistinguishedName(newCert.Certificate.Issuer, newCert.Certificate.Subject));
+                var cert = new X509Certificate2(newCert.Certificate.RawData);
                 var crl = await keyVault.RevokeCertificateAsync(group, cert);
                 Assert.NotNull(crl);
                 var caCert = await keyVault.GetCACertificateAsync(group);

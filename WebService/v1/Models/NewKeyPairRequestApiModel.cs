@@ -16,11 +16,24 @@ namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.v1.Models
         [JsonProperty(PropertyName = "DomainNames", Order = 30)]
         public string [] DomainNames { get; set; }
 
-        public NewKeyPairRequestApiModel(string applicationURI, string subjectName, string[] domainNames)
+        [JsonProperty(PropertyName = "PrivateKeyFormat", Order = 40)]
+        public string PrivateKeyFormat { get; set; }
+
+        [JsonProperty(PropertyName = "PrivateKeyPassword", Order = 50)]
+        public string PrivateKeyPassword { get; set; }
+
+        public NewKeyPairRequestApiModel(
+            string applicationURI, 
+            string subjectName, 
+            string[] domainNames,
+            string PrivateKeyFormat,
+            string PrivateKeyPassword)
         {
             this.ApplicationURI = applicationURI;
             this.SubjectName = subjectName;
             this.DomainNames = domainNames;
+            this.PrivateKeyFormat = PrivateKeyFormat;
+            this.PrivateKeyPassword = PrivateKeyPassword;
         }
 
     }

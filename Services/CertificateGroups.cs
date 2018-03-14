@@ -29,11 +29,13 @@ namespace Microsoft.Azure.IoTSolutions.GdsVault.Services
         Task<X509Certificate2> CreateCACertificateAsync(
             string id
             );
-        Task<X509Certificate2> NewKeyPairRequestAsync(
+        Task<Opc.Ua.Gds.Server.X509Certificate2KeyPair> NewKeyPairRequestAsync(
             string id,
             string applicationUri,
             string subjectName,
-            string[] domainNames
+            string[] domainNames,
+            string privateKeyFormat,
+            string privateKeyPassword
             );
     }
 
@@ -126,18 +128,20 @@ namespace Microsoft.Azure.IoTSolutions.GdsVault.Services
             return await certificateGroup.SigningRequestAsync(app, null, certificateRequest).ConfigureAwait(false); ;
         }
 
-        public async Task<X509Certificate2> NewKeyPairRequestAsync(
+        public async Task<Opc.Ua.Gds.Server.X509Certificate2KeyPair> NewKeyPairRequestAsync(
             string id,
             string applicationUri,
             string subjectName,
-            string[] domainNames
+            string[] domainNames,
+            string privateKeyFormat,
+            string privateKeyPassword
             )
         {
             var certificateGroup = await KeyVaultCertificateGroup.Create(_keyVaultServiceClient, id).ConfigureAwait(false); ;
             var app = new Opc.Ua.Gds.ApplicationRecordDataType();
             app.ApplicationNames = new Opc.Ua.LocalizedTextCollection();
             app.ApplicationUri = applicationUri;
-            return await certificateGroup.NewKeyPairRequestAsync(app, subjectName, domainNames).ConfigureAwait(false); ;
+            return await certificateGroup.NewKeyPairRequestAsync(app, subjectName, domainNames, privateKeyFormat, privateKeyPassword).ConfigureAwait(false); ;
         }
 
         public async Task<X509Certificate2> GetCACertificateAsync(string id)
