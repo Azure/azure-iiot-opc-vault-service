@@ -9,11 +9,11 @@ using Microsoft.Azure.IoTSolutions.GdsVault.WebService.v1.Models;
 namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.v1.Controllers
 {
     [Route(Version.Path + "/groups"), TypeFilter(typeof(ExceptionsFilterAttribute))]
-    public sealed class CertificateGroupsController : Controller
+    public sealed class CertificateGroupController : Controller
     {
-        private readonly ICertificateGroups certificateGroups;
+        private readonly ICertificateGroup certificateGroups;
 
-        public CertificateGroupsController(ICertificateGroups certificateGroups)
+        public CertificateGroupController(ICertificateGroup certificateGroups)
         {
             this.certificateGroups = certificateGroups;
         }

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Azure.IoTSolutions.GdsVault.Services
 {
-    public interface ICertificateGroups
+    public interface ICertificateGroup
     {
         Task<string[]> GetCertificateGroupIds();
         Task<Opc.Ua.Gds.Server.CertificateGroupConfiguration> GetCertificateGroupConfiguration(string id);
@@ -39,9 +39,9 @@ namespace Microsoft.Azure.IoTSolutions.GdsVault.Services
             );
     }
 
-    public sealed class CertificateGroups : ICertificateGroups
+    public sealed class CertificateGroup : ICertificateGroup
     {
-        public CertificateGroups(
+        public CertificateGroup(
             IServicesConfig config,
             ILogger logger)
         {

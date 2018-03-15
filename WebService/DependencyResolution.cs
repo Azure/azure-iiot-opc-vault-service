@@ -62,8 +62,11 @@ namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService
             // By default Autofac uses a request lifetime, creating new objects
             // for each request, which is good to reduce the risk of memory
             // leaks, but not so good for the overall performance.
+#if mist
             builder.RegisterType<Services.Devices>().As<IDevices>().SingleInstance();
             builder.RegisterType<DeviceTwins>().As<IDeviceTwins>().SingleInstance();
+#endif
+            builder.RegisterType<CertificateGroup>().As<ICertificateGroup>().SingleInstance();
         }
 
         private static void RegisterFactory(IContainer container)
