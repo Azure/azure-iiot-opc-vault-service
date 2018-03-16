@@ -4,7 +4,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 
-namespace Microsoft.Azure.IoTSolutions.GdsVault.Services.Diagnostics
+namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Diagnostics
 {
     public enum LogLevel
     {

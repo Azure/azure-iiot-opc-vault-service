@@ -1,7 +1,10 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Xunit.Abstractions;
@@ -28,6 +31,7 @@ namespace WebService.Test.helpers.Http
     public class HttpClient : IHttpClient
     {
         private readonly ITestOutputHelper log;
+        private readonly bool logCanContainCredentials;
 
         public HttpClient()
         {
@@ -36,6 +40,19 @@ namespace WebService.Test.helpers.Http
         public HttpClient(ITestOutputHelper logger)
         {
             this.log = logger;
+
+            try
+            {
+                // See team wiki /wiki/Environment-variables
+                var envSetting = Environment
+                    .GetEnvironmentVariable("PCS_ENABLE_UNSAFE_LOGS")
+                    .ToLowerInvariant();
+                this.logCanContainCredentials = envSetting == "true";
+            }
+            catch (Exception)
+            {
+                this.logCanContainCredentials = false;
+            }
         }
 
         public async Task<IHttpResponse> GetAsync(IHttpRequest request)
@@ -75,7 +92,7 @@ namespace WebService.Test.helpers.Http
 
         private async Task<IHttpResponse> SendAsync(IHttpRequest request, HttpMethod httpMethod)
         {
-            this.LogRequest(request);
+            this.LogRequest(request, httpMethod);
 
             var clientHandler = new HttpClientHandler();
             using (var client = new System.Net.Http.HttpClient(clientHandler))
@@ -143,14 +160,26 @@ namespace WebService.Test.helpers.Http
             client.Timeout = TimeSpan.FromMilliseconds(request.Options.Timeout);
         }
 
-        private void LogRequest(IHttpRequest request)
+        private void LogRequest(IHttpRequest request, HttpMethod httpMethod)
         {
             if (this.log == null) return;
 
             this.log.WriteLine("### REQUEST ##############################");
+            this.log.WriteLine("# Method: " + httpMethod);
             this.log.WriteLine("# URI: " + request.Uri);
             this.log.WriteLine("# Timeout: " + request.Options.Timeout);
-            this.log.WriteLine("# Headers:\n" + request.Headers);
+
+            var headers = this.HeadersToString(request.Headers);
+            if (httpMethod == HttpMethod.Post || httpMethod == HttpMethod.Put)
+            {
+                headers = headers.Trim() + this.HeadersToString(request.Content.Headers);
+            }
+            this.log.WriteLine("# Headers:\n" + headers);
+
+            if (httpMethod == HttpMethod.Post || httpMethod == HttpMethod.Put)
+            {
+                this.LogContent(request.Content.ReadAsStringAsync().Result);
+            }
         }
 
         private void LogResponse(IHttpResponse response)
@@ -158,20 +187,51 @@ namespace WebService.Test.helpers.Http
             if (this.log == null) return;
 
             this.log.WriteLine("### RESPONSE ##############################");
-            this.log.WriteLine("# Status code: " + response.StatusCode);
-            this.log.WriteLine("# Headers:\n" + response.Headers.ToString());
-            this.log.WriteLine("# Content:");
+            this.log.WriteLine("# Status code: " + (int) response.StatusCode + " " + response.StatusCode);
+            this.log.WriteLine("# Headers:\n" + this.HeadersToString(response.Headers));
+            this.LogContent(response.Content);
+        }
 
-            try
+        private void LogContent(string content)
+        {
+            if (this.logCanContainCredentials)
             {
-                var o = JsonConvert.DeserializeObject(response.Content);
-                var s = JsonConvert.SerializeObject(o, Formatting.Indented);
-                this.log.WriteLine(s);
+                this.log.WriteLine("# Content: **LOG ENABLED** (see dev. setup to hide sensitive content)");
+                try
+                {
+                    var o = JsonConvert.DeserializeObject(content);
+                    var s = JsonConvert.SerializeObject(o, Formatting.Indented);
+                    this.log.WriteLine(s);
+                }
+                catch (Exception)
+                {
+                    this.log.WriteLine(content);
+                }
             }
-            catch (Exception)
+            else
             {
-                this.log.WriteLine(response.Content);
+                this.log.WriteLine("# Content: **HIDDEN** (see dev. setup to unhide sensitive content)");
             }
+        }
+
+        private string HeadersToString(HttpHeaders h)
+        {
+            // Headers not to log in unsafe/shared environments (e.g. CI)
+            var restricted = new List<string> { "authorization", "proxy-authorization", "cookie", "set-cookie" };
+
+            var result = "";
+            foreach (var pair in h)
+            {
+                if (this.logCanContainCredentials || !restricted.Contains(pair.Key.ToLowerInvariant()))
+                {
+                    result = pair.Value.Aggregate(result, (current, s) => current + "  " + pair.Key + ": " + s + "\n");
+                }
+                else
+                {
+                    result = result + "  " + pair.Key + ": **HIDDEN** (see dev. setup to unhide sensitive content)\n";
+                }
+            }
+            return result.Trim('\n');
         }
     }
 }

@@ -2,11 +2,11 @@
 
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.IoTSolutions.GdsVault.Services;
-using Microsoft.Azure.IoTSolutions.GdsVault.WebService.v1.Filters;
-using Microsoft.Azure.IoTSolutions.GdsVault.WebService.v1.Models;
+using Microsoft.Azure.IoTSolutions.OpcGdsVault.Services;
+using Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.v1.Filters;
+using Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.v1.Models;
 
-namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.v1.Controllers
+namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.v1.Controllers
 {
     [Route(Version.Path + "/groups"), TypeFilter(typeof(ExceptionsFilterAttribute))]
     public sealed class CertificateGroupController : Controller

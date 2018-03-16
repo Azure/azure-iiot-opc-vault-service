@@ -2,7 +2,7 @@
 
 using System;
 
-namespace Microsoft.Azure.IoTSolutions.GdsVault.Services.Exceptions
+namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Exceptions
 {
     /// <summary>
     /// This exception is thrown when the service is configured incorrectly.

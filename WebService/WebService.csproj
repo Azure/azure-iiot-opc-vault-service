@@ -2,8 +2,8 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp1.1</TargetFramework>
     <LangVersion>6</LangVersion>
-    <AssemblyName>Microsoft.Azure.IoTSolutions.OpcGds.WebService</AssemblyName>
-    <RootNamespace>Microsoft.Azure.IoTSolutions.OpcGds.WebService</RootNamespace>
+    <AssemblyName>Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService</AssemblyName>
+    <RootNamespace>Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="appsettings.ini">

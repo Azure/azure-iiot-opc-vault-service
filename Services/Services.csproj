@@ -1,11 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <LangVersion>6</LangVersion>
     <TargetFramework>netstandard1.6</TargetFramework>
-    <AssemblyName>Microsoft.Azure.IoTSolutions.OpcGds.Services</AssemblyName>
-    <RootNamespace>Microsoft.Azure.IoTSolutions.OpcGds.Services</RootNamespace>
+    <AssemblyName>Microsoft.Azure.IoTSolutions.OpcGdsVault.Services</AssemblyName>
+    <RootNamespace>Microsoft.Azure.IoTSolutions.OpcGdsVault.Services</RootNamespace>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <Company>Microsoft</Company>
+    <Product>Azure IoT OPC UA GDS Vault services</Product>
+    <Authors>Microsoft</Authors>
+    <PackageLicenseUrl>https://github.com/Azure/iot-opc-gdsvault-service/blob/master/LICENSE</PackageLicenseUrl>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.Devices" Version="1.5.1" />
     <PackageReference Include="Microsoft.Azure.KeyVault" Version="2.4.0-preview" />
     <PackageReference Include="Microsoft.Azure.Services.AppAuthentication" Version="1.1.0-preview" />
     <PackageReference Include="Opc.Ua.Gds.Server.Common" Version="1.4.352.1-preview180315" />

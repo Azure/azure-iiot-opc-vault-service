@@ -3,7 +3,7 @@
 using System.Net;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
-using Microsoft.Azure.IoTSolutions.GdsVault.WebService;
+using Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService;
 using WebService.Test.helpers;
 using WebService.Test.helpers.Http;
 using Xunit;

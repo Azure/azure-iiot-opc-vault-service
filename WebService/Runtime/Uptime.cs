@@ -2,7 +2,7 @@
 
 using System;
 
-namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.Runtime
+namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Runtime
 {
     /// <summary>Helper capturing runtime information.</summary>
     public static class Uptime

@@ -2,9 +2,9 @@
 
 using System;
 using System.IO;
-using Microsoft.Azure.IoTSolutions.GdsVault.Services.Runtime;
+using Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Runtime;
 
-namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.Runtime
+namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Runtime
 {
     public interface IConfig
     {
@@ -21,7 +21,7 @@ namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.Runtime
     /// <summary>Web service configuration</summary>
     public class Config : IConfig
     {
-        private const string ApplicationKey = "GdsVault:";
+        private const string ApplicationKey = "OpcGdsVault:";
         private const string PortKey = ApplicationKey + "webservice_port";
         private const string SomeFolderKey = ApplicationKey + "some_folder_path";
 

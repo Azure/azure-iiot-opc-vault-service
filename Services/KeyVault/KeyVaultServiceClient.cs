@@ -14,7 +14,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Microsoft.Azure.IoTSolutions.GdsVault.Services
+namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services
 {
 
     public class KeyVaultServiceClient
@@ -270,7 +270,8 @@ namespace Microsoft.Azure.IoTSolutions.GdsVault.Services
             {
                 foreach (var secretItem in secretItems.Where(s => s.Tags != null))
                 {
-                    secretItem.Tags.TryGetValue(id, out string tag);
+                    string tag;
+                    secretItem.Tags.TryGetValue(id, out tag);
                     bool issuer = tag == TagIssuerList;
                     bool trusted = tag == TagTrustedList;
                     if ((issuer || trusted) &&
@@ -309,7 +310,8 @@ namespace Microsoft.Azure.IoTSolutions.GdsVault.Services
             {
                 foreach (var certItem in certItems.Where(c => c.Tags != null))
                 {
-                    certItem.Tags.TryGetValue(id, out string tag);
+                    string tag;
+                    certItem.Tags.TryGetValue(id, out tag);
                     bool issuer = tag == TagIssuerList;
                     bool trusted = tag == TagTrustedList;
 

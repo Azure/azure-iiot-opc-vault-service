@@ -6,9 +6,9 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Azure.IoTSolutions.GdsVault.Services.Diagnostics;
+using Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Diagnostics;
 
-namespace Microsoft.Azure.IoTSolutions.GdsVault.Services.Http
+namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Http
 {
     public class Example
     {

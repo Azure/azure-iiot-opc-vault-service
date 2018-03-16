@@ -3,7 +3,7 @@
 using System.Net;
 using System.Net.Http.Headers;
 
-namespace Microsoft.Azure.IoTSolutions.GdsVault.Services.Http
+namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Http
 {
     public interface IHttpResponse
     {

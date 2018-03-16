@@ -4,4 +4,4 @@ cd /app/
 
 cd webservice
 
-dotnet Microsoft.Azure.IoTSolutions.OpcGds.WebService.dll
+dotnet Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.dll

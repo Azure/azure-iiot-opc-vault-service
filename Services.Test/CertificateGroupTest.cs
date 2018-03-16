@@ -1,8 +1,8 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
-using Microsoft.Azure.IoTSolutions.GdsVault.Services;
-using Microsoft.Azure.IoTSolutions.GdsVault.Services.Diagnostics;
-using Microsoft.Azure.IoTSolutions.GdsVault.Services.Runtime;
+using Microsoft.Azure.IoTSolutions.OpcGdsVault.Services;
+using Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Diagnostics;
+using Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Runtime;
 using Opc.Ua;
 using Opc.Ua.Gds;
 using Opc.Ua.Test;
@@ -119,7 +119,7 @@ namespace Services.Test
             var groups = await keyVault.GetCertificateGroupIds();
             foreach (var group in groups)
             {
-                for (int i = 0; i < 10; i++)
+                for (int i = 0; i < 3; i++)
                 {
                     var result = await keyVault.CreateCACertificateAsync(group);
                     Assert.NotNull(result);
@@ -171,7 +171,7 @@ namespace Services.Test
                     randomApp.DomainNames.ToArray(),
                     certificateGroupConfiguration.DefaultCertificateKeySize,
                     DateTime.UtcNow.AddDays(-10),
-                    certificateGroupConfiguration.DefaultCertificateLifetime, 
+                    certificateGroupConfiguration.DefaultCertificateLifetime,
                     certificateGroupConfiguration.DefaultCertificateHashSize
                     );
                 byte[] certificateRequest = CertificateFactory.CreateSigningRequest(csrCertificate, randomApp.DomainNames);

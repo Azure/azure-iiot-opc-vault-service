@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
-namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.v1
+namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.v1
 {
     /// <summary>Web service API version 1 information</summary>
     public static class Version

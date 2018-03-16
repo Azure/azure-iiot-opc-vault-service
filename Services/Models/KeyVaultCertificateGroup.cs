@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
-using Microsoft.Azure.IoTSolutions.GdsVault.Services.Exceptions;
+using Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Exceptions;
 using Newtonsoft.Json;
 using Opc.Ua;
 using Opc.Ua.Gds.Server;
@@ -10,7 +10,7 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
-namespace Microsoft.Azure.IoTSolutions.GdsVault.Services.Models
+namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models
 {
     public class KeyVaultTrustList
     {
