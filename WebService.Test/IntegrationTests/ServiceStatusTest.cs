@@ -1,15 +1,14 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
-using System.Net;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
-using Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService;
-using WebService.Test.helpers;
+using Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Test.Helpers;
+using System.Net;
 using WebService.Test.helpers.Http;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace WebService.Test.IntegrationTests
+namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Test.IntegrationTests
 {
     public class ServiceStatusTest
     {

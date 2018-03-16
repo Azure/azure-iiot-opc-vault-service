@@ -2,7 +2,7 @@
 
 using System;
 
-namespace WebService.Test.helpers
+namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Test.Helpers
 {
     public class WebServiceHost
     {

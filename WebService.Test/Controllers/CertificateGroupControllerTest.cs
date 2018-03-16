@@ -1,18 +1,14 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
-using System;
-using System.Collections.Generic;
 using Microsoft.Azure.IoTSolutions.OpcGdsVault.Services;
-using Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models;
+using Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Test.Helpers;
 using Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.v1.Controllers;
 using Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.v1.Models;
 using Moq;
-using Newtonsoft.Json.Linq;
-using WebService.Test.helpers;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace WebService.Test.Controllers
+namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Test.Controllers
 {
     public class CertificateGroupControllerTest
     {
