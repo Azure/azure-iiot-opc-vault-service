@@ -1,6 +1,5 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
-using Microsoft.Azure.IoTSolutions.OpcGdsVault.Services;
 using Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Diagnostics;
 using Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Runtime;
 using Opc.Ua;
@@ -14,7 +13,7 @@ using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Services.Test
+namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Test
 {
     public class ApplicationTestData
     {
