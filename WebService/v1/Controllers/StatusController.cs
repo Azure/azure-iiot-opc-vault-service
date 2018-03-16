@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Diagnostics;
+using Microsoft.Azure.IoTSolutions.Common.Diagnostics;
 using Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.v1.Filters;
 using Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.v1.Models;
 

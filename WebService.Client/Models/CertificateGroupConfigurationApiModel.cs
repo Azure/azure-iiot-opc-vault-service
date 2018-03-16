@@ -2,7 +2,7 @@
 
 using Newtonsoft.Json;
 
-namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.v1.Models
+namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Client.Models
 {
     public sealed class CertificateGroupConfigurationApiModel
     {
@@ -20,14 +20,5 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.v1.Models
 
         [JsonProperty(PropertyName = "DefaultCertificateHashSize", Order = 50)]
         public ushort DefaultCertificateHashSize { get; set; }
-
-        public CertificateGroupConfigurationApiModel(string id, Opc.Ua.Gds.Server.CertificateGroupConfiguration config)
-        {
-            this.Id = id;
-            this.SubjectName = config.SubjectName;
-            this.DefaultCertificateLifetime = config.DefaultCertificateLifetime;
-            this.DefaultCertificateKeySize = config.DefaultCertificateKeySize;
-            this.DefaultCertificateHashSize = config.DefaultCertificateHashSize;
-        }
     }
 }

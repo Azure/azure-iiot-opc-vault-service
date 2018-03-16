@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
 using Microsoft.Azure.IoTSolutions.Common.Diagnostics;
+using Microsoft.Azure.IoTSolutions.OpcGdsVault.Webservice.Client.Http;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -8,7 +9,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Http
+namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Webservice.Client
 {
     public class Example
     {

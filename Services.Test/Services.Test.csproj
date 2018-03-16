@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netcoreapp1.1</TargetFramework>
+    <LangVersion>6</LangVersion>
     <AssemblyName>Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Test</AssemblyName>
     <RootNamespace>Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Test</RootNamespace>
   </PropertyGroup>

@@ -1,11 +1,12 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
-using Microsoft.Azure.IoTSolutions.Common.Diagnostics;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.Azure.IoTSolutions.Common.Diagnostics;
+using Microsoft.Azure.IoTSolutions.Common.Http;
 
-namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Http
+namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Webservice.Client.Http
 {
     public interface IHttpClient
     {

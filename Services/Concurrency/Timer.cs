@@ -1,8 +1,8 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
+using Microsoft.Azure.IoTSolutions.Common.Diagnostics;
 using System;
 using System.Threading;
-using Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Diagnostics;
 
 namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Concurrency
 {

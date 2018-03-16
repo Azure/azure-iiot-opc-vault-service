@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
+using Microsoft.Azure.IoTSolutions.Common.Diagnostics;
 using Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Diagnostics;
 using Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Runtime;
 using Opc.Ua;

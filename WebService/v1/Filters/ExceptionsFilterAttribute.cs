@@ -1,18 +1,17 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.Azure.IoTSolutions.Common.Diagnostics;
+using Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Exceptions;
+using Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.v1.Exceptions;
+using Newtonsoft.Json;
 using System;
 using System.Buffers;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc.Formatters;
-using Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Diagnostics;
-using Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Exceptions;
-using Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.v1.Exceptions;
-using Microsoft.Extensions.DependencyModel;
-using Newtonsoft.Json;
 
 namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.v1.Filters
 {
