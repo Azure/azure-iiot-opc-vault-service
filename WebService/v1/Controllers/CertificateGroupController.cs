@@ -34,6 +34,21 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.v1.Controllers
                 await this.certificateGroups.GetCertificateGroupConfiguration(id));
         }
 
+        /// <summary>Get group configuration</summary>
+        [HttpGet("config")]
+        public async Task<CertificateGroupConfigurationCollectionApiModel> GetConfigAsync()
+        {
+            return new CertificateGroupConfigurationCollectionApiModel(
+                await this.certificateGroups.GetCertificateGroupConfigurationCollection());
+        }
+
+        /// <summary>Get group configuration</summary>
+        [HttpGet("iothub")]
+        public async Task<KeyVaultSecretApiModel> GetIotHubAsync(string id)
+        {
+            return new KeyVaultSecretApiModel(await this.certificateGroups.GetIotHubSecretAsync().ConfigureAwait(false));
+        }
+
         /// <summary>Create new CA Certificate</summary>
         [HttpGet("create/{id}")]
         public async Task<X509Certificate2ApiModel> GetCACertificateAsync(string id)

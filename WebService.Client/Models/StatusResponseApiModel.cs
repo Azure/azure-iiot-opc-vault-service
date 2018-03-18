@@ -1,11 +1,12 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
-using Newtonsoft.Json;
-using System.Collections.Generic;
 
 namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Client.Models
 {
-    public sealed class StatusApiModel
+    using Newtonsoft.Json;
+    using System.Collections.Generic;
+
+    public sealed class StatusResponseApiModel
     {
         private const string DateFormat = "yyyy-MM-dd'T'HH:mm:sszzz";
 

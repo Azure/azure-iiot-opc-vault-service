@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netstandard1.6</TargetFramework>
+    <TargetFrameworks>netstandard1.6;netstandard2.0</TargetFrameworks>
     <LangVersion>7</LangVersion>
     <AssemblyName>Microsoft.Azure.IoTSolutions.Common</AssemblyName>
     <RootNamespace>Microsoft.Azure.IoTSolutions.Common</RootNamespace>
@@ -16,10 +16,14 @@
     <FileVersion>0.1.0</FileVersion>
     <Copyright>Copyright © 2018 Microsoft Corp. All rights reserved.</Copyright>
   </PropertyGroup>
-  <ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.6'">
     <PackageReference Include="Microsoft.Extensions.Logging" Version="1.1.2" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
     <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.1" />
     <PackageReference Include="System.Security.Cryptography.Cng" Version="4.3.0" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="1.1.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
   </ItemGroup>
 </Project>

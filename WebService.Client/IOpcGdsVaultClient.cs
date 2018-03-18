@@ -5,19 +5,28 @@
 
 namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Client {
     using Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Client.Models;
+    using System.Net.Http;
     using System.Threading.Tasks;
+
+    public delegate Task<string> AuthenticationCallback(string authority, string resource, string scope);
 
     /// <summary>
     /// Represents OPC twin service api functions
     /// </summary>
-    public interface IOpcGdsVaultService {
-#if mist
+    public interface IOpcGdsVaultClient {
+
+
         /// <summary>
         /// Returns status of the service
         /// </summary>
         /// <returns></returns>
         Task<StatusResponseApiModel> GetServiceStatusAsync();
 
+        Task<KeyVaultSecretApiModel> GetIotHubSecretAsync();
+
+        Task<CertificateGroupConfigurationCollectionApiModel> GetCertificateGroupConfiguration();
+
+#if must
         /// <summary>
         /// Register new twin
         /// </summary>

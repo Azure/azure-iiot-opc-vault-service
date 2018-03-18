@@ -10,7 +10,7 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Client {
     public interface IOpcGdsVaultConfig {
 
         /// <summary>
-        /// Opc twin service url
+        /// GDS Vault service url
         /// </summary>
         string OpcGdsVaultServiceApiUrl { get; }
     }

@@ -36,6 +36,8 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services
             string privateKeyFormat,
             string privateKeyPassword
             );
+
+        Task<string> GetIotHubSecretAsync();
     }
 
     public sealed class CertificateGroup : ICertificateGroup
@@ -159,8 +161,8 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services
         {
             await _keyVaultServiceClient.GetTrustListAsync(id).ConfigureAwait(false);
         }
-
-        private async Task<string> GetIotHubSecretAsync()
+        // TODO: just for testing, remove
+        public async Task<string> GetIotHubSecretAsync()
         {
             return await _keyVaultServiceClient.GetIotHubSecretAsync().ConfigureAwait(false);
         }
