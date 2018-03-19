@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
 using Newtonsoft.Json;
-using System;
-using System.Security.Cryptography.X509Certificates;
 
 namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Client.Models
 {

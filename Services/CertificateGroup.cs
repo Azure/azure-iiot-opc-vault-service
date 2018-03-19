@@ -5,6 +5,7 @@ using Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models;
 using Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Runtime;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
@@ -15,6 +16,8 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services
         Task<string[]> GetCertificateGroupIds();
         Task<Opc.Ua.Gds.Server.CertificateGroupConfiguration> GetCertificateGroupConfiguration(string id);
         Task<Opc.Ua.Gds.Server.CertificateGroupConfigurationCollection> GetCertificateGroupConfigurationCollection();
+        Task<X509Certificate2Collection> GetCACertificateChainAsync(string id);
+        Task<IList<Opc.Ua.X509CRL>> GetCACrlChainAsync(string id);
 
         Task<X509Certificate2> SigningRequestAsync(
             string id,
@@ -145,22 +148,27 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services
             return await certificateGroup.NewKeyPairRequestAsync(app, subjectName, domainNames, privateKeyFormat, privateKeyPassword).ConfigureAwait(false); ;
         }
 
-        public async Task<X509Certificate2> GetCACertificateAsync(string id)
+        public async Task<X509Certificate2Collection> GetCACertificateChainAsync(string id)
         {
-            var certificateGroup = await KeyVaultCertificateGroup.Create(_keyVaultServiceClient, id).ConfigureAwait(false); ;
-            return await certificateGroup.GetCACertificateAsync(id).ConfigureAwait(false);
+            var certificateGroup = await KeyVaultCertificateGroup.Create(_keyVaultServiceClient, id).ConfigureAwait(false);
+            // TODO: return CA chain
+            return new X509Certificate2Collection(await certificateGroup.GetCACertificateAsync(id).ConfigureAwait(false));
         }
 
-        public async Task<Opc.Ua.X509CRL> GetCACrlAsync(string id)
+        public async Task<IList<Opc.Ua.X509CRL>> GetCACrlChainAsync(string id)
         {
-            var certificateGroup = await KeyVaultCertificateGroup.Create(_keyVaultServiceClient, id).ConfigureAwait(false); ;
-            return await certificateGroup.GetCACrlAsync(id).ConfigureAwait(false);
+            var certificateGroup = await KeyVaultCertificateGroup.Create(_keyVaultServiceClient, id).ConfigureAwait(false);
+            var crlList = new List<Opc.Ua.X509CRL>();
+            // TODO: return CA CRL chain
+            crlList.Add(await certificateGroup.GetCACrlAsync(id).ConfigureAwait(false));
+            return crlList;
         }
 
         public async Task GetTrustListAsync(string id)
         {
             await _keyVaultServiceClient.GetTrustListAsync(id).ConfigureAwait(false);
         }
+
         // TODO: just for testing, remove
         public async Task<string> GetIotHubSecretAsync()
         {

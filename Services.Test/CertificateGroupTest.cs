@@ -100,13 +100,21 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Test
             var groups = await keyVault.GetCertificateGroupIds();
             foreach (var group in groups)
             {
-                var caCert = await keyVault.GetCACertificateAsync(group);
-                Assert.NotNull(caCert);
-                Assert.False(caCert.HasPrivateKey);
-                var crl = await keyVault.GetCACrlAsync(group);
-                Assert.NotNull(crl);
-                crl.VerifySignature(caCert, true);
-                Assert.True(Utils.CompareDistinguishedName(crl.Issuer, caCert.Issuer));
+                var caChain = await keyVault.GetCACertificateChainAsync(group);
+                Assert.NotNull(caChain);
+                Assert.True(caChain.Count >= 1);
+                foreach (var caCert in caChain)
+                {
+                    Assert.False(caCert.HasPrivateKey);
+                }
+                var crlChain = await keyVault.GetCACrlChainAsync(group);
+                Assert.NotNull(crlChain);
+                Assert.True(crlChain.Count >= 1);
+                for (int i = 0; i < caChain.Count; i++)
+                {
+                    crlChain[i].VerifySignature(caChain[i], true);
+                    Assert.True(Utils.CompareDistinguishedName(crlChain[i].Issuer, caChain[i].Issuer));
+                }
             }
         }
 
@@ -215,8 +223,9 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Test
                 var cert = new X509Certificate2(newCert.Certificate.RawData);
                 var crl = await keyVault.RevokeCertificateAsync(group, cert);
                 Assert.NotNull(crl);
-                var caCert = await keyVault.GetCACertificateAsync(group);
-                Assert.NotNull(caCert);
+                var caChain = await keyVault.GetCACertificateChainAsync(group);
+                Assert.NotNull(caChain);
+                var caCert = caChain[0];
                 Assert.False(caCert.HasPrivateKey);
                 crl.VerifySignature(caCert, true);
                 Assert.True(Utils.CompareDistinguishedName(crl.Issuer, caCert.Issuer));

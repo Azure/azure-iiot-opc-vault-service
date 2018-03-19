@@ -49,6 +49,22 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.v1.Controllers
             return new KeyVaultSecretApiModel(await this.certificateGroups.GetIotHubSecretAsync().ConfigureAwait(false));
         }
 
+        /// <summary>Get CA Certificate chain</summary>
+        [HttpGet("cacert/{id}")]
+        public async Task<X509Certificate2CollectionApiModel> GetCACertificateChainAsync(string id)
+        {
+            return new X509Certificate2CollectionApiModel(
+                await this.certificateGroups.GetCACertificateChainAsync(id));
+        }
+
+        /// <summary>Get CA CRL chain</summary>
+        [HttpGet("cacrl/{id}")]
+        public async Task<X509CrlCollectionApiModel> GetCACrlChainAsync(string id)
+        {
+            return new X509CrlCollectionApiModel(
+                await this.certificateGroups.GetCACrlChainAsync(id));
+        }
+
         /// <summary>Create new CA Certificate</summary>
         [HttpGet("create/{id}")]
         public async Task<X509Certificate2ApiModel> GetCACertificateAsync(string id)
@@ -67,9 +83,9 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.v1.Controllers
 
         /// <summary>Revoke Certificate</summary>
         [HttpPost("revoke/{id}")]
-        public async Task<X509CRLApiModel> PostRevokeAsync(string id, [FromBody] X509Certificate2ApiModel cert)
+        public async Task<X509CrlApiModel> PostRevokeAsync(string id, [FromBody] X509Certificate2ApiModel cert)
         {
-            return new X509CRLApiModel(
+            return new X509CrlApiModel(
                 await this.certificateGroups.RevokeCertificateAsync(
                     id,
                     cert.ToServiceModel()));

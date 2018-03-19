@@ -5,7 +5,7 @@ using System;
 
 namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.v1.Models
 {
-    public sealed class X509CRLApiModel
+    public sealed class X509CrlApiModel
     {
         [JsonProperty(PropertyName = "Issuer", Order = 10)]
         public string Issuer { get; set; }
@@ -13,7 +13,7 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.v1.Models
         [JsonProperty(PropertyName = "Crl", Order = 20)]
         public string Crl { get; set; }
 
-        public X509CRLApiModel(Opc.Ua.X509CRL crl)
+        public X509CrlApiModel(Opc.Ua.X509CRL crl)
         {
             this.Crl = Convert.ToBase64String(crl.RawData);
             this.Issuer = crl.Issuer;

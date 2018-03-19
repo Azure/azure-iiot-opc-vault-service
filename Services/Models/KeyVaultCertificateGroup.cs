@@ -16,9 +16,9 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models
     {
         public readonly string Id;
         public X509Certificate2Collection IssuerCertificates;
-        public ICollection<X509CRL> IssuerCrls;
+        public IList<X509CRL> IssuerCrls;
         public X509Certificate2Collection TrustedCertificates;
-        public ICollection<X509CRL> TrustedCrls;
+        public IList<X509CRL> TrustedCrls;
 
         public KeyVaultTrustList(string id)
         {

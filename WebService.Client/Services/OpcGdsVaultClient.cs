@@ -90,6 +90,22 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Client {
             return JsonConvertEx.DeserializeObject<CertificateGroupConfigurationCollectionApiModel>(response.Content);
         }
 
+        public async Task<X509Certificate2CollectionApiModel> GetCACertificateChainAsync(string id)
+        {
+            var request = NewRequest($"{_serviceUri}/groups/cacert/"+id);
+            var response = await _httpClient.GetAsync(request);
+            response.Validate();
+            return JsonConvertEx.DeserializeObject<X509Certificate2CollectionApiModel>(response.Content);
+        }
+
+        public async Task<X509CrlCollectionApiModel> GetCACrlChainAsync(string id)
+        {
+            var request = NewRequest($"{_serviceUri}/groups/cacrl/"+id);
+            var response = await _httpClient.GetAsync(request);
+            response.Validate();
+            return JsonConvertEx.DeserializeObject<X509CrlCollectionApiModel>(response.Content);
+        }
+
 #if mist
         /// <summary>
         /// Create service client
@@ -525,12 +541,12 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Client {
             throw new NotImplementedException();
         }
 #endif
-            /// <summary>
-            /// Helper to create new request
-            /// </summary>
-            /// <param name="uri"></param>
-            /// <returns></returns>
-            private static HttpRequest NewRequest(string uri) {
+        /// <summary>
+        /// Helper to create new request
+        /// </summary>
+        /// <param name="uri"></param>
+        /// <returns></returns>
+        private static HttpRequest NewRequest(string uri) {
             var request = new HttpRequest();
             request.SetUriFromString(uri);
             if (uri.ToLowerInvariant().StartsWith("https:",
