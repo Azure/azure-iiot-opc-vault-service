@@ -30,6 +30,14 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Client {
 
         Task<X509CrlCollectionApiModel> GetCACrlChainAsync(string id);
 
+        Task<X509CrlApiModel> RevokeCertificateAsync(string id, X509Certificate2ApiModel model);
+
+        Task<X509Certificate2ApiModel> CreateCACertificateAsync(string id);
+
+        Task<X509Certificate2ApiModel> SigningRequestAsync(string id, SigningRequestApiModel model);
+
+        Task<CertificateKeyPairApiModel> NewKeyPairRequestAsync(string id, NewKeyPairRequestApiModel model);
+
 #if must
         /// <summary>
         /// Register new twin
