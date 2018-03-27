@@ -58,8 +58,8 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.v1.Models
         [JsonProperty(PropertyName = "$metadata", Order = 1000)]
         public Dictionary<string, string> Metadata => new Dictionary<string, string>
         {
-            { "$type", "Status;" + Version.Number },
-            { "$uri", "/" + Version.Path + "/status" }
+            { "$type", "Status;" + ServiceInfo.NUMBER },
+            { "$uri", "/" + ServiceInfo.PATH + "/status" }
         };
 
         public StatusApiModel(bool isOk, string msg)

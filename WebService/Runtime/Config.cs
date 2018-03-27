@@ -2,7 +2,9 @@
 
 using System;
 using System.IO;
+using Microsoft.Azure.IoTSolutions.Common.Diagnostics;
 using Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Runtime;
+using Microsoft.Extensions.Configuration;
 
 namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Runtime
 {
@@ -16,6 +18,22 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Runtime
 
         /// <summary>Service layer configuration</summary>
         IServicesConfig ServicesConfig { get; }
+
+        /// <summary>
+        /// A configured logger
+        /// </summary>
+        ILogger Logger { get; }
+
+        /// <summary>
+        /// Configuration
+        /// </summary>
+        IConfigurationRoot Configuration { get; }
+
+        /// <summary>
+        /// The configuration data.
+        /// </summary>
+        IConfigData ConfigData { get; }
+
     }
 
     /// <summary>Web service configuration</summary>
@@ -41,16 +59,36 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Runtime
         /// <summary>Service layer configuration</summary>
         public IServicesConfig ServicesConfig { get; }
 
-        public Config(IConfigData configData)
-        {
-            this.Port = configData.GetInt(PortKey);
-            this.SomeFolder = MapRelativePath(configData.GetString(SomeFolderKey));
+        /// <summary>
+        /// A configured logger.
+        /// </summary>
+        public ILogger Logger { get; }
 
+        /// <summary>
+        /// The Configuration root.
+        /// </summary>
+        public IConfigurationRoot Configuration { get; }
+
+        /// <summary>
+        /// The configuration data.
+        /// </summary>
+        public IConfigData ConfigData { get; }
+
+        public Config(IConfigurationRoot configRoot)
+        {
+            this.Configuration = configRoot;
+            this.ConfigData = new ConfigData(configRoot);
+
+            Logger = new Logger(Uptime.ProcessId, LogLevel.Debug);
+            //ConfigData.GetLogLevel("Logging:LogLevel:Default", LogLevel.Debug);
+            this.Port = ConfigData.GetInt(PortKey);
+            this.SomeFolder = MapRelativePath(this.ConfigData.GetString(SomeFolderKey));
+            
             this.ServicesConfig = new ServicesConfig
             {
-                HubConnString = configData.GetString(IoTHubConnStringKey),
-                IoTHubManagerApiUrl = configData.GetString(IoTHubManagerApiUrlKey),
-                IoTHubManagerTimeout = configData.GetInt(IoTHubManagerApiTimeoutKey)
+                HubConnString = this.ConfigData.GetString(IoTHubConnStringKey),
+                IoTHubManagerApiUrl = this.ConfigData.GetString(IoTHubManagerApiUrlKey),
+                IoTHubManagerTimeout = this.ConfigData.GetInt(IoTHubManagerApiTimeoutKey)
             };
         }
 
@@ -61,3 +99,4 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Runtime
         }
     }
 }
+

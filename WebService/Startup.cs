@@ -1,62 +1,252 @@
-// Copyright (c) Microsoft. All rights reserved.
+// ------------------------------------------------------------
+//  Copyright (c) Microsoft Corporation.  All rights reserved.
+//  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
+// ------------------------------------------------------------
 
 using System;
+using System.IO;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Azure.IoTSolutions.Common.Diagnostics;
+using Microsoft.Azure.IoTSolutions.Common.Http;
+using Microsoft.Azure.IoTSolutions.OpcGdsVault.Services;
+using Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Runtime;
+using Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.v1;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using ILogger = Microsoft.Azure.IoTSolutions.Common.Diagnostics.ILogger;
 
 namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService
 {
-    public class Startup
-    {
-        // Initialized in `Startup`
-        public IConfigurationRoot Configuration { get; }
 
-        // Initialized in `ConfigureServices`
+    /// <summary>
+    /// Webservice startup
+    /// </summary>
+    public class Startup {
+
+        /// <summary>
+        /// Configuration - Initialized in constructor
+        /// </summary>
+        public IConfig Config { get; }
+
+        /// <summary>
+        /// Current hosting environment - Initialized in constructor
+        /// </summary>
+        public IHostingEnvironment Environment { get; }
+
+        /// <summary>
+        /// Di container - Initialized in `ConfigureServices`
+        /// </summary>
         public IContainer ApplicationContainer { get; private set; }
 
-        // Invoked by `Program.cs`
-        public Startup(IHostingEnvironment env)
-        {
-            var builder = new ConfigurationBuilder()
+        /// <summary>
+        /// Created through builder
+        /// </summary>
+        /// <param name="env"></param>
+        public Startup(IHostingEnvironment env) {
+            Environment = env;
+
+            var config = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
-                .AddIniFile("appsettings.ini", optional: false, reloadOnChange: true);
-            this.Configuration = builder.Build();
+                .AddIniFile("appsettings.ini", optional: false, reloadOnChange: true)
+#if TODO
+                .AddJsonFile(
+                    "appsettings.json", true, true)
+                .AddJsonFile(
+                    $"appsettings.{env.EnvironmentName}.json", true, true)
+                .AddEnvironmentVariables()
+#endif
+                .Build();
+
+            Config = new Config(config);
         }
 
-        // This is where you register dependencies, add services to the
-        // container. This method is called by the runtime, before the
-        // Configure method below.
-        public IServiceProvider ConfigureServices(IServiceCollection services)
-        {
+        /// <summary>
+        /// This is where you register dependencies, add services to the
+        /// container. This method is called by the runtime, before the
+        /// Configure method below.
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        public IServiceProvider ConfigureServices(IServiceCollection services) {
+#if TODO
+            // Setup (not enabling yet) CORS
+            services.AddCors();
+
+            // Add authentication
+            services.AddJwtBearerAuthentication(Config,
+                Environment.IsDevelopment());
+
+            // Add authorization
+            services.AddAuthorization(options => {
+                options.AddV1Policies(Config);
+            });
+#endif
             // Add controllers as services so they'll be resolved.
-            services.AddMvc().AddControllersAsServices();
+            services.AddMvc().AddControllersAsServices().AddJsonOptions(options => {
+                options.SerializerSettings.Formatting = Formatting.Indented;
+                options.SerializerSettings.Converters.Add(new ExceptionConverter(
+                    Environment.IsDevelopment()));
+                options.SerializerSettings.MaxDepth = 10;
+            });
 
-            this.ApplicationContainer = DependencyResolution.Setup(services);
+#if TODO
+            // Generate swagger documentation
+            services.AddSwaggerGen(options => {
+                // Add info
+                options.SwaggerDoc(ServiceInfo.PATH, new Info {
+                    Title = ServiceInfo.NAME,
+                    Version = ServiceInfo.PATH,
+                    Description = ServiceInfo.DESCRIPTION,
+                });
 
+                // Add help
+                options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory,
+                    typeof(Startup).Assembly.GetName().Name + ".xml"));
+#if TODO
+                // If auth enabled, need to have bearer token to access any api
+                if (Config.AuthRequired) {
+                    options.AddSecurityDefinition("bearer", new ApiKeyScheme {
+                        Description = "Authorization token in the form of 'bearer <token>'",
+                        Name = "Authorization",
+                        In = "header"
+                    });
+                }
+#endif
+            });
+#endif
+            // Prepare DI container
+            ApplicationContainer = ConfigureContainer(services);
             // Create the IServiceProvider based on the container
-            return new AutofacServiceProvider(this.ApplicationContainer);
+            return new AutofacServiceProvider(ApplicationContainer);
         }
 
-        // This method is called by the runtime, after the ConfigureServices
-        // method above. Use this method to add middleware.
-        public void Configure(
-            IApplicationBuilder app,
+        /// <summary>
+        /// This method is called by the runtime, after the ConfigureServices
+        /// method above and used to add middleware
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="env"></param>
+        /// <param name="loggerFactory"></param>
+        /// <param name="corsSetup"></param>
+        /// <param name="appLifetime"></param>
+        public void Configure(IApplicationBuilder app, 
             IHostingEnvironment env,
-            ILoggerFactory loggerFactory,
-            IApplicationLifetime appLifetime)
-        {
-            loggerFactory.AddConsole(this.Configuration.GetSection("Logging"));
+            ILoggerFactory loggerFactory, 
+            //ICorsSetup corsSetup,
+            IApplicationLifetime appLifetime) {
 
+            var log = ApplicationContainer.Resolve<ILogger>();
+            loggerFactory.AddConsole(Config.Configuration.GetSection("Logging"));
+#if TODO
+
+            if (Config.AuthRequired) {
+                // Try authenticate
+                app.UseAuthentication();
+                // Filter for x-source
+                app.UseMiddleware<AuthMiddleware>();
+            }
+
+            // Enable CORS - Must be before UseMvc
+            // see: https://docs.microsoft.com/en-us/aspnet/core/security/cors
+            corsSetup.UseMiddleware(app);
+#endif
             app.UseMvc();
-
+#if TODO
+            // Enable swagger and swagger ui
+            app.UseSwagger();
+            app.UseSwaggerUI(options => {
+                options.SwaggerEndpoint("/swagger/v1/swagger.json",
+                    $"{ServiceInfo.PATH} Docs ({ServiceInfo.DATE})");
+            });
+#endif
             // If you want to dispose of resources that have been resolved in the
             // application container, register for the "ApplicationStopped" event.
-            appLifetime.ApplicationStopped.Register(() => this.ApplicationContainer.Dispose());
+            appLifetime.ApplicationStopped.Register(() => ApplicationContainer.Dispose());
+
+            // Print some useful information at bootstrap time
+            log.Info($"{ServiceInfo.NAME} web service started",
+                () => new { Uptime.ProcessId, env });
+        }
+
+        /// <summary>
+        /// Autofac configuration. Find more information here:
+        /// @see http://docs.autofac.org/en/latest/integration/aspnetcore.html
+        /// </summary>
+        public IContainer ConfigureContainer(IServiceCollection services) {
+            var builder = new ContainerBuilder();
+
+            // Populate from services di
+            builder.Populate(services);
+
+            // By default Autofac uses a request lifetime, creating new objects
+            // for each request, which is good to reduce the risk of memory
+            // leaks, but not so good for the overall performance.
+
+            // Register logger
+            builder.RegisterInstance(Config.Logger)
+                .AsImplementedInterfaces().SingleInstance();
+
+            // Register configuration interfaces
+            builder.RegisterInstance(Config)
+                .AsImplementedInterfaces().SingleInstance();
+            builder.RegisterInstance(Config.ServicesConfig)
+                .AsImplementedInterfaces().SingleInstance();
+
+#if TODO
+            // Auth and CORS setup
+            builder.RegisterType<CorsSetup>()
+                .AsImplementedInterfaces().SingleInstance();
+#endif
+            // Register http client implementation
+            builder.RegisterType<HttpClient>()
+                .AsImplementedInterfaces().SingleInstance();
+
+            // Register endpoint services and ...
+            builder.RegisterType<CertificateGroup>()
+                .AsImplementedInterfaces().SingleInstance();
+
+#if mist
+            // ... use iot hub manager micro service ...
+            if (!string.IsNullOrEmpty(Config.IoTHubManagerV1ApiUrl)) {
+                // ... if the dependency was configured
+                builder.RegisterType<IoTHubManagerServiceClient>()
+                    .AsImplementedInterfaces().SingleInstance();
+            }
+            else {
+                // ... or if not, for testing, use direct services
+                builder.RegisterType<IoTHubServiceHttpClient>()
+                    .AsImplementedInterfaces().SingleInstance();
+            }
+
+            // Register opc ua proxy client if not bypassing
+            if (!Config.BypassProxy) {
+                builder.RegisterType<Services.External.Stack.OpcUaClient>()
+                    .AsImplementedInterfaces().SingleInstance();
+
+                // Register misc opc services, such as variant codec
+                builder.RegisterType<Services.External.Stack.OpcUaJsonVariantCodec>()
+                    .AsImplementedInterfaces().SingleInstance();
+
+                // Register composite validator
+                builder.RegisterType<OpcUaCompositeValidator>()
+                    .AsImplementedInterfaces().SingleInstance();
+            }
+            else {
+                // Validate only through jobs
+                builder.RegisterType<OpcUaTwinValidator>()
+                    .AsImplementedInterfaces().SingleInstance();
+            }
+
+            // Register composite client
+            builder.RegisterType<OpcUaCompositeClient>()
+                .AsImplementedInterfaces().SingleInstance();
+#endif
+            return builder.Build();
         }
     }
 }

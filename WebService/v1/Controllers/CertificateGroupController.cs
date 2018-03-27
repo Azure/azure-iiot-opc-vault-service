@@ -8,7 +8,7 @@ using Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.v1.Models;
 
 namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.v1.Controllers
 {
-    [Route(Version.Path + "/groups"), TypeFilter(typeof(ExceptionsFilterAttribute))]
+    [Route(ServiceInfo.PATH + "/groups"), TypeFilter(typeof(ExceptionsFilterAttribute))]
     public sealed class CertificateGroupController : Controller
     {
         private readonly ICertificateGroup certificateGroups;

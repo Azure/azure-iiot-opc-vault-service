@@ -142,9 +142,11 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services
             )
         {
             var certificateGroup = await KeyVaultCertificateGroup.Create(_keyVaultServiceClient, id).ConfigureAwait(false); ;
-            var app = new Opc.Ua.Gds.ApplicationRecordDataType();
-            app.ApplicationNames = new Opc.Ua.LocalizedTextCollection();
-            app.ApplicationUri = applicationUri;
+            var app = new Opc.Ua.Gds.ApplicationRecordDataType
+            {
+                ApplicationNames = new Opc.Ua.LocalizedTextCollection(),
+                ApplicationUri = applicationUri
+            };
             return await certificateGroup.NewKeyPairRequestAsync(app, subjectName, domainNames, privateKeyFormat, privateKeyPassword).ConfigureAwait(false); ;
         }
 
@@ -158,9 +160,11 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services
         public async Task<IList<Opc.Ua.X509CRL>> GetCACrlChainAsync(string id)
         {
             var certificateGroup = await KeyVaultCertificateGroup.Create(_keyVaultServiceClient, id).ConfigureAwait(false);
-            var crlList = new List<Opc.Ua.X509CRL>();
-            // TODO: return CA CRL chain
-            crlList.Add(await certificateGroup.GetCACrlAsync(id).ConfigureAwait(false));
+            var crlList = new List<Opc.Ua.X509CRL>
+            {
+                // TODO: return CA CRL chain
+                await certificateGroup.GetCACrlAsync(id).ConfigureAwait(false)
+            };
             return crlList;
         }
 

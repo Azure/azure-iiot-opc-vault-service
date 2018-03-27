@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <LangVersion>6</LangVersion>
-    <TargetFramework>netstandard1.6</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>Microsoft.Azure.IoTSolutions.OpcGdsVault.Services</AssemblyName>
     <RootNamespace>Microsoft.Azure.IoTSolutions.OpcGdsVault.Services</RootNamespace>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>

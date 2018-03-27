@@ -193,8 +193,10 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services
                 }
             };
 
-            Dictionary<string, string> tags = new Dictionary<string, string>();
-            tags[id] = trusted ? TagTrustedList : TagIssuerList;
+            Dictionary<string, string> tags = new Dictionary<string, string>
+            {
+                [id] = trusted ? TagTrustedList : TagIssuerList
+            };
 
             var result = await _keyVaultClient.ImportCertificateAsync(
                 _vaultBaseUrl,

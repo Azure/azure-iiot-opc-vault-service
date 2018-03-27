@@ -5,11 +5,19 @@ using System;
 
 namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.v1.Models
 {
+    /// <summary>
+    /// A X509 certificate revocation list.
+    /// </summary>
     public sealed class X509CrlApiModel
     {
+        /// <summary>
+        /// The Issuer name of the revocation list.
+        /// </summary>
         [JsonProperty(PropertyName = "Issuer", Order = 10)]
         public string Issuer { get; set; }
-
+        /// <summary>
+        /// The base64 encoded X509 certificate revocation list.
+        /// </summary>
         [JsonProperty(PropertyName = "Crl", Order = 20)]
         public string Crl { get; set; }
 

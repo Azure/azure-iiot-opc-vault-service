@@ -11,7 +11,15 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Runtime
 {
     public interface IConfigData
     {
+        /// <summary>
+        /// Read a string value from configuration.
+        /// </summary>
+        /// <param name="key">The key of the configuration string.</param>
         string GetString(string key);
+        /// <summary>
+        /// Read an integer value from configuration.
+        /// </summary>
+        /// <param name="key">The key of the configuration integer.</param>
         int GetInt(string key);
     }
 
@@ -19,23 +27,30 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Runtime
     {
         private readonly IConfigurationRoot configuration;
 
-        public ConfigData()
+        /// <summary>
+        /// More info about configuration at
+        /// https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration
+        /// </summary>
+        /// <param name="configRoot">The IConfigurationRoot</param>
+        public ConfigData(IConfigurationRoot configRoot)
         {
-            // More info about configuration at
-            // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration
-
-            var configurationBuilder = new ConfigurationBuilder();
-            configurationBuilder.AddIniFile("appsettings.ini", optional: true, reloadOnChange: true);
-
-            this.configuration = configurationBuilder.Build();
+            this.configuration = configRoot;
         }
 
+        /// <summary>
+        /// Read a string value from configuration.
+        /// </summary>
+        /// <param name="key">The key of the configuration string.</param>
         public string GetString(string key)
         {
             var value = this.configuration.GetValue<string>(key);
             return ReplaceEnvironmentVariables(value);
         }
 
+        /// <summary>
+        /// Read an integer value from configuration.
+        /// </summary>
+        /// <param name="key">The key of the configuration integer.</param>
         public int GetInt(string key)
         {
             try
