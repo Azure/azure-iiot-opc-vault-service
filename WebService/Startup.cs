@@ -18,6 +18,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Swashbuckle.AspNetCore.Swagger;
 using ILogger = Microsoft.Azure.IoTSolutions.Common.Diagnostics.ILogger;
 
 namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService
@@ -94,7 +95,6 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService
                 options.SerializerSettings.MaxDepth = 10;
             });
 
-#if TODO
             // Generate swagger documentation
             services.AddSwaggerGen(options => {
                 // Add info
@@ -105,8 +105,8 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService
                 });
 
                 // Add help
-                options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory,
-                    typeof(Startup).Assembly.GetName().Name + ".xml"));
+                //options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory,
+                //    typeof(Startup).Assembly.GetName().Name + ".xml"));
 #if TODO
                 // If auth enabled, need to have bearer token to access any api
                 if (Config.AuthRequired) {
@@ -118,7 +118,7 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService
                 }
 #endif
             });
-#endif
+
             // Prepare DI container
             ApplicationContainer = ConfigureContainer(services);
             // Create the IServiceProvider based on the container
@@ -155,15 +155,16 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService
             // see: https://docs.microsoft.com/en-us/aspnet/core/security/cors
             corsSetup.UseMiddleware(app);
 #endif
-            app.UseMvc();
-#if TODO
+
             // Enable swagger and swagger ui
             app.UseSwagger();
             app.UseSwaggerUI(options => {
                 options.SwaggerEndpoint("/swagger/v1/swagger.json",
                     $"{ServiceInfo.PATH} Docs ({ServiceInfo.DATE})");
             });
-#endif
+
+            app.UseMvc();
+
             // If you want to dispose of resources that have been resolved in the
             // application container, register for the "ApplicationStopped" event.
             appLifetime.ApplicationStopped.Register(() => ApplicationContainer.Dispose());

@@ -8,10 +8,10 @@
     <Company>Microsoft</Company>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\netcoreapp2.0\Microsoft.Azure.IoTSolutions.OpcTwin.WebService.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\netcoreapp2.0\Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin\Release\netcoreapp2.0\Microsoft.Azure.IoTSolutions.OpcTwin.WebService.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\netcoreapp2.0\Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="appsettings.ini">
@@ -31,13 +31,13 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Autofac" Version="4.6.2" />
-    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.2.0" />
-    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.2.0-beta3" />
-    <PackageReference Include="Microsoft.AspNetCore" Version="2.0.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="2.0.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.0.1" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="1.1.0" />
+    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.2.2" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.2.1" />
+    <PackageReference Include="Microsoft.AspNetCore" Version="2.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="2.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.0.2" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="2.3.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Ini" Version="2.0.1" />
   </ItemGroup>
   <ItemGroup>

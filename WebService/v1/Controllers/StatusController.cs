@@ -9,6 +9,8 @@ using Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.v1.Filters;
 using Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.v1.Models;
 
     [Route(ServiceInfo.PATH + "/[controller]"), TypeFilter(typeof(ExceptionsFilterAttribute))]
+    [Produces("application/json")]
+
     public sealed class StatusController : Controller
     {
         private readonly ILogger log;
@@ -18,6 +20,7 @@ using Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.v1.Models;
             this.log = logger;
         }
 
+        [HttpGet]
         public StatusApiModel Get()
         {
             // TODO: calculate the actual service status
