@@ -49,11 +49,12 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services
             IServicesConfig config,
             ILogger logger)
         {
-            // TODO: use config
-            _keyVaultServiceClient = new KeyVaultServiceClient("https://iopgds.vault.azure.net");
+            // TODO: "https://iopgds.vault.azure.net"
+            _keyVaultServiceClient = new KeyVaultServiceClient(config.KeyVaultApiUrl);
+            // TODO: support AD App ID for authentication
             _keyVaultServiceClient.SetAuthenticationTokenProvider();
             _log = logger;
-            _log.Debug("Creating new instance of `KeyVault` service", () => { });
+            _log.Debug("Creating new instance of `KeyVault` service " + config.KeyVaultApiUrl, () => { });
         }
 
         public async Task Init()

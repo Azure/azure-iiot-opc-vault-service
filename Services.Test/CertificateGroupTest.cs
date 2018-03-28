@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
 using Microsoft.Azure.IoTSolutions.Common.Diagnostics;
-using Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Diagnostics;
 using Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Runtime;
 using Opc.Ua;
 using Opc.Ua.Gds;
@@ -53,6 +52,11 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Test
 
     public class CertificateGroupTest
     {
+        ServicesConfig config = new ServicesConfig()
+        {
+            KeyVaultApiUrl = "https://iopgds.vault.azure.net"
+        };
+        Logger logger = new Logger("Services.Test", LogLevel.Debug);
 
         public CertificateGroupTest(ITestOutputHelper log)
         {
@@ -65,8 +69,6 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Test
         [Fact, Trait(Constants.Type, Constants.UnitTest)]
         public async Task KeyVaultInit()
         {
-            var config = new ServicesConfig();
-            var logger = new Logger("Services.Test", LogLevel.Debug);
             var keyVault = new CertificateGroup(config, logger);
             await keyVault.Init();
         }
@@ -74,8 +76,6 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Test
         [Fact, Trait(Constants.Type, Constants.UnitTest)]
         public async Task KeyVaultListOfCertGroups()
         {
-            var config = new ServicesConfig();
-            var logger = new Logger("Services.Test", LogLevel.Debug);
             var keyVault = new CertificateGroup(config, logger);
             var groups = await keyVault.GetCertificateGroupIds();
         }
@@ -83,8 +83,7 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Test
         [Fact, Trait(Constants.Type, Constants.UnitTest)]
         public async Task KeyVaultGroupConfigurationCollection()
         {
-            var config = new ServicesConfig();
-            var logger = new Logger("Services.Test", LogLevel.Debug);
+
             var keyVault = new CertificateGroup(config, logger);
             var groupCollection = await keyVault.GetCertificateGroupConfigurationCollection();
             Assert.NotNull(groupCollection);
@@ -94,8 +93,6 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Test
         [Fact, Trait(Constants.Type, Constants.UnitTest)]
         public async Task KeyVaultGetCertificateAsync()
         {
-            var config = new ServicesConfig();
-            var logger = new Logger("Services.Test", LogLevel.Debug);
             var keyVault = new CertificateGroup(config, logger);
             var groups = await keyVault.GetCertificateGroupIds();
             foreach (var group in groups)
@@ -121,8 +118,6 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Test
         [Fact, Trait(Constants.Type, Constants.UnitTest)]
         public async Task KeyVaultCreateCACertificateAsync()
         {
-            var config = new ServicesConfig();
-            var logger = new Logger("Services.Test", LogLevel.Debug);
             var keyVault = new CertificateGroup(config, logger);
             var groups = await keyVault.GetCertificateGroupIds();
             foreach (var group in groups)
@@ -139,8 +134,6 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Test
         [Fact, Trait(Constants.Type, Constants.UnitTest)]
         public async Task KeyVaultCreateNewKeyPairRequestAsync()
         {
-            var config = new ServicesConfig();
-            var logger = new Logger("Services.Test", LogLevel.Debug);
             var keyVault = new CertificateGroup(config, logger);
             var groups = await keyVault.GetCertificateGroupIds();
             foreach (var group in groups)
@@ -163,8 +156,6 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Test
         [Fact, Trait(Constants.Type, Constants.UnitTest)]
         public async Task KeyVaultSigningRequestAsync()
         {
-            var config = new ServicesConfig();
-            var logger = new Logger("Services.Test", LogLevel.Debug);
             var keyVault = new CertificateGroup(config, logger);
             var groups = await keyVault.GetCertificateGroupIds();
             foreach (var group in groups)
@@ -201,8 +192,6 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Test
         [Fact, Trait(Constants.Type, Constants.UnitTest)]
         public async Task KeyVaultCreateNewKeyPairAndRevokeCertificateAsync()
         {
-            var config = new ServicesConfig();
-            var logger = new Logger("Services.Test", LogLevel.Debug);
             var keyVault = new CertificateGroup(config, logger);
             var groups = await keyVault.GetCertificateGroupIds();
             foreach (var group in groups)
@@ -235,8 +224,6 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Test
         [Fact, Trait(Constants.Type, Constants.UnitTest)]
         public async Task GetTrustListAsync()
         {
-            var config = new ServicesConfig();
-            var logger = new Logger("Services.Test", LogLevel.Debug);
             var keyVault = new CertificateGroup(config, logger);
             var groups = await keyVault.GetCertificateGroupIds();
             foreach (var group in groups)

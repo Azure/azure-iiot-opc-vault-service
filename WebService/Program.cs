@@ -38,16 +38,10 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService
 
             var host = new WebHostBuilder()
                 .UseConfiguration(configRoot)
-                //.ConfigureServices(services => services.AddAutofac())
                 .UseKestrel(options => { options.AddServerHeader = false; })
                 .UseIISIntegration()
                 .UseStartup<Startup>()
                 .Build();
-
-            //var config = configRoot.
-            //Console.WriteLine($"[{Uptime.ProcessId}] Web service listening on port " + configRoot.Port);
-            //Console.WriteLine($"[{Uptime.ProcessId}] Web service health check at: http://127.0.0.1:" + config.Port + "/" + v1.ServiceInfo.PATH + "/status");
-            //Console.WriteLine($"[{Uptime.ProcessId}] IoT Hub manager API at " + config.ServicesConfig.IoTHubManagerApiUrl);
 
             host.Run();
         }

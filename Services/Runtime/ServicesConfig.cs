@@ -4,15 +4,13 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Runtime
 {
     public interface IServicesConfig
     {
-        string HubConnString { get; set; }
-        string IoTHubManagerApiUrl { get; set; }
-        int IoTHubManagerTimeout { get; set; }
+        string KeyVaultApiUrl { get; set; }
+        int KeyVaultApiTimeout { get; set; }
     }
 
     public class ServicesConfig : IServicesConfig
     {
-        public string HubConnString { get; set; }
-        public string IoTHubManagerApiUrl { get; set; }
-        public int IoTHubManagerTimeout { get; set; }
+        public string KeyVaultApiUrl { get; set; }
+        public int KeyVaultApiTimeout { get; set; }
     }
 }

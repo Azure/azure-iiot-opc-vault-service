@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Azure.IoTSolutions.Common.Diagnostics;
 using Microsoft.Azure.IoTSolutions.Common.Http;
 using Microsoft.Azure.IoTSolutions.OpcGdsVault.Services;
+using Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Auth;
 using Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Runtime;
 using Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.v1;
 using Microsoft.Extensions.Configuration;
@@ -53,14 +54,10 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService
 
             var config = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
-                .AddIniFile("appsettings.ini", optional: false, reloadOnChange: true)
-#if TODO
-                .AddJsonFile(
-                    "appsettings.json", true, true)
-                .AddJsonFile(
-                    $"appsettings.{env.EnvironmentName}.json", true, true)
+                //.AddIniFile("appsettings.ini", optional: true, reloadOnChange: true)
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", true, true)
                 .AddEnvironmentVariables()
-#endif
                 .Build();
 
             Config = new Config(config);
@@ -74,7 +71,7 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService
         /// <param name="services"></param>
         /// <returns></returns>
         public IServiceProvider ConfigureServices(IServiceCollection services) {
-#if TODO
+
             // Setup (not enabling yet) CORS
             services.AddCors();
 
@@ -83,10 +80,10 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService
                 Environment.IsDevelopment());
 
             // Add authorization
-            services.AddAuthorization(options => {
-                options.AddV1Policies(Config);
-            });
-#endif
+            //services.AddAuthorization(options => {
+            //    options.AddV1Policies(Config);
+            //});
+
             // Add controllers as services so they'll be resolved.
             services.AddMvc().AddControllersAsServices().AddJsonOptions(options => {
                 options.SerializerSettings.Formatting = Formatting.Indented;
@@ -105,9 +102,9 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService
                 });
 
                 // Add help
-                //options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory,
-                //    typeof(Startup).Assembly.GetName().Name + ".xml"));
-#if TODO
+                options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory,
+                    typeof(Startup).Assembly.GetName().Name + ".xml"));
+
                 // If auth enabled, need to have bearer token to access any api
                 if (Config.AuthRequired) {
                     options.AddSecurityDefinition("bearer", new ApiKeyScheme {
@@ -116,7 +113,7 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService
                         In = "header"
                     });
                 }
-#endif
+
             });
 
             // Prepare DI container
@@ -134,15 +131,15 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService
         /// <param name="loggerFactory"></param>
         /// <param name="corsSetup"></param>
         /// <param name="appLifetime"></param>
-        public void Configure(IApplicationBuilder app, 
+        public void Configure(
+            IApplicationBuilder app, 
             IHostingEnvironment env,
             ILoggerFactory loggerFactory, 
-            //ICorsSetup corsSetup,
+            ICorsSetup corsSetup,
             IApplicationLifetime appLifetime) {
 
             var log = ApplicationContainer.Resolve<ILogger>();
             loggerFactory.AddConsole(Config.Configuration.GetSection("Logging"));
-#if TODO
 
             if (Config.AuthRequired) {
                 // Try authenticate
@@ -154,7 +151,6 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService
             // Enable CORS - Must be before UseMvc
             // see: https://docs.microsoft.com/en-us/aspnet/core/security/cors
             corsSetup.UseMiddleware(app);
-#endif
 
             // Enable swagger and swagger ui
             app.UseSwagger();
@@ -198,11 +194,10 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService
             builder.RegisterInstance(Config.ServicesConfig)
                 .AsImplementedInterfaces().SingleInstance();
 
-#if TODO
             // Auth and CORS setup
             builder.RegisterType<CorsSetup>()
                 .AsImplementedInterfaces().SingleInstance();
-#endif
+
             // Register http client implementation
             builder.RegisterType<HttpClient>()
                 .AsImplementedInterfaces().SingleInstance();

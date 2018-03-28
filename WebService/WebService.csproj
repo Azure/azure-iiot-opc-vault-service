@@ -14,11 +14,6 @@
     <DocumentationFile>bin\Release\netcoreapp2.0\Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="appsettings.ini">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
     <Folder Include="Properties" />
   </ItemGroup>
   <ItemGroup>
@@ -32,12 +27,11 @@
   <ItemGroup>
     <PackageReference Include="Autofac" Version="4.6.2" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.2.2" />
-    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.2.1" />
     <PackageReference Include="Microsoft.AspNetCore" Version="2.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="2.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.0.2" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="2.3.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="1.2.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Ini" Version="2.0.1" />
   </ItemGroup>
   <ItemGroup>
