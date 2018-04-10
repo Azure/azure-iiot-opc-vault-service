@@ -36,29 +36,35 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Client
 
             if (string.IsNullOrEmpty(_serviceUri))
             {
-                _serviceUri = "http://localhost:54321/v1";
+                _serviceUri = "http://localhost:58801/v1";
                 _logger.Error(
-                    "No opc twin service Uri specified.Using default " +
+                    "No gds vaultservice Uri specified.Using default " +
                     _serviceUri + ". If this is not your intention, or to " +
                     "remove this error, please configure the Url " +
-                    "in the appsettings.json file or set the " +
-                    "PCS_OpcGdsVault_WEBSERVICE_URL environment variable.",
+                    "in the appsettings.json file.",
                     () => { });
             }
         }
 
 
         public OpcGdsVaultClient(
-            //IHttpClient httpClient,
-            //IOpcGdsVaultConfig config,
-
+            IOpcGdsVaultConfig config,
             AuthenticationCallback authenticationCallback)
         {
             ILogger logger = new Logger("processid", LogLevel.Error);
-
-            _httpClient = new Common.Http.HttpClient(logger);
-            _serviceUri = "http://localhost:54321/v1";
             _logger = logger;
+            _httpClient = new HttpClient(logger);
+            _serviceUri = config.OpcGdsVaultServiceApiUrl;
+            if (string.IsNullOrEmpty(_serviceUri))
+            {
+                _serviceUri = "http://localhost:58801/v1";
+                _logger.Error(
+                    "No gds vaultservice Uri specified.Using default " +
+                    _serviceUri + ". If this is not your intention, or to " +
+                    "remove this error, please configure the Url " +
+                    "in the appsettings.json file.",
+                    () => { });
+            }
         }
 
         /// <summary>
@@ -92,7 +98,7 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Client
 
         public async Task<X509Certificate2CollectionApiModel> GetCACertificateChainAsync(string id)
         {
-            var request = NewRequest($"{_serviceUri}/groups/cacert/{id}");
+            var request = NewRequest($"{_serviceUri}/groups/{id}/cacert");
             var response = await _httpClient.GetAsync(request);
             response.Validate();
             return JsonConvertEx.DeserializeObject<X509Certificate2CollectionApiModel>(response.Content);
@@ -100,7 +106,7 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Client
 
         public async Task<X509CrlCollectionApiModel> GetCACrlChainAsync(string id)
         {
-            var request = NewRequest($"{_serviceUri}/groups/cacrl/{id}");
+            var request = NewRequest($"{_serviceUri}/groups/{id}/cacrl");
             var response = await _httpClient.GetAsync(request);
             response.Validate();
             return JsonConvertEx.DeserializeObject<X509CrlCollectionApiModel>(response.Content);
@@ -131,7 +137,7 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Client
 
             return Retry.WithExponentialBackoff(_logger, async () =>
             {
-                var request = NewRequest($"{_serviceUri}/groups/revoke/{id}");
+                var request = NewRequest($"{_serviceUri}/groups/{id}/revoke");
                 request.SetContent(model);
                 var response = await _httpClient.PostAsync(request);
                 response.Validate();
@@ -141,7 +147,7 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Client
 
         public async Task<X509Certificate2ApiModel> CreateCACertificateAsync(string id)
         {
-            var request = NewRequest($"{_serviceUri}/groups/create/{id}");
+            var request = NewRequest($"{_serviceUri}/groups/{id}/create/");
             var response = await _httpClient.GetAsync(request);
             response.Validate();
             return JsonConvertEx.DeserializeObject<X509Certificate2ApiModel>(response.Content);
@@ -167,7 +173,7 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Client
             }
             return Retry.WithExponentialBackoff(_logger, async () =>
             {
-                var request = NewRequest($"{_serviceUri}/groups/sign/{id}");
+                var request = NewRequest($"{_serviceUri}/groups/{id}/sign");
                 request.SetContent(model);
                 var response = await _httpClient.PostAsync(request);
                 response.Validate();
@@ -204,7 +210,7 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Client
 
             return Retry.WithExponentialBackoff(_logger, async () =>
             {
-                var request = NewRequest($"{_serviceUri}/groups/newkey/{id}");
+                var request = NewRequest($"{_serviceUri}/groups/{id}/newkey");
                 request.SetContent(model);
                 var response = await _httpClient.PostAsync(request);
                 response.Validate();

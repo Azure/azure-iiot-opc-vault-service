@@ -52,7 +52,7 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.v1.Controllers
         }
 
         /// <summary>Get CA Certificate chain</summary>
-        [HttpGet("cacert/{id}")]
+        [HttpGet("{id}/cacert")]
         public async Task<X509Certificate2CollectionApiModel> GetCACertificateChainAsync(string id)
         {
             return new X509Certificate2CollectionApiModel(
@@ -60,7 +60,7 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.v1.Controllers
         }
 
         /// <summary>Get CA CRL chain</summary>
-        [HttpGet("cacrl/{id}")]
+        [HttpGet("{id}/cacrl")]
         public async Task<X509CrlCollectionApiModel> GetCACrlChainAsync(string id)
         {
             return new X509CrlCollectionApiModel(
@@ -68,15 +68,7 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.v1.Controllers
         }
 
         /// <summary>Create new CA Certificate</summary>
-        [HttpGet("create/{id}")]
-        public async Task<X509Certificate2ApiModel> GetCACertificateAsync(string id)
-        {
-            return new X509Certificate2ApiModel(
-                await this.certificateGroups.CreateCACertificateAsync(id));
-        }
-
-        /// <summary>Create new CA Certificate</summary>
-        [HttpPost("create/{id}")]
+        [HttpPost("{id}/create")]
         public async Task<X509Certificate2ApiModel> PostCreateAsync(string id)
         {
             return new X509Certificate2ApiModel(
@@ -84,7 +76,7 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.v1.Controllers
         }
 
         /// <summary>Revoke Certificate</summary>
-        [HttpPost("revoke/{id}")]
+        [HttpPost("{id}/revoke")]
         public async Task<X509CrlApiModel> PostRevokeAsync(string id, [FromBody] X509Certificate2ApiModel cert)
         {
             return new X509CrlApiModel(
@@ -94,7 +86,7 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.v1.Controllers
         }
 
         /// <summary>Certificate Signing Request</summary>
-        [HttpPost("sign/{id}")]
+        [HttpPost("{id}/sign")]
         public async Task<X509Certificate2ApiModel> PostSignAsync(string id, [FromBody] SigningRequestApiModel sr)
         {
             return new X509Certificate2ApiModel(
@@ -105,7 +97,7 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.v1.Controllers
         }
 
         /// <summary>Create New Key Pair</summary>
-        [HttpPost("newkey/{id}")]
+        [HttpPost("{id}/newkey")]
         public async Task<CertificateKeyPairApiModel> PostNewKeyAsync(string id, [FromBody] NewKeyPairRequestApiModel nkpr)
         {
             return new CertificateKeyPairApiModel(
