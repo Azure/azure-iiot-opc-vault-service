@@ -272,17 +272,16 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services
             {
                 foreach (var secretItem in secretItems.Where(s => s.Tags != null))
                 {
-                    string tag;
-                    secretItem.Tags.TryGetValue(id, out tag);
+                    string tag = secretItem.Tags.FirstOrDefault(x => String.Equals(x.Key, id, StringComparison.OrdinalIgnoreCase)).Value;
                     bool issuer = tag == TagIssuerList;
                     bool trusted = tag == TagTrustedList;
-                    if ((issuer || trusted) &&
-                        (secretItem.ContentType == ContentTypeCert ||
-                         secretItem.ContentType == ContentTypeCrl))
+                    bool certType = secretItem.ContentType == ContentTypeCert;
+                    bool crlType = secretItem.ContentType == ContentTypeCrl;
+                    if (issuer || trusted && (certType || crlType))
                     {
                         X509CRL crl = null;
                         X509Certificate2 cert = null;
-                        if (secretItem.ContentType == ContentTypeCert)
+                        if (certType)
                         {
                             var certCollection = issuer ? trustList.IssuerCertificates : trustList.TrustedCertificates;
                             cert = await LoadCertSecret(secretItem.Identifier.Name, ct).ConfigureAwait(false);
@@ -312,8 +311,7 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services
             {
                 foreach (var certItem in certItems.Where(c => c.Tags != null))
                 {
-                    string tag;
-                    certItem.Tags.TryGetValue(id, out tag);
+                    string tag = certItem.Tags.FirstOrDefault(x => String.Equals(x.Key, id, StringComparison.OrdinalIgnoreCase)).Value;
                     bool issuer = tag == TagIssuerList;
                     bool trusted = tag == TagTrustedList;
 
@@ -322,7 +320,7 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services
                         var certBundle = await _keyVaultClient.GetCertificateAsync(certItem.Id, ct).ConfigureAwait(false);
                         var cert = new X509Certificate2(certBundle.Cer);
                         var crl = await LoadCACrl(id, cert, ct);
-                        if (certItem.Tags[id] == TagIssuerList)
+                        if (issuer)
                         {
                             trustList.IssuerCertificates.Add(cert);
                             trustList.IssuerCrls.Add(crl);

@@ -112,6 +112,14 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Client
             return JsonConvertEx.DeserializeObject<X509CrlCollectionApiModel>(response.Content);
         }
 
+        public async Task<TrustListApiModel> GetTrustListAsync(string id)
+        {
+            var request = NewRequest($"{_serviceUri}/groups/{id}/trustlist");
+            var response = await _httpClient.GetAsync(request);
+            response.Validate();
+            return JsonConvertEx.DeserializeObject<TrustListApiModel>(response.Content);
+        }
+
         public Task<X509CrlApiModel> RevokeCertificateAsync(string id, X509Certificate2ApiModel model)
         {
             if (string.IsNullOrEmpty(id))

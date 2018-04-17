@@ -18,6 +18,7 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services
         Task<Opc.Ua.Gds.Server.CertificateGroupConfigurationCollection> GetCertificateGroupConfigurationCollection();
         Task<X509Certificate2Collection> GetCACertificateChainAsync(string id);
         Task<IList<Opc.Ua.X509CRL>> GetCACrlChainAsync(string id);
+        Task<KeyVaultTrustList> GetTrustListAsync(string id);
 
         Task<X509Certificate2> SigningRequestAsync(
             string id,
@@ -39,8 +40,9 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services
             string privateKeyFormat,
             string privateKeyPassword
             );
-
+#if IOTHUB
         Task<string> GetIotHubSecretAsync();
+#endif
     }
 
     public sealed class CertificateGroup : ICertificateGroup
@@ -49,7 +51,6 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services
             IServicesConfig config,
             ILogger logger)
         {
-            // TODO: "https://iopgds.vault.azure.net"
             _keyVaultServiceClient = new KeyVaultServiceClient(config.KeyVaultApiUrl);
             // TODO: support AD App ID for authentication
             _keyVaultServiceClient.SetAuthenticationTokenProvider();
@@ -169,16 +170,18 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services
             return crlList;
         }
 
-        public async Task GetTrustListAsync(string id)
+        public async Task<KeyVaultTrustList> GetTrustListAsync(string id)
         {
-            await _keyVaultServiceClient.GetTrustListAsync(id).ConfigureAwait(false);
+            return await _keyVaultServiceClient.GetTrustListAsync(id).ConfigureAwait(false);
         }
 
+#if IOTHUB
         // TODO: just for testing, remove
         public async Task<string> GetIotHubSecretAsync()
         {
             return await _keyVaultServiceClient.GetIotHubSecretAsync().ConfigureAwait(false);
         }
+#endif
 
         private async Task<X509Certificate2Collection> GetCertificateVersionsAsync(string id)
         {

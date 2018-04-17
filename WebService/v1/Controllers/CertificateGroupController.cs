@@ -44,12 +44,14 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.v1.Controllers
                 await this.certificateGroups.GetCertificateGroupConfigurationCollection());
         }
 
+#if IOTHUB
         /// <summary>Get group configuration</summary>
         [HttpGet("iothub")]
         public async Task<KeyVaultSecretApiModel> GetIotHubAsync(string id)
         {
             return new KeyVaultSecretApiModel(await this.certificateGroups.GetIotHubSecretAsync().ConfigureAwait(false));
         }
+#endif
 
         /// <summary>Get CA Certificate chain</summary>
         [HttpGet("{id}/cacert")]
@@ -65,6 +67,13 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.v1.Controllers
         {
             return new X509CrlCollectionApiModel(
                 await this.certificateGroups.GetCACrlChainAsync(id));
+        }
+
+        /// <summary>Get trust list</summary>
+        [HttpGet("{id}/trustlist")]
+        public async Task<TrustListApiModel> GetTrustListAsync(string id)
+        {
+            return new TrustListApiModel(await this.certificateGroups.GetTrustListAsync(id));
         }
 
         /// <summary>Create new CA Certificate</summary>
