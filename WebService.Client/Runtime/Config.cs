@@ -5,8 +5,8 @@
 
 namespace Microsoft.Azure.IoTSolutions.Shared.Runtime
 {
-    using Microsoft.Azure.IoTSolutions.Common.Diagnostics;
-    using Microsoft.Azure.IoTSolutions.Common.Exceptions;
+    using Microsoft.Azure.IoTSolutions.OpcGdsVault.Common.Diagnostics;
+    using Microsoft.Azure.IoTSolutions.OpcGdsVault.Common.Exceptions;
     using Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Client;
     using Microsoft.Extensions.Configuration;
     using System;

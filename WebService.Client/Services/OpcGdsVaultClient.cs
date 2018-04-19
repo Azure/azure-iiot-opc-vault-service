@@ -5,9 +5,9 @@
 
 namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Client
 {
-    using Microsoft.Azure.IoTSolutions.Common.Diagnostics;
-    using Microsoft.Azure.IoTSolutions.Common.Http;
-    using Microsoft.Azure.IoTSolutions.Common.Utils;
+    using Microsoft.Azure.IoTSolutions.OpcGdsVault.Common.Diagnostics;
+    using Microsoft.Azure.IoTSolutions.OpcGdsVault.Common.Http;
+    using Microsoft.Azure.IoTSolutions.OpcGdsVault.Common.Utils;
     using Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Client.Models;
     using Newtonsoft.Json;
     using System;
