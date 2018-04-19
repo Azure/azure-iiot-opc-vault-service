@@ -3,8 +3,8 @@
 //  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------
 
-namespace Microsoft.Azure.IoTSolutions.Common.Http {
-    using Microsoft.Azure.IoTSolutions.Common.Diagnostics;
+namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Common.Http {
+    using Microsoft.Azure.IoTSolutions.OpcGdsVault.Common.Diagnostics;
     using System;
     using System.Net.Http;
     using System.Threading.Tasks;
