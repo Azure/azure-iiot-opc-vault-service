@@ -68,7 +68,7 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services
                 {
                     certificateGroup = KeyVaultCertificateGroup.Create(_keyVaultServiceClient, certificateGroupConfiguration);
                     await certificateGroup.Init().ConfigureAwait(false);
-                    await certificateGroup.LoadSigningKeyAsync(null, null);
+                    //await certificateGroup.LoadSigningKeyAsync(null, null);
                     continue;
                 }
                 catch (Exception ex)

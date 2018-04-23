@@ -9,6 +9,7 @@ using Opc.Ua;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
@@ -154,9 +155,60 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services
         /// <summary>
         /// Sign a digest with the signing key.
         /// </summary>
-        public async Task SignDigestAsync(string signingKey, byte[] digest, CancellationToken ct = default(CancellationToken))
+        public async Task<byte[]> SignDigestAsync(
+            string signingKey, 
+            byte[] digest, 
+            HashAlgorithmName hashAlgorithm,
+            RSASignaturePadding padding,
+            CancellationToken ct = default(CancellationToken))
         {
-            var result = await _keyVaultClient.SignAsync(signingKey, JsonWebKeySignatureAlgorithm.RS256, digest, ct);
+            string algorithm;
+
+            if (padding == RSASignaturePadding.Pkcs1)
+            {
+                if (hashAlgorithm == HashAlgorithmName.SHA256)
+                {
+                    algorithm = JsonWebKeySignatureAlgorithm.RS256;
+                }
+                else if (hashAlgorithm == HashAlgorithmName.SHA384)
+                {
+                    algorithm = JsonWebKeySignatureAlgorithm.RS384;
+                }
+                else if (hashAlgorithm == HashAlgorithmName.SHA512)
+                {
+                    algorithm = JsonWebKeySignatureAlgorithm.RS512;
+                }
+                else
+                {
+                    throw new ArgumentOutOfRangeException(nameof(hashAlgorithm));
+                }
+            }
+            else if(padding == RSASignaturePadding.Pss)
+            {
+                if (hashAlgorithm == HashAlgorithmName.SHA256)
+                {
+                    algorithm = JsonWebKeySignatureAlgorithm.PS256;
+                }
+                else if (hashAlgorithm == HashAlgorithmName.SHA384)
+                {
+                    algorithm = JsonWebKeySignatureAlgorithm.PS384;
+                }
+                else if (hashAlgorithm == HashAlgorithmName.SHA512)
+                {
+                    algorithm = JsonWebKeySignatureAlgorithm.PS512;
+                }
+                else
+                {
+                    throw new ArgumentOutOfRangeException(nameof(hashAlgorithm));
+                }
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException(nameof(padding));
+            }
+
+            var result = await _keyVaultClient.SignAsync(signingKey, algorithm, digest, ct);
+            return result.Result;
         }
 
         /// <summary>
@@ -179,9 +231,10 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services
                 },
                 KeyProperties = new KeyProperties
                 {
-                    Exportable = true,
+                    Exportable = false,
                     KeySize = certificate.GetRSAPublicKey().KeySize,
-                    KeyType = "RSA"
+                    KeyType = "RSA",
+                    ReuseKey = false
                 },
                 SecretProperties = new SecretProperties
                 {
@@ -208,6 +261,69 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services
                 ct)
                 .ConfigureAwait(false);
         }
+
+        /// <summary>
+        /// Imports a new CA certificate in group id, tags it for trusted or issuer store.
+        /// </summary>
+        public async Task CreateCACertificateAsync(string id, X509Certificate2 certificate, bool trusted, CancellationToken ct = default(CancellationToken))
+        {
+            CertificateAttributes attributes = new CertificateAttributes
+            {
+                Enabled = true,
+                Expires = certificate.NotAfter,
+                NotBefore = certificate.NotBefore,
+            };
+
+            var policy = new CertificatePolicy
+            {
+                IssuerParameters = new IssuerParameters
+                {
+                    Name = "Self",
+                },
+                KeyProperties = new KeyProperties
+                {
+                    Exportable = false,
+                    KeySize = certificate.GetRSAPublicKey().KeySize,
+                    KeyType = "RSAHSM",
+                    ReuseKey = false
+                },
+                SecretProperties = new SecretProperties
+                {
+                    ContentType = CertificateContentType.Pfx
+                },
+                X509CertificateProperties = new X509CertificateProperties
+                {
+                    Subject = certificate.Subject
+                },
+                Attributes = new CertificateAttributes()//,
+                //LifetimeActions = new LifetimeAction()
+            };
+
+            Dictionary<string, string> tags = new Dictionary<string, string>
+            {
+                [id] = trusted ? TagTrustedList : TagIssuerList
+            };
+
+            var result2 = await _keyVaultClient.CreateCertificateAsync(
+                _vaultBaseUrl,
+                id,
+                policy,
+                attributes,
+                tags,
+                ct)
+                .ConfigureAwait(false);
+
+            var result = await _keyVaultClient.ImportCertificateAsync(
+                _vaultBaseUrl,
+                id,
+                new X509Certificate2Collection(certificate),
+                policy,
+                attributes,
+                tags,
+                ct)
+                .ConfigureAwait(false);
+        }
+
 
         /// <summary>
         /// Imports a new CRL for group id.
@@ -371,6 +487,8 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services
             }
             return null;
         }
+
+        //CertificateRequest
 
         private string _vaultBaseUrl;
         private IKeyVaultClient _keyVaultClient;

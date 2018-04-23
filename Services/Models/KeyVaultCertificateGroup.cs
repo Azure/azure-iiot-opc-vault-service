@@ -3,12 +3,14 @@
 using Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Exceptions;
 using Newtonsoft.Json;
 using Opc.Ua;
+using Opc.Ua.Gds;
 using Opc.Ua.Gds.Server;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
+using static Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models.KeyVaultCertFactory;
 
 namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models
 {
@@ -34,6 +36,7 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models
     public sealed class KeyVaultCertificateGroup : Opc.Ua.Gds.Server.CertificateGroup
     {
         public X509CRL Crl;
+        public X509SignatureGenerator x509SignatureGenerator;
 
         private KeyVaultCertificateGroup(
             KeyVaultServiceClient keyVaultServiceClient,
@@ -91,6 +94,7 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models
                 if (Opc.Ua.Utils.CompareDistinguishedName(Certificate.Subject, Configuration.SubjectName))
                 {
                     _caCertSecretIdentifier = result.SecretIdentifier.Identifier;
+                    _caCertKeyIdentifier = result.KeyIdentifier.Identifier;
                     Crl = await _keyVaultServiceClient.LoadCACrl(Configuration.Id, Certificate);
                 }
                 else
@@ -101,6 +105,7 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models
             catch (Exception e)
             {
                 _caCertSecretIdentifier = null;
+                _caCertKeyIdentifier = null;
                 Certificate = null;
                 Crl = null;
                 throw e;
@@ -146,7 +151,7 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models
             return true;
         }
 
-        public override async Task RevokeCertificateAsync(
+        public override async Task<X509CRL> RevokeCertificateAsync(
             X509Certificate2 certificate)
         {
             await LoadPublicAssets().ConfigureAwait(false);
@@ -155,6 +160,76 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models
             var crls = new List<X509CRL>() { Crl };
             Crl = CertificateFactory.RevokeCertificate(issuerCert, crls, certificates);
             await _keyVaultServiceClient.ImportCACrl(Configuration.Id, Certificate, Crl).ConfigureAwait(false);
+            return Crl;
+        }
+
+        public override async Task<X509Certificate2> SigningRequestAsync(
+            ApplicationRecordDataType application,
+            string[] domainNames,
+            byte[] certificateRequest
+            )
+        {
+            // await base.VerifySigningRequestAsync(application, certificateRequest);
+            try
+            {
+
+                var pkcs10CertificationRequest = new Org.BouncyCastle.Pkcs.Pkcs10CertificationRequest(certificateRequest);
+
+                if (!pkcs10CertificationRequest.Verify())
+                {
+                    throw new ServiceResultException(StatusCodes.BadInvalidArgument, "CSR signature invalid.");
+                }
+
+                var info = pkcs10CertificationRequest.GetCertificationRequestInfo();
+                var altNameExtension = GetAltNameExtensionFromCSRInfo(info);
+                if (altNameExtension != null)
+                {
+                    if (altNameExtension.Uris.Count > 0)
+                    {
+                        if (!altNameExtension.Uris.Contains(application.ApplicationUri))
+                        {
+                            throw new ServiceResultException(StatusCodes.BadCertificateUriInvalid,
+                                "CSR AltNameExtension does not match " + application.ApplicationUri);
+                        }
+                    }
+
+                    if (altNameExtension.IPAddresses.Count > 0 || altNameExtension.DomainNames.Count > 0)
+                    {
+                        var domainNameList = new List<string>();
+                        domainNameList.AddRange(altNameExtension.DomainNames);
+                        domainNameList.AddRange(altNameExtension.IPAddresses);
+                        domainNames = domainNameList.ToArray();
+                    }
+                }
+
+                DateTime yesterday = DateTime.UtcNow.AddDays(-1);
+                // to verify signing key
+                // using (var signingKey = await LoadSigningKeyAsync(Certificate, string.Empty))
+                await LoadPublicAssets().ConfigureAwait(false);
+                var signingKey = Certificate;
+                {
+                    return await KeyVaultCertFactory.CreateSignedCertificate(
+                        application.ApplicationUri,
+                        application.ApplicationNames.Count > 0 ? application.ApplicationNames[0].Text : "ApplicationName",
+                        info.Subject.ToString(),
+                        domainNames,
+                        Configuration.DefaultCertificateKeySize,
+                        yesterday,
+                        Configuration.DefaultCertificateLifetime,
+                        Configuration.DefaultCertificateHashSize,
+                        signingKey,
+                        info.SubjectPublicKeyInfo.GetDerEncoded(),
+                        new KeyVaultSignatureGenerator(_keyVaultServiceClient, _caCertKeyIdentifier, signingKey));
+                }
+            }
+            catch (Exception ex)
+            {
+                if (ex is ServiceResultException)
+                {
+                    throw ex as ServiceResultException;
+                }
+                throw new ServiceResultException(StatusCodes.BadInvalidArgument, ex.Message);
+            }
         }
 
         public async Task<X509Certificate2> GetCACertificateAsync(string id)
@@ -181,7 +256,9 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models
         }
         private async Task LoadPublicAssets()
         {
-            if (Certificate == null || _caCertSecretIdentifier == null)
+            if (Certificate == null || 
+                _caCertSecretIdentifier == null ||
+                _caCertKeyIdentifier == null)
             {
                 await Init();
             }
@@ -189,5 +266,6 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models
 
         private KeyVaultServiceClient _keyVaultServiceClient;
         private string _caCertSecretIdentifier;
+        private string _caCertKeyIdentifier;
     }
 }
