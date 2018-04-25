@@ -1,16 +1,13 @@
+using Opc.Ua;
 using System;
-using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
-using static System.Security.Cryptography.X509Certificates.CertificateRequest;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using Opc.Ua;
 using System.Text;
-using System.Linq;
-using System.Diagnostics;
-using System.Numerics;
+using System.Threading.Tasks;
 
 namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models
 {
@@ -30,12 +27,12 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models
             ushort lifetimeInMonths,
             ushort hashSizeInBits,
             X509Certificate2 issuerCAKeyCert,
-            byte[] publicKeyArray,
+            RSA publicKey,
             X509SignatureGenerator generator,
             bool isCA = false
             )
         {
-            if (publicKeyArray == null || issuerCAKeyCert == null)
+            if (publicKey == null || issuerCAKeyCert == null)
             {
                 throw new NotSupportedException("Need a public key and a CA certificate.");
             }
@@ -48,207 +45,132 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models
                 ref domainNames,
                 ref keySize,
                 ref lifetimeInMonths);
-            //var pb = new PublicKey();
-            //var aa = new AsymmetricAlgorithm(issuerCAKeyCert.PublicKey);
-            //issuerCAKeyCert.PublicKey.
-            //var publicKey = new PublicKey(new Oid("1.2.840.113549.1.1.1"), issuerCAKeyCert.PublicKey.EncodedKeyValue, new AsnEncodedData(publicKeyArray));
-            //RSAParameters parameters = rsa.ExportParameters(false);
-            //byte[] rsaPublicKey = DerEncoder.ConstructSequence(
-            //    DerEncoder.SegmentedEncodeUnsignedInteger(parameters.Modulus),
-            //    DerEncoder.SegmentedEncodeUnsignedInteger(parameters.Exponent));
 
-            const string RsaRsa = "1.2.840.113549.1.1.1";
-            Oid oid = new Oid(RsaRsa);
-            var encodedPublicKey = new AsnEncodedData(oid, publicKeyArray);
-            var content = encodedPublicKey.Format(true);
-            var publicKey = new PublicKey(oid, new AsnEncodedData(oid, new byte[] { 0x05, 0x00 }), encodedPublicKey);
-            RSA rsa = RSA.Create();
-            //X509SignatureGenerator generator = X509SignatureGenerator.CreateForRSA(issuerCAKeyCert.GetRSAPrivateKey(), RSASignaturePadding.Pkcs1);
-            //KeyVaultSignatureGenerator kvGenerator = new KeyVaultSignatureGenerator(issuerCAKeyCert);
+            var request = new CertificateRequest(subjectDN, publicKey, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
 
-            //RSAParameters parameters = new RSAParameters();
-            //parameters.Exponent =
-            //parameters.Modulus = 
-            //rsa.ImportParameters(parameters);
-            var provider = DecodeX509PublicKey(publicKeyArray);
-            //var generator = new X509SignatureGenerator();
-            var request = new CertificateRequest(subjectDN, provider, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
+            // Basic constraints
             request.CertificateExtensions.Add(
-                new X509BasicConstraintsExtension(false, false, 0, false));
+                new X509BasicConstraintsExtension(false, false, 0, true));
+            // Subject key identifier
+            RSAParameters rsaParams = publicKey.ExportParameters(false);
+            var subjectPublicKey = new Org.BouncyCastle.Crypto.Parameters.RsaKeyParameters(
+                false,
+                new Org.BouncyCastle.Math.BigInteger(1, rsaParams.Modulus),
+                new Org.BouncyCastle.Math.BigInteger(1, rsaParams.Exponent));
+            var subjectKeyIdentifier = new AsnEncodedData(new Oid(Org.BouncyCastle.Asn1.X509.X509Extensions.SubjectKeyIdentifier.Id),
+                new Org.BouncyCastle.Asn1.X509.SubjectKeyIdentifier(
+                    Org.BouncyCastle.X509.SubjectPublicKeyInfoFactory.CreateSubjectPublicKeyInfo(subjectPublicKey)).GetDerEncoded());
+            request.CertificateExtensions.Add(new X509Extension(subjectKeyIdentifier, false));
+
+            // Authority Key Identifier
+            var issuerPublicKey = GetPublicKeyParameter(issuerCAKeyCert);
+            var issuerSerialNumber = GetSerialNumber(issuerCAKeyCert);
+            var authorityKey = new AsnEncodedData(new Oid(Org.BouncyCastle.Asn1.X509.X509Extensions.AuthorityKeyIdentifier.Id),
+                    new Org.BouncyCastle.Asn1.X509.AuthorityKeyIdentifier(
+                        Org.BouncyCastle.X509.SubjectPublicKeyInfoFactory.CreateSubjectPublicKeyInfo(issuerPublicKey),
+                        new Org.BouncyCastle.Asn1.X509.GeneralNames(
+                            new Org.BouncyCastle.Asn1.X509.GeneralName(
+                                new CertificateFactoryX509Name(issuerCAKeyCert.Subject))),
+                        issuerSerialNumber).GetDerEncoded());
+            request.CertificateExtensions.Add(new X509Extension(authorityKey, false));
+
+            // Key Usage
             request.CertificateExtensions.Add(
                 new X509KeyUsageExtension(
-                    X509KeyUsageFlags.DigitalSignature | X509KeyUsageFlags.DataEncipherment | X509KeyUsageFlags.DigitalSignature |
-                    X509KeyUsageFlags.NonRepudiation | X509KeyUsageFlags.KeyCertSign | X509KeyUsageFlags.KeyEncipherment, true));
+                    X509KeyUsageFlags.DigitalSignature | X509KeyUsageFlags.DataEncipherment |
+                    X509KeyUsageFlags.NonRepudiation | X509KeyUsageFlags.KeyEncipherment, true));
+
+            // Enhanced key usage
             request.CertificateExtensions.Add(
                 new X509EnhancedKeyUsageExtension(
                     new OidCollection {
                         new Oid("1.3.6.1.5.5.7.3.1"),
-                        new Oid("1.3.6.1.5.5.7.3.2") }, false));
-            X509Certificate2 signedCert = request.Create(
-                issuerCAKeyCert.SubjectName,
-                generator,
-                startTime,
-                startTime.AddDays(lifetimeInMonths),
-                new byte[] { 0, 1, 2 }  // serial number
-                );
+                        new Oid("1.3.6.1.5.5.7.3.2") }, true));
 
-#if SIGNKEYLOCAL
-            RSAParameters parameters = new RSAParameters();
-            //parameters.Exponent =
-            //parameters.Modulus = 
-            //rsa.ImportParameters(parameters);
-            var provider = DecodeX509PublicKey(publicKeyArray);
-            //var generator = new X509SignatureGenerator();
-            var request = new CertificateRequest(subjectDN, provider, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
-            request.CertificateExtensions.Add(
-                new X509BasicConstraintsExtension(false, false, 0, false));
-            request.CertificateExtensions.Add(
-                new X509KeyUsageExtension(
-                    X509KeyUsageFlags.DigitalSignature | X509KeyUsageFlags.DataEncipherment | X509KeyUsageFlags.DigitalSignature |
-                    X509KeyUsageFlags.NonRepudiation | X509KeyUsageFlags.KeyCertSign | X509KeyUsageFlags.KeyEncipherment, true));
-            request.CertificateExtensions.Add(
-                new X509EnhancedKeyUsageExtension(
-                    new OidCollection { new Oid("1.3.6.1.5.5.7.3.2") }, false));
+            // Subject Alternative Name
+            var generalNames = new List<Org.BouncyCastle.Asn1.X509.GeneralName>();
+            generalNames.Add(new Org.BouncyCastle.Asn1.X509.GeneralName(
+                Org.BouncyCastle.Asn1.X509.GeneralName.UniformResourceIdentifier, applicationUri));
+            generalNames.AddRange(CreateSubjectAlternateNameDomains(domainNames));
+            var subjectAltName = new AsnEncodedData(new Oid(Org.BouncyCastle.Asn1.X509.X509Extensions.SubjectAlternativeName.Id),
+                new Org.BouncyCastle.Asn1.X509.GeneralNames(generalNames.ToArray()).GetDerEncoded());
+            request.CertificateExtensions.Add(new X509Extension(subjectAltName, false));
 
-            X509Certificate2 signedCert = request.Create(
-                issuerCAKeyCert,
-                startTime,
-                startTime.AddDays(lifetimeInMonths),
-                new byte[] { 0, 1, 2 }
-                );
-#endif
-
-#if NEWKEYPAIR
-            var request = new CertificateRequest(subjectDN, rsa, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
-            X509Certificate2 signedCert = request.Create(
-                issuerCAKeyCert,
-                startTime,
-                startTime.AddDays(lifetimeInMonths),
-                new byte[] { 0, 1, 2 }
-                );
-#endif
-#if ALT
             using (var cfrg = new CertificateFactoryRandomGenerator())
             {
                 // cert generators
-                SecureRandom random = new SecureRandom(cfrg);
-                X509V3CertificateGenerator cg = new X509V3CertificateGenerator();
+                var random = new Org.BouncyCastle.Security.SecureRandom(cfrg);
 
                 // Serial Number
-                BigInteger serialNumber = BigIntegers.CreateRandomInRange(BigInteger.One, BigInteger.ValueOf(Int64.MaxValue), random);
-                cg.SetSerialNumber(serialNumber);
+                var serialNumber = Org.BouncyCastle.Utilities.BigIntegers.CreateRandomInRange(
+                    Org.BouncyCastle.Math.BigInteger.One,
+                    Org.BouncyCastle.Math.BigInteger.ValueOf(Int64.MaxValue), random);
 
-                // subject and issuer DN
-                X509Name issuerDN = null;
-                if (issuerCAKeyCert != null)
+                DateTime notAfter = startTime.AddMonths(lifetimeInMonths);
+                if (notAfter > issuerCAKeyCert.NotAfter)
                 {
-                    issuerDN = new CertificateFactoryX509Name(issuerCAKeyCert.Subject);
-                }
-                else
-                {
-                    // self signed 
-                    issuerDN = subjectDN;
-                }
-                cg.SetIssuerDN(issuerDN);
-                cg.SetSubjectDN(subjectDN);
-
-                // valid for
-                cg.SetNotBefore(startTime);
-                cg.SetNotAfter(startTime.AddMonths(lifetimeInMonths));
-
-                // set Private/Public Key
-                AsymmetricKeyParameter subjectPublicKey;
-                AsymmetricKeyParameter subjectPrivateKey;
-                if (publicKey == null)
-                {
-                    var keyGenerationParameters = new KeyGenerationParameters(random, keySize);
-                    var keyPairGenerator = new RsaKeyPairGenerator();
-                    keyPairGenerator.Init(keyGenerationParameters);
-                    AsymmetricCipherKeyPair subjectKeyPair = keyPairGenerator.GenerateKeyPair();
-                    subjectPublicKey = subjectKeyPair.Public;
-                    subjectPrivateKey = subjectKeyPair.Private;
-                }
-                else
-                {
-                    // special case, if a cert is signed by CA, the private key of the cert is not needed
-                    subjectPublicKey = PublicKeyFactory.CreateKey(publicKey);
-                    subjectPrivateKey = null;
-                }
-                cg.SetPublicKey(subjectPublicKey);
-
-                // add extensions
-                // Subject key identifier
-                cg.AddExtension(X509Extensions.SubjectKeyIdentifier.Id, false,
-                    new SubjectKeyIdentifier(SubjectPublicKeyInfoFactory.CreateSubjectPublicKeyInfo(subjectPublicKey)));
-
-                // Basic constraints
-                cg.AddExtension(X509Extensions.BasicConstraints.Id, true, new BasicConstraints(isCA));
-
-                // Authority Key identifier references the issuer cert or itself when self signed
-                AsymmetricKeyParameter issuerPublicKey;
-                BigInteger issuerSerialNumber;
-                issuerPublicKey = GetPublicKeyParameter(issuerCAKeyCert);
-                issuerSerialNumber = GetSerialNumber(issuerCAKeyCert);
-
-                cg.AddExtension(X509Extensions.AuthorityKeyIdentifier.Id, false,
-                    new AuthorityKeyIdentifier(SubjectPublicKeyInfoFactory.CreateSubjectPublicKeyInfo(issuerPublicKey),
-                        new GeneralNames(new GeneralName(issuerDN)), issuerSerialNumber));
-
-                if (!isCA)
-                {
-                    // Key usage 
-                    cg.AddExtension(X509Extensions.KeyUsage, true,
-                        new KeyUsage(KeyUsage.DataEncipherment | KeyUsage.DigitalSignature |
-                            KeyUsage.NonRepudiation | KeyUsage.KeyCertSign | KeyUsage.KeyEncipherment));
-
-                    // Extended Key usage
-                    cg.AddExtension(X509Extensions.ExtendedKeyUsage, true,
-                        new ExtendedKeyUsage(new List<DerObjectIdentifier>() {
-                    new DerObjectIdentifier("1.3.6.1.5.5.7.3.1"), // server auth
-                    new DerObjectIdentifier("1.3.6.1.5.5.7.3.2"), // client auth
-                        }));
-
-                    // subject alternate name
-                    List<GeneralName> generalNames = new List<GeneralName>();
-                    generalNames.Add(new GeneralName(GeneralName.UniformResourceIdentifier, applicationUri));
-                    generalNames.AddRange(CreateSubjectAlternateNameDomains(domainNames));
-                    cg.AddExtension(X509Extensions.SubjectAlternativeName, false, new GeneralNames(generalNames.ToArray()));
-                }
-                else
-                {
-                    // Key usage CA
-                    cg.AddExtension(X509Extensions.KeyUsage, true,
-                        new KeyUsage(KeyUsage.CrlSign | KeyUsage.DigitalSignature | KeyUsage.KeyCertSign));
+                    notAfter = issuerCAKeyCert.NotAfter;
                 }
 
-                // sign certificate
-                AsymmetricKeyParameter signingKey;
-                if (issuerCAKeyCert != null)
-                {
-                    // signed by issuer
-                    signingKey = null; // GetPrivateKeyParameter(issuerCAKeyCert);
-                }
-                else
-                {
-                    // self signed
-                    signingKey = subjectPrivateKey;
-                }
-                ISignatureFactory signatureFactory =
-                            new Asn1SignatureFactory(GetRSAHashAlgorithm(hashSizeInBits), signingKey, random);
-                Org.BouncyCastle.X509.X509Certificate x509 = cg.Generate(signatureFactory);
+                X509Certificate2 signedCert = request.Create(
+                    issuerCAKeyCert.SubjectName,
+                    generator,
+                    startTime,
+                    notAfter,
+                    serialNumber.ToByteArray()
+                    );
 
-                // convert to X509Certificate2
-                X509Certificate2 certificate = null;
-                if (subjectPrivateKey == null)
-                {
-                    // create the cert without the private key
-                    certificate = new X509Certificate2(x509.GetEncoded());
-                }
+                return Task.FromResult<X509Certificate2>(signedCert);
+            }
+        }
 
-                Utils.Trace(Utils.TraceMasks.Security, "Created new certificate: {0}", certificate.Thumbprint);
-                return Task.FromResult(certificate);
-#endif
-            return Task.FromResult<X509Certificate2>(signedCert);
+        private static X509AuthorityKeyIdentifierExtension FindAuthorityKeyIdentifier(X509Certificate2 certificate)
+        {
+            for (int ii = 0; ii < certificate.Extensions.Count; ii++)
+            {
+                X509Extension extension = certificate.Extensions[ii];
+
+                switch (extension.Oid.Value)
+                {
+                    case X509AuthorityKeyIdentifierExtension.AuthorityKeyIdentifierOid:
+                    case X509AuthorityKeyIdentifierExtension.AuthorityKeyIdentifier2Oid:
+                        {
+                            return new X509AuthorityKeyIdentifierExtension(extension, extension.Critical);
+                        }
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Get public key parameters from a X509Certificate2
+        /// </summary>
+        private static Org.BouncyCastle.Crypto.Parameters.RsaKeyParameters GetPublicKeyParameter(X509Certificate2 certificate)
+        {
+            RSA rsa = null;
+            try
+            {
+                rsa = certificate.GetRSAPublicKey();
+                RSAParameters rsaParams = rsa.ExportParameters(false);
+                return new Org.BouncyCastle.Crypto.Parameters.RsaKeyParameters(
+                    false,
+                    new Org.BouncyCastle.Math.BigInteger(1, rsaParams.Modulus),
+                    new Org.BouncyCastle.Math.BigInteger(1, rsaParams.Exponent));
+            }
+            finally
+            {
+                RsaUtils.RSADispose(rsa);
+            }
+        }
+
+        /// <summary>
+        /// Get the serial number from a certificate as BigInteger.
+        /// </summary>
+        private static Org.BouncyCastle.Math.BigInteger GetSerialNumber(X509Certificate2 certificate)
+        {
+            byte[] serialNumber = certificate.GetSerialNumber();
+            Array.Reverse(serialNumber);
+            return new Org.BouncyCastle.Math.BigInteger(1, serialNumber);
         }
 
         public static RSACryptoServiceProvider DecodeX509PublicKey(byte[] x509key)
@@ -465,78 +387,31 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models
             return new X500DistinguishedName(subjectName);
         }
 
-#if ALT
-        /// <summary>
-        /// helper to get the Bouncy Castle hash algorithm name by hash size in bits.
-        /// </summary>
-        /// <param name="hashSizeInBits"></param>
-        private static string GetRSAHashAlgorithm(uint hashSizeInBits)
-        {
-            if (hashSizeInBits <= 160)
-                return "SHA1WITHRSA";
-            if (hashSizeInBits <= 224)
-                return "SHA224WITHRSA";
-            else if (hashSizeInBits <= 256)
-                return "SHA256WITHRSA";
-            else if (hashSizeInBits <= 384)
-                return "SHA384WITHRSA";
-            else
-                return "SHA512WITHRSA";
-        }
-
-        private static RsaKeyParameters GetPublicKeyParameter(X509Certificate2 certificate)
-        {
-            RSA rsa = null;
-            try
-            {
-                rsa = certificate.GetRSAPublicKey();
-                RSAParameters rsaParams = rsa.ExportParameters(false);
-                return new RsaKeyParameters(
-                    false,
-                    new BigInteger(1, rsaParams.Modulus),
-                    new BigInteger(1, rsaParams.Exponent));
-            }
-            finally
-            {
-                RsaUtils.RSADispose(rsa);
-            }
-        }
-
         /// <summary>
         /// helper to build alternate name domains list for certs.
         /// </summary>
-        private static List<GeneralName> CreateSubjectAlternateNameDomains(IList<String> domainNames)
+        private static List<Org.BouncyCastle.Asn1.X509.GeneralName> CreateSubjectAlternateNameDomains(IList<String> domainNames)
         {
             // subject alternate name
-            List<GeneralName> generalNames = new List<GeneralName>();
+            var generalNames = new List<Org.BouncyCastle.Asn1.X509.GeneralName>();
             for (int i = 0; i < domainNames.Count; i++)
             {
-                int domainType = GeneralName.OtherName;
+                int domainType = Org.BouncyCastle.Asn1.X509.GeneralName.OtherName;
                 switch (Uri.CheckHostName(domainNames[i]))
                 {
-                    case UriHostNameType.Dns: domainType = GeneralName.DnsName; break;
+                    case UriHostNameType.Dns: domainType = Org.BouncyCastle.Asn1.X509.GeneralName.DnsName; break;
                     case UriHostNameType.IPv4:
-                    case UriHostNameType.IPv6: domainType = GeneralName.IPAddress; break;
+                    case UriHostNameType.IPv6: domainType = Org.BouncyCastle.Asn1.X509.GeneralName.IPAddress; break;
                     default: continue;
                 }
-                generalNames.Add(new GeneralName(domainType, domainNames[i]));
+                generalNames.Add(new Org.BouncyCastle.Asn1.X509.GeneralName(domainType, domainNames[i]));
             }
             return generalNames;
         }
 
-        /// <summary>
-        /// Get the serial number from a certificate as BigInteger.
-        /// </summary>
-        private static BigInteger GetSerialNumber(X509Certificate2 certificate)
-        {
-            byte[] serialNumber = certificate.GetSerialNumber();
-            Array.Reverse(serialNumber);
-            return new BigInteger(1, serialNumber);
-        }
-#endif
+
         public class KeyVaultSignatureGenerator : X509SignatureGenerator
         {
-            //private readonly RSA _key;
             X509Certificate2 _issuerCert;
             KeyVaultServiceClient _keyVaultServiceClient;
             string _signingKey;
@@ -549,17 +424,31 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models
                 _issuerCert = issuerCertificate;
                 _keyVaultServiceClient = keyVaultServiceClient;
                 _signingKey = signingKey;
-                GetSignatureAlgorithmIdentifier(HashAlgorithmName.SHA256);
-                GetSignatureAlgorithmIdentifier(HashAlgorithmName.SHA384);
-                GetSignatureAlgorithmIdentifier(HashAlgorithmName.SHA512);
-                //_key = key;
             }
 
             public override byte[] SignData(byte[] data, HashAlgorithmName hashAlgorithm)
             {
-                var hash = SHA256.Create();
+                HashAlgorithm hash;
+                if (hashAlgorithm == HashAlgorithmName.SHA256)
+                {
+                    hash = SHA256.Create();
+                }
+                else if (hashAlgorithm == HashAlgorithmName.SHA384)
+                {
+                    hash = SHA384.Create();
+                }
+                else if (hashAlgorithm == HashAlgorithmName.SHA512)
+                {
+                    hash = SHA512.Create();
+                }
+                else
+                {
+                    throw new ArgumentOutOfRangeException(nameof(hashAlgorithm));
+                }
                 var digest = hash.ComputeHash(data);
                 var resultKeyVaultPkcs = _keyVaultServiceClient.SignDigestAsync(_signingKey, digest, hashAlgorithm, RSASignaturePadding.Pkcs1).Result;
+#if TESTANDVERIFYTHEKEYVAULTSIGNER
+                // for testing only
                 if (_issuerCert.HasPrivateKey)
                 {
                     var resultKeyVaultPss = _keyVaultServiceClient.SignDigestAsync(_signingKey, digest, hashAlgorithm, RSASignaturePadding.Pss).Result;
@@ -580,6 +469,7 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models
                         }
                     }
                 }
+#endif
                 return resultKeyVaultPkcs;
             }
 
@@ -595,33 +485,28 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models
 
             public override byte[] GetSignatureAlgorithmIdentifier(HashAlgorithmName hashAlgorithm)
             {
-                const string RsaPkcs1Sha256 = "1.2.840.113549.1.1.11";
-                const string RsaPkcs1Sha384 = "1.2.840.113549.1.1.12";
-                const string RsaPkcs1Sha512 = "1.2.840.113549.1.1.13";
-
-                string oid = null;
+                byte[] oidSequence;
 
                 if (hashAlgorithm == HashAlgorithmName.SHA256)
                 {
-                    oid = RsaPkcs1Sha256;
+                    //const string RsaPkcs1Sha256 = "1.2.840.113549.1.1.11";
+                    oidSequence = new byte[] { 48, 13, 6, 9, 42, 134, 72, 134, 247, 13, 1, 1, 11, 5, 0 };
                 }
                 else if (hashAlgorithm == HashAlgorithmName.SHA384)
                 {
-                    oid = RsaPkcs1Sha384;
+                    //const string RsaPkcs1Sha384 = "1.2.840.113549.1.1.12";
+                    oidSequence = new byte[] { 48, 13, 6, 9, 42, 134, 72, 134, 247, 13, 1, 1, 12, 5, 0 };
                 }
                 else if (hashAlgorithm == HashAlgorithmName.SHA512)
                 {
-                    oid = RsaPkcs1Sha512;
+                    //const string RsaPkcs1Sha512 = "1.2.840.113549.1.1.13";
+                    oidSequence = new byte[] { 48, 13, 6, 9, 42, 134, 72, 134, 247, 13, 1, 1, 13, 5, 0 };
                 }
                 else
                 {
                     throw new ArgumentOutOfRangeException(nameof(hashAlgorithm));
                 }
-                //var encoded = new AsnEncodedData(oid, null);
-                var result = DerEncoder.ConstructSequence(
-                    DerEncoder.SegmentedEncodeOid(oid),
-                    DerEncoder.SegmentedEncodeNull()); ;
-                return result;
+                return oidSequence;
             }
         }
     }

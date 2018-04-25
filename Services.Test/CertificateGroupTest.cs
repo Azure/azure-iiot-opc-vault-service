@@ -7,6 +7,7 @@ using Opc.Ua.Gds;
 using Opc.Ua.Test;
 using Services.Test.helpers;
 using System;
+using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -123,12 +124,13 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Test
             var groups = await keyVault.GetCertificateGroupIds();
             foreach (var group in groups)
             {
-                for (int i = 0; i < 3; i++)
-                {
-                    var result = await keyVault.CreateCACertificateAsync(group);
-                    Assert.NotNull(result);
-                    Assert.False(result.HasPrivateKey);
-                }
+                var result = await keyVault.CreateCACertificateAsync(group);
+                Assert.NotNull(result);
+                Assert.False(result.HasPrivateKey);
+                Assert.True(Utils.CompareDistinguishedName(result.Issuer, result.Subject));
+                var basicConstraints = FindBasicConstraintsExtension(result);
+                Assert.NotNull(basicConstraints);
+                Assert.True(basicConstraints.CertificateAuthority);
             }
         }
 
@@ -151,6 +153,25 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Test
                 Assert.False(newKeyPair.Certificate.HasPrivateKey);
                 Assert.True(Utils.CompareDistinguishedName(randomApp.Subject, newKeyPair.Certificate.Subject));
                 Assert.False(Utils.CompareDistinguishedName(newKeyPair.Certificate.Issuer, newKeyPair.Certificate.Subject));
+
+                X509Certificate2 newPrivateKeyCert = null;
+                if (randomApp.PrivateKeyFormat == "PFX")
+                {
+                    newPrivateKeyCert = CertificateFactory.CreateCertificateFromPKCS12(newKeyPair.PrivateKey, randomApp.PrivateKeyPassword);
+                }
+                else if (randomApp.PrivateKeyFormat == "PEM")
+                {
+                    newPrivateKeyCert = CertificateFactory.CreateCertificateWithPEMPrivateKey(newKeyPair.Certificate, newKeyPair.PrivateKey, randomApp.PrivateKeyPassword);
+                }
+                else
+                {
+                    Assert.True(false, "Invalid private key format");
+                }
+
+                Assert.True(CertificateFactory.VerifyRSAKeyPair(newKeyPair.Certificate, newPrivateKeyCert, true));
+                Assert.True(CertificateFactory.VerifyRSAKeyPair(newPrivateKeyCert, newPrivateKeyCert, true));
+
+
             }
         }
 
@@ -186,6 +207,69 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Test
                 Assert.True(Utils.CompareDistinguishedName(randomApp.Subject, newCert.Subject));
                 Assert.False(Utils.CompareDistinguishedName(newCert.Issuer, newCert.Subject));
                 Assert.True(Utils.CompareDistinguishedName(newCert.Issuer, certificateGroupConfiguration.SubjectName));
+#if WRITECERT
+                // save cert for debugging
+                using (ICertificateStore store = CertificateStoreIdentifier.CreateStore(CertificateStoreType.Directory))
+                {
+                    Assert.NotNull(store);
+                    store.Open("d:\\unittest");
+                    await store.Add(newCert);
+                }
+#endif
+                // test basic constraints
+                var constraints = FindBasicConstraintsExtension(newCert);
+                Assert.NotNull(constraints);
+                Assert.True(constraints.Critical);
+                Assert.False(constraints.CertificateAuthority);
+                Assert.False(constraints.HasPathLengthConstraint);
+
+                // key usage
+                var keyUsage = FindKeyUsageExtension(newCert);
+                Assert.NotNull(keyUsage);
+                Assert.True(keyUsage.Critical);
+                Assert.True((keyUsage.KeyUsages & X509KeyUsageFlags.CrlSign) == 0);
+                Assert.True((keyUsage.KeyUsages & X509KeyUsageFlags.DataEncipherment) == X509KeyUsageFlags.DataEncipherment);
+                Assert.True((keyUsage.KeyUsages & X509KeyUsageFlags.DecipherOnly) == 0);
+                Assert.True((keyUsage.KeyUsages & X509KeyUsageFlags.DigitalSignature) == X509KeyUsageFlags.DigitalSignature);
+                Assert.True((keyUsage.KeyUsages & X509KeyUsageFlags.EncipherOnly) == 0);
+                Assert.True((keyUsage.KeyUsages & X509KeyUsageFlags.KeyAgreement) == 0);
+                Assert.True((keyUsage.KeyUsages & X509KeyUsageFlags.KeyCertSign) == 0);
+                Assert.True((keyUsage.KeyUsages & X509KeyUsageFlags.KeyEncipherment) == X509KeyUsageFlags.KeyEncipherment);
+                Assert.True((keyUsage.KeyUsages & X509KeyUsageFlags.NonRepudiation) == X509KeyUsageFlags.NonRepudiation);
+
+                // enhanced key usage
+                var enhancedKeyUsage = FindEnhancedKeyUsageExtension(newCert);
+                Assert.NotNull(enhancedKeyUsage);
+                Assert.True(enhancedKeyUsage.Critical);
+
+                // test for authority key
+                X509AuthorityKeyIdentifierExtension authority = FindAuthorityKeyIdentifier(newCert);
+                Assert.NotNull(authority);
+                Assert.NotNull(authority.SerialNumber);
+                Assert.NotNull(authority.KeyId);
+                Assert.NotNull(authority.AuthorityNames);
+
+                // get issuer cert used for signing
+                var issuerCert = await keyVault.GetCACertificateChainAsync(group);
+                Assert.NotNull(issuerCert);
+                Assert.True(issuerCert.Count >= 1);
+
+                // verify authority key in signed cert
+                X509SubjectKeyIdentifierExtension subjectKeyId = FindSubjectKeyIdentifierExtension(issuerCert[0]);
+                Assert.Equal(subjectKeyId.SubjectKeyIdentifier, authority.KeyId);
+                Assert.Equal(issuerCert[0].SerialNumber, authority.SerialNumber);
+
+                X509SubjectAltNameExtension subjectAlternateName = FindSubjectAltName(newCert);
+                Assert.NotNull(subjectAlternateName);
+                Assert.False(subjectAlternateName.Critical);
+                var domainNames = Utils.GetDomainsFromCertficate(newCert);
+                foreach (var domainName in randomApp.DomainNames)
+                {
+                    Assert.True(domainNames.Contains(domainName, StringComparer.OrdinalIgnoreCase));
+                }
+                Assert.True(subjectAlternateName.Uris.Count == 1);
+                var applicationUri = Utils.GetApplicationUriFromCertificate(newCert);
+                Assert.True(randomApp.ApplicationRecord.ApplicationUri == applicationUri);
             }
         }
 
@@ -323,6 +407,98 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Test
                 }
             }
             return result;
+        }
+
+        private X509BasicConstraintsExtension FindBasicConstraintsExtension(X509Certificate2 certificate)
+        {
+            for (int ii = 0; ii < certificate.Extensions.Count; ii++)
+            {
+                X509BasicConstraintsExtension extension = certificate.Extensions[ii] as X509BasicConstraintsExtension;
+                if (extension != null)
+                {
+                    return extension;
+                }
+            }
+            return null;
+        }
+
+        private X509KeyUsageExtension FindKeyUsageExtension(X509Certificate2 certificate)
+        {
+            for (int ii = 0; ii < certificate.Extensions.Count; ii++)
+            {
+                X509KeyUsageExtension extension = certificate.Extensions[ii] as X509KeyUsageExtension;
+                if (extension != null)
+                {
+                    return extension;
+                }
+            }
+            return null;
+        }
+        private X509EnhancedKeyUsageExtension FindEnhancedKeyUsageExtension(X509Certificate2 certificate)
+        {
+            for (int ii = 0; ii < certificate.Extensions.Count; ii++)
+            {
+                X509EnhancedKeyUsageExtension extension = certificate.Extensions[ii] as X509EnhancedKeyUsageExtension;
+                if (extension != null)
+                {
+                    return extension;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Returns the authority key identifier in the certificate.
+        /// </summary>
+        private X509AuthorityKeyIdentifierExtension FindAuthorityKeyIdentifier(X509Certificate2 certificate)
+        {
+            for (int ii = 0; ii < certificate.Extensions.Count; ii++)
+            {
+                X509Extension extension = certificate.Extensions[ii];
+
+                switch (extension.Oid.Value)
+                {
+                    case X509AuthorityKeyIdentifierExtension.AuthorityKeyIdentifierOid:
+                    case X509AuthorityKeyIdentifierExtension.AuthorityKeyIdentifier2Oid:
+                        {
+                            return new X509AuthorityKeyIdentifierExtension(extension, extension.Critical);
+                        }
+                }
+            }
+
+            return null;
+        }
+
+        private X509SubjectAltNameExtension FindSubjectAltName(X509Certificate2 certificate)
+        {
+            foreach (var extension in certificate.Extensions)
+            {
+                if (extension.Oid.Value == X509SubjectAltNameExtension.SubjectAltNameOid ||
+                    extension.Oid.Value == X509SubjectAltNameExtension.SubjectAltName2Oid)
+                {
+                    return new X509SubjectAltNameExtension(extension, extension.Critical);
+                }
+            }
+            return null;
+        }
+
+
+        ///
+        /// Returns the subject key identifier in the certificate.
+        /// </summary>
+        private X509SubjectKeyIdentifierExtension FindSubjectKeyIdentifierExtension(X509Certificate2 certificate)
+        {
+            for (int ii = 0; ii < certificate.Extensions.Count; ii++)
+            {
+                X509SubjectKeyIdentifierExtension extension = certificate.Extensions[ii] as X509SubjectKeyIdentifierExtension;
+
+                if (extension != null)
+                {
+                    return extension;
+                }
+            }
+
+            return null;
         }
 
         /// <summary>The test logger</summary>

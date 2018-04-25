@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
     <LangVersion>6</LangVersion>
     <AssemblyName>Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Test</AssemblyName>
     <RootNamespace>Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Test</RootNamespace>

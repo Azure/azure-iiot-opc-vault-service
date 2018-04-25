@@ -51,7 +51,7 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services
             IServicesConfig config,
             ILogger logger)
         {
-            _keyVaultServiceClient = new KeyVaultServiceClient(config.KeyVaultApiUrl);
+            _keyVaultServiceClient = new KeyVaultServiceClient(config.KeyVaultApiUrl, logger);
             // TODO: support AD App ID for authentication
             _keyVaultServiceClient.SetAuthenticationTokenProvider();
             _log = logger;
@@ -68,20 +68,26 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services
                 {
                     certificateGroup = KeyVaultCertificateGroup.Create(_keyVaultServiceClient, certificateGroupConfiguration);
                     await certificateGroup.Init().ConfigureAwait(false);
-                    //await certificateGroup.LoadSigningKeyAsync(null, null);
+#if LOADPRIVATEKEY
+                    // test if private key can be loaded
+                    await certificateGroup.LoadSigningKeyAsync(null, null);
+#endif
                     continue;
                 }
                 catch (Exception ex)
                 {
+                    _log.Error("Failed to initialize certificate group. ", () => new { ex });
                     if (certificateGroup == null)
                     {
                         throw ex;
                     }
                 }
 
+                _log.Error("Create new root CA certificate for group. ", () => new { certificateGroup });
+
                 if (!await certificateGroup.CreateCACertificateAsync().ConfigureAwait(false))
                 {
-
+                    _log.Error("Failed to create CA certificate. ", () => new { certificateGroup });
                 }
             }
         }

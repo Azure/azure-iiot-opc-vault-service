@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
+using Microsoft.Azure.IoTSolutions.OpcGdsVault.Common.Diagnostics;
 using Microsoft.Azure.KeyVault;
 using Microsoft.Azure.KeyVault.Models;
 using Microsoft.Azure.KeyVault.WebKey;
@@ -32,9 +33,10 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services
         /// 
         /// </summary>
         /// <param name="vaultBaseUrl">The Url of the Key Vault.</param>
-        public KeyVaultServiceClient(string vaultBaseUrl)
+        public KeyVaultServiceClient(string vaultBaseUrl, ILogger logger)
         {
             _vaultBaseUrl = vaultBaseUrl;
+            _logger = logger;
         }
 
         /// <summary>
@@ -61,7 +63,9 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services
                 new KeyVaultClient.AuthenticationCallback(azureServiceTokenProvider.KeyVaultTokenCallback));
         }
 
-
+        /// <summary>
+        /// Private callback for keyvault authentication.
+        /// </summary>
         private async Task<string> GetAccessTokenAsync(string authority, string resource, string scope)
         {
             var context = new AuthenticationContext(authority, TokenCache.DefaultShared);
@@ -87,6 +91,12 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services
             return secret.Value;
         }
 
+        /// <summary>
+        /// Get Certificate bundle from key Vault.
+        /// </summary>
+        /// <param name="name">Key Vault name</param>
+        /// <param name="ct">CancellationToken</param>
+        /// <returns></returns>
         internal async Task<CertificateBundle> GetCertificateAsync(string name, CancellationToken ct = default(CancellationToken))
         {
             return await _keyVaultClient.GetCertificateAsync(_vaultBaseUrl, name, ct).ConfigureAwait(false);
@@ -122,11 +132,9 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // TODO
-                //Utils.Trace("Error while loading the certificate versions for " + id);
-                //Utils.Trace("Exception: " + ex.Message);
+                _logger.Error("Error while loading the certificate versions for " + id + ".", () => new { ex });
             }
             return certificates;
         }
@@ -134,9 +142,10 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services
         /// <summary>
         /// Load the signing CA certificate for signing operations.
         /// </summary>
-        internal async Task<X509Certificate2> LoadSigningCertificateAsync(string signingCertificateKey, X509Certificate2 publicCert, CancellationToken ct = default(CancellationToken))
+        internal Task<X509Certificate2> LoadSigningCertificateAsync(string signingCertificateKey, X509Certificate2 publicCert, CancellationToken ct = default(CancellationToken))
         {
-            var secret = await _keyVaultClient.GetSecretAsync(signingCertificateKey,ct );
+#if LOADPRIVATEKEY
+            var secret = await _keyVaultClient.GetSecretAsync(signingCertificateKey, ct);
             if (secret.ContentType == CertificateContentType.Pfx)
             {
                 var certBlob = Convert.FromBase64String(secret.Value);
@@ -148,16 +157,20 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services
                 var privateKey = encoder.GetBytes(secret.Value.ToCharArray());
                 return CertificateFactory.CreateCertificateWithPEMPrivateKey(publicCert, privateKey, string.Empty);
             }
-
             throw new NotImplementedException("Unknown content type: " + secret.ContentType);
+#else
+            _logger.Error("Error in LoadSigningCertificateAsync " + signingCertificateKey + "." +
+                "Loading the private key is not permitted.", () => new { signingCertificateKey });
+            throw new NotSupportedException("Loading the private key from key Vault is not permitted.");
+#endif
         }
 
         /// <summary>
         /// Sign a digest with the signing key.
         /// </summary>
         public async Task<byte[]> SignDigestAsync(
-            string signingKey, 
-            byte[] digest, 
+            string signingKey,
+            byte[] digest,
             HashAlgorithmName hashAlgorithm,
             RSASignaturePadding padding,
             CancellationToken ct = default(CancellationToken))
@@ -180,10 +193,13 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services
                 }
                 else
                 {
+                    _logger.Error("Error in SignDigestAsync " + signingKey + "." +
+                        "Unsupported hash algorithm used.", () => new { signingKey });
                     throw new ArgumentOutOfRangeException(nameof(hashAlgorithm));
                 }
             }
-            else if(padding == RSASignaturePadding.Pss)
+#if FUTURE
+            else if (padding == RSASignaturePadding.Pss)
             {
                 if (hashAlgorithm == HashAlgorithmName.SHA256)
                 {
@@ -202,8 +218,11 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services
                     throw new ArgumentOutOfRangeException(nameof(hashAlgorithm));
                 }
             }
+#endif
             else
             {
+                _logger.Error("Error in SignDigestAsync " + padding + "." +
+                    "Unsupported padding algorithm used.", () => new { padding });
                 throw new ArgumentOutOfRangeException(nameof(padding));
             }
 
@@ -214,8 +233,9 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services
         /// <summary>
         /// Imports a new CA certificate in group id, tags it for trusted or issuer store.
         /// </summary>
-        public async Task ImportCACertificate(string id, X509Certificate2 certificate, bool trusted, CancellationToken ct = default(CancellationToken))
+        public async Task ImportCACertificate(string id, X509Certificate2Collection certificates, bool trusted, CancellationToken ct = default(CancellationToken))
         {
+            X509Certificate2 certificate = certificates[0];
             CertificateAttributes attributes = new CertificateAttributes
             {
                 Enabled = true,
@@ -227,7 +247,9 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services
             {
                 IssuerParameters = new IssuerParameters
                 {
-                    Name = "Self",
+                    Name = "Self"
+                    //CertificateTransparency = true,
+                    //CertificateType = "OPC UA Root CA"
                 },
                 KeyProperties = new KeyProperties
                 {
@@ -254,7 +276,7 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services
             var result = await _keyVaultClient.ImportCertificateAsync(
                 _vaultBaseUrl,
                 id,
-                new X509Certificate2Collection(certificate),
+                certificates,
                 policy,
                 attributes,
                 tags,
@@ -343,11 +365,11 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services
                 // do not set tag for a CRL, the CA cert is already tagged.
 
                 var result = await _keyVaultClient.SetSecretAsync(
-                    _vaultBaseUrl, 
-                    secretIdentifier, 
-                    Convert.ToBase64String(crl.RawData), 
-                    null, 
-                    ContentTypeCrl, 
+                    _vaultBaseUrl,
+                    secretIdentifier,
+                    Convert.ToBase64String(crl.RawData),
+                    null,
+                    ContentTypeCrl,
                     secretAttributes,
                     ct)
                     .ConfigureAwait(false);
@@ -488,10 +510,9 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services
             return null;
         }
 
-        //CertificateRequest
-
         private string _vaultBaseUrl;
         private IKeyVaultClient _keyVaultClient;
+        private ILogger _logger;
         private ClientAssertionCertificate _assertionCert;
     }
 }

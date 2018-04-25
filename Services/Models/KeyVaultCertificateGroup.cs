@@ -117,7 +117,7 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models
             DateTime yesterday = DateTime.UtcNow.AddDays(-1);
             try
             {
-                var caCert = CertificateFactory.CreateCertificate(
+                using (var caCert = CertificateFactory.CreateCertificate(
                     null,
                     null,
                     null,
@@ -131,18 +131,19 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models
                     Configuration.DefaultCertificateHashSize,
                     true,
                     null,
-                    null);
+                    null))
+                {
 
-                // save only public key
-                Certificate = new X509Certificate2(caCert.RawData);
+                    // save only public key
+                    Certificate = new X509Certificate2(caCert.RawData);
 
-                // initialize revocation list
-                Crl = CertificateFactory.RevokeCertificate(caCert, null, null);
+                    // initialize revocation list
+                    Crl = CertificateFactory.RevokeCertificate(caCert, null, null);
 
-                // upload ca cert with private key
-                await _keyVaultServiceClient.ImportCACertificate(Configuration.Id, caCert, true).ConfigureAwait(false);
-                await _keyVaultServiceClient.ImportCACrl(Configuration.Id, Certificate, Crl).ConfigureAwait(false);
-
+                    // upload ca cert with private key
+                    await _keyVaultServiceClient.ImportCACertificate(Configuration.Id, new X509Certificate2Collection(caCert), true).ConfigureAwait(false);
+                    await _keyVaultServiceClient.ImportCACrl(Configuration.Id, Certificate, Crl).ConfigureAwait(false);
+                }
             }
             catch
             {
@@ -163,18 +164,75 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models
             return Crl;
         }
 
+        public override async Task<X509Certificate2KeyPair> NewKeyPairRequestAsync(
+            ApplicationRecordDataType application,
+            string subjectName,
+            string[] domainNames,
+            string privateKeyFormat,
+            string privateKeyPassword)
+        {
+            DateTime yesterday = DateTime.UtcNow.AddDays(-1);
+            // create self signed
+            using (var selfSignedCertificate = CertificateFactory.CreateCertificate(
+                 null,
+                 null,
+                 null,
+                 application.ApplicationUri ?? "urn:ApplicationURI",
+                 application.ApplicationNames.Count > 0 ? application.ApplicationNames[0].Text : "ApplicationName",
+                 subjectName,
+                 domainNames,
+                 Configuration.DefaultCertificateKeySize,
+                 yesterday,
+                 Configuration.DefaultCertificateLifetime,
+                 Configuration.DefaultCertificateHashSize,
+                 false,
+                 null,
+                 null))
+            {
+                await LoadPublicAssets().ConfigureAwait(false);
+                var signedCert = await KeyVaultCertFactory.CreateSignedCertificate(
+                    application.ApplicationUri,
+                    application.ApplicationNames.Count > 0 ? application.ApplicationNames[0].Text : "ApplicationName",
+                    subjectName,
+                    domainNames,
+                    Configuration.DefaultCertificateKeySize,
+                    yesterday,
+                    Configuration.DefaultCertificateLifetime,
+                    Configuration.DefaultCertificateHashSize,
+                    Certificate,
+                    selfSignedCertificate.GetRSAPublicKey(),
+                    new KeyVaultSignatureGenerator(_keyVaultServiceClient, _caCertKeyIdentifier, Certificate));
+
+                using (var signedCertWithPrivateKey = CertificateFactory.CreateCertificateWithPrivateKey(signedCert, selfSignedCertificate))
+                {
+                    byte[] privateKey;
+                    if (privateKeyFormat == "PFX")
+                    {
+                        privateKey = signedCertWithPrivateKey.Export(X509ContentType.Pfx, privateKeyPassword);
+                    }
+                    else if (privateKeyFormat == "PEM")
+                    {
+                        privateKey = CertificateFactory.ExportPrivateKeyAsPEM(signedCertWithPrivateKey);
+                    }
+                    else
+                    {
+                        throw new ServiceResultException(StatusCodes.BadInvalidArgument, "Invalid private key format");
+                    }
+                    return new X509Certificate2KeyPair(new X509Certificate2(signedCertWithPrivateKey.RawData), privateKeyFormat, privateKey);
+                }
+            }
+        }
+
+
         public override async Task<X509Certificate2> SigningRequestAsync(
             ApplicationRecordDataType application,
             string[] domainNames,
             byte[] certificateRequest
             )
         {
-            // await base.VerifySigningRequestAsync(application, certificateRequest);
             try
             {
-
                 var pkcs10CertificationRequest = new Org.BouncyCastle.Pkcs.Pkcs10CertificationRequest(certificateRequest);
-
                 if (!pkcs10CertificationRequest.Verify())
                 {
                     throw new ServiceResultException(StatusCodes.BadInvalidArgument, "CSR signature invalid.");
@@ -203,11 +261,10 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models
                 }
 
                 DateTime yesterday = DateTime.UtcNow.AddDays(-1);
-                // to verify signing key
-                // using (var signingKey = await LoadSigningKeyAsync(Certificate, string.Empty))
                 await LoadPublicAssets().ConfigureAwait(false);
                 var signingKey = Certificate;
                 {
+                    var provider = DecodeX509PublicKey(info.SubjectPublicKeyInfo.GetDerEncoded());
                     return await KeyVaultCertFactory.CreateSignedCertificate(
                         application.ApplicationUri,
                         application.ApplicationNames.Count > 0 ? application.ApplicationNames[0].Text : "ApplicationName",
@@ -218,7 +275,7 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models
                         Configuration.DefaultCertificateLifetime,
                         Configuration.DefaultCertificateHashSize,
                         signingKey,
-                        info.SubjectPublicKeyInfo.GetDerEncoded(),
+                        provider,
                         new KeyVaultSignatureGenerator(_keyVaultServiceClient, _caCertKeyIdentifier, signingKey));
                 }
             }
@@ -245,14 +302,18 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models
         }
         #endregion
 
-        public override async Task<X509Certificate2> LoadSigningKeyAsync(
+        public override Task<X509Certificate2> LoadSigningKeyAsync(
             X509Certificate2 signingCertificate,
             string signingKeyPassword)
         {
+#if LOADPRIVATEKEY
             await LoadPublicAssets();
             return await _keyVaultServiceClient.LoadSigningCertificateAsync(
                 _caCertSecretIdentifier,
                 Certificate);
+#else
+            throw new NotSupportedException("Loading a private key from key Vault is not supported.");
+#endif
         }
         private async Task LoadPublicAssets()
         {
