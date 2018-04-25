@@ -5,7 +5,7 @@
 
 namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Auth {
     using Microsoft.AspNetCore.Http;
-    using Microsoft.Azure.IoTSolutions.Common.Diagnostics;
+    using Microsoft.Azure.IoTSolutions.OpcGdsVault.Common.Diagnostics;
     using System.Net;
     using System.Threading.Tasks;
 

@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
-using Microsoft.Azure.IoTSolutions.Common.Diagnostics;
+using Microsoft.Azure.IoTSolutions.OpcGdsVault.Common.Diagnostics;
 using Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Runtime;
 using Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Auth;
 using Microsoft.Extensions.Configuration;

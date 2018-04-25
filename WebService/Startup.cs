@@ -9,8 +9,8 @@ using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Azure.IoTSolutions.Common.Diagnostics;
-using Microsoft.Azure.IoTSolutions.Common.Http;
+using Microsoft.Azure.IoTSolutions.OpcGdsVault.Common.Diagnostics;
+using Microsoft.Azure.IoTSolutions.OpcGdsVault.Common.Http;
 using Microsoft.Azure.IoTSolutions.OpcGdsVault.Services;
 using Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Auth;
 using Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Runtime;
@@ -20,7 +20,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.Swagger;
-using ILogger = Microsoft.Azure.IoTSolutions.Common.Diagnostics.ILogger;
+using ILogger = Microsoft.Azure.IoTSolutions.OpcGdsVault.Common.Diagnostics.ILogger;
 
 namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService
 {

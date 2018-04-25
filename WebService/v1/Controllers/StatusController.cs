@@ -4,7 +4,7 @@
 namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.v1.Controllers
 {
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.IoTSolutions.Common.Diagnostics;
+using Microsoft.Azure.IoTSolutions.OpcGdsVault.Common.Diagnostics;
 using Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.v1.Filters;
 using Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.v1.Models;
 

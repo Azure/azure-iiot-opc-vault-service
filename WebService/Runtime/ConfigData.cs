@@ -5,7 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Microsoft.Azure.IoTSolutions.Common.Diagnostics;
+using Microsoft.Azure.IoTSolutions.OpcGdsVault.Common.Diagnostics;
 using Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Exceptions;
 using Microsoft.Extensions.Configuration;
 

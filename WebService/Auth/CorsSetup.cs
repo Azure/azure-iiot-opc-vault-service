@@ -4,7 +4,7 @@ using System;
 using System.Linq;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors.Infrastructure;
-using Microsoft.Azure.IoTSolutions.Common.Diagnostics;
+using Microsoft.Azure.IoTSolutions.OpcGdsVault.Common.Diagnostics;
 using Newtonsoft.Json;
 
 namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Auth {
