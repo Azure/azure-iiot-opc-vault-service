@@ -156,10 +156,14 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models
             X509Certificate2 certificate)
         {
             await LoadPublicAssets().ConfigureAwait(false);
+#if LOADPRIVATEKEY
             var issuerCert = await LoadSigningKeyAsync(null, null).ConfigureAwait(false);
+#else
+            var issuerCert = Certificate;
+#endif
             var certificates = new X509Certificate2Collection() { certificate };
             var crls = new List<X509CRL>() { Crl };
-            Crl = CertificateFactory.RevokeCertificate(issuerCert, crls, certificates);
+            Crl = RevokeCertificate(issuerCert, crls, certificates, new KeyVaultSignatureGenerator(_keyVaultServiceClient, _caCertKeyIdentifier, Certificate));
             await _keyVaultServiceClient.ImportCACrl(Configuration.Id, Certificate, Crl).ConfigureAwait(false);
             return Crl;
         }
@@ -300,7 +304,7 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models
             await LoadPublicAssets().ConfigureAwait(false);
             return Crl;
         }
-        #endregion
+#endregion
 
         public override Task<X509Certificate2> LoadSigningKeyAsync(
             X509Certificate2 signingCertificate,

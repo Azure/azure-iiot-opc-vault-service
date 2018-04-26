@@ -1,7 +1,6 @@
 using Opc.Ua;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -124,20 +123,127 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models
             }
         }
 
-        private static X509AuthorityKeyIdentifierExtension FindAuthorityKeyIdentifier(X509Certificate2 certificate)
+        /// <summary>
+        /// Revoke the certificate. 
+        /// The CRL number is increased by one and the new CRL is returned.
+        /// </summary>
+        public static X509CRL RevokeCertificate(
+            X509Certificate2 issuerCertificate,
+            List<X509CRL> issuerCrls,
+            X509Certificate2Collection revokedCertificates,
+            X509SignatureGenerator generator
+            )
         {
-            for (int ii = 0; ii < certificate.Extensions.Count; ii++)
-            {
-                X509Extension extension = certificate.Extensions[ii];
+            var crlSerialNumber = Org.BouncyCastle.Math.BigInteger.Zero;
+            Org.BouncyCastle.X509.X509Certificate bcCertCA =
+                new Org.BouncyCastle.X509.X509CertificateParser().ReadCertificate(issuerCertificate.RawData);
+            Org.BouncyCastle.Crypto.ISignatureFactory signatureFactory =
+                    new KeyVaultSignatureFactory(HashAlgorithmName.SHA256, generator);
 
-                switch (extension.Oid.Value)
+            var crlGen = new Org.BouncyCastle.X509.X509V2CrlGenerator();
+            crlGen.SetIssuerDN(bcCertCA.IssuerDN);
+
+            DateTime now = DateTime.UtcNow;
+            DateTime nextUpdate = now.AddMonths(12);
+            if (nextUpdate > bcCertCA.NotAfter)
+            {
+                nextUpdate = bcCertCA.NotAfter;
+            }
+            crlGen.SetThisUpdate(now);
+            crlGen.SetNextUpdate(nextUpdate);
+
+            // merge all existing revocation list
+            if (issuerCrls != null)
+            {
+                var parser = new Org.BouncyCastle.X509.X509CrlParser();
+                foreach (X509CRL issuerCrl in issuerCrls)
                 {
-                    case X509AuthorityKeyIdentifierExtension.AuthorityKeyIdentifierOid:
-                    case X509AuthorityKeyIdentifierExtension.AuthorityKeyIdentifier2Oid:
-                        {
-                            return new X509AuthorityKeyIdentifierExtension(extension, extension.Critical);
-                        }
+                    Org.BouncyCastle.X509.X509Crl crl = parser.ReadCrl(issuerCrl.RawData);
+                    crlGen.AddCrl(crl);
+                    var crlVersion = GetCrlNumber(crl);
+                    if (crlVersion.IntValue > crlSerialNumber.IntValue)
+                    {
+                        crlSerialNumber = crlVersion;
+                    }
                 }
+            }
+
+            if (revokedCertificates == null || revokedCertificates.Count == 0)
+            {
+                // add a dummy revoked cert
+                crlGen.AddCrlEntry(Org.BouncyCastle.Math.BigInteger.One, now, Org.BouncyCastle.Asn1.X509.CrlReason.Unspecified);
+            }
+            else
+            {
+                // add the revoked cert
+                foreach (var revokedCertificate in revokedCertificates)
+                {
+                    crlGen.AddCrlEntry(GetSerialNumber(revokedCertificate), now, Org.BouncyCastle.Asn1.X509.CrlReason.PrivilegeWithdrawn);
+                }
+            }
+
+            crlGen.AddExtension(Org.BouncyCastle.Asn1.X509.X509Extensions.AuthorityKeyIdentifier,
+                                false,
+                                new Org.BouncyCastle.X509.Extension.AuthorityKeyIdentifierStructure(bcCertCA));
+
+            // set new serial number
+            crlSerialNumber = crlSerialNumber.Add(Org.BouncyCastle.Math.BigInteger.One);
+            crlGen.AddExtension(Org.BouncyCastle.Asn1.X509.X509Extensions.CrlNumber,
+                                false,
+                                new Org.BouncyCastle.Asn1.X509.CrlNumber(crlSerialNumber));
+
+            // generate updated CRL
+            Org.BouncyCastle.X509.X509Crl updatedCrl = crlGen.Generate(signatureFactory);
+
+            return new X509CRL(updatedCrl.GetEncoded());
+        }
+
+        private static string GetRSAHashAlgorithm(uint hashSizeInBits)
+        {
+            if (hashSizeInBits <= 160)
+                return "SHA1WITHRSA";
+            if (hashSizeInBits <= 224)
+                return "SHA224WITHRSA";
+            else if (hashSizeInBits <= 256)
+                return "SHA256WITHRSA";
+            else if (hashSizeInBits <= 384)
+                return "SHA384WITHRSA";
+            else
+                return "SHA512WITHRSA";
+        }
+
+
+        /// <summary>
+        /// Read the Crl number from a X509Crl.
+        /// </summary>
+        private static Org.BouncyCastle.Math.BigInteger GetCrlNumber(Org.BouncyCastle.X509.X509Crl crl)
+        {
+            Org.BouncyCastle.Math.BigInteger crlNumber = Org.BouncyCastle.Math.BigInteger.One;
+            try
+            {
+                Org.BouncyCastle.Asn1.Asn1Object asn1Object = GetExtensionValue(crl, Org.BouncyCastle.Asn1.X509.X509Extensions.CrlNumber);
+                if (asn1Object != null)
+                {
+                    crlNumber = Org.BouncyCastle.Asn1.X509.CrlNumber.GetInstance(asn1Object).PositiveValue;
+                }
+            }
+            finally
+            {
+            }
+            return crlNumber;
+        }
+
+        /// <summary>
+        /// Get the value of an extension oid.
+        /// </summary>
+        private static Org.BouncyCastle.Asn1.Asn1Object GetExtensionValue(
+            Org.BouncyCastle.X509.IX509Extension extension,
+            Org.BouncyCastle.Asn1.DerObjectIdentifier oid)
+        {
+            Org.BouncyCastle.Asn1.Asn1OctetString asn1Octet = extension.GetExtensionValue(oid);
+            if (asn1Octet != null)
+            {
+                return Org.BouncyCastle.X509.Extension.X509ExtensionUtilities.FromExtensionValue(asn1Octet);
             }
             return null;
         }
@@ -409,7 +515,6 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models
             return generalNames;
         }
 
-
         public class KeyVaultSignatureGenerator : X509SignatureGenerator
         {
             X509Certificate2 _issuerCert;
@@ -511,5 +616,96 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models
         }
     }
 
-}
+    /// <summary>
+    /// Calculator factory class for signature generation in ASN.1 based profiles that use an AlgorithmIdentifier to preserve
+    /// signature algorithm details.
+    /// </summary>
+    public class KeyVaultSignatureFactory : Org.BouncyCastle.Crypto.ISignatureFactory
+    {
+        private readonly Org.BouncyCastle.Asn1.X509.AlgorithmIdentifier algID;
+        private readonly HashAlgorithmName hashAlgorithm;
+        private X509SignatureGenerator generator;
 
+        /// <summary>
+        /// Constructor which also specifies a source of randomness to be used if one is required.
+        /// </summary>
+        /// <param name="algorithm">The name of the signature algorithm to use.</param>
+        /// <param name="privateKey">The private key to be used in the signing operation.</param>
+        /// <param name="random">The source of randomness to be used in signature calculation.</param>
+        public KeyVaultSignatureFactory(HashAlgorithmName hashAlgorithm, X509SignatureGenerator generator)
+        {
+            Org.BouncyCastle.Asn1.DerObjectIdentifier sigOid;
+            if (hashAlgorithm == HashAlgorithmName.SHA256)
+            {
+                sigOid = Org.BouncyCastle.Asn1.Pkcs.PkcsObjectIdentifiers.Sha256WithRsaEncryption;
+            }
+            else if (hashAlgorithm == HashAlgorithmName.SHA384)
+            {
+                sigOid = Org.BouncyCastle.Asn1.Pkcs.PkcsObjectIdentifiers.Sha384WithRsaEncryption;
+            }
+            else if (hashAlgorithm == HashAlgorithmName.SHA512)
+            {
+                sigOid = Org.BouncyCastle.Asn1.Pkcs.PkcsObjectIdentifiers.Sha512WithRsaEncryption;
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException(nameof(hashAlgorithm));
+            }
+            this.hashAlgorithm = hashAlgorithm;
+            this.generator = generator;
+            this.algID = new Org.BouncyCastle.Asn1.X509.AlgorithmIdentifier(sigOid);
+        }
+
+        public Object AlgorithmDetails
+        {
+            get { return this.algID; }
+        }
+
+        public Org.BouncyCastle.Crypto.IStreamCalculator CreateCalculator()
+        {
+            return new KeyVaultStreamCalculator(generator, hashAlgorithm);
+        }
+    }
+
+    public class KeyVaultStreamCalculator : Org.BouncyCastle.Crypto.IStreamCalculator
+    {
+        private X509SignatureGenerator generator;
+        private HashAlgorithmName hashAlgorithm;
+
+        public KeyVaultStreamCalculator(
+            X509SignatureGenerator generator,
+            HashAlgorithmName hashAlgorithm)
+        {
+            Stream = new MemoryStream();
+            this.generator = generator;
+            this.hashAlgorithm = hashAlgorithm;
+        }
+
+        public Stream Stream { get; }
+
+        public object GetResult()
+        {
+            var memStream = Stream as MemoryStream;
+            var digest = memStream.ToArray();
+            var signature = generator.SignData(digest, hashAlgorithm);
+            return new MemoryBlockResult(signature);
+        }
+    }
+
+    public class MemoryBlockResult : Org.BouncyCastle.Crypto.IBlockResult
+    {
+        private byte[] data;
+        public MemoryBlockResult(byte[] data)
+        {
+            this.data = data;
+        }
+        public byte[] Collect()
+        {
+            return data;
+        }
+        public int Collect(byte[] destination, int offset)
+        {
+            throw new NotImplementedException();
+        }
+    }
+}
