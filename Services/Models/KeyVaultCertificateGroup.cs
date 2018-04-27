@@ -268,7 +268,8 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models
                 await LoadPublicAssets().ConfigureAwait(false);
                 var signingKey = Certificate;
                 {
-                    var provider = DecodeX509PublicKey(info.SubjectPublicKeyInfo.GetDerEncoded());
+                    var asn1Decoder = new ASN1Decoder(info.SubjectPublicKeyInfo.GetDerEncoded());
+                    var provider = asn1Decoder.GetRSAPublicKey();
                     return await KeyVaultCertFactory.CreateSignedCertificate(
                         application.ApplicationUri,
                         application.ApplicationNames.Count > 0 ? application.ApplicationNames[0].Text : "ApplicationName",

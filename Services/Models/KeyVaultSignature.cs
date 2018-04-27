@@ -279,89 +279,6 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models
             return new Org.BouncyCastle.Math.BigInteger(1, serialNumber);
         }
 
-        public static RSACryptoServiceProvider DecodeX509PublicKey(byte[] x509key)
-        {
-            byte[] SeqOID = { 0x2A, 0x86, 0x48, 0x86, 0xF7, 0x0D, 0x01, 0x01, 0x01 };
-
-            MemoryStream ms = new MemoryStream(x509key);
-            BinaryReader reader = new BinaryReader(ms);
-
-            if (reader.ReadByte() == 0x30)
-                ReadASNLength(reader); //skip the size
-            else
-                return null;
-
-            int identifierSize = 0; //total length of Object Identifier section
-            if (reader.ReadByte() == 0x30)
-                identifierSize = ReadASNLength(reader);
-            else
-                return null;
-
-            if (reader.ReadByte() == 0x06) //is the next element an object identifier?
-            {
-                int oidLength = ReadASNLength(reader);
-                byte[] oidBytes = new byte[oidLength];
-                reader.Read(oidBytes, 0, oidBytes.Length);
-                if (oidBytes.SequenceEqual(SeqOID) == false) //is the object identifier rsaEncryption PKCS#1?
-                    return null;
-
-                int remainingBytes = identifierSize - 2 - oidBytes.Length;
-                reader.ReadBytes(remainingBytes);
-            }
-
-            if (reader.ReadByte() == 0x03) //is the next element a bit string?
-            {
-                ReadASNLength(reader); //skip the size
-                reader.ReadByte(); //skip unused bits indicator
-                if (reader.ReadByte() == 0x30)
-                {
-                    ReadASNLength(reader); //skip the size
-                    if (reader.ReadByte() == 0x02) //is it an integer?
-                    {
-                        int modulusSize = ReadASNLength(reader);
-                        byte[] modulus = new byte[modulusSize];
-                        reader.Read(modulus, 0, modulus.Length);
-                        if (modulus[0] == 0x00) //strip off the first byte if it's 0
-                        {
-                            byte[] tempModulus = new byte[modulus.Length - 1];
-                            Array.Copy(modulus, 1, tempModulus, 0, modulus.Length - 1);
-                            modulus = tempModulus;
-                        }
-
-                        if (reader.ReadByte() == 0x02) //is it an integer?
-                        {
-                            int exponentSize = ReadASNLength(reader);
-                            byte[] exponent = new byte[exponentSize];
-                            reader.Read(exponent, 0, exponent.Length);
-
-                            RSACryptoServiceProvider rsa = new RSACryptoServiceProvider();
-                            RSAParameters rsaKeyInfo = new RSAParameters();
-                            rsaKeyInfo.Modulus = modulus;
-                            rsaKeyInfo.Exponent = exponent;
-                            rsa.ImportParameters(rsaKeyInfo);
-                            return rsa;
-                        }
-                    }
-                }
-            }
-            return null;
-        }
-
-        public static int ReadASNLength(BinaryReader reader)
-        {
-            //Note: this method only reads lengths up to 4 bytes long as
-            //this is satisfactory for the majority of situations.
-            int length = reader.ReadByte();
-            if ((length & 0x00000080) == 0x00000080) //is the length greater than 1 byte
-            {
-                int count = length & 0x0000000f;
-                byte[] lengthBytes = new byte[4];
-                reader.Read(lengthBytes, 4 - count, count);
-                Array.Reverse(lengthBytes); //
-                length = BitConverter.ToInt32(lengthBytes, 0);
-            }
-            return length;
-        }
 
         /// <summary>
         /// Sets the parameters to suitable defaults.
@@ -706,6 +623,130 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models
         public int Collect(byte[] destination, int offset)
         {
             throw new NotImplementedException();
+        }
+    }
+
+    public class ASN1Decoder //: IDisposable
+    {
+        internal enum DerTag : byte
+        {
+            Boolean = 0x01,
+            Integer = 0x02,
+            BitString = 0x03,
+            OctetString = 0x04,
+            Null = 0x05,
+            ObjectIdentifier = 0x06,
+            UTF8String = 0x0C,
+            Sequence = 0x10,
+            Set = 0x11,
+            PrintableString = 0x13,
+            T61String = 0x14,
+            IA5String = 0x16,
+            UTCTime = 0x17,
+            GeneralizedTime = 0x18,
+            BMPString = 0x1E,
+        }
+
+        private BinaryReader _reader;
+
+        public ASN1Decoder(byte[] asn1Blob)
+        {
+            var stream = new MemoryStream(asn1Blob);
+            _reader = new BinaryReader(stream);
+        }
+
+        public ASN1Decoder(Stream asn1Stream)
+        {
+            _reader = new BinaryReader(asn1Stream);
+        }
+
+        public RSACryptoServiceProvider GetRSAPublicKey()
+        {
+            var oidRSAEncryption = Org.BouncyCastle.Asn1.Pkcs.PkcsObjectIdentifiers.RsaEncryption.GetDerEncoded().Skip(2);
+
+            int headerSize = ReadASN1HeaderLength();
+            int identifierSize = ReadASN1HeaderLength();
+
+            if (ReadByte() == (byte)DerTag.ObjectIdentifier)
+            {
+                int oidLength = ReadASN1HeaderLength(false);
+                byte[] oidBytes = new byte[oidLength];
+                _reader.Read(oidBytes, 0, oidBytes.Length);
+                if (!oidBytes.SequenceEqual(oidRSAEncryption))
+                {
+                    new CryptographicException("No RSA Encryption key.");
+                }
+                int remainingBytes = identifierSize - 2 - oidBytes.Length;
+                _reader.ReadBytes(remainingBytes);
+            }
+
+            if (ReadByte() == (byte)DerTag.BitString)
+            {
+                ReadASN1HeaderLength(false);
+                _reader.ReadByte();
+                ReadASN1HeaderLength();
+                if (_reader.ReadByte() == (byte)DerTag.Integer)
+                {
+                    int modulusSize = ReadASN1HeaderLength(false);
+                    byte modulus0 = ReadByte();
+                    if (modulus0 == 0)
+                    {
+                        modulusSize--;
+                    }
+                    byte[] modulus = new byte[modulusSize];
+                    if (modulus0 != 0)
+                    {
+                        modulus[0] = modulus0;
+                        _reader.Read(modulus, 1, modulus.Length - 1);
+                    }
+                    else
+                    {
+                        _reader.Read(modulus, 0, modulus.Length);
+                    }
+
+                    if (ReadByte() == (byte)DerTag.Integer)
+                    {
+                        int exponentSize = ReadASN1HeaderLength(false);
+                        byte[] exponent = new byte[exponentSize];
+                        _reader.Read(exponent, 0, exponent.Length);
+
+                        RSACryptoServiceProvider rsa = new RSACryptoServiceProvider();
+                        RSAParameters rsaKeyInfo = new RSAParameters();
+                        rsaKeyInfo.Modulus = modulus;
+                        rsaKeyInfo.Exponent = exponent;
+                        rsa.ImportParameters(rsaKeyInfo);
+                        return rsa;
+                    }
+                }
+            }
+            throw new CryptographicException("Invalid RSA key.");
+        }
+
+        private byte ReadByte()
+        {
+            return _reader.ReadByte();
+        }
+
+        private int ReadASN1HeaderLength(bool testHeader = true)
+        {
+            if (testHeader)
+            {
+                if (ReadByte() != 0x30)
+                {
+                    throw new CryptographicException("ASN.1 Header not found");
+                }
+            }
+            int length = ReadByte();
+            if ((length & 0x80) != 0)
+            {
+                const int maxBytes = 4;
+                int count = length & 0x0f;
+                byte[] lengthBytes = new byte[maxBytes];
+                _reader.Read(lengthBytes, maxBytes - count, count);
+                Array.Reverse(lengthBytes);
+                length = BitConverter.ToInt32(lengthBytes, 0);
+            }
+            return length;
         }
     }
 }
