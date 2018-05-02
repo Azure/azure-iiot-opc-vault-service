@@ -442,9 +442,8 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models
 
                 // Add the tag to constructed context-specific 4 (GeneralName.directoryName)
                 Asn1Tag directoryNameTag = new Asn1Tag(TagClass.ContextSpecific, 4, true);
-                byte[] issuerName = new byte[issuer.SubjectName.RawData.Length];
-                Array.Copy(issuer.SubjectName.RawData, issuerName, issuerName.Length);
                 writer.PushSetOf(directoryNameTag);
+                byte[] issuerName = issuer.SubjectName.RawData;
                 writer.WriteEncodedValue(issuerName);
                 writer.PopSetOf(directoryNameTag);
                 writer.PopSequence(issuerNameTag);
