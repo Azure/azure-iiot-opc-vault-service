@@ -3,7 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Security.Cryptography;
+using System.Security.Cryptography.Asn1;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
@@ -50,28 +52,16 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models
             // Basic constraints
             request.CertificateExtensions.Add(
                 new X509BasicConstraintsExtension(false, false, 0, true));
-            // Subject key identifier
-            RSAParameters rsaParams = publicKey.ExportParameters(false);
-            var subjectPublicKey = new Org.BouncyCastle.Crypto.Parameters.RsaKeyParameters(
-                false,
-                new Org.BouncyCastle.Math.BigInteger(1, rsaParams.Modulus),
-                new Org.BouncyCastle.Math.BigInteger(1, rsaParams.Exponent));
-            var subjectKeyIdentifier = new AsnEncodedData(new Oid(Org.BouncyCastle.Asn1.X509.X509Extensions.SubjectKeyIdentifier.Id),
-                new Org.BouncyCastle.Asn1.X509.SubjectKeyIdentifier(
-                    Org.BouncyCastle.X509.SubjectPublicKeyInfoFactory.CreateSubjectPublicKeyInfo(subjectPublicKey)).GetDerEncoded());
-            request.CertificateExtensions.Add(new X509Extension(subjectKeyIdentifier, false));
+
+            // Subject Key Identifier
+            request.CertificateExtensions.Add(
+                            new X509SubjectKeyIdentifierExtension(
+                                request.PublicKey,
+                                X509SubjectKeyIdentifierHashAlgorithm.Sha1,
+                                false));
 
             // Authority Key Identifier
-            var issuerPublicKey = GetPublicKeyParameter(issuerCAKeyCert);
-            var issuerSerialNumber = GetSerialNumber(issuerCAKeyCert);
-            var authorityKey = new AsnEncodedData(new Oid(Org.BouncyCastle.Asn1.X509.X509Extensions.AuthorityKeyIdentifier.Id),
-                    new Org.BouncyCastle.Asn1.X509.AuthorityKeyIdentifier(
-                        Org.BouncyCastle.X509.SubjectPublicKeyInfoFactory.CreateSubjectPublicKeyInfo(issuerPublicKey),
-                        new Org.BouncyCastle.Asn1.X509.GeneralNames(
-                            new Org.BouncyCastle.Asn1.X509.GeneralName(
-                                new CertificateFactoryX509Name(issuerCAKeyCert.Subject))),
-                        issuerSerialNumber).GetDerEncoded());
-            request.CertificateExtensions.Add(new X509Extension(authorityKey, false));
+            request.CertificateExtensions.Add(BuildAuthorityKeyIdentifier(issuerCAKeyCert));
 
             // Key Usage
             request.CertificateExtensions.Add(
@@ -87,40 +77,28 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models
                         new Oid("1.3.6.1.5.5.7.3.2") }, true));
 
             // Subject Alternative Name
-            var generalNames = new List<Org.BouncyCastle.Asn1.X509.GeneralName>();
-            generalNames.Add(new Org.BouncyCastle.Asn1.X509.GeneralName(
-                Org.BouncyCastle.Asn1.X509.GeneralName.UniformResourceIdentifier, applicationUri));
-            generalNames.AddRange(CreateSubjectAlternateNameDomains(domainNames));
-            var subjectAltName = new AsnEncodedData(new Oid(Org.BouncyCastle.Asn1.X509.X509Extensions.SubjectAlternativeName.Id),
-                new Org.BouncyCastle.Asn1.X509.GeneralNames(generalNames.ToArray()).GetDerEncoded());
+            var subjectAltName = BuildSubjectAlternativeName(applicationUri, domainNames);
             request.CertificateExtensions.Add(new X509Extension(subjectAltName, false));
 
-            using (var cfrg = new CertificateFactoryRandomGenerator())
+            byte[] serialNumber = new byte[20];
+            RandomNumberGenerator.Fill(serialNumber);
+            serialNumber[0] &= 0x7F;
+
+            DateTime notAfter = startTime.AddMonths(lifetimeInMonths);
+            if (notAfter > issuerCAKeyCert.NotAfter)
             {
-                // cert generators
-                var random = new Org.BouncyCastle.Security.SecureRandom(cfrg);
-
-                // Serial Number
-                var serialNumber = Org.BouncyCastle.Utilities.BigIntegers.CreateRandomInRange(
-                    Org.BouncyCastle.Math.BigInteger.One,
-                    Org.BouncyCastle.Math.BigInteger.ValueOf(Int64.MaxValue), random);
-
-                DateTime notAfter = startTime.AddMonths(lifetimeInMonths);
-                if (notAfter > issuerCAKeyCert.NotAfter)
-                {
-                    notAfter = issuerCAKeyCert.NotAfter;
-                }
-
-                X509Certificate2 signedCert = request.Create(
-                    issuerCAKeyCert.SubjectName,
-                    generator,
-                    startTime,
-                    notAfter,
-                    serialNumber.ToByteArray()
-                    );
-
-                return Task.FromResult<X509Certificate2>(signedCert);
+                notAfter = issuerCAKeyCert.NotAfter;
             }
+
+            X509Certificate2 signedCert = request.Create(
+                issuerCAKeyCert.SubjectName,
+                generator,
+                startTime,
+                notAfter,
+                serialNumber
+                );
+
+            return Task.FromResult<X509Certificate2>(signedCert);
         }
 
         /// <summary>
@@ -211,7 +189,6 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models
             else
                 return "SHA512WITHRSA";
         }
-
 
         /// <summary>
         /// Read the Crl number from a X509Crl.
@@ -410,26 +387,77 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models
             return new X500DistinguishedName(subjectName);
         }
 
-        /// <summary>
-        /// helper to build alternate name domains list for certs.
-        /// </summary>
-        private static List<Org.BouncyCastle.Asn1.X509.GeneralName> CreateSubjectAlternateNameDomains(IList<String> domainNames)
+        private static X509Extension BuildSubjectAlternativeName(string applicationUri, IList<string> domainNames)
         {
-            // subject alternate name
-            var generalNames = new List<Org.BouncyCastle.Asn1.X509.GeneralName>();
-            for (int i = 0; i < domainNames.Count; i++)
+            var sanBuilder = new SubjectAlternativeNameBuilder();
+            sanBuilder.AddUri(new Uri(applicationUri));
+            foreach (string domainName in domainNames)
             {
-                int domainType = Org.BouncyCastle.Asn1.X509.GeneralName.OtherName;
-                switch (Uri.CheckHostName(domainNames[i]))
+                IPAddress ipAddr;
+                if (IPAddress.TryParse(domainName, out ipAddr))
                 {
-                    case UriHostNameType.Dns: domainType = Org.BouncyCastle.Asn1.X509.GeneralName.DnsName; break;
-                    case UriHostNameType.IPv4:
-                    case UriHostNameType.IPv6: domainType = Org.BouncyCastle.Asn1.X509.GeneralName.IPAddress; break;
-                    default: continue;
+                    sanBuilder.AddIpAddress(ipAddr);
                 }
-                generalNames.Add(new Org.BouncyCastle.Asn1.X509.GeneralName(domainType, domainNames[i]));
+                else
+                {
+                    sanBuilder.AddDnsName(domainName);
+                }
             }
-            return generalNames;
+
+            return sanBuilder.Build();
+        }
+
+        internal static byte[] HexToByteArray(string hexString)
+        {
+            byte[] bytes = new byte[hexString.Length / 2];
+
+            for (int i = 0; i < hexString.Length; i += 2)
+            {
+                string s = hexString.Substring(i, 2);
+                bytes[i / 2] = byte.Parse(s, System.Globalization.NumberStyles.HexNumber, null);
+            }
+
+            return bytes;
+        }
+
+        private static X509Extension BuildAuthorityKeyIdentifier(X509Certificate2 issuer)
+        {
+            using (AsnWriter writer = new AsnWriter(AsnEncodingRules.DER))
+            {
+                writer.PushSequence();
+
+                // Clearly, you could get rid of the “OrDefault” if you want to require it having been present.
+                var ski = issuer.Extensions.OfType<X509SubjectKeyIdentifierExtension>().SingleOrDefault();
+
+                if (ski != null)
+                {
+                    Asn1Tag keyIdTag = new Asn1Tag(TagClass.ContextSpecific, 0);
+                    // Sadly, have to parse the hex string.
+                    writer.WriteOctetString(keyIdTag, HexToByteArray(ski.SubjectKeyIdentifier));
+                }
+
+                // If you want to continue writing the name and serial, though this isn't very common.
+                Asn1Tag issuerNameTag = new Asn1Tag(TagClass.ContextSpecific, 1);
+                writer.PushSequence(issuerNameTag);
+
+                // Add the tag to constructed context-specific 4 (GeneralName.directoryName)
+                Asn1Tag directoryNameTag = new Asn1Tag(TagClass.ContextSpecific, 4, true);
+                byte[] issuerName = new byte[issuer.SubjectName.RawData.Length];
+                Array.Copy(issuer.SubjectName.RawData, issuerName, issuerName.Length);
+                writer.PushSetOf(directoryNameTag);
+                writer.WriteEncodedValue(issuerName);
+                writer.PopSetOf(directoryNameTag);
+                writer.PopSequence(issuerNameTag);
+
+                Asn1Tag issuerSerialTag = new Asn1Tag(TagClass.ContextSpecific, 2);
+
+                // issuer.GetSerialNumber returns a little-endian value, which is what BigInteger wants.
+                System.Numerics.BigInteger issuerSerial = new System.Numerics.BigInteger(issuer.GetSerialNumber());
+                writer.WriteInteger(issuerSerialTag, issuerSerial);
+
+                writer.PopSequence();
+                return new X509Extension("2.5.29.35", writer.Encode(), false);
+            }
         }
 
         public class KeyVaultSignatureGenerator : X509SignatureGenerator
@@ -533,10 +561,6 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models
         }
     }
 
-    /// <summary>
-    /// Calculator factory class for signature generation in ASN.1 based profiles that use an AlgorithmIdentifier to preserve
-    /// signature algorithm details.
-    /// </summary>
     public class KeyVaultSignatureFactory : Org.BouncyCastle.Crypto.ISignatureFactory
     {
         private readonly Org.BouncyCastle.Asn1.X509.AlgorithmIdentifier algID;
