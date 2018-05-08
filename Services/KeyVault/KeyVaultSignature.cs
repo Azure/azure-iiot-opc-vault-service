@@ -10,7 +10,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models
+namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.KeyVault
 {
     public class KeyVaultCertFactory
     {
@@ -38,6 +38,16 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models
                 throw new NotSupportedException("Need a public key and a CA certificate.");
             }
 
+            if (publicKey.KeySize != keySize)
+            {
+                throw new NotSupportedException(String.Format("Public key size {0} does not match expected key size {1}", publicKey.KeySize, keySize));
+            }
+
+            if (publicKey.KeySize != keySize)
+            {
+                throw new NotSupportedException(String.Format("Public key size {0} does not match expected key size {1}", publicKey.KeySize, keySize));
+            }
+
             // set default values.
             X500DistinguishedName subjectDN = SetSuitableDefaults(
                 ref applicationUri,
@@ -47,7 +57,7 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models
                 ref keySize,
                 ref lifetimeInMonths);
 
-            var request = new CertificateRequest(subjectDN, publicKey, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
+            var request = new CertificateRequest(subjectDN, publicKey, GetRSAHashAlgorithmName(hashSizeInBits), RSASignaturePadding.Pkcs1);
 
             // Basic constraints
             request.CertificateExtensions.Add(
@@ -109,14 +119,15 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models
             X509Certificate2 issuerCertificate,
             List<X509CRL> issuerCrls,
             X509Certificate2Collection revokedCertificates,
-            X509SignatureGenerator generator
+            X509SignatureGenerator generator,
+            uint hashSize
             )
         {
             var crlSerialNumber = Org.BouncyCastle.Math.BigInteger.Zero;
             Org.BouncyCastle.X509.X509Certificate bcCertCA =
                 new Org.BouncyCastle.X509.X509CertificateParser().ReadCertificate(issuerCertificate.RawData);
             Org.BouncyCastle.Crypto.ISignatureFactory signatureFactory =
-                    new KeyVaultSignatureFactory(HashAlgorithmName.SHA256, generator);
+                    new KeyVaultSignatureFactory(GetRSAHashAlgorithmName(hashSize), generator);
 
             var crlGen = new Org.BouncyCastle.X509.X509V2CrlGenerator();
             crlGen.SetIssuerDN(bcCertCA.IssuerDN);
@@ -189,6 +200,19 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models
             else
                 return "SHA512WITHRSA";
         }
+
+        private static HashAlgorithmName GetRSAHashAlgorithmName(uint hashSizeInBits)
+        {
+            if (hashSizeInBits <= 160)
+                return HashAlgorithmName.SHA1;
+            else if (hashSizeInBits <= 256)
+                return HashAlgorithmName.SHA256;
+            else if (hashSizeInBits <= 384)
+                return HashAlgorithmName.SHA384;
+            else
+                return HashAlgorithmName.SHA512;
+        }
+
 
         /// <summary>
         /// Read the Crl number from a X509Crl.
@@ -426,17 +450,14 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models
             {
                 writer.PushSequence();
 
-                // Clearly, you could get rid of the “OrDefault” if you want to require it having been present.
-                var ski = issuer.Extensions.OfType<X509SubjectKeyIdentifierExtension>().SingleOrDefault();
-
+                // force exception if SKI is not present
+                var ski = issuer.Extensions.OfType<X509SubjectKeyIdentifierExtension>().Single();
                 if (ski != null)
                 {
                     Asn1Tag keyIdTag = new Asn1Tag(TagClass.ContextSpecific, 0);
-                    // Sadly, have to parse the hex string.
                     writer.WriteOctetString(keyIdTag, HexToByteArray(ski.SubjectKeyIdentifier));
                 }
 
-                // If you want to continue writing the name and serial, though this isn't very common.
                 Asn1Tag issuerNameTag = new Asn1Tag(TagClass.ContextSpecific, 1);
                 writer.PushSequence(issuerNameTag);
 
@@ -449,8 +470,6 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models
                 writer.PopSequence(issuerNameTag);
 
                 Asn1Tag issuerSerialTag = new Asn1Tag(TagClass.ContextSpecific, 2);
-
-                // issuer.GetSerialNumber returns a little-endian value, which is what BigInteger wants.
                 System.Numerics.BigInteger issuerSerial = new System.Numerics.BigInteger(issuer.GetSerialNumber());
                 writer.WriteInteger(issuerSerialTag, issuerSerial);
 

@@ -12,6 +12,9 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.v1.Models
         [JsonProperty(PropertyName = "SubjectName", Order = 20)]
         public string SubjectName { get; set; }
 
+        [JsonProperty(PropertyName = "CertificateType", Order = 20)]
+        public string CertificateType { get; set; }
+
         [JsonProperty(PropertyName = "DefaultCertificateLifetime", Order = 30)]
         public ushort DefaultCertificateLifetime { get; set; }
 
@@ -21,13 +24,27 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.v1.Models
         [JsonProperty(PropertyName = "DefaultCertificateHashSize", Order = 50)]
         public ushort DefaultCertificateHashSize { get; set; }
 
+        [JsonProperty(PropertyName = "CACertificateLifetime", Order = 60)]
+        public ushort CACertificateLifetime { get; set; }
+
+        [JsonProperty(PropertyName = "CACertificateKeySize", Order = 70)]
+        public ushort CACertificateKeySize { get; set; }
+
+        [JsonProperty(PropertyName = "CACertificateHashSize", Order = 80)]
+        public ushort CACertificateHashSize { get; set; }
+
+
         public CertificateGroupConfigurationApiModel(string id, Opc.Ua.Gds.Server.CertificateGroupConfiguration config)
         {
             this.Id = id;
+            this.CertificateType = config.CertificateType;
             this.SubjectName = config.SubjectName;
             this.DefaultCertificateLifetime = config.DefaultCertificateLifetime;
             this.DefaultCertificateKeySize = config.DefaultCertificateKeySize;
             this.DefaultCertificateHashSize = config.DefaultCertificateHashSize;
+            this.CACertificateLifetime = config.CACertificateLifetime;
+            this.CACertificateKeySize = config.CACertificateKeySize;
+            this.CACertificateHashSize = config.CACertificateHashSize;
         }
     }
 }

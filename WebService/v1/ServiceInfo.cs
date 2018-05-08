@@ -25,7 +25,7 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.v1
         /// <summary>
         /// Date when the API version has been published
         /// </summary>
-        public const string DATE = "20180301";
+        public const string DATE = "20180501";
 
         /// <summary>
         /// Description of service

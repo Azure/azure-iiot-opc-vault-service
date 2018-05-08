@@ -48,11 +48,8 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.v1.Models
         [JsonProperty(PropertyName = "Dependencies", Order = 80)]
         public Dictionary<string, string> Dependencies => new Dictionary<string, string>
         {
-            { "IoTHubManagerAPI", "OK:...msg..." },
-            { "StorageAPI", "OK:timeout after 3 secs" },
-            { "AuthAPI", "ERROR:certificate expired" },
-            { "IoTHub", "OK:...msg..." },
-            { "AAD", "ERROR:certificate expired" }
+            // TODO: implement meaningful status output
+            { "KeyVaultAPI", "OK:...msg..." }
         };
 
         [JsonProperty(PropertyName = "$metadata", Order = 1000)]

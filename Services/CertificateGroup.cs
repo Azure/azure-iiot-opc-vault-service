@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
 using Microsoft.Azure.IoTSolutions.OpcGdsVault.Common.Diagnostics;
+using Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.KeyVault;
 using Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models;
 using Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Runtime;
 using Newtonsoft.Json;

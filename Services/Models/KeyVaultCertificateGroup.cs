@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
 using Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Exceptions;
+using Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.KeyVault;
 using Newtonsoft.Json;
 using Opc.Ua;
 using Opc.Ua.Gds;
@@ -10,7 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
-using static Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models.KeyVaultCertFactory;
+using static Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.KeyVault.KeyVaultCertFactory;
 
 namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models
 {
@@ -114,7 +115,7 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models
 
         public async Task<bool> CreateCACertificateAsync()
         {
-            DateTime yesterday = DateTime.UtcNow.AddDays(-1);
+            DateTime now = DateTime.UtcNow;
             try
             {
                 using (var caCert = CertificateFactory.CreateCertificate(
@@ -125,10 +126,10 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models
                     null,
                     Configuration.SubjectName,
                     null,
-                    Configuration.DefaultCertificateKeySize,
-                    yesterday,
-                    Configuration.DefaultCertificateLifetime,
-                    Configuration.DefaultCertificateHashSize,
+                    Configuration.CACertificateKeySize,
+                    now,
+                    Configuration.CACertificateLifetime,
+                    Configuration.CACertificateHashSize,
                     true,
                     null,
                     null))
@@ -163,7 +164,9 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models
 #endif
             var certificates = new X509Certificate2Collection() { certificate };
             var crls = new List<X509CRL>() { Crl };
-            Crl = RevokeCertificate(issuerCert, crls, certificates, new KeyVaultSignatureGenerator(_keyVaultServiceClient, _caCertKeyIdentifier, Certificate));
+            Crl = RevokeCertificate(issuerCert, crls, certificates, 
+                new KeyVaultSignatureGenerator(_keyVaultServiceClient, _caCertKeyIdentifier, Certificate),
+                this.Configuration.CACertificateHashSize);
             await _keyVaultServiceClient.ImportCACrl(Configuration.Id, Certificate, Crl).ConfigureAwait(false);
             return Crl;
         }

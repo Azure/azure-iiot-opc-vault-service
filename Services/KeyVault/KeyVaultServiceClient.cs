@@ -12,11 +12,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services
+namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.KeyVault
 {
 
     public class KeyVaultServiceClient
@@ -72,7 +71,7 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services
             var result = await context.AcquireTokenAsync(resource, _assertionCert);
             return result.AccessToken;
         }
-
+#if IOTHUB
         /// <summary>
         /// Read the IoTHub connection string from keyVault.
         /// </summary>
@@ -81,7 +80,7 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services
             SecretBundle secret = await _keyVaultClient.GetSecretAsync(_vaultBaseUrl + "/secrets/iothub", ct).ConfigureAwait(false);
             return secret.Value;
         }
-
+#endif
         /// <summary>
         /// Read the GDS CertificateConfigurationGroups as Json.
         /// </summary>
@@ -255,7 +254,7 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services
                 {
                     Exportable = false,
                     KeySize = certificate.GetRSAPublicKey().KeySize,
-                    KeyType = "RSA",
+                    KeyType = "RSA-HSM",
                     ReuseKey = false
                 },
                 SecretProperties = new SecretProperties
@@ -265,6 +264,16 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services
                 X509CertificateProperties = new X509CertificateProperties
                 {
                     Subject = certificate.Subject
+                },
+                // make sure key is not auto renewed, the auto 
+                // renewed cert would miss the CA basic constraint subtype
+                LifetimeActions = new List<LifetimeAction>
+                {
+                    new LifetimeAction
+                    {
+                        Trigger = new Trigger(80, 0),
+                        Action = new Microsoft.Azure.KeyVault.Models.Action(ActionType.EmailContacts)
+                    }
                 }
             };
 
