@@ -264,7 +264,9 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.KeyVault
                 X509CertificateProperties = new X509CertificateProperties
                 {
                     Subject = certificate.Subject
-                },
+                }
+#if CAUSESBADREQUEST
+                ,
                 // make sure key is not auto renewed, the auto 
                 // renewed cert would miss the CA basic constraint subtype
                 LifetimeActions = new List<LifetimeAction>
@@ -275,6 +277,7 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.KeyVault
                         Action = new Microsoft.Azure.KeyVault.Models.Action(ActionType.EmailContacts)
                     }
                 }
+#endif
             };
 
             Dictionary<string, string> tags = new Dictionary<string, string>

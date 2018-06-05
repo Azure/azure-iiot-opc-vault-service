@@ -55,7 +55,7 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Test
     {
         ServicesConfig config = new ServicesConfig()
         {
-            KeyVaultApiUrl = "https://iopgdshsm.vault.azure.net"
+            KeyVaultApiUrl = "https://iopgds.vault.azure.net"
         };
         Logger logger = new Logger("Services.Test", LogLevel.Debug);
 
@@ -193,7 +193,7 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Test
                     group,
                     randomApp.ApplicationRecord.ApplicationUri,
                     certificateRequest);
-#if WRITECERT
+#if !WRITECERT
                 // save cert for debugging
                 using (ICertificateStore store = CertificateStoreIdentifier.CreateStore(CertificateStoreType.Directory))
                 {
