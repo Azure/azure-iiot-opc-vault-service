@@ -3,7 +3,7 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:54321/",
+      "applicationUrl": "http://localhost:58801/swagger",
       "sslPort": 0
     }
   },
@@ -11,19 +11,19 @@
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
-      "launchUrl": "http://localhost:54321/v1/status",
+      "launchUrl": "http://localhost:58801/swagger",
       "environmentVariables": {
-        "PCS_IOTHUB_CONNSTRING": "HostName={Your Azure IoT Hub hostname};SharedAccessKeyName=iothubowner;SharedAccessKey={SECRET KEY}"
+        "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
     "WebService": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "http://localhost:54321/v1/status",
+      "launchUrl": "http://localhost:58801/swagger",
       "environmentVariables": {
-        "PCS_IOTHUB_CONNSTRING": "HostName={Your Azure IoT Hub hostname};SharedAccessKeyName=iothubowner;SharedAccessKey={SECRET KEY}"
+        "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "http://localhost:54321/v1/status"
+      "applicationUrl": "http://localhost:58801/swagger"
     }
   }
 }
