@@ -14,6 +14,9 @@
     <DocumentationFile>bin\Release\netcoreapp2.0\Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Properties\PublishProfiles\AdvancedSettings.pubxml" />
+  </ItemGroup>
+  <ItemGroup>
     <Folder Include="Properties" />
   </ItemGroup>
   <ItemGroup>

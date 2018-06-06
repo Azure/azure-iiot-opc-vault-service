@@ -9,11 +9,11 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.v1.Models
         [JsonProperty(PropertyName = "Name", Order = 10)]
         public string Id { get; set; }
 
+        [JsonProperty(PropertyName = "CertificateType", Order = 15)]
+        public string CertificateType { get; set; }
+
         [JsonProperty(PropertyName = "SubjectName", Order = 20)]
         public string SubjectName { get; set; }
-
-        [JsonProperty(PropertyName = "CertificateType", Order = 20)]
-        public string CertificateType { get; set; }
 
         [JsonProperty(PropertyName = "DefaultCertificateLifetime", Order = 30)]
         public ushort DefaultCertificateLifetime { get; set; }
