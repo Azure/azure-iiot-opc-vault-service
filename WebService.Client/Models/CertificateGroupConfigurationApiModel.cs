@@ -9,6 +9,9 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Client.Models
         [JsonProperty(PropertyName = "Name", Order = 10)]
         public string Id { get; set; }
 
+        [JsonProperty(PropertyName = "CertificateType", Order = 15)]
+        public string CertificateType { get; set; }
+
         [JsonProperty(PropertyName = "SubjectName", Order = 20)]
         public string SubjectName { get; set; }
 
@@ -20,5 +23,15 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Client.Models
 
         [JsonProperty(PropertyName = "DefaultCertificateHashSize", Order = 50)]
         public ushort DefaultCertificateHashSize { get; set; }
+
+        [JsonProperty(PropertyName = "CACertificateLifetime", Order = 60)]
+        public ushort CACertificateLifetime { get; set; }
+
+        [JsonProperty(PropertyName = "CACertificateKeySize", Order = 70)]
+        public ushort CACertificateKeySize { get; set; }
+
+        [JsonProperty(PropertyName = "CACertificateHashSize", Order = 80)]
+        public ushort CACertificateHashSize { get; set; }
+
     }
 }
