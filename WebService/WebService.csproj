@@ -3,7 +3,7 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <AssemblyName>Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService</AssemblyName>
     <RootNamespace>Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService</RootNamespace>
-    <Product>Microsoft Azure Opc Ua GDS Vault Service</Product>
+    <Product>Microsoft Azure IoT Solutions Opc Ua GDS Vault Service</Product>
     <Authors>Microsoft</Authors>
     <Company>Microsoft</Company>
   </PropertyGroup>
