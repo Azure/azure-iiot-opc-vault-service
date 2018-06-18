@@ -187,12 +187,6 @@ With this configuration, when checking in files, git will verify that the
 application passes all the tests, running the build and the tests in your
 workstation, using the tools installed in your OS.
 
-## Code style
-
-If you use ReSharper or Rider, you can load the code style settings from
-the repository, stored in
-[iot-opc-gds-service.sln.DotSettings](iot-opc-gds-service.sln.DotSettings)
-
 Some quick notes about the project code style:
 
 1. Where reasonable, lines length is limited to 80 chars max, to help code
