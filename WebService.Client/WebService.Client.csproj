@@ -12,9 +12,9 @@
     <Description>Azure IoT OPC UA GDS Vault Services Class Library</Description>
     <Authors>Microsoft</Authors>
     <PackageLicenseUrl>https://github.com/Azure/iot-opc-gdsvault-service/blob/master/LICENSE</PackageLicenseUrl>
-    <Version>1.0.0-preview180615</Version>
-    <AssemblyVersion>1.0.0</AssemblyVersion>
-    <FileVersion>1.0.0</FileVersion>
+    <Version>1.0.1-preview180615</Version>
+    <AssemblyVersion>1.0.1</AssemblyVersion>
+    <FileVersion>1.0.1</FileVersion>
     <Copyright>Copyright © 2018 Microsoft Corp. All rights reserved.</Copyright>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
