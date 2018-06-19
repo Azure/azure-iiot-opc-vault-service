@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\WebService.Client\WebService.Client.csproj" />
+    <ProjectReference Include="..\WebService.Client\GdsVault.WebService.Client.csproj" />
   </ItemGroup>
 
   <ItemGroup>

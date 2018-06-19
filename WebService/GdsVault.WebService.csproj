@@ -38,10 +38,9 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Ini" Version="2.0.1" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Services\Services.csproj">
-      <Project>{786a5b9b-98ee-4b73-9fe3-2080b70007af}</Project>
-      <Name>Services</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\Services\GdsVault.Services.csproj" />
+  </ItemGroup>
+  <ItemGroup>
     <!-- "Service Include" required by IntelliJ Rider -->
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>

@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27130.2036
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebService", "WebService\WebService.csproj", "{F305CAD5-BE38-4391-A692-580C526A0CB1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GdsVault.WebService", "WebService\GdsVault.WebService.csproj", "{F305CAD5-BE38-4391-A692-580C526A0CB1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebService.Test", "WebService.Test\WebService.Test.csproj", "{6A4D86AD-56D0-421B-B9B2-2EBB34A5BBBC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GdsVault.WebService.Test", "WebService.Test\GdsVault.WebService.Test.csproj", "{6A4D86AD-56D0-421B-B9B2-2EBB34A5BBBC}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "solution", "solution", "{8289AFAE-0933-40EF-9D19-6FFA2DB04837}"
 	ProjectSection(SolutionItems) = preProject
@@ -19,9 +19,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "solution", "solution", "{82
 		version = version
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Services", "Services\Services.csproj", "{786A5B9B-98EE-4B73-9FE3-2080B70007AF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GdsVault.Services", "Services\GdsVault.Services.csproj", "{786A5B9B-98EE-4B73-9FE3-2080B70007AF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Services.Test", "Services.Test\Services.Test.csproj", "{1BC54189-1DF9-448E-AE5F-66EB2EF51D82}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GdsVault.Services.Test", "Services.Test\GdsVault.Services.Test.csproj", "{1BC54189-1DF9-448E-AE5F-66EB2EF51D82}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{7357A079-B54D-490F-AA91-1B7BDAFE5E3F}"
 	ProjectSection(SolutionItems) = preProject
@@ -82,7 +82,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "content", "content", "{8BAA
 		scripts\docker\content\run.sh = scripts\docker\content\run.sh
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebService.Client", "WebService.Client\WebService.Client.csproj", "{1B12D1FA-1906-413E-8C84-24A2C4A4CA5B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GdsVault.WebService.Client", "WebService.Client\GdsVault.WebService.Client.csproj", "{1B12D1FA-1906-413E-8C84-24A2C4A4CA5B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Services.Common", "Services.Common\Services.Common.csproj", "{6C65FCB3-B2E2-4818-BA12-EB0B80EF01CE}"
 EndProject
