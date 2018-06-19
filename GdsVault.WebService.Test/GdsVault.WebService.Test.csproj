@@ -2,10 +2,16 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <LangVersion>6</LangVersion>
-    <AssemblyName>Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Test</AssemblyName>
-    <RootNamespace>Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Test</RootNamespace>
+    <AssemblyName>Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Test</AssemblyName>
+    <RootNamespace>Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Test</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="appsettings.ini">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="1.1.2" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
     <PackageReference Include="Moq" Version="4.7.63" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
@@ -15,10 +21,9 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Services\GdsVault.Services.csproj" />
+    <ProjectReference Include="..\GdsVault.WebService\GdsVault.WebService.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <!-- "Service Include" required by IntelliJ Rider -->
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>
 </Project>
