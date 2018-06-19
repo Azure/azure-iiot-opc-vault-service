@@ -1,16 +1,17 @@
 ﻿using Newtonsoft.Json;
+using Opc.Ua;
 using System;
 
-namespace Opc.Ua.Gds.Server.Database.CosmosDB.Models
+namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.CosmosDB.Models
 {
     [Serializable]
-    class ApplicationName
+    public class ApplicationName
     {
         public string Locale { get; set; }
         public string Text { get; set; }
     }
     [Serializable]
-    class Application
+    public class Application
     {
         [JsonProperty(PropertyName = "id")]
         public Guid ApplicationId { get; set; }
@@ -28,7 +29,7 @@ namespace Opc.Ua.Gds.Server.Database.CosmosDB.Models
         public string[] DiscoveryUrls { get; set; }
     }
     [Serializable]
-    class CertificateRequest
+    public class CertificateRequest
     {
         [JsonProperty(PropertyName = "id")]
         public Guid RequestId { get; set; }
@@ -49,7 +50,7 @@ namespace Opc.Ua.Gds.Server.Database.CosmosDB.Models
     }
 
     [Serializable]
-    class CertificateStore
+    public class CertificateStore
     {
         [JsonProperty(PropertyName = "id")]
         public Guid TrustListId { get; private set; }

@@ -1,5 +1,5 @@
-﻿namespace Opc.Ua.Gds.Server.Database.CosmosDB
-{
+﻿namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.CosmosDB.Models
+{ 
     using System;
     using System.Collections.Generic;
     using System.Linq;

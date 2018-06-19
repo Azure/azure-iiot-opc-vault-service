@@ -86,9 +86,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GdsVault.WebService.Client"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Services.Common", "Services.Common\Services.Common.csproj", "{6C65FCB3-B2E2-4818-BA12-EB0B80EF01CE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EdgeGlobalDiscoveryServer", "EdgeServer\EdgeGlobalDiscoveryServer.csproj", "{B69DF015-80BC-4D67-8893-1CC70BC8C01C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EdgeGlobalDiscoveryServer", "EdgeGlobalDiscoveryServer\EdgeGlobalDiscoveryServer.csproj", "{B69DF015-80BC-4D67-8893-1CC70BC8C01C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GdsVault.App", "GdsVault.App\GdsVault.App.csproj", "{32FF143F-51B5-46F1-9D1F-038F12947B1C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CosmosDB.Models", "CosmosDB.Models\CosmosDB.Models.csproj", "{A8407B45-F745-4D61-A10E-F8009BEB2044}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -128,6 +130,10 @@ Global
 		{32FF143F-51B5-46F1-9D1F-038F12947B1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{32FF143F-51B5-46F1-9D1F-038F12947B1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{32FF143F-51B5-46F1-9D1F-038F12947B1C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A8407B45-F745-4D61-A10E-F8009BEB2044}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A8407B45-F745-4D61-A10E-F8009BEB2044}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A8407B45-F745-4D61-A10E-F8009BEB2044}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A8407B45-F745-4D61-A10E-F8009BEB2044}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

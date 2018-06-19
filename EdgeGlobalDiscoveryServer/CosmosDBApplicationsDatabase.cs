@@ -1,8 +1,9 @@
-﻿using Opc.Ua.Gds.Server.Database.CosmosDB.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security;
+using Microsoft.Azure.IoTSolutions.OpcGdsVault.CosmosDB.Models;
+using Opc.Ua.Gds.Server;
 
 namespace Opc.Ua.Gds.Server.Database.CosmosDB
 {
@@ -80,10 +81,10 @@ namespace Opc.Ua.Gds.Server.Database.CosmosDB
                     foreach (var applicationName in application.ApplicationNames)
                     {
                         applicationNames.Add(new ApplicationName()
-                            {
-                                Locale = applicationName.Locale,
-                                Text = applicationName.Text
-                            });
+                        {
+                            Locale = applicationName.Locale,
+                            Text = applicationName.Text
+                        });
                     }
                     record.ApplicationNames = applicationNames.ToArray();
                 }
@@ -266,9 +267,9 @@ namespace Opc.Ua.Gds.Server.Database.CosmosDB
             lastCounterResetTime = queryCounterResetTime;
 
             bool matchQuery = false;
-            bool complexQuery = 
+            bool complexQuery =
                 !String.IsNullOrEmpty(applicationName) ||
-                !String.IsNullOrEmpty(applicationUri) || 
+                !String.IsNullOrEmpty(applicationUri) ||
                 !String.IsNullOrEmpty(productUri) ||
                 (serverCapabilities != null && serverCapabilities.Length > 0);
 
@@ -581,7 +582,7 @@ namespace Opc.Ua.Gds.Server.Database.CosmosDB
             CertificateRequests.UpdateAsync(request.RequestId, request).Wait();
         }
 
-        public void AcceptCertificateRequest(NodeId requestId, byte [] signedCertificate)
+        public void AcceptCertificateRequest(NodeId requestId, byte[] signedCertificate)
         {
             Guid id = GetNodeIdGuid(requestId);
 
@@ -672,18 +673,18 @@ namespace Opc.Ua.Gds.Server.Database.CosmosDB
             return CertificateRequestState.Approved;
 
         }
-#endregion
-#region Public Members
+        #endregion
+        #region Public Members
         public virtual void Save()
         {
         }
-#endregion
-#region Private Fields
+        #endregion
+        #region Private Fields
         private DateTime queryCounterResetTime = DateTime.UtcNow;
         private DocumentDBRepository db;
         private IDocumentDBCollection<Application> Applications;
         private IDocumentDBCollection<CertificateRequest> CertificateRequests;
         private IDocumentDBCollection<CertificateStore> CertificateStores;
-#endregion
+        #endregion
     }
 }

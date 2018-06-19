@@ -1,7 +1,7 @@
 [
   {
     "Id": "Default",
-    "CertificateType": "RsaSha256CertificateType",
+    "CertificateType": "RsaSha256ApplicationCertificateType",
     "SubjectName": "CN=Azure IoT GDS CA, O=Microsoft Corp.",
     "BaseStorePath": "/default",
     "DefaultCertificateLifetime": 12,
