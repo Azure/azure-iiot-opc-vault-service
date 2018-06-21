@@ -1,10 +1,10 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
-using Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Test.Helpers;
+using Microsoft.Azure.IoTSolutions.GdsVault.WebService.Test.Helpers;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Test.Controllers
+namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.Test.Controllers
 {
     public class SomeControllerTest
     {

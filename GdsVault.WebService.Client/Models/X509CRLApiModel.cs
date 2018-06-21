@@ -3,7 +3,7 @@
 using Newtonsoft.Json;
 using System;
 
-namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Client.Models
+namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.Client.Models
 {
     public sealed class X509CrlApiModel
     {

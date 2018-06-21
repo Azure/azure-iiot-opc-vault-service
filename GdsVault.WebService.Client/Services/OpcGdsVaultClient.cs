@@ -3,12 +3,12 @@
 //  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------
 
-namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Client
+namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.Client
 {
-    using Microsoft.Azure.IoTSolutions.OpcGdsVault.Common.Diagnostics;
-    using Microsoft.Azure.IoTSolutions.OpcGdsVault.Common.Http;
-    using Microsoft.Azure.IoTSolutions.OpcGdsVault.Common.Utils;
-    using Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Client.Models;
+    using Microsoft.Azure.IoTSolutions.GdsVault.Common.Diagnostics;
+    using Microsoft.Azure.IoTSolutions.GdsVault.Common.Http;
+    using Microsoft.Azure.IoTSolutions.GdsVault.Common.Utils;
+    using Microsoft.Azure.IoTSolutions.GdsVault.WebService.Client.Models;
     using Newtonsoft.Json;
     using System;
     using System.Threading.Tasks;
@@ -16,7 +16,7 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Client
     /// <summary>
     /// Implementation of v1 service adapter.
     /// </summary>
-    public class OpcGdsVaultClient : IOpcGdsVaultClient
+    public class GdsVaultClient : IGdsVaultClient
     {
 
         /// <summary>
@@ -25,14 +25,14 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Client
         /// <param name="httpClient"></param>
         /// <param name="config"></param>
         /// <param name="logger"></param>
-        public OpcGdsVaultClient(
+        public GdsVaultClient(
             IHttpClient httpClient,
-            IOpcGdsVaultConfig config,
+            IGdsVaultConfig config,
             ILogger logger)
         {
             _httpClient = httpClient;
             _logger = logger;
-            _serviceUri = config.OpcGdsVaultServiceApiUrl;
+            _serviceUri = config.GdsVaultServiceApiUrl;
 
             if (string.IsNullOrEmpty(_serviceUri))
             {
@@ -47,14 +47,14 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Client
         }
 
 
-        public OpcGdsVaultClient(
-            IOpcGdsVaultConfig config,
+        public GdsVaultClient(
+            IGdsVaultConfig config,
             AuthenticationCallback authenticationCallback)
         {
             ILogger logger = new Logger("processid", LogLevel.Error);
             _logger = logger;
             _httpClient = new HttpClient(logger);
-            _serviceUri = config.OpcGdsVaultServiceApiUrl;
+            _serviceUri = config.GdsVaultServiceApiUrl;
             if (string.IsNullOrEmpty(_serviceUri))
             {
                 _serviceUri = "http://localhost:58801/v1";

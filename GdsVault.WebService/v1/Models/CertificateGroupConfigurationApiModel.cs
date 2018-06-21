@@ -2,7 +2,7 @@
 
 using Newtonsoft.Json;
 
-namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.v1.Models
+namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.v1.Models
 {
     public sealed class CertificateGroupConfigurationApiModel
     {

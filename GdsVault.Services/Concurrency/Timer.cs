@@ -1,10 +1,10 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
-using Microsoft.Azure.IoTSolutions.OpcGdsVault.Common.Diagnostics;
+using Microsoft.Azure.IoTSolutions.GdsVault.Common.Diagnostics;
 using System;
 using System.Threading;
 
-namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Concurrency
+namespace Microsoft.Azure.IoTSolutions.GdsVault.Services.Concurrency
 {
     public interface ITimer
     {

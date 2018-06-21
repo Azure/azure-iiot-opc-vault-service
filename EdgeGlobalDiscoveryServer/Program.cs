@@ -258,7 +258,7 @@ namespace Opc.Ua.Gds.Server
             }
 
             // The vault handler with authentication
-            var gdsVaultHandler = new OpcGdsVaultClientHandler(gdsVaultServiceUrl);
+            var gdsVaultHandler = new GdsVaultClientHandler(gdsVaultServiceUrl);
             if (String.IsNullOrEmpty(appId))
             {
                 // authenticate key vault with MSI (web app) or developer user account

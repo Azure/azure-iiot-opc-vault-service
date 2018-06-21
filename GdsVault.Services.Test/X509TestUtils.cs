@@ -31,7 +31,7 @@ using Xunit;
 using System;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
-using Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Test;
+using Microsoft.Azure.IoTSolutions.GdsVault.Services.Test;
 
 namespace Opc.Ua.Gds.Test
 {

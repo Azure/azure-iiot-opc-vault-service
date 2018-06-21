@@ -4,10 +4,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Runtime;
+using Microsoft.Azure.IoTSolutions.GdsVault.WebService.Runtime;
 using Microsoft.Extensions.Configuration;
 
-namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService
+namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService
 {
     /// <summary>Application entry point</summary>
     public class Program

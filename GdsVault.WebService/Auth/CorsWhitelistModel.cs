@@ -1,6 +1,6 @@
 // Copyright (c) Microsoft. All rights reserved.
 
-namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Auth
+namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.Auth
 {
     class CorsWhitelistModel
     {

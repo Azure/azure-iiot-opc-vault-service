@@ -88,9 +88,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Services.Common", "Services
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EdgeGlobalDiscoveryServer", "EdgeGlobalDiscoveryServer\EdgeGlobalDiscoveryServer.csproj", "{B69DF015-80BC-4D67-8893-1CC70BC8C01C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GdsVault.App", "GdsVault.App\GdsVault.App.csproj", "{32FF143F-51B5-46F1-9D1F-038F12947B1C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GdsVault.App", "GdsVault.App\GdsVault.App.csproj", "{32FF143F-51B5-46F1-9D1F-038F12947B1C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CosmosDB.Models", "CosmosDB.Models\CosmosDB.Models.csproj", "{A8407B45-F745-4D61-A10E-F8009BEB2044}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GdsVault.CosmosDB.Models", "CosmosDB.Models\GdsVault.CosmosDB.Models.csproj", "{A8407B45-F745-4D61-A10E-F8009BEB2044}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

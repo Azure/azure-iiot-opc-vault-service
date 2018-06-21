@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
-namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Test.Helpers
+namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.Test.Helpers
 {
     /// <summary>
     /// Use these flags to allow running a subset of tests from the test

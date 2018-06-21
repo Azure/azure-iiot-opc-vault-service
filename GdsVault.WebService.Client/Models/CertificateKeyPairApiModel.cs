@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 using System;
 using System.Security.Cryptography.X509Certificates;
 
-namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Client.Models
+namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.Client.Models
 {
     public sealed class CertificateKeyPairApiModel
     {

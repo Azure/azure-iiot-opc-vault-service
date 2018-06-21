@@ -2,7 +2,7 @@
 
 using System;
 
-namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.v1.Exceptions
+namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.v1.Exceptions
 {
     public class BadRequestException : Exception
     {

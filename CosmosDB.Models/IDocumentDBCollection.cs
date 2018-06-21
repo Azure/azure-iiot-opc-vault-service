@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
-namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.CosmosDB.Models
+namespace Microsoft.Azure.IoTSolutions.GdsVault.CosmosDB.Models
 {
     public interface IDocumentDBCollection<T> where T : class
     {

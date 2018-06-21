@@ -4,10 +4,10 @@ using System;
 using System.Linq;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors.Infrastructure;
-using Microsoft.Azure.IoTSolutions.OpcGdsVault.Common.Diagnostics;
+using Microsoft.Azure.IoTSolutions.GdsVault.Common.Diagnostics;
 using Newtonsoft.Json;
 
-namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Auth {
+namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.Auth {
 
     /// <summary>
     /// Cors setup implementation

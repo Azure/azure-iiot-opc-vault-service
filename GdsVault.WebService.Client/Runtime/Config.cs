@@ -5,9 +5,9 @@
 
 namespace Microsoft.Azure.IoTSolutions.Shared.Runtime
 {
-    using Microsoft.Azure.IoTSolutions.OpcGdsVault.Common.Diagnostics;
-    using Microsoft.Azure.IoTSolutions.OpcGdsVault.Common.Exceptions;
-    using Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Client;
+    using Microsoft.Azure.IoTSolutions.GdsVault.Common.Diagnostics;
+    using Microsoft.Azure.IoTSolutions.GdsVault.Common.Exceptions;
+    using Microsoft.Azure.IoTSolutions.GdsVault.WebService.Client;
     using Microsoft.Extensions.Configuration;
     using System;
     using System.Collections.Generic;
@@ -17,7 +17,7 @@ namespace Microsoft.Azure.IoTSolutions.Shared.Runtime
     /// <summary>
     /// Web service configuration - wraps a configuration root
     /// </summary>
-    public class Config : IOpcGdsVaultConfig {
+    public class Config : IGdsVaultConfig {
 
         /// <summary>
         /// A configured logger
@@ -33,10 +33,10 @@ namespace Microsoft.Azure.IoTSolutions.Shared.Runtime
         /// Service configuration
         /// </summary>
         private const string DEPENDENCIES_KEY = "Dependencies:";
-        private const string OPC_TWIN_SERVICE_KEY = DEPENDENCIES_KEY + "OpcGdsVault:";
+        private const string GDS_VAULT_SERVICE_KEY = DEPENDENCIES_KEY + "GdsVault:";
         /// <summary>OPC twin endpoint url</summary>
-        public string OpcGdsVaultServiceApiUrl =>
-            GetString(OPC_TWIN_SERVICE_KEY + "webservice_url");
+        public string GdsVaultServiceApiUrl =>
+            GetString(GDS_VAULT_SERVICE_KEY + "webservice_url");
 
         /// <summary>
         /// Configuration constructor

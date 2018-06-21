@@ -1,9 +1,9 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
-using Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models;
+using Microsoft.Azure.IoTSolutions.GdsVault.Services.Models;
 using Newtonsoft.Json;
 
-namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.v1.Models
+namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.v1.Models
 {
     public sealed class TrustListApiModel
     {

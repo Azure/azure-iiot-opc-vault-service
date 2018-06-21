@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
 
-namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Client.Models
+namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.Client.Models
 {
     using Newtonsoft.Json;
     using System.Collections.Generic;

@@ -6,7 +6,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using Newtonsoft.Json;
 
-namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Webservice.Client.Http
+namespace Microsoft.Azure.IoTSolutions.GdsVault.Webservice.Client.Http
 {
     public interface IHttpRequest
     {

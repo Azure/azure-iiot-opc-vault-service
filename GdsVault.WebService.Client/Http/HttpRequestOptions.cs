@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
-namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Webservice.Client.Http
+namespace Microsoft.Azure.IoTSolutions.GdsVault.Webservice.Client.Http
 {
     public class HttpRequestOptions
     {

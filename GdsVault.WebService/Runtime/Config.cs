@@ -1,14 +1,14 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
-using Microsoft.Azure.IoTSolutions.OpcGdsVault.Common.Diagnostics;
-using Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Runtime;
-using Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Auth;
+using Microsoft.Azure.IoTSolutions.GdsVault.Common.Diagnostics;
+using Microsoft.Azure.IoTSolutions.GdsVault.Services.Runtime;
+using Microsoft.Azure.IoTSolutions.GdsVault.WebService.Auth;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Runtime
+namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.Runtime
 {
     public interface IConfig : IClientAuthConfig
     {
@@ -42,7 +42,7 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Runtime
     public class Config : IConfig
     {
         // web service config
-        private const string ApplicationKey = "OpcGdsVault:";
+        private const string ApplicationKey = "GdsVault:";
         private const string PortKey = ApplicationKey + "webservice_port";
 
         // services config

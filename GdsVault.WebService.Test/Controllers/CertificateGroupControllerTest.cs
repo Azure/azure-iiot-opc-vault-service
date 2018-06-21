@@ -1,14 +1,14 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
-using Microsoft.Azure.IoTSolutions.OpcGdsVault.Services;
-using Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Test.Helpers;
-using Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.v1.Controllers;
-using Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.v1.Models;
+using Microsoft.Azure.IoTSolutions.GdsVault.Services;
+using Microsoft.Azure.IoTSolutions.GdsVault.WebService.Test.Helpers;
+using Microsoft.Azure.IoTSolutions.GdsVault.WebService.v1.Controllers;
+using Microsoft.Azure.IoTSolutions.GdsVault.WebService.v1.Models;
 using Moq;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Test.Controllers
+namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.Test.Controllers
 {
     public class CertificateGroupControllerTest
     {

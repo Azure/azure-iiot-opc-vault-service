@@ -3,13 +3,13 @@
 //  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------
 
-namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Client {
-    using Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Client.Models;
+namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.Client {
+    using Microsoft.Azure.IoTSolutions.GdsVault.WebService.Client.Models;
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
-    public static class OpcGdsVaultServiceEx {
-#if mist
+    public static class GdsVaultServiceEx {
+#if TODO //remove
         /// <summary>
         /// Get endpoint
         /// </summary>

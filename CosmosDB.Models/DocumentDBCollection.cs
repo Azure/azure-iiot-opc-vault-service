@@ -1,4 +1,4 @@
-﻿namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.CosmosDB.Models
+﻿namespace Microsoft.Azure.IoTSolutions.GdsVault.CosmosDB.Models
 { 
     using System;
     using System.Collections.Generic;

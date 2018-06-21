@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
-using Microsoft.Azure.IoTSolutions.OpcGdsVault.Common.Diagnostics;
+using Microsoft.Azure.IoTSolutions.GdsVault.Common.Diagnostics;
 using Microsoft.Azure.KeyVault;
 using Microsoft.Azure.KeyVault.Models;
 using Microsoft.Azure.KeyVault.WebKey;
@@ -15,7 +15,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.KeyVault
+namespace Microsoft.Azure.IoTSolutions.GdsVault.Services.KeyVault
 {
 
     public class KeyVaultServiceClient

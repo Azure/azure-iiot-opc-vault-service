@@ -2,17 +2,17 @@
 
 using System;
 using System.Collections.Generic;
-using Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Runtime;
+using Microsoft.Azure.IoTSolutions.GdsVault.WebService.Runtime;
 using Newtonsoft.Json;
 
-namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.v1.Models
+namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.v1.Models
 {
     public sealed class StatusApiModel
     {
         private const string DateFormat = "yyyy-MM-dd'T'HH:mm:sszzz";
 
         [JsonProperty(PropertyName = "Name", Order = 10)]
-        public string Name => "OpcGdsVault";
+        public string Name => "GdsVault";
 
         [JsonProperty(PropertyName = "Status", Order = 20)]
         public string Status { get; set; }

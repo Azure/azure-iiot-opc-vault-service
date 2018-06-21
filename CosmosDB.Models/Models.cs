@@ -2,7 +2,7 @@
 using Opc.Ua;
 using System;
 
-namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.CosmosDB.Models
+namespace Microsoft.Azure.IoTSolutions.GdsVault.CosmosDB.Models
 {
     [Serializable]
     public class ApplicationName

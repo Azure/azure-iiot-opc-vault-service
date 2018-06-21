@@ -3,10 +3,10 @@
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Microsoft.Azure.IoTSolutions.OpcGdsVault.Common.Diagnostics;
-using Microsoft.Azure.IoTSolutions.OpcGdsVault.Common.Http;
+using Microsoft.Azure.IoTSolutions.GdsVault.Common.Diagnostics;
+using Microsoft.Azure.IoTSolutions.GdsVault.Common.Http;
 
-namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Webservice.Client.Http
+namespace Microsoft.Azure.IoTSolutions.GdsVault.Webservice.Client.Http
 {
     public interface IHttpClient
     {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security;
-using Microsoft.Azure.IoTSolutions.OpcGdsVault.CosmosDB.Models;
+using Microsoft.Azure.IoTSolutions.GdsVault.CosmosDB.Models;
 using Opc.Ua.Gds.Server;
 
 namespace Opc.Ua.Gds.Server.Database.CosmosDB

@@ -2,7 +2,7 @@
 
 using Microsoft.AspNetCore.Builder;
 
-namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Auth {
+namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.Auth {
 
     /// <summary>
     /// Cors setup

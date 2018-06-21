@@ -1,5 +1,5 @@
-﻿using Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Client;
-using Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Client.Models;
+﻿using Microsoft.Azure.IoTSolutions.GdsVault.WebService.Client;
+using Microsoft.Azure.IoTSolutions.GdsVault.WebService.Client.Models;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using System;
@@ -10,29 +10,29 @@ using System.Threading.Tasks;
 
 namespace Opc.Ua.Gds.Server
 {
-    public class OpcGdsVaultConfig: IOpcGdsVaultConfig
+    public class GdsVaultConfig: IGdsVaultConfig
     {
-        public OpcGdsVaultConfig(string url)
+        public GdsVaultConfig(string url)
         {
-            OpcGdsVaultServiceApiUrl = url + "/v1";
+            GdsVaultServiceApiUrl = url + "/v1";
         }
-        public string OpcGdsVaultServiceApiUrl { get; }
+        public string GdsVaultServiceApiUrl { get; }
     }
 
-    public class OpcGdsVaultClientHandler
+    public class GdsVaultClientHandler
     {
-        string _vaultBaseUrl;
-        string _appId;
-        IOpcGdsVaultClient _gdsVaultClient;
-        IOpcGdsVaultConfig _gdsVaultConfig;
-        ClientAssertionCertificate _assertionCert;
+        private string _vaultBaseUrl;
+        private string _appId;
+        private IGdsVaultClient _gdsVaultClient;
+        private IGdsVaultConfig _gdsVaultConfig;
+        private ClientAssertionCertificate _assertionCert;
 
-        public IOpcGdsVaultClient GdsVaultClient { get => _gdsVaultClient; }
+        public IGdsVaultClient GdsVaultClient { get => _gdsVaultClient; }
 
-        public OpcGdsVaultClientHandler(string vaultBaseUrl)
+        public GdsVaultClientHandler(string vaultBaseUrl)
         {
             _vaultBaseUrl = vaultBaseUrl;
-            _gdsVaultConfig = new OpcGdsVaultConfig(_vaultBaseUrl);
+            _gdsVaultConfig = new GdsVaultConfig(_vaultBaseUrl);
         }
 
         public void SetAssertionCertificate(
@@ -41,7 +41,7 @@ namespace Opc.Ua.Gds.Server
         {
             _appId = appId;
             _assertionCert = new ClientAssertionCertificate(appId, clientAssertionCertPfx);
-            _gdsVaultClient = new OpcGdsVaultClient(
+            _gdsVaultClient = new GdsVaultClient(
                 _gdsVaultConfig,
                 new AuthenticationCallback(GetAccessTokenAsync));
         }
@@ -49,7 +49,7 @@ namespace Opc.Ua.Gds.Server
         public void SetTokenProvider()
         {
             AzureServiceTokenProvider azureServiceTokenProvider = new AzureServiceTokenProvider();
-            _gdsVaultClient = new OpcGdsVaultClient(
+            _gdsVaultClient = new GdsVaultClient(
                 _gdsVaultConfig,
                 new AuthenticationCallback(azureServiceTokenProvider.KeyVaultTokenCallback));
         }

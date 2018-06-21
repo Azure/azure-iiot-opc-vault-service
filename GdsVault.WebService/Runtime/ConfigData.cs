@@ -5,11 +5,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Microsoft.Azure.IoTSolutions.OpcGdsVault.Common.Diagnostics;
-using Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Exceptions;
+using Microsoft.Azure.IoTSolutions.GdsVault.Common.Diagnostics;
+using Microsoft.Azure.IoTSolutions.GdsVault.Services.Exceptions;
 using Microsoft.Extensions.Configuration;
 
-namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Runtime
+namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.Runtime
 {
     public interface IConfigData
     {

@@ -1,16 +1,16 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
-using Microsoft.Azure.IoTSolutions.OpcGdsVault.Common.Diagnostics;
-using Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.KeyVault;
-using Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Models;
-using Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Runtime;
+using Microsoft.Azure.IoTSolutions.GdsVault.Common.Diagnostics;
+using Microsoft.Azure.IoTSolutions.GdsVault.Services.KeyVault;
+using Microsoft.Azure.IoTSolutions.GdsVault.Services.Models;
+using Microsoft.Azure.IoTSolutions.GdsVault.Services.Runtime;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
-namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services
+namespace Microsoft.Azure.IoTSolutions.GdsVault.Services
 {
     public interface ICertificateGroup
     {

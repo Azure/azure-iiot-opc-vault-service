@@ -4,7 +4,7 @@
 // ------------------------------------------------------------
 
 namespace Newtonsoft.Json {
-    using Microsoft.Azure.IoTSolutions.OpcGdsVault.Common.Diagnostics;
+    using Microsoft.Azure.IoTSolutions.GdsVault.Common.Diagnostics;
     using Newtonsoft.Json.Converters;
     using Newtonsoft.Json.Serialization;
     using System;

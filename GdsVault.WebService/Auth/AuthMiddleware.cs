@@ -3,9 +3,9 @@
 //  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------
 
-namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.Auth {
+namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.Auth {
     using Microsoft.AspNetCore.Http;
-    using Microsoft.Azure.IoTSolutions.OpcGdsVault.Common.Diagnostics;
+    using Microsoft.Azure.IoTSolutions.GdsVault.Common.Diagnostics;
     using System.Net;
     using System.Threading.Tasks;
 

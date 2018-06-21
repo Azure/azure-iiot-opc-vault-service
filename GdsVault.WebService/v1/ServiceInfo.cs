@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
-namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.v1
+namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.v1
 {
     /// <summary>
     /// Web service API version 1 information
@@ -10,7 +10,7 @@ namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.WebService.v1
         /// <summary>
         /// Name of service
         /// </summary>
-        public const string NAME = "OpcGdsVault";
+        public const string NAME = "GdsVault";
 
         /// <summary>
         /// Number used for routing HTTP requests

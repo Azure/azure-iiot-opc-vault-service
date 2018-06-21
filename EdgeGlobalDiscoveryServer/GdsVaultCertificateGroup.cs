@@ -8,10 +8,10 @@ namespace Opc.Ua.Gds.Server
 
     public class GdsVaultCertificateGroup : CertificateGroup
     {
-        private OpcGdsVaultClientHandler _gdsVaultHandler;
+        private GdsVaultClientHandler _gdsVaultHandler;
 
         private GdsVaultCertificateGroup(
-            OpcGdsVaultClientHandler gdsVaultHandler,
+            GdsVaultClientHandler gdsVaultHandler,
             string authoritiesStorePath,
             CertificateGroupConfiguration certificateGroupConfiguration) :
             base(authoritiesStorePath, certificateGroupConfiguration)
@@ -19,7 +19,7 @@ namespace Opc.Ua.Gds.Server
             _gdsVaultHandler = gdsVaultHandler;
         }
 
-        public GdsVaultCertificateGroup(OpcGdsVaultClientHandler gdsVaultHandler)
+        public GdsVaultCertificateGroup(GdsVaultClientHandler gdsVaultHandler)
         {
             _gdsVaultHandler = gdsVaultHandler;
         }

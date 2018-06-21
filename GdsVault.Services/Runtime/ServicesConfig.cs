@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
-namespace Microsoft.Azure.IoTSolutions.OpcGdsVault.Services.Runtime
+namespace Microsoft.Azure.IoTSolutions.GdsVault.Services.Runtime
 {
     public interface IServicesConfig
     {
