@@ -1,21 +1,19 @@
-using todo.Models;
-
 namespace todo
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Configuration;
-    using System.Linq;
-    using System.Linq.Expressions;
-    using System.Threading.Tasks;
     using Microsoft.Azure.Documents;
     using Microsoft.Azure.Documents.Client;
     using Microsoft.Azure.Documents.Linq;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Linq.Expressions;
+    using System.Threading.Tasks;
+    using Microsoft.Extensions.Configuration;
 
     public static class DocumentDBRepository<T> where T : class
     {
-        private static readonly string DatabaseId = ConfigurationManager.AppSettings["database"];
-        private static readonly string CollectionId = ConfigurationManager.AppSettings["collection"];
+        private static string DatabaseId;
+        private static string CollectionId;
         private static DocumentClient client;
 
         public static async Task<T> GetItemAsync(string id, string category)
@@ -71,11 +69,13 @@ namespace todo
             await client.DeleteDocumentAsync(UriFactory.CreateDocumentUri(DatabaseId, CollectionId, id));
         }
 
-        public static void Initialize()
+        public static async Task InitializeAsync(IConfiguration configuration)
         {
-            client = new DocumentClient(new Uri(ConfigurationManager.AppSettings["endpoint"]), ConfigurationManager.AppSettings["authKey"]);
-            CreateDatabaseIfNotExistsAsync().Wait();
-            CreateCollectionIfNotExistsAsync().Wait();
+            DatabaseId = "GDS";
+            CollectionId = "todo";
+            client = new DocumentClient(new Uri(configuration["Endpoint"]), configuration["Key"]);
+            await CreateDatabaseIfNotExistsAsync();
+            await CreateCollectionIfNotExistsAsync();
         }
 
         private static async Task CreateDatabaseIfNotExistsAsync()

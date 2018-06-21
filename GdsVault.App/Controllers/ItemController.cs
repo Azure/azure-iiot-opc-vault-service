@@ -1,10 +1,11 @@
-﻿namespace todo.Controllers
-{
-    using System.Net;
-    using System.Threading.Tasks;
-    using System.Web.Mvc;
-    using Models;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
+using todo.Models;
 
+namespace todo.Controllers
+{
+    [Authorize]
     public class ItemController : Controller
     {
         [ActionName("Index")]
@@ -25,7 +26,7 @@
         [HttpPost]
         [ActionName("Create")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> CreateAsync([Bind(Include = "Id,Name,Description,Completed,Category")] Item item)
+        public async Task<ActionResult> CreateAsync([Bind("Id,Name,Description,Completed,Category")] Item item)
         {
             if (ModelState.IsValid)
             {
@@ -39,7 +40,7 @@
         [HttpPost]
         [ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> EditAsync([Bind(Include = "Id,Name,Description,Completed,Category")] Item item)
+        public async Task<ActionResult> EditAsync([Bind("Id,Name,Description,Completed,Category")] Item item)
         {
             if (ModelState.IsValid)
             {
@@ -55,13 +56,13 @@
         {
             if (id == null)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                return new BadRequestResult();
             }
 
             Item item = await DocumentDBRepository<Item>.GetItemAsync(id, category);
             if (item == null)
             {
-                return HttpNotFound();
+                return new NotFoundResult();
             }
 
             return View(item);
@@ -72,13 +73,13 @@
         {
             if (id == null)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                return new BadRequestResult();
             }
 
             Item item = await DocumentDBRepository<Item>.GetItemAsync(id, category);
             if (item == null)
             {
-                return HttpNotFound();
+                return new NotFoundResult();
             }
 
             return View(item);
@@ -87,7 +88,7 @@
         [HttpPost]
         [ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> DeleteConfirmedAsync([Bind(Include = "Id, Category")] string id, string category)
+        public async Task<ActionResult> DeleteConfirmedAsync([Bind("Id, Category")] string id, string category)
         {
             await DocumentDBRepository<Item>.DeleteItemAsync(id, category);
             return RedirectToAction("Index");

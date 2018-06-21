@@ -1,10 +1,10 @@
 ﻿namespace todo.Models
 {
-    using System.Data.Entity;
+    using Microsoft.EntityFrameworkCore;
 
     public class Context : DbContext
     {
-        public Context() : base("name=Context")
+        public Context() : base()
         {
         }
 
