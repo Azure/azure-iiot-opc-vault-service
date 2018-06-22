@@ -1,0 +1,46 @@
+﻿@model Microsoft.Azure.IoTSolutions.GdsVault.CosmosDB.Models.Application
+
+<h2>View Application Details</h2>
+
+<div>
+    <h4>Application</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.ApplicationId)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ApplicationId)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ApplicationName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ApplicationName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ApplicationUri)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ApplicationUri)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ProductUri)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ProductUri)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.ApplicationId }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

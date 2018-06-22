@@ -1,0 +1,70 @@
+﻿@model Microsoft.Azure.IoTSolutions.GdsVault.CosmosDB.Models.CertificateRequest
+
+<h2>View Certificate Request Details</h2>
+
+<div>
+    <h4>Item</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.RequestId)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.RequestId)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ApplicationId)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ApplicationId)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.State)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.State)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.SubjectName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.SubjectName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.RequestTime)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.RequestTime)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ApproveRejectTime)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ApproveRejectTime)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.AcceptTime)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.AcceptTime)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.RequestId }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

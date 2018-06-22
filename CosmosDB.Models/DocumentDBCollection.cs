@@ -12,10 +12,11 @@
     public class DocumentDBCollection<T> : IDocumentDBCollection<T> where T : class
     {
         public DocumentCollection Collection { get; private set; }
-        private readonly DocumentDBRepository db;
+        private readonly IDocumentDBRepository db;
         private readonly string CollectionId = typeof(T).Name;
+        private const int RequestLevelLowest = 400;
 
-        public DocumentDBCollection(DocumentDBRepository db)
+        public DocumentDBCollection(IDocumentDBRepository db)
         {
             this.db = db;
             CreateCollectionIfNotExistsAsync().Wait();
@@ -105,7 +106,7 @@
                     Collection = await db.Client.CreateDocumentCollectionAsync(
                         UriFactory.CreateDatabaseUri(db.DatabaseId),
                         new DocumentCollection { Id = CollectionId },
-                        new RequestOptions { OfferThroughput = 1000 });
+                        new RequestOptions { OfferThroughput = RequestLevelLowest });
                 }
                 else
                 {

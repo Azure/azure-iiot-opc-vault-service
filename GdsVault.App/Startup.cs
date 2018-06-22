@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.Azure.Documents.Client;
+using Microsoft.Azure.IoTSolutions.GdsVault.CosmosDB.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -14,6 +16,17 @@ using System.Threading.Tasks;
 
 namespace GdsVault.App
 {
+    public class GdsVaultDocumentDBRepository : IDocumentDBRepository
+    {
+        private static DocumentDBRepository dbClient;
+        public DocumentClient Client { get { return dbClient.Client; } }
+        public string DatabaseId { get { return dbClient.DatabaseId; } }
+
+        public static void Initialize(string endpoint, string authKeyOrResourceToken)
+        {
+            dbClient = new DocumentDBRepository(endpoint, authKeyOrResourceToken);
+        }
+    }
     public class Startup
     {
         public Startup(IConfiguration configuration)
@@ -27,6 +40,13 @@ namespace GdsVault.App
         public void ConfigureServices(IServiceCollection services)
         {
             todo.DocumentDBRepository<todo.Models.Item>.InitializeAsync(Configuration).Wait();
+            GdsVaultDocumentDBRepository.Initialize(Configuration["Endpoint"], Configuration["Key"]);
+
+            services.AddTransient<IDocumentDBCollection<Application>, DocumentDBCollection<Application>>();
+            services.AddTransient<IDocumentDBCollection<CertificateRequest>, DocumentDBCollection<CertificateRequest>>();
+            services.AddTransient<IDocumentDBCollection<CertificateStore>, DocumentDBCollection<CertificateStore>>();
+            services.AddTransient<IDocumentDBRepository, GdsVaultDocumentDBRepository>();
+
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.

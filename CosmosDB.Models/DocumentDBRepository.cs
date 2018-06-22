@@ -6,10 +6,10 @@
     using System.Security;
     using System.Threading.Tasks;
 
-    public class DocumentDBRepository
+    public class DocumentDBRepository : IDocumentDBRepository
     {
         public DocumentClient Client { get; }
-        public readonly string DatabaseId = "GDS";
+        public string DatabaseId { get { return "GDS"; } }
 
         public DocumentDBRepository(string endpoint, string authKeyOrResourceToken)
         {
