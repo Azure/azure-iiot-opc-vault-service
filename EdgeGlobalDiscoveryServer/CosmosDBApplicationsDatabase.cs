@@ -502,14 +502,6 @@ namespace Opc.Ua.Gds.Server.Database.CosmosDB
             }
 
             CertificateRequest request = null;
-#if todo
-            CertificateRequests.GetAsync(
-                x => x.AuthorityId == authorityId && 
-                x.ApplicationId == id &&
-                x.CertificateGroupId == certificateGroupId &&
-                x.CertificateTypeId == certificateTypeId
-                ).Result.SingleOrDefault();
-#endif
             bool isNew = false;
 
             if (request == null)
@@ -609,6 +601,59 @@ namespace Opc.Ua.Gds.Server.Database.CosmosDB
         }
 
         public CertificateRequestState CompleteCertificateRequest(
+            NodeId applicationId,
+            NodeId requestId,
+            out NodeId certificateGroupId,
+            out NodeId certificateTypeId,
+            out byte[] signedCertificate,
+            out byte[] privateKey)
+        {
+            certificateGroupId = null;
+            certificateTypeId = null;
+            signedCertificate = null;
+            privateKey = null;
+            Guid reqId = GetNodeIdGuid(requestId);
+            Guid appId = GetNodeIdGuid(applicationId);
+
+            var application = Applications.GetAsync(appId).Result;
+            if (application == null)
+            {
+                throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
+            }
+
+            var request = CertificateRequests.GetAsync(reqId).Result;
+            if (request == null)
+            {
+                throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
+            }
+
+            switch (request.State)
+            {
+                case Microsoft.Azure.IoTSolutions.GdsVault.CosmosDB.Models.CertificateRequestState.New:
+                    return CertificateRequestState.New;
+                case Microsoft.Azure.IoTSolutions.GdsVault.CosmosDB.Models.CertificateRequestState.Rejected:
+                    return CertificateRequestState.Rejected;
+                case Microsoft.Azure.IoTSolutions.GdsVault.CosmosDB.Models.CertificateRequestState.Accepted:
+                    return CertificateRequestState.Accepted;
+                case Microsoft.Azure.IoTSolutions.GdsVault.CosmosDB.Models.CertificateRequestState.Approved:
+                    break;
+                default:
+                    throw new ServiceResultException(StatusCodes.BadInvalidArgument);
+            }
+
+            if (request.ApplicationId != appId)
+            {
+                throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
+            }
+
+            certificateGroupId = request.CertificateGroupId;
+            certificateTypeId = request.CertificateTypeId;
+            signedCertificate = request.Certificate;
+            privateKey = request.PrivateKey;
+
+            return CertificateRequestState.Approved;
+        }
+        public CertificateRequestState ReadRequest(
             NodeId applicationId,
             NodeId requestId,
             out NodeId certificateGroupId,

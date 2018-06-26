@@ -295,7 +295,7 @@ namespace Microsoft.Azure.IoTSolutions.GdsVault.Services.KeyVault
             // enforce recommended keysize unless lower value is enforced.
             if (keySize < 1024)
             {
-                keySize = CertificateFactory.DefaultKeySize;
+                keySize = CertificateFactory.defaultKeySize;
             }
 
             if (keySize % 1024 != 0)
