@@ -1,9 +1,8 @@
-﻿using System;
+﻿using Microsoft.Azure.IoTSolutions.GdsVault.CosmosDB.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security;
-using Microsoft.Azure.IoTSolutions.GdsVault.CosmosDB.Models;
-using Opc.Ua.Gds.Server;
 
 namespace Opc.Ua.Gds.Server.Database.CosmosDB
 {
@@ -559,22 +558,22 @@ namespace Opc.Ua.Gds.Server.Database.CosmosDB
                 throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
             }
 
-            if (request.State != (int)CertificateRequestState.New)
+            if (request.State != Microsoft.Azure.IoTSolutions.GdsVault.CosmosDB.Models.CertificateRequestState.New)
             {
                 throw new ServiceResultException(StatusCodes.BadInvalidState);
             }
 
             if (isRejected)
             {
-                request.State = (int)CertificateRequestState.Rejected;
-                // erase information which is ot required anymore
+                request.State = Microsoft.Azure.IoTSolutions.GdsVault.CosmosDB.Models.CertificateRequestState.Rejected;
+                // erase information which is not required anymore
                 request.PrivateKeyFormat = null;
                 request.CertificateSigningRequest = null;
                 request.PrivateKeyPassword = null;
             }
             else
             {
-                request.State = (int)CertificateRequestState.Approved;
+                request.State = Microsoft.Azure.IoTSolutions.GdsVault.CosmosDB.Models.CertificateRequestState.Approved;
             }
 
             request.ApproveRejectTime = DateTime.UtcNow;
@@ -592,12 +591,12 @@ namespace Opc.Ua.Gds.Server.Database.CosmosDB
                 throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
             }
 
-            if (request.State != (int)CertificateRequestState.Approved)
+            if (request.State != Microsoft.Azure.IoTSolutions.GdsVault.CosmosDB.Models.CertificateRequestState.Approved)
             {
                 throw new ServiceResultException(StatusCodes.BadInvalidState);
             }
 
-            request.State = (int)CertificateRequestState.Accepted;
+            request.State = Microsoft.Azure.IoTSolutions.GdsVault.CosmosDB.Models.CertificateRequestState.Accepted;
 
             // erase information which is not required anymore
             request.CertificateSigningRequest = null;
@@ -608,7 +607,6 @@ namespace Opc.Ua.Gds.Server.Database.CosmosDB
 
             CertificateRequests.UpdateAsync(request.RequestId, request).Wait();
         }
-
 
         public CertificateRequestState CompleteCertificateRequest(
             NodeId applicationId,
@@ -645,13 +643,13 @@ namespace Opc.Ua.Gds.Server.Database.CosmosDB
 
             switch (request.State)
             {
-                case (int)CertificateRequestState.New:
+                case Microsoft.Azure.IoTSolutions.GdsVault.CosmosDB.Models.CertificateRequestState.New:
                     return CertificateRequestState.New;
-                case (int)CertificateRequestState.Rejected:
+                case Microsoft.Azure.IoTSolutions.GdsVault.CosmosDB.Models.CertificateRequestState.Rejected:
                     return CertificateRequestState.Rejected;
-                case (int)CertificateRequestState.Accepted:
+                case Microsoft.Azure.IoTSolutions.GdsVault.CosmosDB.Models.CertificateRequestState.Accepted:
                     return CertificateRequestState.Accepted;
-                case (int)CertificateRequestState.Approved:
+                case Microsoft.Azure.IoTSolutions.GdsVault.CosmosDB.Models.CertificateRequestState.Approved:
                     break;
                 default:
                     throw new ServiceResultException(StatusCodes.BadInvalidArgument);
@@ -671,7 +669,6 @@ namespace Opc.Ua.Gds.Server.Database.CosmosDB
             privateKeyPassword = request.PrivateKeyPassword;
 
             return CertificateRequestState.Approved;
-
         }
         #endregion
         #region Public Members

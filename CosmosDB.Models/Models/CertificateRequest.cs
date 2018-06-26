@@ -4,13 +4,21 @@ using System;
 
 namespace Microsoft.Azure.IoTSolutions.GdsVault.CosmosDB.Models
 {
+    public enum CertificateRequestState
+    {
+        New,
+        Approved,
+        Rejected,
+        Accepted
+    }
+
     [Serializable]
     public class CertificateRequest
     {
         [JsonProperty(PropertyName = "id")]
         public Guid RequestId { get; set; }
         public Guid ApplicationId { get; set; }
-        public int State { get; set; }
+        public CertificateRequestState State { get; set; }
         public NodeId CertificateGroupId { get; set; }
         public NodeId CertificateTypeId { get; set; }
         public byte[] CertificateSigningRequest { get; set; }

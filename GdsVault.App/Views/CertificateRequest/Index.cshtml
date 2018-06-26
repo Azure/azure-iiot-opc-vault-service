@@ -24,25 +24,25 @@
         <th></th>
     </tr>
 
-    @foreach (var item in Model)
+    @foreach (var request in Model)
     {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.RequestId)
+                @Html.DisplayFor(requestItem => request.RequestId)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.ApplicationId)
+                @Html.DisplayFor(requestItem => request.ApplicationId)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.State)
+                @Html.DisplayFor(requestItem => request.State)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.SubjectName)
+                @Html.DisplayFor(requestItem => request.SubjectName)
             </td>
             <td>
-                @Html.ActionLink("Edit", "Edit", new { id = item.RequestId }) |
-                @Html.ActionLink("Details", "Details", new { id = item.RequestId }) |
-                @Html.ActionLink("Delete", "Delete", new { id = item.RequestId })
+                @Html.ActionLink("Edit", "Edit", new { id = request.RequestId }) |
+                @Html.ActionLink("Details", "Details", new { id = request.RequestId }) |
+                @Html.ActionLink("Delete", "Delete", new { id = request.RequestId })
             </td>
         </tr>
     }
