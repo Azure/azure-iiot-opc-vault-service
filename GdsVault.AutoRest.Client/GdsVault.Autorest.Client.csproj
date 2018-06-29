@@ -1,15 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard1.6;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>netstandard1.4;netstandard2.0</TargetFrameworks>
     <LangVersion>6</LangVersion>
-    <AssemblyName>Microsoft.Azure.IoTSolutions.GdsVault.WebService.Client</AssemblyName>
-    <RootNamespace>Microsoft.Azure.IoTSolutions.GdsVault.WebService.Client</RootNamespace>
+    <AssemblyName>Microsoft.Azure.IoTSolutions.GdsVault.AutoRest.Client</AssemblyName>
+    <RootNamespace>Microsoft.Azure.IoTSolutions.GdsVault.AutoRest.Client</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <Company>Microsoft</Company>
-    <Product>Azure IoT OPC UA GDS Vault Services</Product>
-    <Description>Azure IoT OPC UA GDS Vault Services Class Library</Description>
+    <Product>Azure IoT OPC UA GDS Vault AutoRest Client</Product>
+    <Description>Azure IoT OPC UA GDS Vault AutoRest Client</Description>
     <Authors>Microsoft</Authors>
     <PackageLicenseUrl>https://github.com/Azure/iot-opc-gdsvault-service/blob/master/LICENSE</PackageLicenseUrl>
     <Version>1.0.1-preview180629</Version>
@@ -22,6 +22,5 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Rest.ClientRuntime" Version="2.3.11" />
   </ItemGroup>
-
 
 </Project>
