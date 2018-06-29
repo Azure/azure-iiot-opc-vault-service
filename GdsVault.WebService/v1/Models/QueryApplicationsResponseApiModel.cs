@@ -1,7 +1,9 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
+using Microsoft.Azure.IoTSolutions.GdsVault.CosmosDB.Models;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 
 namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.v1.Models
 {
@@ -17,12 +19,17 @@ namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.v1.Models
         public uint NextRecordId { get; set; }
 
         public QueryApplicationsResponseApiModel(
-            ApplicationDescriptionApiModel[] applications,
+            Application[] applications,
             DateTime lastCounterResetTime,
             uint nextRecordId
             )
         {
-            this.Applications = applications;
+            var applicationsList = new List<ApplicationDescriptionApiModel>();
+            foreach (var application in applications)
+            {
+                applicationsList.Add(new ApplicationDescriptionApiModel(application));
+            }
+            this.Applications = applicationsList.ToArray();
             this.LastCounterResetTime = lastCounterResetTime;
             this.NextRecordId = nextRecordId;
         }

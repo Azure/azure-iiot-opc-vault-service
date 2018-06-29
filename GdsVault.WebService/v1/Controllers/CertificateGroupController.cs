@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.IoTSolutions.GdsVault.Services;
 using Microsoft.Azure.IoTSolutions.GdsVault.WebService.v1.Filters;
 using Microsoft.Azure.IoTSolutions.GdsVault.WebService.v1.Models;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.v1.Controllers
 {
@@ -22,6 +23,7 @@ namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.v1.Controllers
 
         /// <returns>List of certificate groups</returns>
         [HttpGet]
+        [SwaggerOperation(operationId: "GetCertificateGroupIds")]
         public async Task<CertificateGroupListApiModel> GetAsync()
         {
             return new CertificateGroupListApiModel(await this.certificateGroups.GetCertificateGroupIds());
@@ -29,6 +31,7 @@ namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.v1.Controllers
 
         /// <summary>Get group configuration</summary>
         [HttpGet("{id}")]
+        [SwaggerOperation(operationId: "GetCertificateGroupConfiguration")]
         public async Task<CertificateGroupConfigurationApiModel> GetAsync(string id)
         {
             return new CertificateGroupConfigurationApiModel(
@@ -38,6 +41,7 @@ namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.v1.Controllers
 
         /// <summary>Get group configuration</summary>
         [HttpGet("config")]
+        [SwaggerOperation(operationId: "GetCertificateGroupConfigurationCollection")]
         public async Task<CertificateGroupConfigurationCollectionApiModel> GetConfigAsync()
         {
             return new CertificateGroupConfigurationCollectionApiModel(
@@ -55,6 +59,7 @@ namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.v1.Controllers
 
         /// <summary>Get CA Certificate chain</summary>
         [HttpGet("{id}/cacert")]
+        [SwaggerOperation(operationId: "GetCACertificateChain")]
         public async Task<X509Certificate2CollectionApiModel> GetCACertificateChainAsync(string id)
         {
             return new X509Certificate2CollectionApiModel(
@@ -63,6 +68,7 @@ namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.v1.Controllers
 
         /// <summary>Get CA CRL chain</summary>
         [HttpGet("{id}/cacrl")]
+        [SwaggerOperation(operationId: "GetCACrlChain")]
         public async Task<X509CrlCollectionApiModel> GetCACrlChainAsync(string id)
         {
             return new X509CrlCollectionApiModel(
@@ -71,6 +77,7 @@ namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.v1.Controllers
 
         /// <summary>Get trust list</summary>
         [HttpGet("{id}/trustlist")]
+        [SwaggerOperation(operationId: "GetTrustList")]
         public async Task<TrustListApiModel> GetTrustListAsync(string id)
         {
             return new TrustListApiModel(await this.certificateGroups.GetTrustListAsync(id));
@@ -78,6 +85,7 @@ namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.v1.Controllers
 
         /// <summary>Create new CA Certificate</summary>
         [HttpPost("{id}/create")]
+        [SwaggerOperation(operationId: "CreateCACertificate")]
         public async Task<X509Certificate2ApiModel> PostCreateAsync(string id)
         {
             return new X509Certificate2ApiModel(
@@ -86,6 +94,7 @@ namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.v1.Controllers
 
         /// <summary>Revoke Certificate</summary>
         [HttpPost("{id}/revoke")]
+        [SwaggerOperation(operationId: "RevokeCertificate")]
         public async Task<X509CrlApiModel> PostRevokeAsync(string id, [FromBody] X509Certificate2ApiModel cert)
         {
             return new X509CrlApiModel(
@@ -96,6 +105,7 @@ namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.v1.Controllers
 
         /// <summary>Certificate Signing Request</summary>
         [HttpPost("{id}/sign")]
+        [SwaggerOperation(operationId: "SigningRequest")]
         public async Task<X509Certificate2ApiModel> PostSignAsync(string id, [FromBody] SigningRequestApiModel sr)
         {
             return new X509Certificate2ApiModel(
@@ -107,6 +117,7 @@ namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.v1.Controllers
 
         /// <summary>Create New Key Pair</summary>
         [HttpPost("{id}/newkey")]
+        [SwaggerOperation(operationId: "NewKeyPairRequest")]
         public async Task<CertificateKeyPairApiModel> PostNewKeyAsync(string id, [FromBody] NewKeyPairRequestApiModel nkpr)
         {
             return new CertificateKeyPairApiModel(
