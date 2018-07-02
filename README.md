@@ -1,50 +1,14 @@
-[![Build][build-badge]][build-url]
-[![Issues][issues-badge]][issues-url]
-[![Gitter][gitter-badge]][gitter-url]
 
-PROJECT NAME HERE
-=================
+# Contributing
 
-... project description ...
+This project welcomes contributions and suggestions.  Most contributions require you to agree to a
+Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
+the rights to use your contribution. For details, visit https://cla.microsoft.com.
 
-Overview
-========
+When you submit a pull request, a CLA-bot will automatically determine whether you need to provide
+a CLA and decorate the PR appropriately (e.g., label, comment). Simply follow the instructions
+provided by the bot. You will only need to do this once across all repos using our CLA.
 
-... quick demonstrative examples ...
-
-How to use it
-=============
-
-... steps to use this project ...
-... deployment notes ...
-
-[Development, debugging, configuration, etc.](DEVELOPMENT.md)
-
-Configuration
-=============
-
-... how to customize the service, settings, etc. ...
-
-Special notes
-=============
-
-... technical details ...
-
-Edge cases
-==========
-
-... things to take into consideration ...
-... known limitations ...
-
-Other documents
-===============
-
-* [Contributing and Development setup](CONTRIBUTING.md)
-* [Development setup, scripts and tools](DEVELOPMENT.md)
-
-[build-badge]: https://img.shields.io/travis/Azure/PROJECT-ID-HERE-dotnet.svg
-[build-url]: https://travis-ci.org/Azure/PROJECT-ID-HERE-dotnet
-[issues-badge]: https://img.shields.io/github/issues/azure/PROJECT-ID-HERE-dotnet.svg
-[issues-url]: https://github.com/azure/PROJECT-ID-HERE-dotnet/issues
-[gitter-badge]: https://img.shields.io/gitter/room/azure/iot-solutions.js.svg
-[gitter-url]: https://gitter.im/azure/iot-solutions
+This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
+For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
+contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
