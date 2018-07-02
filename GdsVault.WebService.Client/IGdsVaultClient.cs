@@ -3,9 +3,9 @@
 //  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------
 
-namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.Client {
+namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.Client
+{
     using Microsoft.Azure.IoTSolutions.GdsVault.WebService.Client.Models;
-    using System.Net.Http;
     using System.Threading.Tasks;
 
     public delegate Task<string> AuthenticationCallback(string authority, string resource, string scope);
