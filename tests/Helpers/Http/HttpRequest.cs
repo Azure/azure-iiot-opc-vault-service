@@ -1,4 +1,7 @@
-﻿// Copyright (c) Microsoft. All rights reserved.
+﻿// ------------------------------------------------------------
+//  Copyright (c) Microsoft Corporation.  All rights reserved.
+//  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
+// ------------------------------------------------------------
 
 using System;
 using System.Net.Http;
@@ -6,7 +9,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using Newtonsoft.Json;
 
-namespace WebService.Test.helpers.Http
+namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Test.Helpers.Http
 {
     public interface IHttpRequest
     {

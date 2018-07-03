@@ -1,14 +1,13 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
-using Microsoft.Azure.IoTSolutions.GdsVault.Services;
-using Microsoft.Azure.IoTSolutions.GdsVault.WebService.Test.Helpers;
-using Microsoft.Azure.IoTSolutions.GdsVault.WebService.v1.Controllers;
-using Microsoft.Azure.IoTSolutions.GdsVault.WebService.v1.Models;
+using Microsoft.Azure.IIoT.OpcUa.Services.Gds.Test.Helpers;
+using Microsoft.Azure.IIoT.OpcUa.Services.Gds.v1.Controllers;
+using Microsoft.Azure.IIoT.OpcUa.Services.Gds.v1.Models;
 using Moq;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.Test.Controllers
+namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Test.v1.Controllers
 {
     public class CertificateGroupControllerTest
     {
@@ -40,7 +39,7 @@ namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.Test.Controllers
             this.target = new CertificateGroupController(this.group.Object);
         }
 
-        [Fact, Trait(Constants.Type, Constants.UnitTest)]
+        [Fact, Trait(Constants.Type, Constants.ControllerTest)]
         public void ItFetchesACertificateGroupConfigurationFromTheServiceLayer()
         {
             // Test syntax: "AAA" see https://msdn.microsoft.com/en-us/library/hh694602.aspx
@@ -110,7 +109,7 @@ namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.Test.Controllers
             this.group.Verify(x => x.GetCertificateGroupConfiguration(It.Is<string>(s => s == id)), Times.Once);
         }
 
-        [Fact, Trait(Constants.Type, Constants.UnitTest)]
+        [Fact, Trait(Constants.Type, Constants.ControllerTest)]
         public void TestTemplate()
         {
             // Arrange

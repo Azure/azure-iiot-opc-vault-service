@@ -25,6 +25,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.IIoT.OpcUa.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.IIoT.OpcUa.Services.Gds", "src\Microsoft.Azure.IIoT.OpcUa.Services.Gds.csproj", "{917E4276-A66A-4725-91AD-EDA53E649A87}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.IIoT.OpcUa.Services.Gds.Test", "tests\Microsoft.Azure.IIoT.OpcUa.Services.Gds.Test.csproj", "{1CDE362E-DA4B-4593-838C-5FC1FC964653}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,6 +49,10 @@ Global
 		{917E4276-A66A-4725-91AD-EDA53E649A87}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{917E4276-A66A-4725-91AD-EDA53E649A87}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{917E4276-A66A-4725-91AD-EDA53E649A87}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1CDE362E-DA4B-4593-838C-5FC1FC964653}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1CDE362E-DA4B-4593-838C-5FC1FC964653}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1CDE362E-DA4B-4593-838C-5FC1FC964653}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1CDE362E-DA4B-4593-838C-5FC1FC964653}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -2,13 +2,13 @@
 
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
-using Microsoft.Azure.IoTSolutions.GdsVault.WebService.Test.Helpers;
+using Microsoft.Azure.IIoT.OpcUa.Services.Gds.Test.Helpers;
+using Microsoft.Azure.IIoT.OpcUa.Services.Gds.Test.Helpers.Http;
 using System.Net;
-using WebService.Test.helpers.Http;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.Test.IntegrationTests
+namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Test.WebService
 {
     public class ServiceStatusTest
     {

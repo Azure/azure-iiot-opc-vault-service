@@ -1,10 +1,10 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
-using Microsoft.Azure.IoTSolutions.GdsVault.WebService.Test.Helpers;
+using Microsoft.Azure.IIoT.OpcUa.Services.Gds.Test.Helpers;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.Test.Controllers
+namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Test.v1.Controllers
 {
     public class SomeControllerTest
     {
@@ -16,7 +16,7 @@ namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.Test.Controllers
             this.log = log;
         }
 
-        [Fact, Trait(Constants.Type, Constants.UnitTest)]
+        [Fact, Trait(Constants.Type, Constants.ControllerTest)]
         public void SomeTestShowingHowToLog()
         {
             this.log.WriteLine("Some log from the test");

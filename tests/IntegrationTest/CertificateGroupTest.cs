@@ -1,12 +1,15 @@
-﻿// Copyright (c) Microsoft. All rights reserved.
+﻿// ------------------------------------------------------------
+//  Copyright (c) Microsoft Corporation.  All rights reserved.
+//  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
+// ------------------------------------------------------------
 
-using Microsoft.Azure.IoTSolutions.GdsVault.Common.Diagnostics;
-using Microsoft.Azure.IoTSolutions.GdsVault.Services.Runtime;
+
+using Microsoft.Azure.IIoT.Diagnostics;
+using Microsoft.Azure.IIoT.OpcUa.Services.Gds.Runtime;
+using Microsoft.Azure.IIoT.OpcUa.Services.Gds.Test.Helpers;
 using Opc.Ua;
 using Opc.Ua.Gds;
-using Opc.Ua.Gds.Test;
 using Opc.Ua.Test;
-using Services.Test.helpers;
 using System;
 using System.Security.Cryptography.X509Certificates;
 using System.Text.RegularExpressions;
@@ -14,7 +17,7 @@ using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Microsoft.Azure.IoTSolutions.GdsVault.Services.Test
+namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Test
 {
     public class ApplicationTestData
     {
@@ -57,7 +60,8 @@ namespace Microsoft.Azure.IoTSolutions.GdsVault.Services.Test
         {
             KeyVaultApiUrl = "https://iopgds.vault.azure.net"
         };
-        Logger logger = new Logger("Services.Test", LogLevel.Debug);
+        TraceLogger logger = new TraceLogger("Services.Test");
+        //logger.
 
         public CertificateGroupTest(ITestOutputHelper log)
         {
@@ -112,7 +116,7 @@ namespace Microsoft.Azure.IoTSolutions.GdsVault.Services.Test
                 for (int i = 0; i < caChain.Count; i++)
                 {
                     crlChain[i].VerifySignature(caChain[i], true);
-                    Assert.True(Utils.CompareDistinguishedName(crlChain[i].Issuer, caChain[i].Issuer));
+                    Assert.True(Opc.Ua.Utils.CompareDistinguishedName(crlChain[i].Issuer, caChain[i].Issuer));
                 }
             }
         }
@@ -127,7 +131,7 @@ namespace Microsoft.Azure.IoTSolutions.GdsVault.Services.Test
                 var result = await keyVault.CreateCACertificateAsync(group);
                 Assert.NotNull(result);
                 Assert.False(result.HasPrivateKey);
-                Assert.True(Utils.CompareDistinguishedName(result.Issuer, result.Subject));
+                Assert.True(Opc.Ua.Utils.CompareDistinguishedName(result.Issuer, result.Subject));
                 var basicConstraints = X509TestUtils.FindBasicConstraintsExtension(result);
                 Assert.NotNull(basicConstraints);
                 Assert.True(basicConstraints.CertificateAuthority);
@@ -151,8 +155,8 @@ namespace Microsoft.Azure.IoTSolutions.GdsVault.Services.Test
                     randomApp.PrivateKeyPassword);
                 Assert.NotNull(newKeyPair);
                 Assert.False(newKeyPair.Certificate.HasPrivateKey);
-                Assert.True(Utils.CompareDistinguishedName(randomApp.Subject, newKeyPair.Certificate.Subject));
-                Assert.False(Utils.CompareDistinguishedName(newKeyPair.Certificate.Issuer, newKeyPair.Certificate.Subject));
+                Assert.True(Opc.Ua.Utils.CompareDistinguishedName(randomApp.Subject, newKeyPair.Certificate.Subject));
+                Assert.False(Opc.Ua.Utils.CompareDistinguishedName(newKeyPair.Certificate.Issuer, newKeyPair.Certificate.Subject));
                 var issuerCerts = await keyVault.GetCACertificateChainAsync(group);
                 Assert.NotNull(issuerCerts);
                 Assert.True(issuerCerts.Count >= 1);
@@ -230,8 +234,8 @@ namespace Microsoft.Azure.IoTSolutions.GdsVault.Services.Test
                     );
                 Assert.NotNull(newCert);
                 Assert.False(newCert.Certificate.HasPrivateKey);
-                Assert.True(Utils.CompareDistinguishedName(randomApp.Subject, newCert.Certificate.Subject));
-                Assert.False(Utils.CompareDistinguishedName(newCert.Certificate.Issuer, newCert.Certificate.Subject));
+                Assert.True(Opc.Ua.Utils.CompareDistinguishedName(randomApp.Subject, newCert.Certificate.Subject));
+                Assert.False(Opc.Ua.Utils.CompareDistinguishedName(newCert.Certificate.Issuer, newCert.Certificate.Subject));
                 var cert = new X509Certificate2(newCert.Certificate.RawData);
                 var crl = await keyVault.RevokeCertificateAsync(group, cert);
                 Assert.NotNull(crl);
@@ -240,7 +244,7 @@ namespace Microsoft.Azure.IoTSolutions.GdsVault.Services.Test
                 var caCert = caChain[0];
                 Assert.False(caCert.HasPrivateKey);
                 crl.VerifySignature(caCert, true);
-                Assert.True(Utils.CompareDistinguishedName(crl.Issuer, caCert.Issuer));
+                Assert.True(Opc.Ua.Utils.CompareDistinguishedName(crl.Issuer, caCert.Issuer));
             }
         }
 
