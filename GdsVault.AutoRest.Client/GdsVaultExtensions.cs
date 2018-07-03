@@ -4,7 +4,7 @@
 // regenerated.
 // </auto-generated>
 
-namespace GdsVault.Client
+namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Client
 {
     using Models;
     using System.Collections;
