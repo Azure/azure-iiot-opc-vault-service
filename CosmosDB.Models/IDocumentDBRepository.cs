@@ -1,4 +1,4 @@
-﻿namespace Microsoft.Azure.IoTSolutions.GdsVault.CosmosDB.Models
+﻿namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.CosmosDB.Models
 {
     using Microsoft.Azure.Documents.Client;
 

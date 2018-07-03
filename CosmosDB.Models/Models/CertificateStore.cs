@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 
-namespace Microsoft.Azure.IoTSolutions.GdsVault.CosmosDB.Models
+namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.CosmosDB.Models
 {
     [Serializable]
     public class CertificateStore

@@ -2,7 +2,7 @@
 using Opc.Ua;
 using System;
 
-namespace Microsoft.Azure.IoTSolutions.GdsVault.CosmosDB.Models
+namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.CosmosDB.Models
 {
     public enum CertificateRequestState
     {
