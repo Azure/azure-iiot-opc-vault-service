@@ -14,8 +14,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "solution", "solution", "{82
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Services.Common", "Services.Common\Services.Common.csproj", "{6C65FCB3-B2E2-4818-BA12-EB0B80EF01CE}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GdsVault.App", "GdsVault.App\GdsVault.App.csproj", "{32FF143F-51B5-46F1-9D1F-038F12947B1C}"
 	ProjectSection(ProjectDependencies) = postProject
 		{A8407B45-F745-4D61-A10E-F8009BEB2044} = {A8407B45-F745-4D61-A10E-F8009BEB2044}
@@ -33,10 +31,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{6C65FCB3-B2E2-4818-BA12-EB0B80EF01CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6C65FCB3-B2E2-4818-BA12-EB0B80EF01CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6C65FCB3-B2E2-4818-BA12-EB0B80EF01CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6C65FCB3-B2E2-4818-BA12-EB0B80EF01CE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{32FF143F-51B5-46F1-9D1F-038F12947B1C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{32FF143F-51B5-46F1-9D1F-038F12947B1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{32FF143F-51B5-46F1-9D1F-038F12947B1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
