@@ -6,7 +6,7 @@
 * [Azure IoT Hub setup](#azure-iot-hub-setup)
 * [Development setup](#development-setup)
 
-Configuration and Environment variables
+TODO Configuration and Environment variables
 =======================================
 
 The service configuration is stored using ASP.NET Core configuration

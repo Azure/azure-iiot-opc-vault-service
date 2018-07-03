@@ -1,17 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
+    <LangVersion>7.2</LangVersion>
     <TargetFramework>netcoreapp2.1</TargetFramework>
-    <AssemblyName>Microsoft.Azure.IoTSolutions.GdsVault.WebService</AssemblyName>
-    <RootNamespace>Microsoft.Azure.IoTSolutions.GdsVault.WebService</RootNamespace>
-    <Product>Microsoft Azure IoT Solutions Opc Ua GDS Vault Service</Product>
-    <Authors>Microsoft</Authors>
+    <AssemblyName>Microsoft.Azure.IIoT.OpcUa.Services.Gds</AssemblyName>
+    <RootNamespace>Microsoft.Azure.IIoT.OpcUa.Services.Gds</RootNamespace>
+    <Product>Microsoft Azure Industrial IoT OPC UA GDS Service</Product>
+    <Authors>Azure Industrial IoT</Authors>
     <Company>Microsoft</Company>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\netcoreapp2.1\Microsoft.Azure.IoTSolutions.GdsVault.WebService.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\netcoreapp2.1\Microsoft.Azure.IIoT.OpcUa.Services.Gds.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin\Release\netcoreapp2.1\Microsoft.Azure.IoTSolutions.GdsVault.WebService.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\netcoreapp2.1\Microsoft.Azure.IIoT.OpcUa.Services.Gds.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Properties\PublishProfiles\AdvancedSettings.pubxml" />
@@ -20,14 +24,9 @@
     <Folder Include="Properties" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="appsettings.json" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Update="appsettings.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
+    <PackageReference Include="Microsoft.Azure.KeyVault" Version="2.3.2" />
+    <PackageReference Include="Microsoft.Azure.Services.AppAuthentication" Version="1.0.3" />
+    <PackageReference Include="Opc.Ua.Gds.Server.Common" Version="1.4.352.1-preview180626" />
     <PackageReference Include="Autofac" Version="4.6.2" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.2.2" />
     <PackageReference Include="Microsoft.AspNetCore" Version="2.0.2" />
@@ -38,10 +37,16 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Ini" Version="2.0.1" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\GdsVault.Services\GdsVault.Services.csproj" />
+    <ProjectReference Include="..\CosmosDB.Models\GdsVault.CosmosDB.Models.csproj" />
+    <ProjectReference Include="..\Services.Common\Services.Common.csproj" />
   </ItemGroup>
   <ItemGroup>
     <!-- "Service Include" required by IntelliJ Rider -->
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 </Project>

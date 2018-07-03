@@ -1,0 +1,73 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2036
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "solution", "solution", "{8289AFAE-0933-40EF-9D19-6FFA2DB04837}"
+	ProjectSection(SolutionItems) = preProject
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		.travis.yml = .travis.yml
+		CONTRIBUTING.md = CONTRIBUTING.md
+		DEVELOPMENT.md = DEVELOPMENT.md
+		LICENSE = LICENSE
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Services.Common", "Services.Common\Services.Common.csproj", "{6C65FCB3-B2E2-4818-BA12-EB0B80EF01CE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GdsVault.App", "GdsVault.App\GdsVault.App.csproj", "{32FF143F-51B5-46F1-9D1F-038F12947B1C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A8407B45-F745-4D61-A10E-F8009BEB2044} = {A8407B45-F745-4D61-A10E-F8009BEB2044}
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GdsVault.CosmosDB.Models", "CosmosDB.Models\GdsVault.CosmosDB.Models.csproj", "{A8407B45-F745-4D61-A10E-F8009BEB2044}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GdsVault.Autorest.Client", "GdsVault.AutoRest.Client\GdsVault.Autorest.Client.csproj", "{DC4AA778-F83F-4874-9BEA-0AA38DB21A46}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.IIoT.OpcUa.Services.Gds", "src\Microsoft.Azure.IIoT.OpcUa.Services.Gds.csproj", "{917E4276-A66A-4725-91AD-EDA53E649A87}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6C65FCB3-B2E2-4818-BA12-EB0B80EF01CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C65FCB3-B2E2-4818-BA12-EB0B80EF01CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6C65FCB3-B2E2-4818-BA12-EB0B80EF01CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6C65FCB3-B2E2-4818-BA12-EB0B80EF01CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{32FF143F-51B5-46F1-9D1F-038F12947B1C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{32FF143F-51B5-46F1-9D1F-038F12947B1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{32FF143F-51B5-46F1-9D1F-038F12947B1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{32FF143F-51B5-46F1-9D1F-038F12947B1C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A8407B45-F745-4D61-A10E-F8009BEB2044}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A8407B45-F745-4D61-A10E-F8009BEB2044}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A8407B45-F745-4D61-A10E-F8009BEB2044}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A8407B45-F745-4D61-A10E-F8009BEB2044}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC4AA778-F83F-4874-9BEA-0AA38DB21A46}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC4AA778-F83F-4874-9BEA-0AA38DB21A46}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC4AA778-F83F-4874-9BEA-0AA38DB21A46}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC4AA778-F83F-4874-9BEA-0AA38DB21A46}.Release|Any CPU.Build.0 = Release|Any CPU
+		{917E4276-A66A-4725-91AD-EDA53E649A87}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{917E4276-A66A-4725-91AD-EDA53E649A87}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{917E4276-A66A-4725-91AD-EDA53E649A87}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{917E4276-A66A-4725-91AD-EDA53E649A87}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F947AAE7-2D6B-43C0-B5E6-824B8E4D7992}
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		Policies = $0
+		$0.DotNetNamingPolicy = $1
+		$0.TextStylePolicy = $2
+		$2.inheritsSet = null
+		$2.scope = text/x-csharp
+		$0.CSharpFormattingPolicy = $3
+		$3.scope = text/x-csharp
+		$0.VersionControlPolicy = $4
+	EndGlobalSection
+EndGlobal

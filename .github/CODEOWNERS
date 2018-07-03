@@ -8,10 +8,5 @@ LICENSE             @mregen
 .gitignore          @mregen
 .travis.yml         @mregen
 
-scripts/            @mregen
-WebService/			@mregen
-WebService.Client/	@mregen
-WebService.Test/	@mregen
-Services/			@mregen
-Services.Common/	@mregen
-Services.Test/		@mregen
+src/			    @mregen
+tests/	            @mregen
