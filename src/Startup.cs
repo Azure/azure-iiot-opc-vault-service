@@ -53,7 +53,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds
 
             var config = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
-                //.AddIniFile("appsettings.ini", optional: true, reloadOnChange: true)
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", true, true)
                 .AddEnvironmentVariables()
@@ -197,9 +196,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds
             builder.RegisterType<CorsSetup>()
                 .AsImplementedInterfaces().SingleInstance();
 
-            // Register http client implementation
-            builder.RegisterType<HttpClient>()
-                .AsImplementedInterfaces().SingleInstance();
+            // Register http client ...
+            builder.RegisterType<HttpClient>().SingleInstance()
+                .AsImplementedInterfaces();
+            builder.RegisterType<HttpHandlerFactory>().SingleInstance()
+                .AsImplementedInterfaces();
+            builder.RegisterType<HttpClientFactory>().SingleInstance()
+                .AsImplementedInterfaces();
 
             // Register endpoint services and ...
             builder.RegisterType<CertificateGroup>()
