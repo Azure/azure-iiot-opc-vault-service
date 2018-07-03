@@ -4,7 +4,7 @@
 // ------------------------------------------------------------
 
 
-using Microsoft.Azure.IoTSolutions.GdsVault.Common.Diagnostics;
+using Microsoft.Azure.IIoT.Diagnostics;
 using System;
 using System.Threading;
 

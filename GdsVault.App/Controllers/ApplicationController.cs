@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
-using Microsoft.Azure.IoTSolutions.GdsVault.CosmosDB.Models;
+using Microsoft.Azure.IIoT.OpcUa.Services.Gds.CosmosDB.Models;
 using System;
 
-namespace Microsoft.Azure.IoTSolutions.GdsVault.CosmosDB.Controllers
+namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.CosmosDB.Controllers
 {
     [Authorize]
     public class ApplicationController : Controller

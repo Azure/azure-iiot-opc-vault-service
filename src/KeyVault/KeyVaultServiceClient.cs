@@ -4,7 +4,7 @@
 // ------------------------------------------------------------
 
 
-using Microsoft.Azure.IoTSolutions.GdsVault.Common.Diagnostics;
+using Microsoft.Azure.IIoT.Diagnostics;
 using Microsoft.Azure.KeyVault;
 using Microsoft.Azure.KeyVault.Models;
 using Microsoft.Azure.KeyVault.WebKey;

@@ -10,8 +10,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Azure.IIoT.OpcUa.Services.Gds.Auth;
 using Microsoft.Azure.IIoT.OpcUa.Services.Gds.Runtime;
 using Microsoft.Azure.IIoT.OpcUa.Services.Gds.v1;
-using Microsoft.Azure.IoTSolutions.GdsVault.Common.Diagnostics;
-using Microsoft.Azure.IoTSolutions.GdsVault.Common.Http;
+using Microsoft.Azure.IIoT.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -19,7 +18,8 @@ using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.Swagger;
 using System;
 using System.IO;
-using ILogger = Microsoft.Azure.IoTSolutions.GdsVault.Common.Diagnostics.ILogger;
+using ILogger = Microsoft.Azure.IIoT.Diagnostics.ILogger;
+using Microsoft.Azure.IIoT.Http.Default;
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds
 {

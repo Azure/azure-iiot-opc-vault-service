@@ -21,7 +21,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GdsVault.App", "GdsVault.Ap
 		{A8407B45-F745-4D61-A10E-F8009BEB2044} = {A8407B45-F745-4D61-A10E-F8009BEB2044}
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GdsVault.CosmosDB.Models", "CosmosDB.Models\GdsVault.CosmosDB.Models.csproj", "{A8407B45-F745-4D61-A10E-F8009BEB2044}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.IIoT.OpcUa.Services.Gds.CosmosDB.Models", "CosmosDB.Models\Microsoft.Azure.IIoT.OpcUa.Services.Gds.CosmosDB.Models.csproj", "{A8407B45-F745-4D61-A10E-F8009BEB2044}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GdsVault.Autorest.Client", "GdsVault.AutoRest.Client\GdsVault.Autorest.Client.csproj", "{DC4AA778-F83F-4874-9BEA-0AA38DB21A46}"
 EndProject

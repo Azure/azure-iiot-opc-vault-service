@@ -13,7 +13,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CosmosDB.Models\GdsVault.CosmosDB.Models.csproj" />
-    <ProjectReference Include="..\GdsVault.WebService.Client\GdsVault.WebService.Client.csproj" />
   </ItemGroup>
 
   <ItemGroup>

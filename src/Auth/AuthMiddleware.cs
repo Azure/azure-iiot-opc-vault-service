@@ -5,7 +5,7 @@
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Auth {
     using Microsoft.AspNetCore.Http;
-    using Microsoft.Azure.IoTSolutions.GdsVault.Common.Diagnostics;
+    using Microsoft.Azure.IIoT.Diagnostics;
     using System.Net;
     using System.Threading.Tasks;
 

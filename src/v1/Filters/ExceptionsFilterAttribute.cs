@@ -6,7 +6,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Formatters;
-using Microsoft.Azure.IoTSolutions.GdsVault.Common.Diagnostics;
+using Microsoft.Azure.IIoT.Diagnostics;
 using Microsoft.Azure.IIoT.OpcUa.Services.Gds.Exceptions;
 using Microsoft.Azure.IIoT.OpcUa.Services.Gds.v1.Exceptions;
 using Newtonsoft.Json;

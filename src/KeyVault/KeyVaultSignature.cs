@@ -319,7 +319,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.KeyVault
 
             if (!String.IsNullOrEmpty(subjectName))
             {
-                subjectNameEntries = Utils.ParseDistinguishedName(subjectName);
+                subjectNameEntries = Opc.Ua.Utils.ParseDistinguishedName(subjectName);
             }
 
             // check the application name.
@@ -367,7 +367,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.KeyVault
             if (domainNames == null || domainNames.Count == 0)
             {
                 domainNames = new List<string>();
-                domainNames.Add(Utils.GetHostName());
+                domainNames.Add(Opc.Ua.Utils.GetHostName());
             }
 
             // create the application uri.
@@ -383,7 +383,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.KeyVault
                 applicationUri = builder.ToString();
             }
 
-            Uri uri = Utils.ParseUri(applicationUri);
+            Uri uri = Opc.Ua.Utils.ParseUri(applicationUri);
 
             if (uri == null)
             {
@@ -393,23 +393,23 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.KeyVault
             // create the subject name,
             if (String.IsNullOrEmpty(subjectName))
             {
-                subjectName = Utils.Format("CN={0}", applicationName);
+                subjectName = Opc.Ua.Utils.Format("CN={0}", applicationName);
             }
 
             if (!subjectName.Contains("CN="))
             {
-                subjectName = Utils.Format("CN={0}", subjectName);
+                subjectName = Opc.Ua.Utils.Format("CN={0}", subjectName);
             }
 
             if (domainNames != null && domainNames.Count > 0)
             {
                 if (!subjectName.Contains("DC=") && !subjectName.Contains("="))
                 {
-                    subjectName += Utils.Format(", DC={0}", domainNames[0]);
+                    subjectName += Opc.Ua.Utils.Format(", DC={0}", domainNames[0]);
                 }
                 else
                 {
-                    subjectName = Utils.ReplaceDCLocalhost(subjectName, domainNames[0]);
+                    subjectName = Opc.Ua.Utils.ReplaceDCLocalhost(subjectName, domainNames[0]);
                 }
             }
 

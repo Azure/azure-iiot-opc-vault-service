@@ -93,7 +93,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Models
         {
             try
             {
-                Utils.Trace(Utils.TraceMasks.Information, "InitializeCertificateGroup: {0}", m_subjectName);
+                Opc.Ua.Utils.Trace(Opc.Ua.Utils.TraceMasks.Information, "InitializeCertificateGroup: {0}", m_subjectName);
                 var result = await _keyVaultServiceClient.GetCertificateAsync(Configuration.Id).ConfigureAwait(false);
                 Certificate = new X509Certificate2(result.Cer);
                 if (Opc.Ua.Utils.CompareDistinguishedName(Certificate.Subject, Configuration.SubjectName))

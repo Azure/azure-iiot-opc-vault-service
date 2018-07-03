@@ -7,6 +7,9 @@
     <Product>Microsoft Azure Industrial IoT OPC UA GDS Service</Product>
     <Authors>Azure Industrial IoT</Authors>
     <Company>Microsoft</Company>
+    <PackageLicenseUrl>https://github.com/Azure/azure-iiot-opc-gds-service/blob/master/LICENSE</PackageLicenseUrl>
+    <Copyright>Microsoft Corp. All rights reserved.</Copyright>
+    <Description>Azure IoT Industrial shared component</Description>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>bin\Debug\netcoreapp2.1\Microsoft.Azure.IIoT.OpcUa.Services.Gds.xml</DocumentationFile>
@@ -24,20 +27,20 @@
     <Folder Include="Properties" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.Azure.IIoT.Services" Version="1.0.0-preview001" />
     <PackageReference Include="Microsoft.Azure.KeyVault" Version="2.3.2" />
     <PackageReference Include="Microsoft.Azure.Services.AppAuthentication" Version="1.0.3" />
     <PackageReference Include="Opc.Ua.Gds.Server.Common" Version="1.4.352.1-preview180626" />
     <PackageReference Include="Autofac" Version="4.6.2" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.2.2" />
-    <PackageReference Include="Microsoft.AspNetCore" Version="2.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="2.0.3" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.0.3" />
-    <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.0.2" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="2.4.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Ini" Version="2.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore" Version="2.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="2.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.1.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="2.5.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CosmosDB.Models\GdsVault.CosmosDB.Models.csproj" />
+    <ProjectReference Include="..\CosmosDB.Models\Microsoft.Azure.IIoT.OpcUa.Services.Gds.CosmosDB.Models.csproj" />
     <ProjectReference Include="..\Services.Common\Services.Common.csproj" />
   </ItemGroup>
   <ItemGroup>

@@ -4,7 +4,7 @@
 // ------------------------------------------------------------
 
 
-using Microsoft.Azure.IoTSolutions.GdsVault.Common.Diagnostics;
+using Microsoft.Azure.IIoT.Diagnostics;
 using Microsoft.Azure.IIoT.OpcUa.Services.Gds.KeyVault;
 using Microsoft.Azure.IIoT.OpcUa.Services.Gds.Models;
 using Microsoft.Azure.IIoT.OpcUa.Services.Gds.Runtime;

@@ -8,7 +8,7 @@ using System;
 using System.Linq;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors.Infrastructure;
-using Microsoft.Azure.IoTSolutions.GdsVault.Common.Diagnostics;
+using Microsoft.Azure.IIoT.Diagnostics;
 using Newtonsoft.Json;
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Auth {

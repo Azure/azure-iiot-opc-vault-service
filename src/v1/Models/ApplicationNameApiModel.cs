@@ -4,7 +4,7 @@
 // ------------------------------------------------------------
 
 
-using Microsoft.Azure.IoTSolutions.GdsVault.CosmosDB.Models;
+using Microsoft.Azure.IIoT.OpcUa.Services.Gds.CosmosDB.Models;
 using Newtonsoft.Json;
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.v1.Models

@@ -5,7 +5,7 @@
 
 
 using Microsoft.Azure.IIoT.OpcUa.Services.Gds.Auth;
-using Microsoft.Azure.IoTSolutions.GdsVault.Common.Diagnostics;
+using Microsoft.Azure.IIoT.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -78,8 +78,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Runtime
         {
             this.Configuration = configRoot;
             this.ConfigData = new ConfigData(configRoot);
-            this.Logger = new Logger(Uptime.ProcessId,
-                this.ConfigData.GetLogLevel("Logging:LogLevel:Default", LogLevel.Debug));
+            this.Logger = new TraceLogger(Uptime.ProcessId);
             // override port
             if (Port != 0)
             {
