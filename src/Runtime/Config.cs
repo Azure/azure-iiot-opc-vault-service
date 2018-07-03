@@ -1,14 +1,17 @@
-﻿// Copyright (c) Microsoft. All rights reserved.
+﻿// ------------------------------------------------------------
+//  Copyright (c) Microsoft Corporation.  All rights reserved.
+//  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
+// ------------------------------------------------------------
 
+
+using Microsoft.Azure.IIoT.OpcUa.Services.Gds.Auth;
 using Microsoft.Azure.IoTSolutions.GdsVault.Common.Diagnostics;
-using Microsoft.Azure.IoTSolutions.GdsVault.Services.Runtime;
-using Microsoft.Azure.IoTSolutions.GdsVault.WebService.Auth;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.Runtime
+namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Runtime
 {
     public interface IConfig : IClientAuthConfig
     {

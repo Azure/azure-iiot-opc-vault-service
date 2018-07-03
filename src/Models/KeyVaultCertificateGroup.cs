@@ -1,7 +1,11 @@
-﻿// Copyright (c) Microsoft. All rights reserved.
+﻿// ------------------------------------------------------------
+//  Copyright (c) Microsoft Corporation.  All rights reserved.
+//  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
+// ------------------------------------------------------------
 
-using Microsoft.Azure.IoTSolutions.GdsVault.Services.Exceptions;
-using Microsoft.Azure.IoTSolutions.GdsVault.Services.KeyVault;
+
+using Microsoft.Azure.IIoT.OpcUa.Services.Gds.Exceptions;
+using Microsoft.Azure.IIoT.OpcUa.Services.Gds.KeyVault;
 using Newtonsoft.Json;
 using Opc.Ua;
 using Opc.Ua.Gds;
@@ -11,9 +15,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
-using static Microsoft.Azure.IoTSolutions.GdsVault.Services.KeyVault.KeyVaultCertFactory;
+using static Microsoft.Azure.IIoT.OpcUa.Services.Gds.KeyVault.KeyVaultCertFactory;
 
-namespace Microsoft.Azure.IoTSolutions.GdsVault.Services.Models
+namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Models
 {
     public class KeyVaultTrustList
     {

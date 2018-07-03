@@ -3,26 +3,25 @@
 //  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------
 
-using System;
-using System.IO;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Azure.IIoT.OpcUa.Services.Gds.Auth;
+using Microsoft.Azure.IIoT.OpcUa.Services.Gds.Runtime;
+using Microsoft.Azure.IIoT.OpcUa.Services.Gds.v1;
 using Microsoft.Azure.IoTSolutions.GdsVault.Common.Diagnostics;
 using Microsoft.Azure.IoTSolutions.GdsVault.Common.Http;
-using Microsoft.Azure.IoTSolutions.GdsVault.Services;
-using Microsoft.Azure.IoTSolutions.GdsVault.WebService.Auth;
-using Microsoft.Azure.IoTSolutions.GdsVault.WebService.Runtime;
-using Microsoft.Azure.IoTSolutions.GdsVault.WebService.v1;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.Swagger;
+using System;
+using System.IO;
 using ILogger = Microsoft.Azure.IoTSolutions.GdsVault.Common.Diagnostics.ILogger;
 
-namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService
+namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds
 {
 
     /// <summary>

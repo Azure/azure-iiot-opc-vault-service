@@ -1,4 +1,8 @@
-﻿// Copyright (c) Microsoft. All rights reserved.
+﻿// ------------------------------------------------------------
+//  Copyright (c) Microsoft Corporation.  All rights reserved.
+//  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
+// ------------------------------------------------------------
+
 
 using Microsoft.Azure.IoTSolutions.GdsVault.Common.Diagnostics;
 using Microsoft.Azure.KeyVault;
@@ -15,7 +19,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Microsoft.Azure.IoTSolutions.GdsVault.Services.KeyVault
+namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.KeyVault
 {
 
     public class KeyVaultServiceClient

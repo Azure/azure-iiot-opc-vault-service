@@ -1,15 +1,18 @@
-﻿// Copyright (c) Microsoft. All rights reserved.
+﻿// ------------------------------------------------------------
+//  Copyright (c) Microsoft Corporation.  All rights reserved.
+//  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
+// ------------------------------------------------------------
 
+
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.IIoT.OpcUa.Services.Gds.v1.Filters;
+using Microsoft.Azure.IIoT.OpcUa.Services.Gds.v1.Models;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.IoTSolutions.GdsVault.Services;
-using Microsoft.Azure.IoTSolutions.GdsVault.WebService.v1.Filters;
-using Microsoft.Azure.IoTSolutions.GdsVault.WebService.v1.Models;
-using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.v1.Controllers
+namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.v1.Controllers
 {
     [Route(ServiceInfo.PATH + "/app"), TypeFilter(typeof(ExceptionsFilterAttribute))]
     [Produces("application/json")]

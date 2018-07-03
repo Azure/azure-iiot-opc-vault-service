@@ -1,11 +1,14 @@
-﻿// Copyright (c) Microsoft. All rights reserved.
+﻿// ------------------------------------------------------------
+//  Copyright (c) Microsoft Corporation.  All rights reserved.
+//  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
+// ------------------------------------------------------------
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Azure.IoTSolutions.GdsVault.Common.Diagnostics;
-using Microsoft.Azure.IoTSolutions.GdsVault.Services.Exceptions;
-using Microsoft.Azure.IoTSolutions.GdsVault.WebService.v1.Exceptions;
+using Microsoft.Azure.IIoT.OpcUa.Services.Gds.Exceptions;
+using Microsoft.Azure.IIoT.OpcUa.Services.Gds.v1.Exceptions;
 using Newtonsoft.Json;
 using System;
 using System.Buffers;
@@ -13,7 +16,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 
-namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.v1.Filters
+namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.v1.Filters
 {
     /// <summary>
     /// Detect all the unhandled exceptions returned by the API controllers

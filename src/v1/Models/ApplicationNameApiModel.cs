@@ -1,9 +1,13 @@
-﻿// Copyright (c) Microsoft. All rights reserved.
+﻿// ------------------------------------------------------------
+//  Copyright (c) Microsoft Corporation.  All rights reserved.
+//  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
+// ------------------------------------------------------------
+
 
 using Microsoft.Azure.IoTSolutions.GdsVault.CosmosDB.Models;
 using Newtonsoft.Json;
 
-namespace Microsoft.Azure.IoTSolutions.GdsVault.WebService.v1.Models
+namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.v1.Models
 {
     public sealed class ApplicationNameApiModel
     {
