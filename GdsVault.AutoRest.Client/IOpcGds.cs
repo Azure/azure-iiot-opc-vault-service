@@ -15,9 +15,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Client
     using System.Threading.Tasks;
 
     /// <summary>
-    /// Opc GDS Vault Micro Service
+    /// OPC UA GDS Service
     /// </summary>
-    public partial interface IGdsVault : System.IDisposable
+    public partial interface IOpcGds : System.IDisposable
     {
         /// <summary>
         /// The base URI of the service.

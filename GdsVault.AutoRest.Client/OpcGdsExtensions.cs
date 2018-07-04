@@ -13,9 +13,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Client
     using System.Threading.Tasks;
 
     /// <summary>
-    /// Extension methods for GdsVault.
+    /// Extension methods for OpcGds.
     /// </summary>
-    public static partial class GdsVaultExtensions
+    public static partial class OpcGdsExtensions
     {
             /// <summary>
             /// Register new application.
@@ -25,7 +25,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Client
             /// </param>
             /// <param name='application'>
             /// </param>
-            public static string RegisterApplication(this IGdsVault operations, ApplicationRecordApiModel application = default(ApplicationRecordApiModel))
+            public static string RegisterApplication(this IOpcGds operations, ApplicationRecordApiModel application = default(ApplicationRecordApiModel))
             {
                 return operations.RegisterApplicationAsync(application).GetAwaiter().GetResult();
             }
@@ -41,7 +41,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Client
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<string> RegisterApplicationAsync(this IGdsVault operations, ApplicationRecordApiModel application = default(ApplicationRecordApiModel), CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<string> RegisterApplicationAsync(this IOpcGds operations, ApplicationRecordApiModel application = default(ApplicationRecordApiModel), CancellationToken cancellationToken = default(CancellationToken))
             {
                 using (var _result = await operations.RegisterApplicationWithHttpMessagesAsync(application, null, cancellationToken).ConfigureAwait(false))
                 {
@@ -57,7 +57,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Client
             /// </param>
             /// <param name='id'>
             /// </param>
-            public static ApplicationRecordApiModel GetApplication(this IGdsVault operations, string id)
+            public static ApplicationRecordApiModel GetApplication(this IOpcGds operations, string id)
             {
                 return operations.GetApplicationAsync(id).GetAwaiter().GetResult();
             }
@@ -73,7 +73,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Client
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<ApplicationRecordApiModel> GetApplicationAsync(this IGdsVault operations, string id, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<ApplicationRecordApiModel> GetApplicationAsync(this IOpcGds operations, string id, CancellationToken cancellationToken = default(CancellationToken))
             {
                 using (var _result = await operations.GetApplicationWithHttpMessagesAsync(id, null, cancellationToken).ConfigureAwait(false))
                 {
@@ -91,7 +91,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Client
             /// </param>
             /// <param name='application'>
             /// </param>
-            public static string UpdateApplication(this IGdsVault operations, string id, ApplicationRecordApiModel application = default(ApplicationRecordApiModel))
+            public static string UpdateApplication(this IOpcGds operations, string id, ApplicationRecordApiModel application = default(ApplicationRecordApiModel))
             {
                 return operations.UpdateApplicationAsync(id, application).GetAwaiter().GetResult();
             }
@@ -109,7 +109,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Client
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<string> UpdateApplicationAsync(this IGdsVault operations, string id, ApplicationRecordApiModel application = default(ApplicationRecordApiModel), CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<string> UpdateApplicationAsync(this IOpcGds operations, string id, ApplicationRecordApiModel application = default(ApplicationRecordApiModel), CancellationToken cancellationToken = default(CancellationToken))
             {
                 using (var _result = await operations.UpdateApplicationWithHttpMessagesAsync(id, application, null, cancellationToken).ConfigureAwait(false))
                 {
@@ -125,7 +125,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Client
             /// </param>
             /// <param name='id'>
             /// </param>
-            public static void UnregisterApplication(this IGdsVault operations, string id)
+            public static void UnregisterApplication(this IOpcGds operations, string id)
             {
                 operations.UnregisterApplicationAsync(id).GetAwaiter().GetResult();
             }
@@ -141,7 +141,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Client
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task UnregisterApplicationAsync(this IGdsVault operations, string id, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task UnregisterApplicationAsync(this IOpcGds operations, string id, CancellationToken cancellationToken = default(CancellationToken))
             {
                 (await operations.UnregisterApplicationWithHttpMessagesAsync(id, null, cancellationToken).ConfigureAwait(false)).Dispose();
             }
@@ -154,7 +154,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Client
             /// </param>
             /// <param name='uri'>
             /// </param>
-            public static IList<ApplicationRecordApiModel> FindApplication(this IGdsVault operations, string uri)
+            public static IList<ApplicationRecordApiModel> FindApplication(this IOpcGds operations, string uri)
             {
                 return operations.FindApplicationAsync(uri).GetAwaiter().GetResult();
             }
@@ -170,7 +170,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Client
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<IList<ApplicationRecordApiModel>> FindApplicationAsync(this IGdsVault operations, string uri, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<IList<ApplicationRecordApiModel>> FindApplicationAsync(this IOpcGds operations, string uri, CancellationToken cancellationToken = default(CancellationToken))
             {
                 using (var _result = await operations.FindApplicationWithHttpMessagesAsync(uri, null, cancellationToken).ConfigureAwait(false))
                 {
@@ -186,7 +186,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Client
             /// </param>
             /// <param name='query'>
             /// </param>
-            public static QueryApplicationsResponseApiModel QueryApplications(this IGdsVault operations, QueryApplicationsApiModel query = default(QueryApplicationsApiModel))
+            public static QueryApplicationsResponseApiModel QueryApplications(this IOpcGds operations, QueryApplicationsApiModel query = default(QueryApplicationsApiModel))
             {
                 return operations.QueryApplicationsAsync(query).GetAwaiter().GetResult();
             }
@@ -202,7 +202,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Client
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<QueryApplicationsResponseApiModel> QueryApplicationsAsync(this IGdsVault operations, QueryApplicationsApiModel query = default(QueryApplicationsApiModel), CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<QueryApplicationsResponseApiModel> QueryApplicationsAsync(this IOpcGds operations, QueryApplicationsApiModel query = default(QueryApplicationsApiModel), CancellationToken cancellationToken = default(CancellationToken))
             {
                 using (var _result = await operations.QueryApplicationsWithHttpMessagesAsync(query, null, cancellationToken).ConfigureAwait(false))
                 {
@@ -213,7 +213,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Client
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
-            public static CertificateGroupListApiModel GetCertificateGroupIds(this IGdsVault operations)
+            public static CertificateGroupListApiModel GetCertificateGroupIds(this IOpcGds operations)
             {
                 return operations.GetCertificateGroupIdsAsync().GetAwaiter().GetResult();
             }
@@ -224,7 +224,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Client
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<CertificateGroupListApiModel> GetCertificateGroupIdsAsync(this IGdsVault operations, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<CertificateGroupListApiModel> GetCertificateGroupIdsAsync(this IOpcGds operations, CancellationToken cancellationToken = default(CancellationToken))
             {
                 using (var _result = await operations.GetCertificateGroupIdsWithHttpMessagesAsync(null, cancellationToken).ConfigureAwait(false))
                 {
@@ -240,7 +240,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Client
             /// </param>
             /// <param name='id'>
             /// </param>
-            public static CertificateGroupConfigurationApiModel GetCertificateGroupConfiguration(this IGdsVault operations, string id)
+            public static CertificateGroupConfigurationApiModel GetCertificateGroupConfiguration(this IOpcGds operations, string id)
             {
                 return operations.GetCertificateGroupConfigurationAsync(id).GetAwaiter().GetResult();
             }
@@ -256,7 +256,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Client
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<CertificateGroupConfigurationApiModel> GetCertificateGroupConfigurationAsync(this IGdsVault operations, string id, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<CertificateGroupConfigurationApiModel> GetCertificateGroupConfigurationAsync(this IOpcGds operations, string id, CancellationToken cancellationToken = default(CancellationToken))
             {
                 using (var _result = await operations.GetCertificateGroupConfigurationWithHttpMessagesAsync(id, null, cancellationToken).ConfigureAwait(false))
                 {
@@ -270,7 +270,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Client
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
-            public static CertificateGroupConfigurationCollectionApiModel GetCertificateGroupConfigurationCollection(this IGdsVault operations)
+            public static CertificateGroupConfigurationCollectionApiModel GetCertificateGroupConfigurationCollection(this IOpcGds operations)
             {
                 return operations.GetCertificateGroupConfigurationCollectionAsync().GetAwaiter().GetResult();
             }
@@ -284,7 +284,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Client
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<CertificateGroupConfigurationCollectionApiModel> GetCertificateGroupConfigurationCollectionAsync(this IGdsVault operations, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<CertificateGroupConfigurationCollectionApiModel> GetCertificateGroupConfigurationCollectionAsync(this IOpcGds operations, CancellationToken cancellationToken = default(CancellationToken))
             {
                 using (var _result = await operations.GetCertificateGroupConfigurationCollectionWithHttpMessagesAsync(null, cancellationToken).ConfigureAwait(false))
                 {
@@ -300,7 +300,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Client
             /// </param>
             /// <param name='id'>
             /// </param>
-            public static X509Certificate2CollectionApiModel GetCACertificateChain(this IGdsVault operations, string id)
+            public static X509Certificate2CollectionApiModel GetCACertificateChain(this IOpcGds operations, string id)
             {
                 return operations.GetCACertificateChainAsync(id).GetAwaiter().GetResult();
             }
@@ -316,7 +316,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Client
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<X509Certificate2CollectionApiModel> GetCACertificateChainAsync(this IGdsVault operations, string id, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<X509Certificate2CollectionApiModel> GetCACertificateChainAsync(this IOpcGds operations, string id, CancellationToken cancellationToken = default(CancellationToken))
             {
                 using (var _result = await operations.GetCACertificateChainWithHttpMessagesAsync(id, null, cancellationToken).ConfigureAwait(false))
                 {
@@ -332,7 +332,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Client
             /// </param>
             /// <param name='id'>
             /// </param>
-            public static X509CrlCollectionApiModel GetCACrlChain(this IGdsVault operations, string id)
+            public static X509CrlCollectionApiModel GetCACrlChain(this IOpcGds operations, string id)
             {
                 return operations.GetCACrlChainAsync(id).GetAwaiter().GetResult();
             }
@@ -348,7 +348,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Client
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<X509CrlCollectionApiModel> GetCACrlChainAsync(this IGdsVault operations, string id, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<X509CrlCollectionApiModel> GetCACrlChainAsync(this IOpcGds operations, string id, CancellationToken cancellationToken = default(CancellationToken))
             {
                 using (var _result = await operations.GetCACrlChainWithHttpMessagesAsync(id, null, cancellationToken).ConfigureAwait(false))
                 {
@@ -364,7 +364,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Client
             /// </param>
             /// <param name='id'>
             /// </param>
-            public static TrustListApiModel GetTrustList(this IGdsVault operations, string id)
+            public static TrustListApiModel GetTrustList(this IOpcGds operations, string id)
             {
                 return operations.GetTrustListAsync(id).GetAwaiter().GetResult();
             }
@@ -380,7 +380,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Client
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<TrustListApiModel> GetTrustListAsync(this IGdsVault operations, string id, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<TrustListApiModel> GetTrustListAsync(this IOpcGds operations, string id, CancellationToken cancellationToken = default(CancellationToken))
             {
                 using (var _result = await operations.GetTrustListWithHttpMessagesAsync(id, null, cancellationToken).ConfigureAwait(false))
                 {
@@ -396,7 +396,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Client
             /// </param>
             /// <param name='id'>
             /// </param>
-            public static X509Certificate2ApiModel CreateCACertificate(this IGdsVault operations, string id)
+            public static X509Certificate2ApiModel CreateCACertificate(this IOpcGds operations, string id)
             {
                 return operations.CreateCACertificateAsync(id).GetAwaiter().GetResult();
             }
@@ -412,7 +412,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Client
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<X509Certificate2ApiModel> CreateCACertificateAsync(this IGdsVault operations, string id, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<X509Certificate2ApiModel> CreateCACertificateAsync(this IOpcGds operations, string id, CancellationToken cancellationToken = default(CancellationToken))
             {
                 using (var _result = await operations.CreateCACertificateWithHttpMessagesAsync(id, null, cancellationToken).ConfigureAwait(false))
                 {
@@ -430,7 +430,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Client
             /// </param>
             /// <param name='cert'>
             /// </param>
-            public static X509CrlApiModel RevokeCertificate(this IGdsVault operations, string id, X509Certificate2ApiModel cert = default(X509Certificate2ApiModel))
+            public static X509CrlApiModel RevokeCertificate(this IOpcGds operations, string id, X509Certificate2ApiModel cert = default(X509Certificate2ApiModel))
             {
                 return operations.RevokeCertificateAsync(id, cert).GetAwaiter().GetResult();
             }
@@ -448,7 +448,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Client
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<X509CrlApiModel> RevokeCertificateAsync(this IGdsVault operations, string id, X509Certificate2ApiModel cert = default(X509Certificate2ApiModel), CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<X509CrlApiModel> RevokeCertificateAsync(this IOpcGds operations, string id, X509Certificate2ApiModel cert = default(X509Certificate2ApiModel), CancellationToken cancellationToken = default(CancellationToken))
             {
                 using (var _result = await operations.RevokeCertificateWithHttpMessagesAsync(id, cert, null, cancellationToken).ConfigureAwait(false))
                 {
@@ -466,7 +466,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Client
             /// </param>
             /// <param name='sr'>
             /// </param>
-            public static X509Certificate2ApiModel SigningRequest(this IGdsVault operations, string id, SigningRequestApiModel sr = default(SigningRequestApiModel))
+            public static X509Certificate2ApiModel SigningRequest(this IOpcGds operations, string id, SigningRequestApiModel sr = default(SigningRequestApiModel))
             {
                 return operations.SigningRequestAsync(id, sr).GetAwaiter().GetResult();
             }
@@ -484,7 +484,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Client
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<X509Certificate2ApiModel> SigningRequestAsync(this IGdsVault operations, string id, SigningRequestApiModel sr = default(SigningRequestApiModel), CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<X509Certificate2ApiModel> SigningRequestAsync(this IOpcGds operations, string id, SigningRequestApiModel sr = default(SigningRequestApiModel), CancellationToken cancellationToken = default(CancellationToken))
             {
                 using (var _result = await operations.SigningRequestWithHttpMessagesAsync(id, sr, null, cancellationToken).ConfigureAwait(false))
                 {
@@ -502,7 +502,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Client
             /// </param>
             /// <param name='nkpr'>
             /// </param>
-            public static CertificateKeyPairApiModel NewKeyPairRequest(this IGdsVault operations, string id, NewKeyPairRequestApiModel nkpr = default(NewKeyPairRequestApiModel))
+            public static CertificateKeyPairApiModel NewKeyPairRequest(this IOpcGds operations, string id, NewKeyPairRequestApiModel nkpr = default(NewKeyPairRequestApiModel))
             {
                 return operations.NewKeyPairRequestAsync(id, nkpr).GetAwaiter().GetResult();
             }
@@ -520,7 +520,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Client
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<CertificateKeyPairApiModel> NewKeyPairRequestAsync(this IGdsVault operations, string id, NewKeyPairRequestApiModel nkpr = default(NewKeyPairRequestApiModel), CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<CertificateKeyPairApiModel> NewKeyPairRequestAsync(this IOpcGds operations, string id, NewKeyPairRequestApiModel nkpr = default(NewKeyPairRequestApiModel), CancellationToken cancellationToken = default(CancellationToken))
             {
                 using (var _result = await operations.NewKeyPairRequestWithHttpMessagesAsync(id, nkpr, null, cancellationToken).ConfigureAwait(false))
                 {
@@ -531,7 +531,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Client
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
-            public static StatusApiModel V1StatusGet(this IGdsVault operations)
+            public static StatusApiModel V1StatusGet(this IOpcGds operations)
             {
                 return operations.V1StatusGetAsync().GetAwaiter().GetResult();
             }
@@ -542,7 +542,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Client
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<StatusApiModel> V1StatusGetAsync(this IGdsVault operations, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<StatusApiModel> V1StatusGetAsync(this IOpcGds operations, CancellationToken cancellationToken = default(CancellationToken))
             {
                 using (var _result = await operations.V1StatusGetWithHttpMessagesAsync(null, cancellationToken).ConfigureAwait(false))
                 {

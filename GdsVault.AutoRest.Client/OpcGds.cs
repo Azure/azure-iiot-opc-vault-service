@@ -18,9 +18,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Client
     using System.Threading.Tasks;
 
     /// <summary>
-    /// Opc GDS Vault Micro Service
+    /// OPC UA GDS Service
     /// </summary>
-    public partial class GdsVault : ServiceClient<GdsVault>, IGdsVault
+    public partial class OpcGds : ServiceClient<OpcGds>, IOpcGds
     {
         /// <summary>
         /// The base URI of the service.
@@ -38,18 +38,18 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Client
         public JsonSerializerSettings DeserializationSettings { get; private set; }
 
         /// <summary>
-        /// Initializes a new instance of the GdsVault class.
+        /// Initializes a new instance of the OpcGds class.
         /// </summary>
         /// <param name='handlers'>
         /// Optional. The delegating handlers to add to the http client pipeline.
         /// </param>
-        public GdsVault(params DelegatingHandler[] handlers) : base(handlers)
+        public OpcGds(params DelegatingHandler[] handlers) : base(handlers)
         {
             Initialize();
         }
 
         /// <summary>
-        /// Initializes a new instance of the GdsVault class.
+        /// Initializes a new instance of the OpcGds class.
         /// </summary>
         /// <param name='rootHandler'>
         /// Optional. The http client handler used to handle http transport.
@@ -57,13 +57,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Client
         /// <param name='handlers'>
         /// Optional. The delegating handlers to add to the http client pipeline.
         /// </param>
-        public GdsVault(HttpClientHandler rootHandler, params DelegatingHandler[] handlers) : base(rootHandler, handlers)
+        public OpcGds(HttpClientHandler rootHandler, params DelegatingHandler[] handlers) : base(rootHandler, handlers)
         {
             Initialize();
         }
 
         /// <summary>
-        /// Initializes a new instance of the GdsVault class.
+        /// Initializes a new instance of the OpcGds class.
         /// </summary>
         /// <param name='baseUri'>
         /// Optional. The base URI of the service.
@@ -74,7 +74,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Client
         /// <exception cref="System.ArgumentNullException">
         /// Thrown when a required parameter is null
         /// </exception>
-        public GdsVault(System.Uri baseUri, params DelegatingHandler[] handlers) : this(handlers)
+        public OpcGds(System.Uri baseUri, params DelegatingHandler[] handlers) : this(handlers)
         {
             if (baseUri == null)
             {
@@ -84,7 +84,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Client
         }
 
         /// <summary>
-        /// Initializes a new instance of the GdsVault class.
+        /// Initializes a new instance of the OpcGds class.
         /// </summary>
         /// <param name='baseUri'>
         /// Optional. The base URI of the service.
@@ -98,7 +98,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Client
         /// <exception cref="System.ArgumentNullException">
         /// Thrown when a required parameter is null
         /// </exception>
-        public GdsVault(System.Uri baseUri, HttpClientHandler rootHandler, params DelegatingHandler[] handlers) : this(rootHandler, handlers)
+        public OpcGds(System.Uri baseUri, HttpClientHandler rootHandler, params DelegatingHandler[] handlers) : this(rootHandler, handlers)
         {
             if (baseUri == null)
             {
@@ -116,7 +116,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Client
         /// </summary>
         private void Initialize()
         {
-            BaseUri = new System.Uri("http://localhost");
+            BaseUri = new System.Uri("http://localhost:58801");
             SerializationSettings = new JsonSerializerSettings
             {
                 Formatting = Newtonsoft.Json.Formatting.Indented,
