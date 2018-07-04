@@ -1,6 +1,6 @@
 using System;
 
-namespace GdsVault.App.Models
+namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.App.Models
 {
     public class ErrorViewModel
     {

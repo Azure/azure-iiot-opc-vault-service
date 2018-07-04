@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.v1.Controllers
 {
-    [Route(ServiceInfo.PATH + "/app"), TypeFilter(typeof(ExceptionsFilterAttribute))]
+    [Route(VersionInfo.PATH + "/app"), TypeFilter(typeof(ExceptionsFilterAttribute))]
     [Produces("application/json")]
 
     public sealed class ApplicationController : Controller

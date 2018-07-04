@@ -9,13 +9,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.v1
     /// <summary>
     /// Web service API version 1 information
     /// </summary>
-    public static class ServiceInfo
+    public static class VersionInfo
     {
-        /// <summary>
-        /// Name of service
-        /// </summary>
-        public const string NAME = "GdsVault";
-
         /// <summary>
         /// Number used for routing HTTP requests
         /// </summary>
@@ -29,11 +24,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.v1
         /// <summary>
         /// Date when the API version has been published
         /// </summary>
-        public const string DATE = "20180501";
+        public const string DATE = "20180701";
 
-        /// <summary>
-        /// Description of service
-        /// </summary>
-        public const string DESCRIPTION = "Opc GDS Vault Micro Service";
     }
 }

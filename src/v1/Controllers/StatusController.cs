@@ -12,7 +12,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.v1.Controllers
     using Microsoft.Azure.IIoT.OpcUa.Services.Gds.v1.Filters;
     using Microsoft.Azure.IIoT.OpcUa.Services.Gds.v1.Models;
 
-    [Route(ServiceInfo.PATH + "/[controller]"), TypeFilter(typeof(ExceptionsFilterAttribute))]
+    [Route(VersionInfo.PATH + "/[controller]"), TypeFilter(typeof(ExceptionsFilterAttribute))]
     [Produces("application/json")]
 
     public sealed class StatusController : Controller

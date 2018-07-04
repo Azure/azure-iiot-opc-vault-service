@@ -4,8 +4,8 @@
 // ------------------------------------------------------------
 
 
-using Microsoft.Azure.IIoT.OpcUa.Services.Gds.Auth;
 using Microsoft.Azure.IIoT.Diagnostics;
+using Microsoft.Azure.IIoT.Services.Runtime;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -13,36 +13,8 @@ using System.IO;
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Runtime
 {
-    public interface IConfig : IClientAuthConfig
-    {
-        /// <summary>Web service listening port</summary>
-        int Port { get; }
-
-        /// <summary>Example of a path setting</summary>
-        ///string SomeFolder { get; }
-
-        /// <summary>Service layer configuration</summary>
-        IServicesConfig ServicesConfig { get; }
-
-        /// <summary>
-        /// A configured logger
-        /// </summary>
-        ILogger Logger { get; }
-
-        /// <summary>
-        /// Configuration
-        /// </summary>
-        IConfigurationRoot Configuration { get; }
-
-        /// <summary>
-        /// The configuration data.
-        /// </summary>
-        IConfigData ConfigData { get; }
-
-    }
-
     /// <summary>Web service configuration</summary>
-    public class Config : IConfig
+    public class Config : ServiceConfig
     {
         // web service config
         private const string ApplicationKey = "GdsVault:";
@@ -53,37 +25,19 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Runtime
         private const string KeyVaultApiUrlKey = KeyVaultKey + "serviceuri";
         private const string KeyVaultApiTimeoutKey = KeyVaultKey + "timeout";
         
-
-        // TODO: OPCTWIN
-        //private const string IoTHubManagerKey = "iothubmanager:";
-        //private const string IoTHubManagerApiUrlKey = IoTHubManagerKey + "webservice_url";
-        //private const string IoTHubManagerApiTimeoutKey = IoTHubManagerKey + "webservice_timeout";
-
-        /// <summary>
-        /// A configured logger.
-        /// </summary>
-        public ILogger Logger { get; }
-
-        /// <summary>
-        /// The Configuration root.
-        /// </summary>
-        public IConfigurationRoot Configuration { get; }
-
         /// <summary>
         /// The configuration data.
         /// </summary>
         public IConfigData ConfigData { get; }
 
-        public Config(IConfigurationRoot configRoot)
+        /// <summary>
+        /// Configuration constructor
+        /// </summary>
+        /// <param name="configuration"></param>
+        public Config(IConfigurationRoot configuration) :
+            base(Uptime.ProcessId, ServiceInfo.ID, configuration)
         {
-            this.Configuration = configRoot;
-            this.ConfigData = new ConfigData(configRoot);
-            this.Logger = new TraceLogger(Uptime.ProcessId);
-            // override port
-            if (Port != 0)
-            {
-                configRoot["urls"] = "http://*:" + Port.ToString();
-            }
+            this.ConfigData = new ConfigData(configuration);
         }
 
         private static string MapRelativePath(string path)
@@ -91,9 +45,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Runtime
             if (path.StartsWith(".")) return AppContext.BaseDirectory + Path.DirectorySeparatorChar + path;
             return path;
         }
-
-        /// <summary>Web service listening port</summary>
-        public int Port => ConfigData.GetInt(PortKey);
 
         /// <summary>Service layer configuration</summary>
         public IServicesConfig ServicesConfig =>
@@ -110,15 +61,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Runtime
         private const string CORS_WHITELIST_KEY = AUTH_KEY + "cors_whitelist";
         private const string AUTH_TYPE_KEY = AUTH_KEY + "auth_type";
         private const string AUTH_REQUIRED_KEY = AUTH_KEY + "auth_required";
-        /// <summary>Cors whitelist</summary>
-        public string CorsWhitelist =>
-            ConfigData.GetString(CORS_WHITELIST_KEY, string.Empty);
-        /// <summary>Whether enabled</summary>
-        public bool CorsEnabled =>
-            !string.IsNullOrEmpty(CorsWhitelist.Trim());
-        /// <summary>Auth needed?</summary>
-        public bool AuthRequired =>
-            ConfigData.GetBool(AUTH_REQUIRED_KEY, false);
         /// <summary>Type of auth token</summary>
         public string AuthType =>
             ConfigData.GetString(AUTH_TYPE_KEY, "JWT");

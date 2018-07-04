@@ -3,36 +3,41 @@
 //  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------
 
-using Autofac;
-using Autofac.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Azure.IIoT.OpcUa.Services.Gds.Auth;
-using Microsoft.Azure.IIoT.OpcUa.Services.Gds.Runtime;
-using Microsoft.Azure.IIoT.OpcUa.Services.Gds.v1;
-using Microsoft.Azure.IIoT.Diagnostics;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using Swashbuckle.AspNetCore.Swagger;
-using System;
-using System.IO;
-using ILogger = Microsoft.Azure.IIoT.Diagnostics.ILogger;
-using Microsoft.Azure.IIoT.Http.Default;
-
 namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds
 {
+    using Autofac;
+    using Autofac.Extensions.DependencyInjection;
+    using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.Azure.IIoT.Diagnostics;
+    using Microsoft.Azure.IIoT.Http.Auth;
+    using Microsoft.Azure.IIoT.Http.Default;
+    using Microsoft.Azure.IIoT.Http.Ssl;
+    using Microsoft.Azure.IIoT.OpcUa.Services.Gds.Runtime;
+    using Microsoft.Azure.IIoT.OpcUa.Services.Gds.v1;
+    using Microsoft.Azure.IIoT.OpcUa.Services.Gds.v1.Auth;
+    using Microsoft.Azure.IIoT.Services;
+    using Microsoft.Azure.IIoT.Services.Auth;
+    using Microsoft.Azure.IIoT.Services.Auth.Azure;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Logging;
+    using Newtonsoft.Json;
+    using Swashbuckle.AspNetCore.Swagger;
+    using System;
+    using CorsSetup = IIoT.Services.Cors.CorsSetup;
+    using ILogger = Microsoft.Azure.IIoT.Diagnostics.ILogger;
 
     /// <summary>
     /// Webservice startup
     /// </summary>
-    public class Startup {
+    public class Startup
+    {
 
         /// <summary>
         /// Configuration - Initialized in constructor
         /// </summary>
-        public IConfig Config { get; }
+        public Config Config { get; }
 
         /// <summary>
         /// Current hosting environment - Initialized in constructor
@@ -48,7 +53,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds
         /// Created through builder
         /// </summary>
         /// <param name="env"></param>
-        public Startup(IHostingEnvironment env) {
+        public Startup(IHostingEnvironment env)
+        {
             Environment = env;
 
             var config = new ConfigurationBuilder()
@@ -68,50 +74,36 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds
         /// </summary>
         /// <param name="services"></param>
         /// <returns></returns>
-        public IServiceProvider ConfigureServices(IServiceCollection services) {
+        public IServiceProvider ConfigureServices(IServiceCollection services)
+        {
 
             // Setup (not enabling yet) CORS
             services.AddCors();
 
             // Add authentication
-            services.AddJwtBearerAuthentication(Config,
+            services.AddJwtBearerAuthentication(Config, Config.ClientId,
                 Environment.IsDevelopment());
 
             // Add authorization
-            //services.AddAuthorization(options => {
-            //    options.AddV1Policies(Config);
-            //});
+            services.AddAuthorization(options =>
+            {
+                options.AddV1Policies(Config);
+            });
 
             // Add controllers as services so they'll be resolved.
-            services.AddMvc().AddControllersAsServices().AddJsonOptions(options => {
+            services.AddMvc().AddControllersAsServices().AddJsonOptions(options =>
+            {
                 options.SerializerSettings.Formatting = Formatting.Indented;
                 options.SerializerSettings.Converters.Add(new ExceptionConverter(
                     Environment.IsDevelopment()));
                 options.SerializerSettings.MaxDepth = 10;
             });
 
-            // Generate swagger documentation
-            services.AddSwaggerGen(options => {
-                // Add info
-                options.SwaggerDoc(ServiceInfo.PATH, new Info {
-                    Title = ServiceInfo.NAME,
-                    Version = ServiceInfo.PATH,
-                    Description = ServiceInfo.DESCRIPTION,
-                });
-
-                // Add help
-                options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory,
-                    typeof(Startup).Assembly.GetName().Name + ".xml"));
-
-                // If auth enabled, need to have bearer token to access any api
-                if (Config.AuthRequired) {
-                    options.AddSecurityDefinition("bearer", new ApiKeyScheme {
-                        Description = "Authorization token in the form of 'bearer <token>'",
-                        Name = "Authorization",
-                        In = "header"
-                    });
-                }
-
+            services.AddSwagger(Config, new Info
+            {
+                Title = ServiceInfo.NAME,
+                Version = VersionInfo.PATH,
+                Description = ServiceInfo.DESCRIPTION,
             });
 
             // Prepare DI container
@@ -120,6 +112,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds
             return new AutofacServiceProvider(ApplicationContainer);
         }
 
+
         /// <summary>
         /// This method is called by the runtime, after the ConfigureServices
         /// method above and used to add middleware
@@ -127,41 +120,36 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds
         /// <param name="app"></param>
         /// <param name="env"></param>
         /// <param name="loggerFactory"></param>
-        /// <param name="corsSetup"></param>
         /// <param name="appLifetime"></param>
         public void Configure(
             IApplicationBuilder app, 
             IHostingEnvironment env,
             ILoggerFactory loggerFactory, 
-            ICorsSetup corsSetup,
-            IApplicationLifetime appLifetime) {
+            IApplicationLifetime appLifetime)
+        {
 
             var log = ApplicationContainer.Resolve<ILogger>();
             loggerFactory.AddConsole(Config.Configuration.GetSection("Logging"));
 
-            if (Config.AuthRequired) {
-                // Try authenticate
+            if (Config.AuthRequired)
+            {
                 app.UseAuthentication();
-                // Filter for x-source
-                app.UseMiddleware<AuthMiddleware>();
             }
 
-            // Enable CORS - Must be before UseMvc
-            // see: https://docs.microsoft.com/en-us/aspnet/core/security/cors
-            corsSetup.UseMiddleware(app);
+            app.EnableCors();
 
-            // Enable swagger and swagger ui
-            app.UseSwagger();
-            app.UseSwaggerUI(options => {
-                options.SwaggerEndpoint("/swagger/v1/swagger.json",
-                    $"{ServiceInfo.PATH} Docs ({ServiceInfo.DATE})");
+            app.UseSwagger(Config, new Info
+            {
+                Title = ServiceInfo.NAME,
+                Version = VersionInfo.PATH,
+                Description = ServiceInfo.DESCRIPTION,
             });
 
             app.UseMvc();
 
             // If you want to dispose of resources that have been resolved in the
             // application container, register for the "ApplicationStopped" event.
-            appLifetime.ApplicationStopped.Register(() => ApplicationContainer.Dispose());
+            appLifetime.ApplicationStopped.Register(ApplicationContainer.Dispose);
 
             // Print some useful information at bootstrap time
             log.Info($"{ServiceInfo.NAME} web service started",
@@ -172,7 +160,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds
         /// Autofac configuration. Find more information here:
         /// @see http://docs.autofac.org/en/latest/integration/aspnetcore.html
         /// </summary>
-        public IContainer ConfigureContainer(IServiceCollection services) {
+        public IContainer ConfigureContainer(IServiceCollection services)
+        {
             var builder = new ContainerBuilder();
 
             // Populate from services di
@@ -192,7 +181,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds
             builder.RegisterInstance(Config.ServicesConfig)
                 .AsImplementedInterfaces().SingleInstance();
 
-            // Auth and CORS setup
+            // CORS setup
             builder.RegisterType<CorsSetup>()
                 .AsImplementedInterfaces().SingleInstance();
 
@@ -208,42 +197,19 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds
             builder.RegisterType<CertificateGroup>()
                 .AsImplementedInterfaces().SingleInstance();
 
-#if mist
-            // ... use iot hub manager micro service ...
-            if (!string.IsNullOrEmpty(Config.IoTHubManagerV1ApiUrl)) {
-                // ... if the dependency was configured
-                builder.RegisterType<IoTHubManagerServiceClient>()
+            // ... with bearer auth
+            if (Config.AuthRequired)
+            {
+                builder.RegisterType<BehalfOfTokenProvider>()
+                    .AsImplementedInterfaces().SingleInstance();
+                builder.RegisterType<HttpBearerAuthentication>()
                     .AsImplementedInterfaces().SingleInstance();
             }
-            else {
-                // ... or if not, for testing, use direct services
-                builder.RegisterType<IoTHubServiceHttpClient>()
-                    .AsImplementedInterfaces().SingleInstance();
-            }
-
-            // Register opc ua proxy client if not bypassing
-            if (!Config.BypassProxy) {
-                builder.RegisterType<Services.External.Stack.OpcUaClient>()
-                    .AsImplementedInterfaces().SingleInstance();
-
-                // Register misc opc services, such as variant codec
-                builder.RegisterType<Services.External.Stack.OpcUaJsonVariantCodec>()
-                    .AsImplementedInterfaces().SingleInstance();
-
-                // Register composite validator
-                builder.RegisterType<OpcUaCompositeValidator>()
-                    .AsImplementedInterfaces().SingleInstance();
-            }
-            else {
-                // Validate only through jobs
-                builder.RegisterType<OpcUaTwinValidator>()
-                    .AsImplementedInterfaces().SingleInstance();
-            }
-
-            // Register composite client
-            builder.RegisterType<OpcUaCompositeClient>()
-                .AsImplementedInterfaces().SingleInstance();
+#if DEBUG
+            builder.RegisterType<NoOpValidator>()
+                .AsImplementedInterfaces();
 #endif
+
             return builder.Build();
         }
     }

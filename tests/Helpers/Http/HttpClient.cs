@@ -49,7 +49,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Test.Helpers.Http
             {
                 // See team wiki /wiki/Environment-variables
                 var envSetting = Environment
-                    .GetEnvironmentVariable("PCS_ENABLE_UNSAFE_LOGS")
+                    .GetEnvironmentVariable("IIOT_ENABLE_UNSAFE_LOGS")
                     .ToLowerInvariant();
                 this.logCanContainCredentials = envSetting == "true";
             }
