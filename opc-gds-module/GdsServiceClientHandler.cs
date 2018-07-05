@@ -1,5 +1,10 @@
-﻿using Microsoft.Azure.IoTSolutions.GdsVault.WebService.Client;
-using Microsoft.Azure.IoTSolutions.GdsVault.WebService.Client.Models;
+﻿// ------------------------------------------------------------
+//  Copyright (c) Microsoft Corporation.  All rights reserved.
+//  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
+// ------------------------------------------------------------
+
+using Microsoft.Azure.IIoT.OpcUa.Services.Gds.Api;
+using Microsoft.Azure.IIoT.OpcUa.Services.Gds.Api.Models;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using System;
@@ -10,38 +15,27 @@ using System.Threading.Tasks;
 
 namespace Opc.Ua.Gds.Server
 {
-    public class GdsVaultConfig: IGdsVaultConfig
+    public class GdsServiceClientHandler
     {
-        public GdsVaultConfig(string url)
+        //private string _appId;
+        private IOpcGds _gdsServiceClient;
+        //private ClientAssertionCertificate _assertionCert;
+
+        public IOpcGds GdsServiceClient { get => _gdsServiceClient; }
+
+        public GdsServiceClientHandler(Uri vaultBaseUrl)
         {
-            GdsVaultServiceApiUrl = url + "/v1";
-        }
-        public string GdsVaultServiceApiUrl { get; }
-    }
-
-    public class GdsVaultClientHandler
-    {
-        private string _vaultBaseUrl;
-        private string _appId;
-        private IGdsVaultClient _gdsVaultClient;
-        private IGdsVaultConfig _gdsVaultConfig;
-        private ClientAssertionCertificate _assertionCert;
-
-        public IGdsVaultClient GdsVaultClient { get => _gdsVaultClient; }
-
-        public GdsVaultClientHandler(string vaultBaseUrl)
-        {
-            _vaultBaseUrl = vaultBaseUrl;
-            _gdsVaultConfig = new GdsVaultConfig(_vaultBaseUrl);
+            _gdsServiceClient = new OpcGds(vaultBaseUrl);
         }
 
+#if MIST
         public void SetAssertionCertificate(
             string appId,
             X509Certificate2 clientAssertionCertPfx)
         {
             _appId = appId;
             _assertionCert = new ClientAssertionCertificate(appId, clientAssertionCertPfx);
-            _gdsVaultClient = new GdsVaultClient(
+            _gdsServiceClient = new GdsVaultClient(
                 _gdsVaultConfig,
                 new AuthenticationCallback(GetAccessTokenAsync));
         }
@@ -49,7 +43,7 @@ namespace Opc.Ua.Gds.Server
         public void SetTokenProvider()
         {
             AzureServiceTokenProvider azureServiceTokenProvider = new AzureServiceTokenProvider();
-            _gdsVaultClient = new GdsVaultClient(
+            _gdsServiceClient = new GdsVaultClient(
                 _gdsVaultConfig,
                 new AuthenticationCallback(azureServiceTokenProvider.KeyVaultTokenCallback));
         }
@@ -63,14 +57,14 @@ namespace Opc.Ua.Gds.Server
 
         public async Task<string> GetIotHubSecretAsync()
         {
-            var secret = await _gdsVaultClient.GetIotHubSecretAsync().ConfigureAwait(false);
+            var secret = await _gdsServiceClient.GetIotHubSecretAsync().ConfigureAwait(false);
             return secret.Secret;
         }
-
+#endif
         public async Task<X509Certificate2Collection> GetCACertificateChainAsync(string id)
         {
             var result = new X509Certificate2Collection();
-            var chainApiModel = await _gdsVaultClient.GetCACertificateChainAsync(id).ConfigureAwait(false);
+            var chainApiModel = await _gdsServiceClient.GetCACertificateChainAsync(id).ConfigureAwait(false);
             foreach (var certApiModel in chainApiModel.Chain)
             {
                 var cert = new X509Certificate2(Convert.FromBase64String(certApiModel.Certificate));
@@ -82,7 +76,7 @@ namespace Opc.Ua.Gds.Server
         public async Task<IList<Opc.Ua.X509CRL>> GetCACrlChainAsync(string id)
         {
             var result = new List<Opc.Ua.X509CRL>();
-            var chainApiModel = await _gdsVaultClient.GetCACrlChainAsync(id).ConfigureAwait(false);
+            var chainApiModel = await _gdsServiceClient.GetCACrlChainAsync(id).ConfigureAwait(false);
             foreach (var certApiModel in chainApiModel.Chain)
             {
                 var crl = new Opc.Ua.X509CRL(Convert.FromBase64String(certApiModel.Crl));
@@ -93,22 +87,22 @@ namespace Opc.Ua.Gds.Server
 
         public async Task<CertificateGroupConfigurationCollection> GetCertificateConfigurationGroupsAsync(string baseStorePath)
         {
-            var groups = await _gdsVaultClient.GetCertificateGroupConfiguration().ConfigureAwait(false);
+            var groups = await _gdsServiceClient.GetCertificateGroupConfigurationCollectionAsync().ConfigureAwait(false);
             var groupCollection = new CertificateGroupConfigurationCollection();
             foreach (var group in groups.Groups)
             {
                 var newGroup = new CertificateGroupConfiguration()
                 {
-                    Id = group.Id,
+                    Id = group.Name,
                     CertificateType = group.CertificateType,
                     SubjectName = group.SubjectName,
-                    BaseStorePath = baseStorePath + Path.DirectorySeparatorChar + group.Id,
-                    DefaultCertificateHashSize = group.DefaultCertificateHashSize,
-                    DefaultCertificateKeySize = group.DefaultCertificateKeySize,
-                    DefaultCertificateLifetime = group.DefaultCertificateLifetime,
-                    CACertificateHashSize = group.CACertificateHashSize,
-                    CACertificateKeySize = group.CACertificateKeySize,
-                    CACertificateLifetime = group.CACertificateLifetime
+                    BaseStorePath = baseStorePath + Path.DirectorySeparatorChar + group.Name,
+                    DefaultCertificateHashSize = (ushort)group.DefaultCertificateHashSize,
+                    DefaultCertificateKeySize = (ushort)group.DefaultCertificateKeySize,
+                    DefaultCertificateLifetime = (ushort)group.DefaultCertificateLifetime,
+                    CACertificateHashSize = (ushort)group.CACertificateHashSize,
+                    CACertificateKeySize = (ushort)group.CACertificateKeySize,
+                    CACertificateLifetime = (ushort)group.CACertificateLifetime
                 };
                 groupCollection.Add(newGroup);
             }
@@ -125,7 +119,7 @@ namespace Opc.Ua.Gds.Server
                 ApplicationURI = application.ApplicationUri,
                 Csr = Convert.ToBase64String(certificateRequest)
             };
-            var certModel = await _gdsVaultClient.SigningRequestAsync(id, sr).ConfigureAwait(false);
+            var certModel = await _gdsServiceClient.SigningRequestAsync(id, sr).ConfigureAwait(false);
             return new X509Certificate2(Convert.FromBase64String(certModel.Certificate));
         }
 
@@ -139,7 +133,7 @@ namespace Opc.Ua.Gds.Server
                 Subject = certificate.Subject,
                 Thumbprint = certificate.Thumbprint
             };
-            var crlModel = await _gdsVaultClient.RevokeCertificateAsync(id, certModel).ConfigureAwait(false);
+            var crlModel = await _gdsServiceClient.RevokeCertificateAsync(id, certModel).ConfigureAwait(false);
             return new Opc.Ua.X509CRL(Convert.FromBase64String(crlModel.Crl));
 
         }
@@ -160,7 +154,7 @@ namespace Opc.Ua.Gds.Server
                 PrivateKeyFormat = privateKeyFormat,
                 PrivateKeyPassword = privateKeyPassword
             };
-            var nkpModel = await _gdsVaultClient.NewKeyPairRequestAsync(id, certModel).ConfigureAwait(false);
+            var nkpModel = await _gdsServiceClient.NewKeyPairRequestAsync(id, certModel).ConfigureAwait(false);
             return new X509Certificate2KeyPair(
                 new X509Certificate2(Convert.FromBase64String(nkpModel.Certificate)),
                 nkpModel.PrivateKeyFormat,

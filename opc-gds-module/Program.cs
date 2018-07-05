@@ -1,4 +1,9 @@
-﻿using Mono.Options;
+﻿// ------------------------------------------------------------
+//  Copyright (c) Microsoft Corporation.  All rights reserved.
+//  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
+// ------------------------------------------------------------
+
+using Mono.Options;
 using Opc.Ua.Configuration;
 using Opc.Ua.Gds.Server.Database.CosmosDB;
 using Opc.Ua.Server;
@@ -63,9 +68,11 @@ namespace Opc.Ua.Gds.Server
     public class Program
     {
 
+        public static string Name = "Azure Industrial IoT Edge OPC UA Global Discovery Server";
+
         public static int Main(string[] args)
         {
-            Console.WriteLine("Azure IoT Manufacturing Edge OPC UA Global Discovery Server");
+            Console.WriteLine("Azure Industrial IoT Edge OPC UA Global Discovery Server");
 
             // command line options
             bool showHelp = false;
@@ -99,7 +106,7 @@ namespace Opc.Ua.Gds.Server
 
             if (showHelp)
             {
-                Console.WriteLine("Usage: dotnet EdgeGlobalDiscoveryServer.dll [OPTIONS]");
+                Console.WriteLine("Usage: dotnet Microsoft.Azure.IIoT.OpcUa.Services.Gds.Edge.dll [OPTIONS]");
                 Console.WriteLine();
 
                 Console.WriteLine("Options:");
@@ -197,9 +204,9 @@ namespace Opc.Ua.Gds.Server
             ApplicationInstance.MessageDlg = new ApplicationMessageDlg();
             ApplicationInstance application = new ApplicationInstance
             {
-                ApplicationName = "Azure IoT Manufacturing Edge Global Discovery Server",
+                ApplicationName = Program.Name,
                 ApplicationType = ApplicationType.Server,
-                ConfigSectionName = "Opc.Ua.EdgeGlobalDiscoveryServer"
+                ConfigSectionName = "Microsoft.Azure.IIoT.OpcUa.Services.Gds.Edge"
             };
 
             // load the application configuration.
@@ -258,7 +265,8 @@ namespace Opc.Ua.Gds.Server
             }
 
             // The vault handler with authentication
-            var gdsVaultHandler = new GdsVaultClientHandler(gdsVaultServiceUrl);
+            var gdsVaultHandler = new GdsServiceClientHandler(new Uri(gdsVaultServiceUrl));
+#if TODO
             if (String.IsNullOrEmpty(appId))
             {
                 // authenticate key vault with MSI (web app) or developer user account
@@ -269,12 +277,12 @@ namespace Opc.Ua.Gds.Server
                 // authenticate key vault with app cert
                 gdsVaultHandler.SetAssertionCertificate(appId, await config.SecurityConfiguration.ApplicationCertificate.LoadPrivateKey(string.Empty));
             }
-
+#endif
             // read configurations from GDS Vault
             gdsConfiguration.CertificateGroups = await gdsVaultHandler.GetCertificateConfigurationGroupsAsync(gdsConfiguration.BaseCertificateGroupStorePath);
             UpdateGDSConfigurationDocument(config.Extensions, gdsConfiguration);
 
-            var certGroup = new GdsVaultCertificateGroup(gdsVaultHandler);
+            var certGroup = new GdsServiceCertificateGroup(gdsVaultHandler);
             if (!String.IsNullOrEmpty(dbServiceUrl))
             {
                 // TODO: use resource token not access key!

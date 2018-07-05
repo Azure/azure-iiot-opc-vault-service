@@ -1,4 +1,9 @@
-﻿using System;
+﻿// ------------------------------------------------------------
+//  Copyright (c) Microsoft Corporation.  All rights reserved.
+//  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
+// ------------------------------------------------------------
+
+using System;
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
@@ -6,12 +11,12 @@ using System.Threading.Tasks;
 namespace Opc.Ua.Gds.Server
 {
 
-    public class GdsVaultCertificateGroup : CertificateGroup
+    public class GdsServiceCertificateGroup : CertificateGroup
     {
-        private GdsVaultClientHandler _gdsVaultHandler;
+        private GdsServiceClientHandler _gdsVaultHandler;
 
-        private GdsVaultCertificateGroup(
-            GdsVaultClientHandler gdsVaultHandler,
+        private GdsServiceCertificateGroup(
+            GdsServiceClientHandler gdsVaultHandler,
             string authoritiesStorePath,
             CertificateGroupConfiguration certificateGroupConfiguration) :
             base(authoritiesStorePath, certificateGroupConfiguration)
@@ -19,7 +24,7 @@ namespace Opc.Ua.Gds.Server
             _gdsVaultHandler = gdsVaultHandler;
         }
 
-        public GdsVaultCertificateGroup(GdsVaultClientHandler gdsVaultHandler)
+        public GdsServiceCertificateGroup(GdsServiceClientHandler gdsVaultHandler)
         {
             _gdsVaultHandler = gdsVaultHandler;
         }
@@ -29,7 +34,7 @@ namespace Opc.Ua.Gds.Server
             string storePath,
             CertificateGroupConfiguration certificateGroupConfiguration)
         {
-            return new GdsVaultCertificateGroup(_gdsVaultHandler, storePath, certificateGroupConfiguration);
+            return new GdsServiceCertificateGroup(_gdsVaultHandler, storePath, certificateGroupConfiguration);
         }
 
         public override async Task Init()

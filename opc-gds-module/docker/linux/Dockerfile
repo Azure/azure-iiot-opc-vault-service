@@ -3,4 +3,4 @@
 COPY ./publish /publish
 WORKDIR /publish
 
-ENTRYPOINT ["dotnet", "EdgeGlobalDiscoveryServer.dll"]
+ENTRYPOINT ["dotnet", "Microsoft.Azure.IIoT.OpcUa.Services.Gds.Edge.dll"]
