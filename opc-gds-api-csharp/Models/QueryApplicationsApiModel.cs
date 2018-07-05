@@ -4,7 +4,7 @@
 // regenerated.
 // </auto-generated>
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Client.Models
+namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Api.Models
 {
     using Newtonsoft.Json;
     using System.Collections;

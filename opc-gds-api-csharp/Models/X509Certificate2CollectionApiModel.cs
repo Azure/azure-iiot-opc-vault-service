@@ -4,27 +4,29 @@
 // regenerated.
 // </auto-generated>
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Client.Models
+namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Api.Models
 {
     using Newtonsoft.Json;
     using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
 
-    public partial class X509CrlCollectionApiModel
+    public partial class X509Certificate2CollectionApiModel
     {
         /// <summary>
-        /// Initializes a new instance of the X509CrlCollectionApiModel class.
+        /// Initializes a new instance of the
+        /// X509Certificate2CollectionApiModel class.
         /// </summary>
-        public X509CrlCollectionApiModel()
+        public X509Certificate2CollectionApiModel()
         {
             CustomInit();
         }
 
         /// <summary>
-        /// Initializes a new instance of the X509CrlCollectionApiModel class.
+        /// Initializes a new instance of the
+        /// X509Certificate2CollectionApiModel class.
         /// </summary>
-        public X509CrlCollectionApiModel(IList<X509CrlApiModel> chain = default(IList<X509CrlApiModel>))
+        public X509Certificate2CollectionApiModel(IList<X509Certificate2ApiModel> chain = default(IList<X509Certificate2ApiModel>))
         {
             Chain = chain;
             CustomInit();
@@ -38,7 +40,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Client.Models
         /// <summary>
         /// </summary>
         [JsonProperty(PropertyName = "Chain")]
-        public IList<X509CrlApiModel> Chain { get; set; }
+        public IList<X509Certificate2ApiModel> Chain { get; set; }
 
     }
 }

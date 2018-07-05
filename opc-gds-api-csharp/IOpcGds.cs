@@ -4,7 +4,7 @@
 // regenerated.
 // </auto-generated>
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Client
+namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Api
 {
     using Microsoft.Rest;
     using Models;
