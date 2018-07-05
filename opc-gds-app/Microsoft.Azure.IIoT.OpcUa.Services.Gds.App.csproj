@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CosmosDB.Models\Microsoft.Azure.IIoT.OpcUa.Services.Gds.CosmosDB.Models.csproj" />
+    <ProjectReference Include="..\opc-gds-common\Microsoft.Azure.IIoT.OpcUa.Services.Gds.Common.csproj" />
   </ItemGroup>
 
 </Project>

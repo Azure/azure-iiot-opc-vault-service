@@ -1,16 +1,17 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
-using Microsoft.Azure.IIoT.OpcUa.Services.Gds.CosmosDB.Models;
+using Microsoft.Azure.IIoT.OpcUa.Services.Gds.Common.CosmosDB;
+using Microsoft.Azure.IIoT.OpcUa.Services.Gds.Common.Models;
 using System;
+using System.Threading.Tasks;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.CosmosDB.Controllers
+namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Common.Controllers
 {
     [Authorize]
-    public class ApplicationController : Controller
+    public class CertificateRequestController : Controller
     {
-        private readonly IDocumentDBCollection<Application> db;
-        public ApplicationController(IDocumentDBCollection<Application> db)
+        private readonly IDocumentDBCollection<CertificateRequest> db;
+        public CertificateRequestController(IDocumentDBCollection<CertificateRequest> db)
         {
             this.db = db;
         }
@@ -18,8 +19,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.CosmosDB.Controllers
         [ActionName("Index")]
         public async Task<ActionResult> IndexAsync()
         {
-            var applications = await db.GetAsync(x => true);
-            return View(applications);
+            var requests = await db.GetAsync(x => true);
+            return View(requests);
         }
 
 #pragma warning disable 1998
@@ -33,29 +34,29 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.CosmosDB.Controllers
         [HttpPost]
         [ActionName("Create")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> CreateAsync([Bind("ApplicationId,ApplicationName,ApplicationUri")] Application application)
+        public async Task<ActionResult> CreateAsync([Bind("RequestId,ApplicationId,State")] CertificateRequest request)
         {
             if (ModelState.IsValid)
             {
-                await db.CreateAsync(application);
+                await db.CreateAsync(request);
                 return RedirectToAction("Index");
             }
 
-            return View(application);
+            return View(request);
         }
 
         [HttpPost]
         [ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> EditAsync([Bind("ApplicationId,ApplicationName,ApplicationUri")] Application application)
+        public async Task<ActionResult> EditAsync([Bind("RequestId,ApplicationId,State")] CertificateRequest request)
         {
             if (ModelState.IsValid)
             {
-                await db.UpdateAsync(application.ApplicationId, application);
+                await db.UpdateAsync(request.RequestId, request);
                 return RedirectToAction("Index");
             }
 
-            return View(application);
+            return View(request);
         }
 
         [ActionName("Edit")]
@@ -66,13 +67,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.CosmosDB.Controllers
                 return new BadRequestResult();
             }
 
-            Application application = await db.GetAsync(id);
-            if (application == null)
+            CertificateRequest request = await db.GetAsync(id);
+            if (request == null)
             {
                 return new NotFoundResult();
             }
 
-            return View(application);
+            return View(request);
         }
 
         [ActionName("Delete")]
@@ -83,19 +84,19 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.CosmosDB.Controllers
                 return new BadRequestResult();
             }
 
-            Application application = await db.GetAsync(id);
-            if (application == null)
+            CertificateRequest request = await db.GetAsync(id);
+            if (request == null)
             {
                 return new NotFoundResult();
             }
 
-            return View(application);
+            return View(request);
         }
 
         [HttpPost]
         [ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> DeleteConfirmedAsync([Bind("Id")] Guid id)
+        public async Task<ActionResult> DeleteConfirmedAsync([Bind("RequestId")] Guid id)
         {
             await db.DeleteAsync(id);
             return RedirectToAction("Index");
@@ -104,8 +105,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.CosmosDB.Controllers
         [ActionName("Details")]
         public async Task<ActionResult> DetailsAsync(Guid id)
         {
-            Application application = await db.GetAsync(id);
-            return View(application);
+            CertificateRequest request = await db.GetAsync(id);
+            return View(request);
         }
     }
 }
