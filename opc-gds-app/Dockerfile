@@ -5,10 +5,10 @@ EXPOSE 44342
 
 FROM microsoft/dotnet:2.1-sdk AS build
 WORKDIR /src
-COPY opc-gds-app/Microsoft.Azure.IIoT.OpcUa.Services.Gds.App.csproj GdsVault.App/
-RUN dotnet restore opc-gds-app/Microsoft.Azure.IIoT.OpcUa.Services.Gds.App.csproj
+COPY opc-gds-app/Microsoft.Azure.IIoT.OpcUa.Services.Gds.App.csproj Gds.App/
+RUN dotnet restore Gds.App/Microsoft.Azure.IIoT.OpcUa.Services.Gds.App.csproj
 COPY . .
-WORKDIR /src/GdsVault.App
+WORKDIR /src/Gds.App
 RUN dotnet build Microsoft.Azure.IIoT.OpcUa.Services.Gds.App.csproj -c Release -o /app
 
 FROM build AS publish
