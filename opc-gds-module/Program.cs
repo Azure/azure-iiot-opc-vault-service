@@ -286,9 +286,10 @@ namespace Opc.Ua.Gds.Server
             if (!String.IsNullOrEmpty(dbServiceUrl))
             {
                 // TODO: use resource token not access key!
-                var database = new CosmosDBApplicationsDatabase(dbServiceUrl, dbServiceKey);
-                database.Initialize();
-                server = new GlobalDiscoverySampleServer(database, database, certGroup);
+                var requestDB = new CosmosDBApplicationsDatabase(dbServiceUrl, dbServiceKey);
+                requestDB.Initialize();
+                var appDB = new GdsServiceApplicationsDatabase(gdsVaultHandler.GdsServiceClient);
+                server = new GlobalDiscoverySampleServer(appDB, requestDB, certGroup);
             }
             else
             {

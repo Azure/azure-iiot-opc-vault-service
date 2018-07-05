@@ -5,8 +5,6 @@
 
 using Microsoft.Azure.IIoT.OpcUa.Services.Gds.Api;
 using Microsoft.Azure.IIoT.OpcUa.Services.Gds.Api.Models;
-using Microsoft.Azure.Services.AppAuthentication;
-using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -17,10 +15,7 @@ namespace Opc.Ua.Gds.Server
 {
     public class GdsServiceClientHandler
     {
-        //private string _appId;
         private IOpcGds _gdsServiceClient;
-        //private ClientAssertionCertificate _assertionCert;
-
         public IOpcGds GdsServiceClient { get => _gdsServiceClient; }
 
         public GdsServiceClientHandler(Uri vaultBaseUrl)
@@ -28,39 +23,6 @@ namespace Opc.Ua.Gds.Server
             _gdsServiceClient = new OpcGds(vaultBaseUrl);
         }
 
-#if MIST
-        public void SetAssertionCertificate(
-            string appId,
-            X509Certificate2 clientAssertionCertPfx)
-        {
-            _appId = appId;
-            _assertionCert = new ClientAssertionCertificate(appId, clientAssertionCertPfx);
-            _gdsServiceClient = new GdsVaultClient(
-                _gdsVaultConfig,
-                new AuthenticationCallback(GetAccessTokenAsync));
-        }
-
-        public void SetTokenProvider()
-        {
-            AzureServiceTokenProvider azureServiceTokenProvider = new AzureServiceTokenProvider();
-            _gdsServiceClient = new GdsVaultClient(
-                _gdsVaultConfig,
-                new AuthenticationCallback(azureServiceTokenProvider.KeyVaultTokenCallback));
-        }
-
-        private async Task<string> GetAccessTokenAsync(string authority, string resource, string scope)
-        {
-            var context = new AuthenticationContext(authority, TokenCache.DefaultShared);
-            var result = await context.AcquireTokenAsync(resource, _assertionCert);
-            return result.AccessToken;
-        }
-
-        public async Task<string> GetIotHubSecretAsync()
-        {
-            var secret = await _gdsServiceClient.GetIotHubSecretAsync().ConfigureAwait(false);
-            return secret.Secret;
-        }
-#endif
         public async Task<X509Certificate2Collection> GetCACertificateChainAsync(string id)
         {
             var result = new X509Certificate2Collection();
@@ -135,7 +97,6 @@ namespace Opc.Ua.Gds.Server
             };
             var crlModel = await _gdsServiceClient.RevokeCertificateAsync(id, certModel).ConfigureAwait(false);
             return new Opc.Ua.X509CRL(Convert.FromBase64String(crlModel.Crl));
-
         }
 
         public async Task<X509Certificate2KeyPair> NewKeyPairRequestAsync(
@@ -160,7 +121,6 @@ namespace Opc.Ua.Gds.Server
                 nkpModel.PrivateKeyFormat,
                 Convert.FromBase64String(nkpModel.PrivateKey));
         }
-
     }
 }
 
