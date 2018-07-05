@@ -1,10 +1,16 @@
-﻿using Microsoft.Azure.Documents;
+﻿// ------------------------------------------------------------
+//  Copyright (c) Microsoft Corporation.  All rights reserved.
+//  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
+// ------------------------------------------------------------
+
+
+using Microsoft.Azure.Documents;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.CosmosDB.Models
+namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Common.CosmosDB
 {
     public interface IDocumentDBCollection<T> where T : class
     {
