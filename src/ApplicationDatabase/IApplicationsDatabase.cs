@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds
 {
-    public interface IApplicationDatabase
+    public interface IApplicationsDatabase
     {
         Task<string> RegisterApplicationAsync(Application application);
         Task<string> UpdateApplicationAsync(string id, Application application);
@@ -28,5 +28,15 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds
             out DateTime lastCounterResetTime,
             out uint nextRecordId
             );
+        Task<Application[]> QueryServersAsync(
+            uint startingRecordId,
+            uint maxRecordsToReturn,
+            string applicationName,
+            string applicationUri,
+            string productUri,
+            string[] serverCapabilities,
+            out DateTime lastCounterResetTime
+            );
+
     }
 }

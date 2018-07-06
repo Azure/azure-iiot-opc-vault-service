@@ -4,8 +4,10 @@
 // ------------------------------------------------------------
 
 
+using Microsoft.Azure.IIoT.OpcUa.Services.Gds.Common.Models;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.v1.Models
 {
@@ -23,6 +25,26 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.v1.Models
             )
         {
             this.Servers = servers;
+            this.LastCounterResetTime = lastCounterResetTime;
+        }
+
+        public QueryServersResponseApiModel(
+            Application[] applications,
+            DateTime lastCounterResetTime
+            )
+        {
+            var servers = new List<ServerOnNetworkApiModel>();
+            if (applications != null)
+            {
+                foreach (var application in applications)
+                {
+                    foreach (var discoverUrl in application.DiscoveryUrls)
+                    {
+                        servers.Add(new ServerOnNetworkApiModel(application, discoverUrl));
+                    }
+                }
+            }
+            this.Servers = servers.ToArray();
             this.LastCounterResetTime = lastCounterResetTime;
         }
 

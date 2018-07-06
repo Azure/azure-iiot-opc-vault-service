@@ -16,12 +16,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.v1.Controllers
 {
     [Route(VersionInfo.PATH + "/app"), TypeFilter(typeof(ExceptionsFilterAttribute))]
     [Produces("application/json")]
-
     public sealed class ApplicationController : Controller
     {
-        private readonly IApplicationDatabase _applicationDatabase;
+        private readonly IApplicationsDatabase _applicationDatabase;
 
-        public ApplicationController(IApplicationDatabase applicationDatabase)
+        public ApplicationController(IApplicationsDatabase applicationDatabase)
         {
             this._applicationDatabase = applicationDatabase;
         }
@@ -33,6 +32,10 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.v1.Controllers
         [SwaggerOperation(operationId: "RegisterApplication")]
         public async Task<string> RegisterApplicationAsync([FromBody] ApplicationRecordApiModel application)
         {
+            if (application == null)
+            {
+                throw new ArgumentNullException(nameof(application));
+            }
             return await _applicationDatabase.RegisterApplicationAsync(application.ToServiceModel());
         }
 
@@ -43,6 +46,10 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.v1.Controllers
         [SwaggerOperation(operationId: "UpdateApplication")]
         public async Task<string> UpdateApplicationAsync(string id, [FromBody] ApplicationRecordApiModel application)
         {
+            if (application == null)
+            {
+                throw new ArgumentNullException(nameof(application));
+            }
             return await _applicationDatabase.UpdateApplicationAsync(id, application.ToServiceModel());
         }
 
@@ -78,7 +85,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.v1.Controllers
         }
 
         /// <summary>Query applications</summary>
-        [HttpGet("query")]
+        [HttpPost("query")]
         [SwaggerOperation(operationId: "QueryApplications")]
         public async Task<QueryApplicationsResponseApiModel> QueryApplicationsAsync([FromBody] QueryApplicationsApiModel query)
         {
@@ -96,6 +103,26 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.v1.Controllers
                 out nextRecordId
                 );
             return new QueryApplicationsResponseApiModel(result, lastCounterResetTime, nextRecordId);
+        }
+
+        [HttpPost("servers")]
+        [SwaggerOperation(operationId: "QueryServers")]
+        public async Task<QueryServersResponseApiModel> QueryServersAsync([FromBody] QueryServersApiModel query)
+        {
+            DateTime lastCounterResetTime;
+            uint nextRecordId;
+            var result = await _applicationDatabase.QueryApplicationsAsync(
+                query.StartingRecordId,
+                query.MaxRecordsToReturn,
+                query.ApplicationName,
+                query.ApplicationUri,
+                0,
+                query.ProductUri,
+                query.ServerCapabilities,
+                out lastCounterResetTime,
+                out nextRecordId
+                );
+            return new QueryServersResponseApiModel(result, lastCounterResetTime);
         }
     }
 }

@@ -196,6 +196,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds
             // Register endpoint services and ...
             builder.RegisterType<CertificateGroup>()
                 .AsImplementedInterfaces().SingleInstance();
+            builder.RegisterType<CosmosDBApplicationsDatabase>()
+                .AsImplementedInterfaces().SingleInstance();
 
             // ... with bearer auth
             if (Config.AuthRequired)

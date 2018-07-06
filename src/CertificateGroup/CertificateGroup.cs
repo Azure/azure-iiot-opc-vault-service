@@ -19,6 +19,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds
 
     public sealed class CertificateGroup : ICertificateGroup
     {
+        private readonly KeyVaultServiceClient _keyVaultServiceClient;
+        private readonly ILogger _log;
         public CertificateGroup(
             IServicesConfig config,
             ILogger logger)
@@ -165,9 +167,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds
         {
             return await _keyVaultServiceClient.GetCertificateVersionsAsync(id).ConfigureAwait(false);
         }
-
-        private readonly KeyVaultServiceClient _keyVaultServiceClient;
-        private readonly ILogger _log;
 
     }
 }

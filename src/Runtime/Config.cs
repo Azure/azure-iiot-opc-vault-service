@@ -24,7 +24,10 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Runtime
         private const string KeyVaultKey = "keyvault:";
         private const string KeyVaultApiUrlKey = KeyVaultKey + "serviceuri";
         private const string KeyVaultApiTimeoutKey = KeyVaultKey + "timeout";
-        
+        private const string CosmosDBKey = "cosmosdb:";
+        private const string CosmosDBEndpointKey = CosmosDBKey + "endpoint";
+        private const string CosmosDBTokenKey = CosmosDBKey + "token";
+
         /// <summary>
         /// The configuration data.
         /// </summary>
@@ -51,9 +54,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Runtime
             new ServicesConfig
             {
                 KeyVaultApiUrl = this.ConfigData.GetString(KeyVaultApiUrlKey),
-                KeyVaultApiTimeout = this.ConfigData.GetInt(KeyVaultApiTimeoutKey)
+                KeyVaultApiTimeout = this.ConfigData.GetInt(KeyVaultApiTimeoutKey),
+                CosmosDBEndpoint = this.ConfigData.GetString(CosmosDBEndpointKey),
+                CosmosDBToken = this.ConfigData.GetString(CosmosDBTokenKey)
             };
-
+#if TODO
         /// <summary>
         /// Auth configuration
         /// </summary>
@@ -82,7 +87,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Runtime
         /// <summary>JWT clock skew</summary>
         public TimeSpan JwtClockSkew =>
             TimeSpan.FromSeconds(ConfigData.GetInt(JWT_CLOCK_SKEW_KEY, 120));
-
+#endif
     }
 }
 

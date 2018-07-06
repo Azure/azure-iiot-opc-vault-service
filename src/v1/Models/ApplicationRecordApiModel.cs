@@ -14,7 +14,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.v1.Models
     public sealed class ApplicationRecordApiModel
     {
         [JsonProperty(PropertyName = "ApplicationId", Order = 10)]
-        public Guid ApplicationId { get; set; }
+        public string ApplicationId { get; set; }
 
         [JsonProperty(PropertyName = "ApplicationUri", Order = 20)]
         public string ApplicationUri { get; set; }
@@ -37,9 +37,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.v1.Models
         [JsonProperty(PropertyName = "ServerCapabilities", Order = 80)]
         public string ServerCapabilities { get; set; }
 
+        public ApplicationRecordApiModel()
+        {
+        }
+
         public ApplicationRecordApiModel(Application application)
         {
-            this.ApplicationId = application.ApplicationId;
+            this.ApplicationId = application.ApplicationId.ToString();
             this.ApplicationUri = application.ApplicationUri;
             this.ApplicationName = application.ApplicationName;
             this.ApplicationType = application.ApplicationType;
@@ -51,13 +55,14 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.v1.Models
             }
             this.ApplicationNames = applicationNames.ToArray();
             this.ProductUri = application.ProductUri;
+            this.DiscoveryUrls = application.DiscoveryUrls;
             this.ServerCapabilities = application.ServerCapabilities;
         }
 
         public Application ToServiceModel()
         {
             var application = new Application();
-            application.ApplicationId = this.ApplicationId;
+            application.ApplicationId = new Guid(this.ApplicationId);
             application.ApplicationUri = this.ApplicationUri;
             application.ApplicationName = this.ApplicationName;
             application.ApplicationType = this.ApplicationType;
@@ -71,6 +76,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.v1.Models
                 application.ApplicationNames = applicationNames.ToArray();
             }
             application.ProductUri = this.ProductUri;
+            application.DiscoveryUrls = this.DiscoveryUrls;
             application.ServerCapabilities = this.ServerCapabilities;
             return application;
         }

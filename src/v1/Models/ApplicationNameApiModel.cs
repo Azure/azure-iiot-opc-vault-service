@@ -17,6 +17,10 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.v1.Models
         [JsonProperty(PropertyName = "Text", Order = 20)]
         public string Text { get; set; }
 
+        public ApplicationNameApiModel()
+        {
+        }
+
         public ApplicationNameApiModel(ApplicationName applicationName)
         {
             this.Locale = applicationName.Locale;
