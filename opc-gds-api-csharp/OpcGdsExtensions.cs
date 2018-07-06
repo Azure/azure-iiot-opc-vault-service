@@ -213,6 +213,32 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Api
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
+            /// <param name='query'>
+            /// </param>
+            public static QueryServersResponseApiModel QueryServers(this IOpcGds operations, QueryServersApiModel query = default(QueryServersApiModel))
+            {
+                return operations.QueryServersAsync(query).GetAwaiter().GetResult();
+            }
+
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='query'>
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<QueryServersResponseApiModel> QueryServersAsync(this IOpcGds operations, QueryServersApiModel query = default(QueryServersApiModel), CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.QueryServersWithHttpMessagesAsync(query, null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
             public static CertificateGroupListApiModel GetCertificateGroupIds(this IOpcGds operations)
             {
                 return operations.GetCertificateGroupIdsAsync().GetAwaiter().GetResult();
@@ -531,9 +557,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Api
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
-            public static StatusApiModel V1StatusGet(this IOpcGds operations)
+            public static StatusApiModel GetStatus(this IOpcGds operations)
             {
-                return operations.V1StatusGetAsync().GetAwaiter().GetResult();
+                return operations.GetStatusAsync().GetAwaiter().GetResult();
             }
 
             /// <param name='operations'>
@@ -542,9 +568,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Api
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<StatusApiModel> V1StatusGetAsync(this IOpcGds operations, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<StatusApiModel> GetStatusAsync(this IOpcGds operations, CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.V1StatusGetWithHttpMessagesAsync(null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.GetStatusWithHttpMessagesAsync(null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }

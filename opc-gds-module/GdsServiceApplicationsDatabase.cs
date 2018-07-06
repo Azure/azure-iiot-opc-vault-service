@@ -5,12 +5,8 @@
 
 using Microsoft.Azure.IIoT.OpcUa.Services.Gds.Api;
 using Microsoft.Azure.IIoT.OpcUa.Services.Gds.Api.Models;
-using Microsoft.Azure.IIoT.OpcUa.Services.Gds.Common.CosmosDB;
-using Microsoft.Azure.IIoT.OpcUa.Services.Gds.Common.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Security;
 
 namespace Opc.Ua.Gds.Server.Database.CosmosDB
 {
@@ -32,50 +28,56 @@ namespace Opc.Ua.Gds.Server.Database.CosmosDB
                 ApplicationRecordDataType application
                 )
         {
+            bool isUpdate = true;
             NodeId appNodeId = base.RegisterApplication(application);
             if (NodeId.IsNull(appNodeId))
             {
                 appNodeId = new NodeId(Guid.NewGuid(), NamespaceIndex);
+                isUpdate = false;
             }
 
             Guid applicationId = GetNodeIdGuid(appNodeId);
             string capabilities = base.ServerCapabilities(application);
 
-            if (applicationId != Guid.Empty)
+            ApplicationRecordApiModel applicationModel = new ApplicationRecordApiModel
             {
-                ApplicationRecordApiModel applicationModel = new ApplicationRecordApiModel
-                {
-                    ApplicationId = applicationId,
-                    ApplicationUri = application.ApplicationUri,
-                    ApplicationName = application.ApplicationNames[0].Text,
-                    ApplicationType = (int)application.ApplicationType,
-                    ProductUri = application.ProductUri,
-                    ServerCapabilities = capabilities
-                };
+                ApplicationId = applicationId.ToString(),
+                ApplicationUri = application.ApplicationUri,
+                ApplicationName = application.ApplicationNames[0].Text,
+                ApplicationType = (int)application.ApplicationType,
+                ProductUri = application.ProductUri,
+                ServerCapabilities = capabilities
+            };
 
-                if (application.DiscoveryUrls != null)
-                {
-                    applicationModel.DiscoveryUrls = application.DiscoveryUrls.ToArray();
-                }
-
-                if (application.ApplicationNames != null && application.ApplicationNames.Count > 0)
-                {
-                    var applicationNames = new List<ApplicationNameApiModel>();
-                    foreach (var applicationName in application.ApplicationNames)
-                    {
-                        applicationNames.Add(new ApplicationNameApiModel()
-                        {
-                            Locale = applicationName.Locale,
-                            Text = applicationName.Text
-                        });
-                    }
-                    applicationModel.ApplicationNames = applicationNames.ToArray();
-                }
-
-                string nodeId = _gdsServiceClient.RegisterApplication(applicationModel);
-
-                // TODO verify result
+            if (application.DiscoveryUrls != null)
+            {
+                applicationModel.DiscoveryUrls = application.DiscoveryUrls.ToArray();
             }
+
+            if (application.ApplicationNames != null && application.ApplicationNames.Count > 0)
+            {
+                var applicationNames = new List<ApplicationNameApiModel>();
+                foreach (var applicationName in application.ApplicationNames)
+                {
+                    applicationNames.Add(new ApplicationNameApiModel()
+                    {
+                        Locale = applicationName.Locale,
+                        Text = applicationName.Text
+                    });
+                }
+                applicationModel.ApplicationNames = applicationNames.ToArray();
+            }
+
+            if (isUpdate)
+            {
+                string nodeId = _gdsServiceClient.UpdateApplication(applicationId.ToString(), applicationModel);
+            }
+            else
+            {
+                var appIdResult = _gdsServiceClient.RegisterApplication(applicationModel);
+                applicationId = new Guid(appIdResult);
+            }
+
             return new NodeId(applicationId, NamespaceIndex);
         }
 
@@ -208,21 +210,6 @@ namespace Opc.Ua.Gds.Server.Database.CosmosDB
             }
 
             return records.ToArray();
-        }
-
-        private string CreateServerQuery(uint startingRecordId, uint maxRecordsToQuery)
-        {
-            string query;
-            if (maxRecordsToQuery != 0)
-            {
-                query = String.Format("SELECT TOP {0}", maxRecordsToQuery);
-            }
-            else
-            {
-                query = String.Format("SELECT");
-            }
-            query += String.Format(" * FROM Applications a WHERE a.ID >= {0} ORDER BY a.ID", startingRecordId);
-            return query;
         }
 
         public override ServerOnNetwork[] QueryServers(
