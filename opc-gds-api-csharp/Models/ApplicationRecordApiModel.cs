@@ -24,7 +24,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Api.Models
         /// <summary>
         /// Initializes a new instance of the ApplicationRecordApiModel class.
         /// </summary>
-        public ApplicationRecordApiModel(System.Guid? applicationId = default(System.Guid?), string applicationUri = default(string), string applicationName = default(string), int? applicationType = default(int?), IList<ApplicationNameApiModel> applicationNames = default(IList<ApplicationNameApiModel>), string productUri = default(string), IList<string> discoveryUrls = default(IList<string>), string serverCapabilities = default(string))
+        public ApplicationRecordApiModel(string applicationId = default(string), string applicationUri = default(string), string applicationName = default(string), int? applicationType = default(int?), IList<ApplicationNameApiModel> applicationNames = default(IList<ApplicationNameApiModel>), string productUri = default(string), IList<string> discoveryUrls = default(IList<string>), string serverCapabilities = default(string))
         {
             ApplicationId = applicationId;
             ApplicationUri = applicationUri;
@@ -45,7 +45,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Api.Models
         /// <summary>
         /// </summary>
         [JsonProperty(PropertyName = "ApplicationId")]
-        public System.Guid? ApplicationId { get; set; }
+        public string ApplicationId { get; set; }
 
         /// <summary>
         /// </summary>
