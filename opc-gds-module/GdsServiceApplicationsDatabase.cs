@@ -82,14 +82,8 @@ namespace Opc.Ua.Gds.Server.Database.CosmosDB
         }
 
 
-        public override void UnregisterApplication(
-            NodeId applicationId,
-            out byte[] certificate,
-            out byte[] httpsCertificate)
+        public override void UnregisterApplication(NodeId applicationId)
         {
-            certificate = null;
-            httpsCertificate = null;
-
             Guid id = GetNodeIdGuid(applicationId);
 
             try
@@ -100,9 +94,6 @@ namespace Opc.Ua.Gds.Server.Database.CosmosDB
             {
                 throw new ArgumentException("A record with the specified application id does not exist.", nameof(applicationId));
             }
-
-            // TODO: read certs
-
         }
 
         public override ApplicationRecordDataType GetApplication(

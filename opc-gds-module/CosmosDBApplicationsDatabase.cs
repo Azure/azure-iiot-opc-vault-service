@@ -110,14 +110,8 @@ namespace Opc.Ua.Gds.Server.Database.CosmosDB
         }
 
 
-        public override void UnregisterApplication(
-            NodeId applicationId,
-            out byte[] certificate,
-            out byte[] httpsCertificate)
+        public override void UnregisterApplication(NodeId applicationId)
         {
-            certificate = null;
-            httpsCertificate = null;
-
             Guid id = GetNodeIdGuid(applicationId);
 
             List<byte[]> certificates = new List<byte[]>();
@@ -127,9 +121,6 @@ namespace Opc.Ua.Gds.Server.Database.CosmosDB
             {
                 throw new ArgumentException("A record with the specified application id does not exist.", nameof(applicationId));
             }
-
-            certificate = application.Certificate;
-            httpsCertificate = application.HttpsCertificate;
 
             var certificateRequests = CertificateRequests.GetAsync(ii => ii.ApplicationId == id).Result;
             foreach (var entry in new List<CertificateRequest>(certificateRequests))
