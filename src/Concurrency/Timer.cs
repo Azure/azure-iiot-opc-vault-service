@@ -8,7 +8,7 @@ using Microsoft.Azure.IIoT.Diagnostics;
 using System;
 using System.Threading;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Concurrency
+namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Concurrency
 {
     public interface ITimer
     {

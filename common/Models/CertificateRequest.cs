@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 using Opc.Ua;
 using System;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Common.Models
+namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Models
 {
     public enum CertificateRequestState
     {

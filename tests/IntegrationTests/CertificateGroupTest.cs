@@ -5,8 +5,8 @@
 
 
 using Microsoft.Azure.IIoT.Diagnostics;
-using Microsoft.Azure.IIoT.OpcUa.Services.Gds.Runtime;
-using Microsoft.Azure.IIoT.OpcUa.Services.Gds.Test.Helpers;
+using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Runtime;
+using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Test.Helpers;
 using Opc.Ua;
 using Opc.Ua.Gds;
 using Opc.Ua.Test;
@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Test
+namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Test
 {
     public class ApplicationTestData
     {

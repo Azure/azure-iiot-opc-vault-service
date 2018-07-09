@@ -4,7 +4,7 @@
 // ------------------------------------------------------------
 
 
-using Microsoft.Azure.IIoT.OpcUa.Services.Gds.Exceptions;
+using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Exceptions;
 using Microsoft.Azure.IIoT.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -12,7 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Runtime
+namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Runtime
 {
     public interface IConfigData
     {

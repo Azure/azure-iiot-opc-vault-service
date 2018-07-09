@@ -82,7 +82,7 @@ namespace Opc.Ua.Gds.Server
             string cosmosDBKey = null;
 
             Mono.Options.OptionSet options = new Mono.Options.OptionSet {
-                { "g|gdsvault=", "GDS Vault Url", g => gdsVault = g },
+                { "g|gdsvault=", "GdsVault Url", g => gdsVault = g },
                 { "a|appid=", "Active Directory Application Id", a => appID = a },
                 { "c|cosmosdb=", "Cosmos DB Url", c => cosmosDB = c },
                 { "k|key=", "Cosmos DB Key", k => cosmosDBKey = k },
@@ -206,7 +206,7 @@ namespace Opc.Ua.Gds.Server
             {
                 ApplicationName = Program.Name,
                 ApplicationType = ApplicationType.Server,
-                ConfigSectionName = "Microsoft.Azure.IIoT.OpcUa.Services.Gds.Edge"
+                ConfigSectionName = "Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Edge"
             };
 
             // load the application configuration.
@@ -278,7 +278,7 @@ namespace Opc.Ua.Gds.Server
                 gdsVaultHandler.SetAssertionCertificate(appId, await config.SecurityConfiguration.ApplicationCertificate.LoadPrivateKey(string.Empty));
             }
 #endif
-            // read configurations from GDS Vault
+            // read configurations from GdsVault
             gdsConfiguration.CertificateGroups = await gdsVaultHandler.GetCertificateConfigurationGroupsAsync(gdsConfiguration.BaseCertificateGroupStorePath);
             UpdateGDSConfigurationDocument(config.Extensions, gdsConfiguration);
 

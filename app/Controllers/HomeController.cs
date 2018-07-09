@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.IIoT.OpcUa.Services.Gds.App.Models;
+using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Models;
 using System.Diagnostics;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.App.Controllers
+namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Controllers
 {
     [Authorize]
     public class HomeController : Controller

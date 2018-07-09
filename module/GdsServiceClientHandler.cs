@@ -3,8 +3,8 @@
 //  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------
 
-using Microsoft.Azure.IIoT.OpcUa.Services.Gds.Api;
-using Microsoft.Azure.IIoT.OpcUa.Services.Gds.Api.Models;
+using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api;
+using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;

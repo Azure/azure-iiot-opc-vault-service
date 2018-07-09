@@ -11,7 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Runtime
+namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Runtime
 {
     /// <summary>Web service configuration</summary>
     public class Config : ServiceConfig

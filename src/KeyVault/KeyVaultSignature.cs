@@ -15,7 +15,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.KeyVault
+namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.KeyVault
 {
     public class KeyVaultCertFactory
     {

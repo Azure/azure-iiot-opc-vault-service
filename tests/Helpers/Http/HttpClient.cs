@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Xunit.Abstractions;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Test.Helpers.Http
+namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Test.Helpers.Http
 {
     public interface IHttpClient
     {

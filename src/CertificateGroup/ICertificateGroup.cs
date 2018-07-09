@@ -4,12 +4,12 @@
 // ------------------------------------------------------------
 
 
-using Microsoft.Azure.IIoT.OpcUa.Services.Gds.Models;
+using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Models;
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds
+namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
 {
     public interface ICertificateGroup
     {

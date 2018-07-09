@@ -4,10 +4,10 @@
 // ------------------------------------------------------------
 
 
-using Microsoft.Azure.IIoT.OpcUa.Services.Gds.Models;
+using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Models;
 using Newtonsoft.Json;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.v1.Models
+namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models
 {
     public sealed class TrustListApiModel
     {

@@ -4,11 +4,11 @@
 // ------------------------------------------------------------
 
 
-using Microsoft.Azure.IIoT.OpcUa.Services.Gds.Common.Models;
+using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Models;
 using System;
 using System.Threading.Tasks;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds
+namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
 {
     public interface IApplicationsDatabase
     {

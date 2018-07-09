@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.IIoT.OpcUa.Services.Gds.Common.CosmosDB;
-using Microsoft.Azure.IIoT.OpcUa.Services.Gds.Common.Models;
+using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.CosmosDB;
+using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Models;
 using System;
 using System.Threading.Tasks;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Common.Controllers
+namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Controllers
 {
     [Authorize]
     public class CertificateRequestController : Controller

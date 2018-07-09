@@ -6,7 +6,7 @@
 
 using System;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.v1.Exceptions
+namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Exceptions
 {
     public class BadRequestException : Exception
     {

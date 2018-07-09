@@ -4,7 +4,7 @@
 // ------------------------------------------------------------
 
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.v1.Auth {
+namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Auth {
     using System.Collections.Generic;
 
     /// <summary>

@@ -3,7 +3,7 @@
 //  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Runtime {
+namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Runtime {
 using System;
 
     /// <summary>

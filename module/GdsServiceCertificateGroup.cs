@@ -242,7 +242,7 @@ namespace Opc.Ua.Gds.Server
             string subjectName
             )
         {
-            throw new NotImplementedException("CA creation not supported with GDS vault. Certificate is created and managed by gdsVault administrator.");
+            throw new NotImplementedException("CA creation not supported with GdsVault. Certificate is created and managed by gdsVault administrator.");
         }
 
         /// <summary>

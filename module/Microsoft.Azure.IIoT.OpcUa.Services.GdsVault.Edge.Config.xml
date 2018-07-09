@@ -137,7 +137,7 @@
           <CertificateGroupConfiguration>
             <Id>Default</Id>
             <CertificateType>RsaSha256CertificateType</CertificateType>
-            <SubjectName>CN=Azure Industrial IoT GDS CA, O=Microsoft Corp.</SubjectName>
+            <SubjectName>CN=Azure Industrial IoT CA, O=Microsoft Corp.</SubjectName>
             <BaseStorePath>%LocalApplicationData%/Microsoft/GDS/PKI/CA/default</BaseStorePath>
             <DefaultCertificateLifetime>12</DefaultCertificateLifetime>
             <DefaultCertificateKeySize>2048</DefaultCertificateKeySize>

@@ -5,12 +5,12 @@
 
 
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.IIoT.OpcUa.Services.Gds.v1.Filters;
-using Microsoft.Azure.IIoT.OpcUa.Services.Gds.v1.Models;
+using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Filters;
+using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Threading.Tasks;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.v1.Controllers
+namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
 {
     [Route(VersionInfo.PATH + "/groups"), TypeFilter(typeof(ExceptionsFilterAttribute))]
     [Produces("application/json")]

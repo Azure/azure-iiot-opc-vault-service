@@ -5,16 +5,16 @@
 
 
 using Microsoft.Azure.IIoT.Diagnostics;
-using Microsoft.Azure.IIoT.OpcUa.Services.Gds.KeyVault;
-using Microsoft.Azure.IIoT.OpcUa.Services.Gds.Models;
-using Microsoft.Azure.IIoT.OpcUa.Services.Gds.Runtime;
+using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.KeyVault;
+using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Models;
+using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Runtime;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds
+namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
 {
 
     public sealed class CertificateGroup : ICertificateGroup

@@ -4,7 +4,7 @@
 // ------------------------------------------------------------
 
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Runtime
+namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Runtime
 {
     public interface IServicesConfig
     {

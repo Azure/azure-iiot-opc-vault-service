@@ -4,8 +4,8 @@
 // ------------------------------------------------------------
 
 
-using Microsoft.Azure.IIoT.OpcUa.Services.Gds.Exceptions;
-using Microsoft.Azure.IIoT.OpcUa.Services.Gds.KeyVault;
+using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Exceptions;
+using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.KeyVault;
 using Newtonsoft.Json;
 using Opc.Ua;
 using Opc.Ua.Gds;
@@ -15,9 +15,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
-using static Microsoft.Azure.IIoT.OpcUa.Services.Gds.KeyVault.KeyVaultCertFactory;
+using static Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.KeyVault.KeyVaultCertFactory;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.Models
+namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Models
 {
     public class KeyVaultTrustList
     {

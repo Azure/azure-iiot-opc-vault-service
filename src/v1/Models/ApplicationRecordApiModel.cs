@@ -4,12 +4,12 @@
 // ------------------------------------------------------------
 
 
-using Microsoft.Azure.IIoT.OpcUa.Services.Gds.Common.Models;
+using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.v1.Models
+namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models
 {
     public sealed class ApplicationRecordApiModel
     {

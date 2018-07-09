@@ -3,7 +3,7 @@
 //  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds
+namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
 {
 
     /// <summary>
@@ -15,17 +15,17 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds
         /// <summary>
         /// ID
         /// </summary>
-        public const string ID = "IIOT_OPCUA_GDS";
+        public const string ID = "IIOT_OPCUA_GDSVAULT";
 
         /// <summary>
         /// Name of service
         /// </summary>
-        public const string NAME = "Opc-Gds";
+        public const string NAME = "Opc-GdsVault";
 
         /// <summary>
         /// Description of service
         /// </summary>
-        public const string DESCRIPTION = "OPC UA GDS Service";
+        public const string DESCRIPTION = "OPC UA GdsVault Service";
 
     }
 }

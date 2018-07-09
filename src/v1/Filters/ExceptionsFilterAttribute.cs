@@ -7,8 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Azure.IIoT.Diagnostics;
-using Microsoft.Azure.IIoT.OpcUa.Services.Gds.Exceptions;
-using Microsoft.Azure.IIoT.OpcUa.Services.Gds.v1.Exceptions;
+using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Exceptions;
+using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Exceptions;
 using Newtonsoft.Json;
 using System;
 using System.Buffers;
@@ -16,7 +16,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.v1.Filters
+namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Filters
 {
     /// <summary>
     /// Detect all the unhandled exceptions returned by the API controllers

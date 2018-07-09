@@ -6,10 +6,10 @@
 
 using System;
 using System.Collections.Generic;
-using Microsoft.Azure.IIoT.OpcUa.Services.Gds.Runtime;
+using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Runtime;
 using Newtonsoft.Json;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds.v1.Models
+namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models
 {
     public sealed class StatusApiModel
     {
