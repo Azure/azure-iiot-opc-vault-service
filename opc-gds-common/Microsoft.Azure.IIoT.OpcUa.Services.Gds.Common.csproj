@@ -5,8 +5,12 @@
     <AssemblyName>Microsoft.Azure.IIoT.OpcUa.Services.Gds.Common</AssemblyName>
     <RootNamespace>Microsoft.Azure.IIoT.OpcUa.Services.Gds.Common</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Configurations>Debug;Release;Develop</Configurations>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Develop|AnyCPU'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
@@ -15,7 +19,7 @@
   </ItemGroup>
 
   <Choose>
-    <When Condition="Exists('..\..\UA-.NETStandard')">
+    <When Condition="Exists('..\..\UA-.NETStandard') and '$(Configuration)'=='Develop'">
       <ItemGroup>
         <ProjectReference Include="..\..\UA-.NETStandard\SampleApplications\Samples\GDS\ServerCommon\GlobalDiscoveryServerLibrary.csproj" />
         <ProjectReference Include="..\..\UA-.NETStandard\SampleApplications\SDK\Opc.Ua.Configuration\Opc.Ua.Configuration.csproj" />

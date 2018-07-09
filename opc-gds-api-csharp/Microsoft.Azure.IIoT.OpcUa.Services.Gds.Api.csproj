@@ -13,6 +13,7 @@
     <Authors>Microsoft Azure Industrial IoT</Authors>
     <PackageLicenseUrl>https://github.com/Azure/iot-opc-gdsvault-service/blob/master/LICENSE</PackageLicenseUrl>
     <Copyright>Copyright © 2018 Microsoft Corp. All rights reserved.</Copyright>
+    <Configurations>Debug;Release;Develop</Configurations>
   </PropertyGroup>
 
   <ItemGroup>

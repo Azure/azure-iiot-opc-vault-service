@@ -5,6 +5,7 @@
     <UserSecretsId>aspnet-Gds.App-5A0E1F7B-A23C-46EF-8EC8-349C434E72BE</UserSecretsId>
     <WebProject_DirectoryAccessLevelKey>0</WebProject_DirectoryAccessLevelKey>
     <DockerTargetOS>Linux</DockerTargetOS>
+    <Configurations>Debug;Release;Develop</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
