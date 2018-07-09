@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\opc-gds-common\Microsoft.Azure.IIoT.OpcUa.Services.Gds.Common.csproj" />
+    <ProjectReference Include="..\common\Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.csproj" />
   </ItemGroup>
 
 </Project>

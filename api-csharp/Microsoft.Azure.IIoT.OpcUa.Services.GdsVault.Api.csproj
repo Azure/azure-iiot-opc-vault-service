@@ -3,15 +3,14 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard1.4;netstandard2.0</TargetFrameworks>
     <LangVersion>6</LangVersion>
-    <AssemblyName>Microsoft.Azure.IIoT.OpcUa.Services.Gds.Api</AssemblyName>
-    <RootNamespace>Microsoft.Azure.IIoT.OpcUa.Services.Gds.Api</RootNamespace>
+    <AssemblyName>Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api</AssemblyName>
+    <RootNamespace>Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <Company>Microsoft</Company>
-    <Product>Microsoft Azure Industrial IoT OPC UA GDS Service Api</Product>
-    <Description>Microsoft Azure Industrial IoT OPC UA GDS Service Api</Description>
-    <Authors>Microsoft Azure Industrial IoT</Authors>
-    <PackageLicenseUrl>https://github.com/Azure/iot-opc-gdsvault-service/blob/master/LICENSE</PackageLicenseUrl>
+    <Product>Microsoft Azure Industrial IoT OPC UA GDS Vault Service Api</Product>
+    <Description>Microsoft Azure Industrial IoT OPC UA GDS Vault Service Api</Description>
+    <PackageLicenseUrl>https://github.com/Azure/azure-iiot-opc-gds-service/blob/master/LICENSE</PackageLicenseUrl>
     <Copyright>Copyright © 2018 Microsoft Corp. All rights reserved.</Copyright>
     <Configurations>Debug;Release;Develop</Configurations>
   </PropertyGroup>

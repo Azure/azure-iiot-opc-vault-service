@@ -2,8 +2,8 @@
   <PropertyGroup>
     <LangVersion>6</LangVersion>
     <TargetFrameworks>netstandard1.5;netstandard2.0</TargetFrameworks>
-    <AssemblyName>Microsoft.Azure.IIoT.OpcUa.Services.Gds.Common</AssemblyName>
-    <RootNamespace>Microsoft.Azure.IIoT.OpcUa.Services.Gds.Common</RootNamespace>
+    <AssemblyName>Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common</AssemblyName>
+    <RootNamespace>Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Configurations>Debug;Release;Develop</Configurations>
   </PropertyGroup>

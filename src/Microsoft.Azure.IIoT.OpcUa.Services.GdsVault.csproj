@@ -2,25 +2,25 @@
   <PropertyGroup>
     <LangVersion>7.2</LangVersion>
     <TargetFramework>netcoreapp2.1</TargetFramework>
-    <AssemblyName>Microsoft.Azure.IIoT.OpcUa.Services.Gds</AssemblyName>
-    <RootNamespace>Microsoft.Azure.IIoT.OpcUa.Services.Gds</RootNamespace>
-    <Product>Microsoft Azure Industrial IoT OPC UA GDS Service</Product>
+    <AssemblyName>Microsoft.Azure.IIoT.OpcUa.Services.GdsVault</AssemblyName>
+    <RootNamespace>Microsoft.Azure.IIoT.OpcUa.Services.GdsVault</RootNamespace>
+    <Product>Microsoft Azure Industrial IoT OPC UA GDS Vault Service</Product>
     <Authors>Azure Industrial IoT</Authors>
     <Company>Microsoft</Company>
     <PackageLicenseUrl>https://github.com/Azure/azure-iiot-opc-gds-service/blob/master/LICENSE</PackageLicenseUrl>
     <Copyright>Microsoft Corp. All rights reserved.</Copyright>
-    <Description>Azure IoT Industrial shared component</Description>
+    <Description>Azure Industrial IoT common component</Description>
     <UserSecretsId>71f9c347-48d7-4f74-8f1b-c3df149c26c8</UserSecretsId>
     <Configurations>Debug;Release;Develop</Configurations>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\netcoreapp2.1\Microsoft.Azure.IIoT.OpcUa.Services.Gds.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\netcoreapp2.1\Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Develop|AnyCPU'">
-    <DocumentationFile>bin\Debug\netcoreapp2.1\Microsoft.Azure.IIoT.OpcUa.Services.Gds.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\netcoreapp2.1\Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin\Release\netcoreapp2.1\Microsoft.Azure.IIoT.OpcUa.Services.Gds.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\netcoreapp2.1\Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -47,7 +47,7 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="2.5.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\opc-gds-common\Microsoft.Azure.IIoT.OpcUa.Services.Gds.Common.csproj" />
+    <ProjectReference Include="..\common\Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.csproj" />
   </ItemGroup>
   <ItemGroup>
     <!-- "Service Include" required by IntelliJ Rider -->
