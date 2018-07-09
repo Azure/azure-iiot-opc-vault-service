@@ -29,14 +29,18 @@ namespace Opc.Ua.Gds.Server.Database.CosmosDB
                 )
         {
             bool isUpdate = true;
+            Guid applicationId;
             NodeId appNodeId = base.RegisterApplication(application);
             if (NodeId.IsNull(appNodeId))
             {
-                appNodeId = new NodeId(Guid.NewGuid(), NamespaceIndex);
                 isUpdate = false;
+                applicationId = Guid.Empty;
+            }
+            else
+            {
+                applicationId = GetNodeIdGuid(appNodeId);
             }
 
-            Guid applicationId = GetNodeIdGuid(appNodeId);
             string capabilities = base.ServerCapabilities(application);
 
             ApplicationRecordApiModel applicationModel = new ApplicationRecordApiModel
@@ -137,9 +141,20 @@ namespace Opc.Ua.Gds.Server.Database.CosmosDB
                 capabilities.AddRange(result.ServerCapabilities.Split(','));
             }
 
+            NodeId appNodeId;
+            var appIdGuid = new Guid(result.ApplicationId);
+            if (appIdGuid == null || appIdGuid == Guid.Empty)
+            {
+                appNodeId = new NodeId(result.ApplicationId, NamespaceIndex);
+            }
+            else
+            {
+                appNodeId = new NodeId(appIdGuid, NamespaceIndex);
+            }
+
             return new ApplicationRecordDataType()
             {
-                ApplicationId = new NodeId(result.ApplicationId, NamespaceIndex),
+                ApplicationId = appNodeId,
                 ApplicationUri = result.ApplicationUri,
                 ApplicationType = (ApplicationType)result.ApplicationType,
                 ApplicationNames = new LocalizedTextCollection(names),
@@ -188,9 +203,20 @@ namespace Opc.Ua.Gds.Server.Database.CosmosDB
                     capabilities = result.ServerCapabilities.Split(',');
                 }
 
+                NodeId appNodeId;
+                var appIdGuid = new Guid(result.ApplicationId);
+                if (appIdGuid == null || appIdGuid == Guid.Empty)
+                {
+                    appNodeId = new NodeId(result.ApplicationId, NamespaceIndex);
+                }
+                else
+                {
+                    appNodeId = new NodeId(appIdGuid, NamespaceIndex);
+                }
+
                 records.Add(new ApplicationRecordDataType()
                 {
-                    ApplicationId = new NodeId(result.ApplicationId, NamespaceIndex),
+                    ApplicationId = appNodeId,
                     ApplicationUri = result.ApplicationUri,
                     ApplicationType = (ApplicationType)result.ApplicationType,
                     ApplicationNames = new LocalizedTextCollection(names),
