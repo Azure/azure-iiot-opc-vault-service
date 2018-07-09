@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "EdgeGlobalDiscoveryServer": {
-      "commandName": "Project",
-      "commandLineArgs": "-g http://iopgds.azurewebsites.net/ -c https://iopgds.documents.azure.com -k "
-    }
-  }
-}
