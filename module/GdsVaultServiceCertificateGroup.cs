@@ -11,12 +11,12 @@ using System.Threading.Tasks;
 namespace Opc.Ua.Gds.Server
 {
 
-    public class GdsServiceCertificateGroup : CertificateGroup
+    public class GdsVaultServiceCertificateGroup : CertificateGroup
     {
-        private GdsServiceClientHandler _gdsVaultHandler;
+        private GdsVaultServiceClientHandler _gdsVaultHandler;
 
-        private GdsServiceCertificateGroup(
-            GdsServiceClientHandler gdsVaultHandler,
+        private GdsVaultServiceCertificateGroup(
+            GdsVaultServiceClientHandler gdsVaultHandler,
             string authoritiesStorePath,
             CertificateGroupConfiguration certificateGroupConfiguration) :
             base(authoritiesStorePath, certificateGroupConfiguration)
@@ -24,7 +24,7 @@ namespace Opc.Ua.Gds.Server
             _gdsVaultHandler = gdsVaultHandler;
         }
 
-        public GdsServiceCertificateGroup(GdsServiceClientHandler gdsVaultHandler)
+        public GdsVaultServiceCertificateGroup(GdsVaultServiceClientHandler gdsVaultHandler)
         {
             _gdsVaultHandler = gdsVaultHandler;
         }
@@ -34,7 +34,7 @@ namespace Opc.Ua.Gds.Server
             string storePath,
             CertificateGroupConfiguration certificateGroupConfiguration)
         {
-            return new GdsServiceCertificateGroup(_gdsVaultHandler, storePath, certificateGroupConfiguration);
+            return new GdsVaultServiceCertificateGroup(_gdsVaultHandler, storePath, certificateGroupConfiguration);
         }
 
         public override async Task Init()

@@ -3,6 +3,8 @@
 //  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------
 
+// TODO: remove cosmosdb direct access
+
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.CosmosDB;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Models;
 using System;

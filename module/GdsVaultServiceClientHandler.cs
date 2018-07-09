@@ -13,14 +13,14 @@ using System.Threading.Tasks;
 
 namespace Opc.Ua.Gds.Server
 {
-    public class GdsServiceClientHandler
+    public class GdsVaultServiceClientHandler
     {
-        private IOpcGds _gdsServiceClient;
-        public IOpcGds GdsServiceClient { get => _gdsServiceClient; }
+        private IOpcGdsVault _gdsServiceClient;
+        public IOpcGdsVault GdsServiceClient { get => _gdsServiceClient; }
 
-        public GdsServiceClientHandler(Uri vaultBaseUrl)
+        public GdsVaultServiceClientHandler(Uri vaultBaseUrl)
         {
-            _gdsServiceClient = new OpcGds(vaultBaseUrl);
+            _gdsServiceClient = new OpcGdsVault(vaultBaseUrl);
         }
 
         public async Task<X509Certificate2Collection> GetCACertificateChainAsync(string id)

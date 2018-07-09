@@ -72,7 +72,7 @@ namespace Opc.Ua.Gds.Server
 
         public static int Main(string[] args)
         {
-            Console.WriteLine("Azure Industrial IoT Edge OPC UA Global Discovery Server");
+            Console.WriteLine(Name);
 
             // command line options
             bool showHelp = false;
@@ -106,7 +106,7 @@ namespace Opc.Ua.Gds.Server
 
             if (showHelp)
             {
-                Console.WriteLine("Usage: dotnet Microsoft.Azure.IIoT.OpcUa.Services.Gds.Edge.dll [OPTIONS]");
+                Console.WriteLine("Usage: dotnet Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Edge.dll [OPTIONS]");
                 Console.WriteLine();
 
                 Console.WriteLine("Options:");
@@ -225,10 +225,10 @@ namespace Opc.Ua.Gds.Server
             }
 
             // get the DatabaseStorePath configuration parameter.
-            GlobalDiscoveryServerConfiguration gdsConfiguration = config.ParseExtension<GlobalDiscoveryServerConfiguration>();
+            GlobalDiscoveryServerConfiguration gdsVaultConfiguration = config.ParseExtension<GlobalDiscoveryServerConfiguration>();
 
             // extract appId and vault name from database storage path
-            string[] keyVaultConfig = gdsConfiguration.DatabaseStorePath?.Split(',');
+            string[] keyVaultConfig = gdsVaultConfiguration.DatabaseStorePath?.Split(',');
             if (keyVaultConfig != null)
             {
                 if (String.IsNullOrEmpty(gdsVaultServiceUrl))
@@ -265,7 +265,7 @@ namespace Opc.Ua.Gds.Server
             }
 
             // The vault handler with authentication
-            var gdsVaultHandler = new GdsServiceClientHandler(new Uri(gdsVaultServiceUrl));
+            var gdsVaultHandler = new GdsVaultServiceClientHandler(new Uri(gdsVaultServiceUrl));
 #if TODO
             if (String.IsNullOrEmpty(appId))
             {
@@ -279,16 +279,16 @@ namespace Opc.Ua.Gds.Server
             }
 #endif
             // read configurations from GdsVault
-            gdsConfiguration.CertificateGroups = await gdsVaultHandler.GetCertificateConfigurationGroupsAsync(gdsConfiguration.BaseCertificateGroupStorePath);
-            UpdateGDSConfigurationDocument(config.Extensions, gdsConfiguration);
+            gdsVaultConfiguration.CertificateGroups = await gdsVaultHandler.GetCertificateConfigurationGroupsAsync(gdsVaultConfiguration.BaseCertificateGroupStorePath);
+            UpdateGDSConfigurationDocument(config.Extensions, gdsVaultConfiguration);
 
-            var certGroup = new GdsServiceCertificateGroup(gdsVaultHandler);
+            var certGroup = new GdsVaultServiceCertificateGroup(gdsVaultHandler);
             if (!String.IsNullOrEmpty(dbServiceUrl))
             {
                 // TODO: use resource token not access key!
                 var requestDB = new CosmosDBApplicationsDatabase(dbServiceUrl, dbServiceKey);
                 requestDB.Initialize();
-                var appDB = new GdsServiceApplicationsDatabase(gdsVaultHandler.GdsServiceClient);
+                var appDB = new GdsVaultServiceApplicationsDatabase(gdsVaultHandler.GdsServiceClient);
                 server = new GlobalDiscoverySampleServer(appDB, requestDB, certGroup);
             }
             else

@@ -10,13 +10,13 @@ using System.Collections.Generic;
 
 namespace Opc.Ua.Gds.Server.Database.CosmosDB
 {
-    public class GdsServiceApplicationsDatabase : ApplicationsDatabaseBase
+    public class GdsVaultServiceApplicationsDatabase : ApplicationsDatabaseBase
     {
-        private IOpcGds _gdsServiceClient { get; }
+        private IOpcGdsVault _gdsVaultServiceClient { get; }
 
-        public GdsServiceApplicationsDatabase(IOpcGds GdsServiceClient)
+        public GdsVaultServiceApplicationsDatabase(IOpcGdsVault GdsVaultServiceClient)
         {
-            this._gdsServiceClient = GdsServiceClient;
+            this._gdsVaultServiceClient = GdsVaultServiceClient;
         }
 
         #region IApplicationsDatabase 
@@ -74,11 +74,11 @@ namespace Opc.Ua.Gds.Server.Database.CosmosDB
 
             if (isUpdate)
             {
-                string nodeId = _gdsServiceClient.UpdateApplication(applicationId.ToString(), applicationModel);
+                string nodeId = _gdsVaultServiceClient.UpdateApplication(applicationId.ToString(), applicationModel);
             }
             else
             {
-                var appIdResult = _gdsServiceClient.RegisterApplication(applicationModel);
+                var appIdResult = _gdsVaultServiceClient.RegisterApplication(applicationModel);
                 applicationId = new Guid(appIdResult);
             }
 
@@ -92,7 +92,7 @@ namespace Opc.Ua.Gds.Server.Database.CosmosDB
 
             try
             {
-                _gdsServiceClient.UnregisterApplication(id.ToString());
+                _gdsVaultServiceClient.UnregisterApplication(id.ToString());
             }
             catch
             {
@@ -109,7 +109,7 @@ namespace Opc.Ua.Gds.Server.Database.CosmosDB
 
             try
             {
-                result = _gdsServiceClient.GetApplication(id.ToString());
+                result = _gdsVaultServiceClient.GetApplication(id.ToString());
             }
             catch
             {
@@ -170,7 +170,7 @@ namespace Opc.Ua.Gds.Server.Database.CosmosDB
         {
             IList<ApplicationRecordApiModel> results;
 
-            results = _gdsServiceClient.FindApplication(applicationUri);
+            results = _gdsVaultServiceClient.FindApplication(applicationUri);
 
             List<ApplicationRecordDataType> records = new List<ApplicationRecordDataType>();
 

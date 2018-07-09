@@ -18,9 +18,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
     using System.Threading.Tasks;
 
     /// <summary>
-    /// OPC UA GDS Service
+    /// OPC UA GdsVault Service
     /// </summary>
-    public partial class OpcGds : ServiceClient<OpcGds>, IOpcGds
+    public partial class OpcGdsVault : ServiceClient<OpcGdsVault>, IOpcGdsVault
     {
         /// <summary>
         /// The base URI of the service.
@@ -38,18 +38,18 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
         public JsonSerializerSettings DeserializationSettings { get; private set; }
 
         /// <summary>
-        /// Initializes a new instance of the OpcGds class.
+        /// Initializes a new instance of the OpcGdsVault class.
         /// </summary>
         /// <param name='handlers'>
         /// Optional. The delegating handlers to add to the http client pipeline.
         /// </param>
-        public OpcGds(params DelegatingHandler[] handlers) : base(handlers)
+        public OpcGdsVault(params DelegatingHandler[] handlers) : base(handlers)
         {
             Initialize();
         }
 
         /// <summary>
-        /// Initializes a new instance of the OpcGds class.
+        /// Initializes a new instance of the OpcGdsVault class.
         /// </summary>
         /// <param name='rootHandler'>
         /// Optional. The http client handler used to handle http transport.
@@ -57,13 +57,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
         /// <param name='handlers'>
         /// Optional. The delegating handlers to add to the http client pipeline.
         /// </param>
-        public OpcGds(HttpClientHandler rootHandler, params DelegatingHandler[] handlers) : base(rootHandler, handlers)
+        public OpcGdsVault(HttpClientHandler rootHandler, params DelegatingHandler[] handlers) : base(rootHandler, handlers)
         {
             Initialize();
         }
 
         /// <summary>
-        /// Initializes a new instance of the OpcGds class.
+        /// Initializes a new instance of the OpcGdsVault class.
         /// </summary>
         /// <param name='baseUri'>
         /// Optional. The base URI of the service.
@@ -74,7 +74,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
         /// <exception cref="System.ArgumentNullException">
         /// Thrown when a required parameter is null
         /// </exception>
-        public OpcGds(System.Uri baseUri, params DelegatingHandler[] handlers) : this(handlers)
+        public OpcGdsVault(System.Uri baseUri, params DelegatingHandler[] handlers) : this(handlers)
         {
             if (baseUri == null)
             {
@@ -84,7 +84,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
         }
 
         /// <summary>
-        /// Initializes a new instance of the OpcGds class.
+        /// Initializes a new instance of the OpcGdsVault class.
         /// </summary>
         /// <param name='baseUri'>
         /// Optional. The base URI of the service.
@@ -98,7 +98,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
         /// <exception cref="System.ArgumentNullException">
         /// Thrown when a required parameter is null
         /// </exception>
-        public OpcGds(System.Uri baseUri, HttpClientHandler rootHandler, params DelegatingHandler[] handlers) : this(rootHandler, handlers)
+        public OpcGdsVault(System.Uri baseUri, HttpClientHandler rootHandler, params DelegatingHandler[] handlers) : this(rootHandler, handlers)
         {
             if (baseUri == null)
             {
