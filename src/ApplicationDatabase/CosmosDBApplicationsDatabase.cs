@@ -41,48 +41,40 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds
 
         public async Task<string> RegisterApplicationAsync(Application application)
         {
+            bool isNew = false;
             Guid applicationId = VerifyRegisterApplication(application);
             if (applicationId == null || Guid.Empty == applicationId)
             {
-                applicationId = Guid.NewGuid();
+                isNew = true;
             }
 
             string capabilities = ServerCapabilities(application);
 
             if (applicationId != Guid.Empty)
             {
-                bool isNew = false;
-                var record = await Applications.GetAsync(applicationId);
+                Application record = await Applications.GetAsync(applicationId);
                 if (record == null)
                 {
-                    applicationId = Guid.NewGuid();
-                    record = new Application()
-                    {
-                        ApplicationId = applicationId
-                    };
+                    application.ApplicationId = Guid.NewGuid();
                     isNew = true;
                 }
-
-                record.ApplicationUri = application.ApplicationUri;
-                record.ApplicationName = application.ApplicationNames[0].Text;
-                record.ApplicationType = application.ApplicationType;
-                record.ProductUri = application.ProductUri;
-                record.ServerCapabilities = capabilities;
-                record.ApplicationNames = application.ApplicationNames;
-                record.DiscoveryUrls = application.DiscoveryUrls;
-
-                if (isNew)
-                {
-                    // find new ID for QueryServers
-                    var maxAppID = await Applications.GetAsync("SELECT TOP 1 * FROM Applications a ORDER BY a.ID DESC");
-                    record.ID = (maxAppID != null) ? maxAppID.SingleOrDefault().ID + 1 : 1;
-                    await Applications.CreateAsync(record);
-                }
-                else
-                {
-                    await Applications.UpdateAsync(record.ApplicationId, record);
-                }
             }
+
+            if (isNew)
+            {
+                // find new ID for QueryServers
+                var maxAppIDEnum = await Applications.GetAsync("SELECT TOP 1 * FROM Applications a ORDER BY a.ID DESC");
+                var maxAppID = maxAppIDEnum.SingleOrDefault();
+                application.ID = (maxAppID != null) ? maxAppID.ID + 1 : 1;
+                application.ApplicationId = Guid.NewGuid();
+                var result = await Applications.CreateAsync(application);
+                applicationId = new Guid(result.Id);
+            }
+            else
+            {
+                await Applications.UpdateAsync(applicationId, application);
+            }
+
             return applicationId.ToString();
         }
 
@@ -105,6 +97,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds
             {
                 application.ApplicationId = applicationId;
             }
+
             string capabilities = ServerCapabilities(application);
 
             if (applicationId != Guid.Empty)
@@ -116,14 +109,14 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds
                 }
 
                 record.ApplicationUri = application.ApplicationUri;
-                record.ApplicationName = application.ApplicationNames[0].Text;
+                record.ApplicationName = application.ApplicationName;
                 record.ApplicationType = application.ApplicationType;
                 record.ProductUri = application.ProductUri;
                 record.ServerCapabilities = capabilities;
                 record.ApplicationNames = application.ApplicationNames;
                 record.DiscoveryUrls = application.DiscoveryUrls;
 
-                await Applications.UpdateAsync(record.ApplicationId, record);
+                await Applications.UpdateAsync(applicationId, record);
             }
             return applicationId.ToString();
         }
@@ -139,16 +132,16 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds
 
             List<byte[]> certificates = new List<byte[]>();
 
-            var application = await Applications.GetAsync(id);
+            var application = await Applications.GetAsync(appId);
             if (application == null)
             {
-                throw new ArgumentException("A record with the specified application id does not exist.", nameof(id));
+                throw new ArgumentException("A record with the specified application id does not exist.", nameof(appId));
             }
 
             var certificateRequests = await CertificateRequests.GetAsync(ii => ii.ApplicationId == appId);
             foreach (var entry in new List<CertificateRequest>(certificateRequests))
             {
-                CertificateRequests.DeleteAsync(entry.RequestId).Wait();
+                await CertificateRequests.DeleteAsync(entry.RequestId);
             }
 
             await Applications.DeleteAsync(appId);
@@ -162,8 +155,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Gds
             }
 
             Guid appId = new Guid(id);
-            var result = await Applications.GetAsync(id);
-            return result.SingleOrDefault();
+            return await Applications.GetAsync(appId);
         }
 
         public async Task<Application[]> FindApplicationAsync(string applicationUri)
