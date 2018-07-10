@@ -43,7 +43,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models
 
         public ApplicationRecordApiModel(Application application)
         {
-            this.ApplicationId = application.ApplicationId.ToString();
+            this.ApplicationId = application.ApplicationId != Guid.Empty ? application.ApplicationId.ToString() : null;
             this.ApplicationUri = application.ApplicationUri;
             this.ApplicationName = application.ApplicationName;
             this.ApplicationType = application.ApplicationType;
@@ -62,7 +62,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models
         public Application ToServiceModel()
         {
             var application = new Application();
-            application.ApplicationId = new Guid(this.ApplicationId);
+            application.ApplicationId = this.ApplicationId != null ? new Guid(this.ApplicationId) : Guid.Empty;
             application.ApplicationUri = this.ApplicationUri;
             application.ApplicationName = this.ApplicationName;
             application.ApplicationType = this.ApplicationType;

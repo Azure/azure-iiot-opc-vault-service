@@ -51,15 +51,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
                 await this.certificateGroups.GetCertificateGroupConfigurationCollection());
         }
 
-#if IOTHUB
-        /// <summary>Get group configuration</summary>
-        [HttpGet("iothub")]
-        public async Task<KeyVaultSecretApiModel> GetIotHubAsync(string id)
-        {
-            return new KeyVaultSecretApiModel(await this.certificateGroups.GetIotHubSecretAsync().ConfigureAwait(false));
-        }
-#endif
-
         /// <summary>Get CA Certificate chain</summary>
         [HttpGet("{groupId}/cacert")]
         [SwaggerOperation(operationId: "GetCACertificateChain")]
