@@ -417,9 +417,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.KeyVault
         /// ii) Then walk all CA cert versions and load all certs tagged with id==Issuer or id==Trusted. 
         ///     Crl is loaded too if CA cert is tagged.
         /// </summary>
-        public async Task<Models.KeyVaultTrustList> GetTrustListAsync(string id, CancellationToken ct = default(CancellationToken))
+        public async Task<Models.KeyVaultTrustListModel> GetTrustListAsync(string id, CancellationToken ct = default(CancellationToken))
         {
-            var trustList = new Models.KeyVaultTrustList(id);
+            var trustList = new Models.KeyVaultTrustListModel(id);
             var secretItems = await _keyVaultClient.GetSecretsAsync(_vaultBaseUrl, MaxResults, ct).ConfigureAwait(false);
 
             while (secretItems != null)

@@ -4,7 +4,6 @@
 // ------------------------------------------------------------
 
 using Newtonsoft.Json;
-using Opc.Ua;
 using System;
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Models
@@ -22,10 +21,10 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Models
     {
         [JsonProperty(PropertyName = "id")]
         public Guid RequestId { get; set; }
-        public Guid ApplicationId { get; set; }
+        public string ApplicationId { get; set; }
         public CertificateRequestState State { get; set; }
-        public NodeId CertificateGroupId { get; set; }
-        public NodeId CertificateTypeId { get; set; }
+        public string CertificateGroupId { get; set; }
+        public string CertificateTypeId { get; set; }
         public byte[] CertificateSigningRequest { get; set; }
         public string SubjectName { get; set; }
         public string[] DomainNames { get; set; }

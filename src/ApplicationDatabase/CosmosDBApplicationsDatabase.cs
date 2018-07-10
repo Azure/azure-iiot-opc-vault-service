@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
 {
-    internal sealed class CosmosDBApplicationsDatabase : IApplicationsDatabase 
+    internal sealed class CosmosDBApplicationsDatabase : IApplicationsDatabase
     {
         private readonly ILogger _log;
         private readonly string Endpoint;
@@ -138,7 +138,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
                 throw new ArgumentException("A record with the specified application id does not exist.", nameof(appId));
             }
 
-            var certificateRequests = await CertificateRequests.GetAsync(ii => ii.ApplicationId == appId);
+            var certificateRequests = await CertificateRequests.GetAsync(ii => ii.ApplicationId == appId.ToString());
             foreach (var entry in new List<CertificateRequest>(certificateRequests))
             {
                 await CertificateRequests.DeleteAsync(entry.RequestId);
@@ -379,292 +379,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
         }
 #endif
         #endregion
-
-        #region ICertificateRequest
-#if mist
-        public NodeId CreateSigningRequest(
-            NodeId applicationId,
-            NodeId certificateGroupId,
-            NodeId certificateTypeId,
-            byte[] certificateRequest,
-            string authorityId)
-        {
-            Guid id = GetNodeIdGuid(applicationId);
-
-            var application = Applications.GetAsync(id).Result;
-            if (application == null)
-            {
-                throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
-            }
-
-            CertificateRequest request = null;
-            bool isNew = false;
-
-            if (request == null)
-            {
-                request = new CertificateRequest() { RequestId = Guid.NewGuid(), AuthorityId = authorityId };
-                isNew = true;
-            }
-
-            request.State = (int)CertificateRequestState.New;
-            request.CertificateGroupId = certificateGroupId;
-            request.CertificateTypeId = certificateTypeId;
-            request.SubjectName = null;
-            request.DomainNames = null;
-            request.PrivateKeyFormat = null;
-            request.PrivateKeyPassword = null;
-            request.CertificateSigningRequest = certificateRequest;
-            request.ApplicationId = id;
-            request.RequestTime = DateTime.UtcNow;
-
-            if (isNew)
-            {
-                CertificateRequests.CreateAsync(request).Wait();
-            }
-            else
-            {
-                CertificateRequests.UpdateAsync(request.RequestId, request).Wait();
-            }
-
-            return new NodeId(request.RequestId, NamespaceIndex);
-        }
-
-        public NodeId CreateNewKeyPairRequest(
-            NodeId applicationId,
-            NodeId certificateGroupId,
-            NodeId certificateTypeId,
-            string subjectName,
-            string[] domainNames,
-            string privateKeyFormat,
-            string privateKeyPassword,
-            string authorityId)
-        {
-            Guid id = GetNodeIdGuid(applicationId);
-
-            var application = Applications.GetAsync(id).Result;
-
-            if (application == null)
-            {
-                throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
-            }
-
-            CertificateRequest request = null;
-            bool isNew = false;
-
-            if (request == null)
-            {
-                request = new CertificateRequest()
-                {
-                    RequestId = Guid.NewGuid(),
-                    AuthorityId = authorityId
-                };
-                isNew = true;
-            }
-
-            request.State = (int)CertificateRequestState.New;
-            request.CertificateGroupId = certificateGroupId;
-            request.CertificateTypeId = certificateTypeId;
-            request.SubjectName = subjectName;
-            request.DomainNames = domainNames;
-            request.PrivateKeyFormat = privateKeyFormat;
-            request.PrivateKeyPassword = privateKeyPassword;
-            request.CertificateSigningRequest = null;
-            request.ApplicationId = id;
-            request.RequestTime = DateTime.UtcNow;
-
-            if (isNew)
-            {
-                CertificateRequests.CreateAsync(request).Wait();
-            }
-            else
-            {
-                CertificateRequests.UpdateAsync(request.RequestId, request).Wait();
-            }
-
-            return new NodeId(request.RequestId, NamespaceIndex);
-        }
-
-        public void ApproveCertificateRequest(
-            NodeId requestId,
-            bool isRejected
-            )
-        {
-            Guid id = GetNodeIdGuid(requestId);
-
-            var request = CertificateRequests.GetAsync(id).Result;
-            if (request == null)
-            {
-                throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
-            }
-
-            if (request.State != Microsoft.Azure.IIoT.OpcUa.Services.Gds.Common.Models.CertificateRequestState.New)
-            {
-                throw new ServiceResultException(StatusCodes.BadInvalidState);
-            }
-
-            if (isRejected)
-            {
-                request.State = Microsoft.Azure.IIoT.OpcUa.Services.Gds.Common.Models.CertificateRequestState.Rejected;
-                // erase information which is not required anymore
-                request.PrivateKeyFormat = null;
-                request.CertificateSigningRequest = null;
-                request.PrivateKeyPassword = null;
-            }
-            else
-            {
-                request.State = Microsoft.Azure.IIoT.OpcUa.Services.Gds.Common.Models.CertificateRequestState.Approved;
-            }
-
-            request.ApproveRejectTime = DateTime.UtcNow;
-
-            CertificateRequests.UpdateAsync(request.RequestId, request).Wait();
-        }
-
-        public void AcceptCertificateRequest(NodeId requestId, byte[] signedCertificate)
-        {
-            Guid id = GetNodeIdGuid(requestId);
-
-            var request = CertificateRequests.GetAsync(id).Result;
-            if (request == null)
-            {
-                throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
-            }
-
-            if (request.State != Microsoft.Azure.IIoT.OpcUa.Services.Gds.Common.Models.CertificateRequestState.Approved)
-            {
-                throw new ServiceResultException(StatusCodes.BadInvalidState);
-            }
-
-            request.State = Microsoft.Azure.IIoT.OpcUa.Services.Gds.Common.Models.CertificateRequestState.Accepted;
-
-            // erase information which is not required anymore
-            request.CertificateSigningRequest = null;
-            request.PrivateKeyFormat = null;
-            request.PrivateKeyPassword = null;
-            request.AcceptTime = DateTime.UtcNow;
-            request.Certificate = signedCertificate;
-
-            CertificateRequests.UpdateAsync(request.RequestId, request).Wait();
-        }
-
-        public CertificateRequestState CompleteCertificateRequest(
-            NodeId applicationId,
-            NodeId requestId,
-            out NodeId certificateGroupId,
-            out NodeId certificateTypeId,
-            out byte[] signedCertificate,
-            out byte[] privateKey)
-        {
-            certificateGroupId = null;
-            certificateTypeId = null;
-            signedCertificate = null;
-            privateKey = null;
-            Guid reqId = GetNodeIdGuid(requestId);
-            Guid appId = GetNodeIdGuid(applicationId);
-
-            var application = Applications.GetAsync(appId).Result;
-            if (application == null)
-            {
-                throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
-            }
-
-            var request = CertificateRequests.GetAsync(reqId).Result;
-            if (request == null)
-            {
-                throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
-            }
-
-            switch (request.State)
-            {
-                case Microsoft.Azure.IIoT.OpcUa.Services.Gds.Common.Models.CertificateRequestState.New:
-                    return CertificateRequestState.New;
-                case Microsoft.Azure.IIoT.OpcUa.Services.Gds.Common.Models.CertificateRequestState.Rejected:
-                    return CertificateRequestState.Rejected;
-                case Microsoft.Azure.IIoT.OpcUa.Services.Gds.Common.Models.CertificateRequestState.Accepted:
-                    return CertificateRequestState.Accepted;
-                case Microsoft.Azure.IIoT.OpcUa.Services.Gds.Common.Models.CertificateRequestState.Approved:
-                    break;
-                default:
-                    throw new ServiceResultException(StatusCodes.BadInvalidArgument);
-            }
-
-            if (request.ApplicationId != appId)
-            {
-                throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
-            }
-
-            certificateGroupId = request.CertificateGroupId;
-            certificateTypeId = request.CertificateTypeId;
-            signedCertificate = request.Certificate;
-            privateKey = request.PrivateKey;
-
-            return CertificateRequestState.Approved;
-        }
-        public CertificateRequestState ReadRequest(
-            NodeId applicationId,
-            NodeId requestId,
-            out NodeId certificateGroupId,
-            out NodeId certificateTypeId,
-            out byte[] certificateRequest,
-            out string subjectName,
-            out string[] domainNames,
-            out string privateKeyFormat,
-            out string privateKeyPassword)
-        {
-            certificateGroupId = null;
-            certificateTypeId = null;
-            certificateRequest = null;
-            subjectName = null;
-            domainNames = null;
-            privateKeyFormat = null;
-            privateKeyPassword = null;
-            Guid reqId = GetNodeIdGuid(requestId);
-            Guid appId = GetNodeIdGuid(applicationId);
-
-            var application = Applications.GetAsync(appId).Result;
-            if (application == null)
-            {
-                throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
-            }
-
-            var request = CertificateRequests.GetAsync(reqId).Result;
-            if (request == null)
-            {
-                throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
-            }
-
-            switch (request.State)
-            {
-                case Microsoft.Azure.IIoT.OpcUa.Services.Gds.Common.Models.CertificateRequestState.New:
-                    return CertificateRequestState.New;
-                case Microsoft.Azure.IIoT.OpcUa.Services.Gds.Common.Models.CertificateRequestState.Rejected:
-                    return CertificateRequestState.Rejected;
-                case Microsoft.Azure.IIoT.OpcUa.Services.Gds.Common.Models.CertificateRequestState.Accepted:
-                    return CertificateRequestState.Accepted;
-                case Microsoft.Azure.IIoT.OpcUa.Services.Gds.Common.Models.CertificateRequestState.Approved:
-                    break;
-                default:
-                    throw new ServiceResultException(StatusCodes.BadInvalidArgument);
-            }
-
-            if (request.ApplicationId != appId)
-            {
-                throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
-            }
-
-            certificateGroupId = request.CertificateGroupId;
-            certificateTypeId = request.CertificateTypeId;
-            certificateRequest = request.CertificateSigningRequest;
-            subjectName = request.SubjectName;
-            domainNames = request.DomainNames;
-            privateKeyFormat = request.PrivateKeyFormat;
-            privateKeyPassword = request.PrivateKeyPassword;
-
-            return CertificateRequestState.Approved;
-        }
-#endif
-        #endregion
-
         #region Private Members
         private void Initialize()
         {
@@ -705,7 +419,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
                 throw new ArgumentException(application.ApplicationUri + " is not a valid URI.", "ApplicationUri");
             }
 
-            if (application.ApplicationType < (int)Opc.Ua.ApplicationType.Server || 
+            if (application.ApplicationType < (int)Opc.Ua.ApplicationType.Server ||
                 application.ApplicationType > (int)Opc.Ua.ApplicationType.DiscoveryServer)
             {
                 throw new ArgumentException(application.ApplicationType.ToString() + " is not a valid ApplicationType.", "ApplicationType");
@@ -805,13 +519,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
             return capabilities.ToString();
         }
 
-#endregion
-#region Private Fields
+        #endregion
+        #region Private Fields
         private DateTime queryCounterResetTime = DateTime.UtcNow;
         private DocumentDBRepository db;
         private IDocumentDBCollection<Application> Applications;
         private IDocumentDBCollection<CertificateRequest> CertificateRequests;
         private IDocumentDBCollection<CertificateStore> CertificateStores;
-#endregion
+        #endregion
     }
 }

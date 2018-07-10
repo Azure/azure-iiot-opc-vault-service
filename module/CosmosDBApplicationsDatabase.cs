@@ -124,7 +124,7 @@ namespace Opc.Ua.Gds.Server.Database.CosmosDB
                 throw new ArgumentException("A record with the specified application id does not exist.", nameof(applicationId));
             }
 
-            var certificateRequests = CertificateRequests.GetAsync(ii => ii.ApplicationId == id).Result;
+            var certificateRequests = CertificateRequests.GetAsync(ii => ii.ApplicationId == id.ToString()).Result;
             foreach (var entry in new List<CertificateRequest>(certificateRequests))
             {
                 CertificateRequests.DeleteAsync(entry.RequestId).Wait();
@@ -462,14 +462,14 @@ namespace Opc.Ua.Gds.Server.Database.CosmosDB
             }
 
             request.State = (int)CertificateRequestState.New;
-            request.CertificateGroupId = certificateGroupId;
-            request.CertificateTypeId = certificateTypeId;
+            request.CertificateGroupId = certificateGroupId.ToString();
+            request.CertificateTypeId = certificateTypeId.ToString();
             request.SubjectName = null;
             request.DomainNames = null;
             request.PrivateKeyFormat = null;
             request.PrivateKeyPassword = null;
             request.CertificateSigningRequest = certificateRequest;
-            request.ApplicationId = id;
+            request.ApplicationId = id.ToString();
             request.RequestTime = DateTime.UtcNow;
 
             if (isNew)
@@ -517,14 +517,14 @@ namespace Opc.Ua.Gds.Server.Database.CosmosDB
             }
 
             request.State = (int)CertificateRequestState.New;
-            request.CertificateGroupId = certificateGroupId;
-            request.CertificateTypeId = certificateTypeId;
+            request.CertificateGroupId = certificateGroupId.ToString();
+            request.CertificateTypeId = certificateTypeId.ToString();
             request.SubjectName = subjectName;
             request.DomainNames = domainNames;
             request.PrivateKeyFormat = privateKeyFormat;
             request.PrivateKeyPassword = privateKeyPassword;
             request.CertificateSigningRequest = null;
-            request.ApplicationId = id;
+            request.ApplicationId = id.ToString();
             request.RequestTime = DateTime.UtcNow;
 
             if (isNew)
@@ -643,7 +643,7 @@ namespace Opc.Ua.Gds.Server.Database.CosmosDB
                     throw new ServiceResultException(StatusCodes.BadInvalidArgument);
             }
 
-            if (request.ApplicationId != appId)
+            if (request.ApplicationId != appId.ToString())
             {
                 throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
             }
@@ -702,7 +702,7 @@ namespace Opc.Ua.Gds.Server.Database.CosmosDB
                     throw new ServiceResultException(StatusCodes.BadInvalidArgument);
             }
 
-            if (request.ApplicationId != appId)
+            if (request.ApplicationId != appId.ToString())
             {
                 throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
             }

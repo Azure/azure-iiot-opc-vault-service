@@ -18,7 +18,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
         Task<Opc.Ua.Gds.Server.CertificateGroupConfigurationCollection> GetCertificateGroupConfigurationCollection();
         Task<X509Certificate2Collection> GetCACertificateChainAsync(string id);
         Task<IList<Opc.Ua.X509CRL>> GetCACrlChainAsync(string id);
-        Task<KeyVaultTrustList> GetTrustListAsync(string id);
+        Task<KeyVaultTrustListModel> GetTrustListAsync(string id);
 
         Task<X509Certificate2> SigningRequestAsync(
             string id,
@@ -40,8 +40,5 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
             string privateKeyFormat,
             string privateKeyPassword
             );
-#if IOTHUB
-        Task<string> GetIotHubSecretAsync();
-#endif
     }
 }

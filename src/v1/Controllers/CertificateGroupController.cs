@@ -33,13 +33,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
         }
 
         /// <summary>Get group configuration</summary>
-        [HttpGet("{id}")]
+        [HttpGet("{groupId}")]
         [SwaggerOperation(operationId: "GetCertificateGroupConfiguration")]
-        public async Task<CertificateGroupConfigurationApiModel> GetAsync(string id)
+        public async Task<CertificateGroupConfigurationApiModel> GetAsync(string groupId)
         {
             return new CertificateGroupConfigurationApiModel(
-                id,
-                await this.certificateGroups.GetCertificateGroupConfiguration(id));
+                groupId,
+                await this.certificateGroups.GetCertificateGroupConfiguration(groupId));
         }
 
         /// <summary>Get group configuration</summary>
@@ -61,71 +61,71 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
 #endif
 
         /// <summary>Get CA Certificate chain</summary>
-        [HttpGet("{id}/cacert")]
+        [HttpGet("{groupId}/cacert")]
         [SwaggerOperation(operationId: "GetCACertificateChain")]
-        public async Task<X509Certificate2CollectionApiModel> GetCACertificateChainAsync(string id)
+        public async Task<X509Certificate2CollectionApiModel> GetCACertificateChainAsync(string groupId)
         {
             return new X509Certificate2CollectionApiModel(
-                await this.certificateGroups.GetCACertificateChainAsync(id));
+                await this.certificateGroups.GetCACertificateChainAsync(groupId));
         }
 
         /// <summary>Get CA CRL chain</summary>
-        [HttpGet("{id}/cacrl")]
+        [HttpGet("{groupId}/cacrl")]
         [SwaggerOperation(operationId: "GetCACrlChain")]
-        public async Task<X509CrlCollectionApiModel> GetCACrlChainAsync(string id)
+        public async Task<X509CrlCollectionApiModel> GetCACrlChainAsync(string groupId)
         {
             return new X509CrlCollectionApiModel(
-                await this.certificateGroups.GetCACrlChainAsync(id));
+                await this.certificateGroups.GetCACrlChainAsync(groupId));
         }
 
         /// <summary>Get trust list</summary>
-        [HttpGet("{id}/trustlist")]
+        [HttpGet("{groupId}/trustlist")]
         [SwaggerOperation(operationId: "GetTrustList")]
-        public async Task<TrustListApiModel> GetTrustListAsync(string id)
+        public async Task<TrustListApiModel> GetTrustListAsync(string groupId)
         {
-            return new TrustListApiModel(await this.certificateGroups.GetTrustListAsync(id));
+            return new TrustListApiModel(await this.certificateGroups.GetTrustListAsync(groupId));
         }
 
         /// <summary>Create new CA Certificate</summary>
-        [HttpPost("{id}/create")]
+        [HttpPost("{groupId}/create")]
         [SwaggerOperation(operationId: "CreateCACertificate")]
-        public async Task<X509Certificate2ApiModel> PostCreateAsync(string id)
+        public async Task<X509Certificate2ApiModel> PostCreateAsync(string groupId)
         {
             return new X509Certificate2ApiModel(
-                await this.certificateGroups.CreateCACertificateAsync(id));
+                await this.certificateGroups.CreateCACertificateAsync(groupId));
         }
 
         /// <summary>Revoke Certificate</summary>
-        [HttpPost("{id}/revoke")]
+        [HttpPost("{groupId}/revoke")]
         [SwaggerOperation(operationId: "RevokeCertificate")]
-        public async Task<X509CrlApiModel> PostRevokeAsync(string id, [FromBody] X509Certificate2ApiModel cert)
+        public async Task<X509CrlApiModel> PostRevokeAsync(string groupId, [FromBody] X509Certificate2ApiModel cert)
         {
             return new X509CrlApiModel(
                 await this.certificateGroups.RevokeCertificateAsync(
-                    id,
+                    groupId,
                     cert.ToServiceModel()));
         }
 
         /// <summary>Certificate Signing Request</summary>
-        [HttpPost("{id}/sign")]
+        [HttpPost("{groupId}/sign")]
         [SwaggerOperation(operationId: "SigningRequest")]
-        public async Task<X509Certificate2ApiModel> PostSignAsync(string id, [FromBody] SigningRequestApiModel sr)
+        public async Task<X509Certificate2ApiModel> PostSignAsync(string groupId, [FromBody] SigningRequestApiModel sr)
         {
             return new X509Certificate2ApiModel(
                 await this.certificateGroups.SigningRequestAsync(
-                    id,
+                    groupId,
                     sr.ApplicationURI,
                     sr.ToServiceModel()));
         }
 
         /// <summary>Create New Key Pair</summary>
-        [HttpPost("{id}/newkey")]
+        [HttpPost("{groupId}/newkey")]
         [SwaggerOperation(operationId: "NewKeyPairRequest")]
-        public async Task<CertificateKeyPairApiModel> PostNewKeyAsync(string id, [FromBody] NewKeyPairRequestApiModel nkpr)
+        public async Task<CertificateKeyPairApiModel> PostNewKeyAsync(string groupId, [FromBody] NewKeyPairRequestApiModel nkpr)
         {
             return new CertificateKeyPairApiModel(
                 await this.certificateGroups.NewKeyPairRequestAsync(
-                    id,
+                    groupId,
                     nkpr.ApplicationURI,
                     nkpr.SubjectName,
                     nkpr.DomainNames,

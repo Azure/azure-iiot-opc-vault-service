@@ -17,27 +17,8 @@ using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using static Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.KeyVault.KeyVaultCertFactory;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Models
+namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
 {
-    public class KeyVaultTrustList
-    {
-        public readonly string Id;
-        public X509Certificate2Collection IssuerCertificates;
-        public IList<X509CRL> IssuerCrls;
-        public X509Certificate2Collection TrustedCertificates;
-        public IList<X509CRL> TrustedCrls;
-
-        public KeyVaultTrustList(string id)
-        {
-            Id = id;
-            IssuerCertificates = new X509Certificate2Collection();
-            IssuerCrls = new List<X509CRL>();
-            TrustedCertificates = new X509Certificate2Collection();
-            TrustedCrls = new List<X509CRL>();
-        }
-    }
-
-
     public sealed class KeyVaultCertificateGroup : Opc.Ua.Gds.Server.CertificateGroup
     {
         public X509CRL Crl;

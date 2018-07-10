@@ -27,7 +27,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models
         [JsonProperty(PropertyName = "TrustedCrls", Order = 50)]
         public X509CrlCollectionApiModel TrustedCrls { get; set; }
 
-        public TrustListApiModel(KeyVaultTrustList keyVaultTrustList)
+        public TrustListApiModel(KeyVaultTrustListModel keyVaultTrustList)
         {
             Id = keyVaultTrustList.Id;
             IssuerCertificates = new X509Certificate2CollectionApiModel(keyVaultTrustList.IssuerCertificates);

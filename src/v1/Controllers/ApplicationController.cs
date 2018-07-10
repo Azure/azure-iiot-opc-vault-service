@@ -42,33 +42,33 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
         /// <summary>
         /// Update application.
         /// </summary>
-        [HttpPut("{id}")]
+        [HttpPut("{applicationId}")]
         [SwaggerOperation(operationId: "UpdateApplication")]
-        public async Task<string> UpdateApplicationAsync(string id, [FromBody] ApplicationRecordApiModel application)
+        public async Task<string> UpdateApplicationAsync(string applicationId, [FromBody] ApplicationRecordApiModel application)
         {
             if (application == null)
             {
                 throw new ArgumentNullException(nameof(application));
             }
-            return await _applicationDatabase.UpdateApplicationAsync(id, application.ToServiceModel());
+            return await _applicationDatabase.UpdateApplicationAsync(applicationId, application.ToServiceModel());
         }
 
         /// <summary>
         /// Unregister application
         /// </summary>
-        [HttpDelete("{id}")]
+        [HttpDelete("{applicationId}")]
         [SwaggerOperation(operationId: "UnregisterApplication")]
-        public async Task UnregisterApplicationAsync(string id)
+        public async Task UnregisterApplicationAsync(string applicationId)
         {
-            await _applicationDatabase.UnregisterApplicationAsync(id);
+            await _applicationDatabase.UnregisterApplicationAsync(applicationId);
         }
 
         /// <summary>Get application</summary>
-        [HttpGet("{id}")]
+        [HttpGet("{applicationId}")]
         [SwaggerOperation(operationId: "GetApplication")]
-        public async Task<ApplicationRecordApiModel> GetApplicationAsync(string id)
+        public async Task<ApplicationRecordApiModel> GetApplicationAsync(string applicationId)
         {
-            return new ApplicationRecordApiModel(await _applicationDatabase.GetApplicationAsync(id));
+            return new ApplicationRecordApiModel(await _applicationDatabase.GetApplicationAsync(applicationId));
         }
 
         /// <summary>Find applications</summary>

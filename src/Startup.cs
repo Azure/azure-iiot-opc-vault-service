@@ -198,6 +198,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
                 .AsImplementedInterfaces().SingleInstance();
             builder.RegisterType<CosmosDBApplicationsDatabase>()
                 .AsImplementedInterfaces().SingleInstance();
+            builder.RegisterType<CosmosDBCertificateRequest>()
+                .AsImplementedInterfaces().SingleInstance();
 
             // ... with bearer auth
             if (Config.AuthRequired)

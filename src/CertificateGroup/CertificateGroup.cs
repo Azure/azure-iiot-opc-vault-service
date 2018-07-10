@@ -105,13 +105,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
             byte[] certificateRequest
             )
         {
-            var certificateGroup = await KeyVaultCertificateGroup.Create(_keyVaultServiceClient, id).ConfigureAwait(false); ;
+            var certificateGroup = await KeyVaultCertificateGroup.Create(_keyVaultServiceClient, id).ConfigureAwait(false);
             var app = new Opc.Ua.Gds.ApplicationRecordDataType
             {
                 ApplicationNames = new Opc.Ua.LocalizedTextCollection(),
                 ApplicationUri = applicationUri
             };
-            return await certificateGroup.SigningRequestAsync(app, null, certificateRequest).ConfigureAwait(false); ;
+            return await certificateGroup.SigningRequestAsync(app, null, certificateRequest).ConfigureAwait(false);
         }
 
         public async Task<Opc.Ua.Gds.Server.X509Certificate2KeyPair> NewKeyPairRequestAsync(
@@ -150,7 +150,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
             return crlList;
         }
 
-        public async Task<KeyVaultTrustList> GetTrustListAsync(string id)
+        public async Task<KeyVaultTrustListModel> GetTrustListAsync(string id)
         {
             return await _keyVaultServiceClient.GetTrustListAsync(id).ConfigureAwait(false);
         }
