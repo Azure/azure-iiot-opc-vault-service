@@ -4,7 +4,7 @@
 // ------------------------------------------------------------
 
 // TODO: remove cosmosdb direct access
-
+#if mist
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.CosmosDB;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Models;
 using System;
@@ -34,8 +34,8 @@ namespace Opc.Ua.Gds.Server.Database.CosmosDB
             this.Endpoint = endpoint;
             this.AuthKeyOrResourceToken = authKeyOrResourceToken;
         }
-
-        #region IApplicationsDatabase 
+#if REMOVED
+#region IApplicationsDatabase 
         public override void Initialize()
         {
             db = new DocumentDBRepository(Endpoint, AuthKeyOrResourceToken);
@@ -435,8 +435,10 @@ namespace Opc.Ua.Gds.Server.Database.CosmosDB
 
             return true;
         }
-        #endregion
-        #region ICertificateRequest
+#endregion
+#endif
+#if REMOVED
+#region ICertificateRequest
         public NodeId CreateSigningRequest(
             NodeId applicationId,
             NodeId certificateGroupId,
@@ -717,18 +719,20 @@ namespace Opc.Ua.Gds.Server.Database.CosmosDB
 
             return CertificateRequestState.Approved;
         }
-        #endregion
-        #region Public Members
+#endregion
+#endif
+#region Public Members
         public virtual void Save()
         {
         }
-        #endregion
-        #region Private Fields
+#endregion
+#region Private Fields
         private DateTime queryCounterResetTime = DateTime.UtcNow;
         private DocumentDBRepository db;
         private IDocumentDBCollection<Application> Applications;
         private IDocumentDBCollection<CertificateRequest> CertificateRequests;
         private IDocumentDBCollection<CertificateStore> CertificateStores;
-        #endregion
+#endregion
     }
 }
+#endif

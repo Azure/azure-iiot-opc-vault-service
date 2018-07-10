@@ -17,19 +17,4 @@
     <PackageReference Include="Microsoft.Azure.DocumentDB.Core" Version="1.9.1" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
   </ItemGroup>
-
-  <Choose>
-    <When Condition="Exists('..\..\UA-.NETStandard') and '$(Configuration)'=='Develop'">
-      <ItemGroup>
-        <ProjectReference Include="..\..\UA-.NETStandard\SampleApplications\Samples\GDS\ServerCommon\GlobalDiscoveryServerLibrary.csproj" />
-        <ProjectReference Include="..\..\UA-.NETStandard\SampleApplications\SDK\Opc.Ua.Configuration\Opc.Ua.Configuration.csproj" />
-      </ItemGroup>
-    </When>
-    <Otherwise>
-      <ItemGroup>
-        <PackageReference Include="Opc.Ua.Gds.Server.Common" Version="1.4.354-preview180709" />
-      </ItemGroup>
-    </Otherwise>
-  </Choose>
-
 </Project>

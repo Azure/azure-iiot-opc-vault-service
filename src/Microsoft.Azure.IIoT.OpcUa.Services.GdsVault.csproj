@@ -49,6 +49,19 @@
     <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.1.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="2.5.0" />
   </ItemGroup>
+  <Choose>
+    <When Condition="Exists('..\..\UA-.NETStandard') and '$(Configuration)'=='Develop'">
+      <ItemGroup>
+        <ProjectReference Include="..\..\UA-.NETStandard\SampleApplications\Samples\GDS\ServerCommon\GlobalDiscoveryServerLibrary.csproj" />
+        <ProjectReference Include="..\..\UA-.NETStandard\SampleApplications\SDK\Opc.Ua.Configuration\Opc.Ua.Configuration.csproj" />
+      </ItemGroup>
+    </When>
+    <Otherwise>
+      <ItemGroup>
+        <PackageReference Include="Opc.Ua.Gds.Server.Common" Version="1.4.354-preview180709" />
+      </ItemGroup>
+    </Otherwise>
+  </Choose>
   <ItemGroup>
     <ProjectReference Include="..\common\Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.csproj" />
   </ItemGroup>

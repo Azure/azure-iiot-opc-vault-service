@@ -3,9 +3,11 @@
 //  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------
 
+using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api;
 using Mono.Options;
 using Opc.Ua.Configuration;
-using Opc.Ua.Gds.Server.Database.CosmosDB;
+using Opc.Ua.Gds.Server.Database.GdsVault;
+using Opc.Ua.Gds.Server.GdsVault;
 using Opc.Ua.Server;
 using System;
 using System.Collections.Generic;
@@ -84,8 +86,6 @@ namespace Opc.Ua.Gds.Server
             Mono.Options.OptionSet options = new Mono.Options.OptionSet {
                 { "g|gdsvault=", "GdsVault Url", g => gdsVault = g },
                 { "a|appid=", "Active Directory Application Id", a => appID = a },
-                { "c|cosmosdb=", "Cosmos DB Url", c => cosmosDB = c },
-                { "k|key=", "Cosmos DB Key", k => cosmosDBKey = k },
                 { "h|help", "show this message and exit", h => showHelp = h != null },
             };
 
@@ -115,7 +115,7 @@ namespace Opc.Ua.Gds.Server
             }
 
             EdgeGlobalDiscoveryServer server = new EdgeGlobalDiscoveryServer();
-            server.Run(gdsVault, appID, cosmosDB, cosmosDBKey);
+            server.Run(gdsVault, appID);
 
             return (int)EdgeGlobalDiscoveryServer.ExitCode;
         }
@@ -132,13 +132,13 @@ namespace Opc.Ua.Gds.Server
         {
         }
 
-        public void Run(string gdsVault, string appID, string cosmosDB, string cosmosDBKey)
+        public void Run(string gdsVault, string appID)
         {
 
             try
             {
                 exitCode = ExitCode.ErrorServerNotStarted;
-                ConsoleGlobalDiscoveryServer(gdsVault, appID, cosmosDB, cosmosDBKey).Wait();
+                ConsoleGlobalDiscoveryServer(gdsVault, appID).Wait();
                 Console.WriteLine("Server started. Press Ctrl-C to exit...");
                 exitCode = ExitCode.ErrorServerRunning;
             }
@@ -197,9 +197,7 @@ namespace Opc.Ua.Gds.Server
 
         private async Task ConsoleGlobalDiscoveryServer(
             string gdsVaultServiceUrl, 
-            string appId, 
-            string dbServiceUrl, 
-            string dbServiceKey)
+            string appId)
         {
             ApplicationInstance.MessageDlg = new ApplicationMessageDlg();
             ApplicationInstance application = new ApplicationInstance
@@ -244,28 +242,12 @@ namespace Opc.Ua.Gds.Server
                         appId = keyVaultConfig[1];
                     }
                 }
-
-                if (String.IsNullOrEmpty(dbServiceUrl))
-                {
-                    // initialize database Uri
-                    if (keyVaultConfig.Length >= 3 && !String.IsNullOrEmpty(keyVaultConfig[2]))
-                    {
-                        dbServiceUrl = keyVaultConfig[2];
-                    }
-                }
-
-                if (String.IsNullOrEmpty(dbServiceKey))
-                {
-                    // initialize database Uri
-                    if (keyVaultConfig.Length >= 4 && !String.IsNullOrEmpty(keyVaultConfig[3]))
-                    {
-                        dbServiceKey = keyVaultConfig[3];
-                    }
-                }
             }
 
-            // The vault handler with authentication
-            var gdsVaultHandler = new GdsVaultServiceClientHandler(new Uri(gdsVaultServiceUrl));
+            IOpcGdsVault gdsServiceClient = new OpcGdsVault(new Uri(gdsVaultServiceUrl));
+
+            // The vault handler (TODO: authentication)
+            var gdsVaultHandler = new GdsVaultClientHandler(gdsServiceClient);
 #if TODO
             if (String.IsNullOrEmpty(appId))
             {
@@ -282,19 +264,12 @@ namespace Opc.Ua.Gds.Server
             gdsVaultConfiguration.CertificateGroups = await gdsVaultHandler.GetCertificateConfigurationGroupsAsync(gdsVaultConfiguration.BaseCertificateGroupStorePath);
             UpdateGDSConfigurationDocument(config.Extensions, gdsVaultConfiguration);
 
-            var certGroup = new GdsVaultServiceCertificateGroup(gdsVaultHandler);
-            if (!String.IsNullOrEmpty(dbServiceUrl))
-            {
-                // TODO: use resource token not access key!
-                var requestDB = new CosmosDBApplicationsDatabase(dbServiceUrl, dbServiceKey);
-                requestDB.Initialize();
-                var appDB = new GdsVaultServiceApplicationsDatabase(gdsVaultHandler.GdsServiceClient);
-                server = new GlobalDiscoverySampleServer(appDB, requestDB, certGroup);
-            }
-            else
-            {
+            var certGroup = new GdsVaultCertificateGroup(gdsVaultHandler);
+            var requestDB = new GdsVaultCertificateRequest(gdsServiceClient);
+            var appDB = new GdsVaultApplicationsDatabase(gdsServiceClient);
 
-            }
+            requestDB.Initialize();
+            server = new GlobalDiscoverySampleServer(appDB, requestDB, certGroup);
 
             // start the server.
             await application.Start(server);

@@ -5,16 +5,17 @@
 
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.Models;
+using Opc.Ua.Gds.Server.GdsVault;
 using System;
 using System.Collections.Generic;
 
-namespace Opc.Ua.Gds.Server.Database.CosmosDB
+namespace Opc.Ua.Gds.Server.Database.GdsVault
 {
-    public class GdsVaultServiceApplicationsDatabase : ApplicationsDatabaseBase
+    public class GdsVaultApplicationsDatabase : ApplicationsDatabaseBase
     {
         private IOpcGdsVault _gdsVaultServiceClient { get; }
 
-        public GdsVaultServiceApplicationsDatabase(IOpcGdsVault GdsVaultServiceClient)
+        public GdsVaultApplicationsDatabase(IOpcGdsVault GdsVaultServiceClient)
         {
             this._gdsVaultServiceClient = GdsVaultServiceClient;
         }
@@ -29,23 +30,22 @@ namespace Opc.Ua.Gds.Server.Database.CosmosDB
                 )
         {
             bool isUpdate = true;
-            Guid applicationId;
+            string applicationId = null;
             NodeId appNodeId = base.RegisterApplication(application);
             if (NodeId.IsNull(appNodeId))
             {
                 isUpdate = false;
-                applicationId = Guid.Empty;
             }
             else
             {
-                applicationId = GetNodeIdGuid(appNodeId);
+                applicationId = GdsVaultClientHelper.GetIdentifierStringFromNodeId(appNodeId, NamespaceIndex);
             }
 
             string capabilities = base.ServerCapabilities(application);
 
             ApplicationRecordApiModel applicationModel = new ApplicationRecordApiModel
             {
-                ApplicationId = applicationId.ToString(),
+                ApplicationId = applicationId,
                 ApplicationUri = application.ApplicationUri,
                 ApplicationName = application.ApplicationNames[0].Text,
                 ApplicationType = (int)application.ApplicationType,
@@ -74,25 +74,24 @@ namespace Opc.Ua.Gds.Server.Database.CosmosDB
 
             if (isUpdate)
             {
-                string nodeId = _gdsVaultServiceClient.UpdateApplication(applicationId.ToString(), applicationModel);
+                string nodeId = _gdsVaultServiceClient.UpdateApplication(applicationId, applicationModel);
             }
             else
             {
-                var appIdResult = _gdsVaultServiceClient.RegisterApplication(applicationModel);
-                applicationId = new Guid(appIdResult);
+                applicationId = _gdsVaultServiceClient.RegisterApplication(applicationModel);
             }
 
-            return new NodeId(applicationId, NamespaceIndex);
+            return GdsVaultClientHelper.GetNodeIdFromIdentifierString(applicationId, NamespaceIndex);
         }
 
 
         public override void UnregisterApplication(NodeId applicationId)
         {
-            Guid id = GetNodeIdGuid(applicationId);
+            string id = GdsVaultClientHelper.GetIdentifierStringFromNodeId(applicationId, NamespaceIndex);
 
             try
             {
-                _gdsVaultServiceClient.UnregisterApplication(id.ToString());
+                _gdsVaultServiceClient.UnregisterApplication(id);
             }
             catch
             {
@@ -104,12 +103,12 @@ namespace Opc.Ua.Gds.Server.Database.CosmosDB
             NodeId applicationId
             )
         {
-            Guid id = GetNodeIdGuid(applicationId);
+            string id = GdsVaultClientHelper.GetIdentifierStringFromNodeId(applicationId, NamespaceIndex);
             ApplicationRecordApiModel result;
 
             try
             {
-                result = _gdsVaultServiceClient.GetApplication(id.ToString());
+                result = _gdsVaultServiceClient.GetApplication(id);
             }
             catch
             {
@@ -141,17 +140,7 @@ namespace Opc.Ua.Gds.Server.Database.CosmosDB
                 capabilities.AddRange(result.ServerCapabilities.Split(','));
             }
 
-            NodeId appNodeId;
-            var appIdGuid = new Guid(result.ApplicationId);
-            if (appIdGuid == null || appIdGuid == Guid.Empty)
-            {
-                appNodeId = new NodeId(result.ApplicationId, NamespaceIndex);
-            }
-            else
-            {
-                appNodeId = new NodeId(appIdGuid, NamespaceIndex);
-            }
-
+            NodeId appNodeId = GdsVaultClientHelper.GetNodeIdFromIdentifierString(result.ApplicationId, NamespaceIndex);
             return new ApplicationRecordDataType()
             {
                 ApplicationId = appNodeId,
@@ -203,16 +192,7 @@ namespace Opc.Ua.Gds.Server.Database.CosmosDB
                     capabilities = result.ServerCapabilities.Split(',');
                 }
 
-                NodeId appNodeId;
-                var appIdGuid = new Guid(result.ApplicationId);
-                if (appIdGuid == null || appIdGuid == Guid.Empty)
-                {
-                    appNodeId = new NodeId(result.ApplicationId, NamespaceIndex);
-                }
-                else
-                {
-                    appNodeId = new NodeId(appIdGuid, NamespaceIndex);
-                }
+                NodeId appNodeId = GdsVaultClientHelper.GetNodeIdFromIdentifierString(result.ApplicationId, NamespaceIndex);
 
                 records.Add(new ApplicationRecordDataType()
                 {
@@ -241,7 +221,7 @@ namespace Opc.Ua.Gds.Server.Database.CosmosDB
             lastCounterResetTime = DateTime.MinValue;
             List<ServerOnNetwork> records = new List<ServerOnNetwork>();
             const uint defaultRecordsPerQuery = 10;
-#if MIST
+#if TODO
             lastCounterResetTime = queryCounterResetTime;
 
             bool matchQuery = false;
@@ -345,7 +325,7 @@ namespace Opc.Ua.Gds.Server.Database.CosmosDB
 #endif
             throw new ServiceResultException("Not Implemented");
         }
-#if mist
+#if TODO_REMOVE // ???
         public override bool SetApplicationCertificate(
             NodeId applicationId,
             byte[] certificate,
@@ -417,13 +397,6 @@ namespace Opc.Ua.Gds.Server.Database.CosmosDB
             return true;
         }
 #endif
-        #endregion
-        #region Public Members
-        public virtual void Save()
-        {
-        }
-        #endregion
-        #region Private Fields
         #endregion
     }
 }

@@ -11,16 +11,14 @@ using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
-namespace Opc.Ua.Gds.Server
+namespace Opc.Ua.Gds.Server.GdsVault
 {
-    public class GdsVaultServiceClientHandler
+    public class GdsVaultClientHandler
     {
         private IOpcGdsVault _gdsServiceClient;
-        public IOpcGdsVault GdsServiceClient { get => _gdsServiceClient; }
-
-        public GdsVaultServiceClientHandler(Uri vaultBaseUrl)
+        public GdsVaultClientHandler(IOpcGdsVault gdsServiceClient)
         {
-            _gdsServiceClient = new OpcGdsVault(vaultBaseUrl);
+            _gdsServiceClient = gdsServiceClient;
         }
 
         public async Task<X509Certificate2Collection> GetCACertificateChainAsync(string id)
