@@ -5,6 +5,7 @@ EXPOSE 80
 FROM microsoft/dotnet:2.1-sdk AS build
 WORKDIR /src
 COPY src/Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.csproj src/
+COPY common/Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.csproj common/
 COPY .nuget .nuget
 RUN dotnet restore --configfile .nuget/NuGet.Config -nowarn:msb3202,nu1503 src/Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.csproj
 COPY . .
