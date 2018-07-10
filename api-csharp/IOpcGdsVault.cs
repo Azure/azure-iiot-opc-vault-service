@@ -51,7 +51,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
         /// <summary>
         /// Get application
         /// </summary>
-        /// <param name='id'>
+        /// <param name='applicationId'>
         /// </param>
         /// <param name='customHeaders'>
         /// The headers that will be added to request.
@@ -59,12 +59,12 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse<ApplicationRecordApiModel>> GetApplicationWithHttpMessagesAsync(string id, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse<ApplicationRecordApiModel>> GetApplicationWithHttpMessagesAsync(string applicationId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Update application.
         /// </summary>
-        /// <param name='id'>
+        /// <param name='applicationId'>
         /// </param>
         /// <param name='application'>
         /// </param>
@@ -74,12 +74,12 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse<string>> UpdateApplicationWithHttpMessagesAsync(string id, ApplicationRecordApiModel application = default(ApplicationRecordApiModel), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse<string>> UpdateApplicationWithHttpMessagesAsync(string applicationId, ApplicationRecordApiModel application = default(ApplicationRecordApiModel), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Unregister application
         /// </summary>
-        /// <param name='id'>
+        /// <param name='applicationId'>
         /// </param>
         /// <param name='customHeaders'>
         /// The headers that will be added to request.
@@ -87,7 +87,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse> UnregisterApplicationWithHttpMessagesAsync(string id, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse> UnregisterApplicationWithHttpMessagesAsync(string applicationId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Find applications
@@ -136,7 +136,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
         /// <summary>
         /// Get group configuration
         /// </summary>
-        /// <param name='id'>
+        /// <param name='groupId'>
         /// </param>
         /// <param name='customHeaders'>
         /// The headers that will be added to request.
@@ -144,7 +144,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse<CertificateGroupConfigurationApiModel>> GetCertificateGroupConfigurationWithHttpMessagesAsync(string id, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse<CertificateGroupConfigurationApiModel>> GetCertificateGroupConfigurationWithHttpMessagesAsync(string groupId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Get group configuration
@@ -160,7 +160,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
         /// <summary>
         /// Get CA Certificate chain
         /// </summary>
-        /// <param name='id'>
+        /// <param name='groupId'>
         /// </param>
         /// <param name='customHeaders'>
         /// The headers that will be added to request.
@@ -168,12 +168,12 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse<X509Certificate2CollectionApiModel>> GetCACertificateChainWithHttpMessagesAsync(string id, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse<X509Certificate2CollectionApiModel>> GetCACertificateChainWithHttpMessagesAsync(string groupId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Get CA CRL chain
         /// </summary>
-        /// <param name='id'>
+        /// <param name='groupId'>
         /// </param>
         /// <param name='customHeaders'>
         /// The headers that will be added to request.
@@ -181,12 +181,12 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse<X509CrlCollectionApiModel>> GetCACrlChainWithHttpMessagesAsync(string id, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse<X509CrlCollectionApiModel>> GetCACrlChainWithHttpMessagesAsync(string groupId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Get trust list
         /// </summary>
-        /// <param name='id'>
+        /// <param name='groupId'>
         /// </param>
         /// <param name='customHeaders'>
         /// The headers that will be added to request.
@@ -194,12 +194,12 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse<TrustListApiModel>> GetTrustListWithHttpMessagesAsync(string id, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse<TrustListApiModel>> GetTrustListWithHttpMessagesAsync(string groupId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Create new CA Certificate
         /// </summary>
-        /// <param name='id'>
+        /// <param name='groupId'>
         /// </param>
         /// <param name='customHeaders'>
         /// The headers that will be added to request.
@@ -207,12 +207,12 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse<X509Certificate2ApiModel>> CreateCACertificateWithHttpMessagesAsync(string id, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse<X509Certificate2ApiModel>> CreateCACertificateWithHttpMessagesAsync(string groupId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Revoke Certificate
         /// </summary>
-        /// <param name='id'>
+        /// <param name='groupId'>
         /// </param>
         /// <param name='cert'>
         /// </param>
@@ -222,12 +222,12 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse<X509CrlApiModel>> RevokeCertificateWithHttpMessagesAsync(string id, X509Certificate2ApiModel cert = default(X509Certificate2ApiModel), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse<X509CrlApiModel>> RevokeCertificateWithHttpMessagesAsync(string groupId, X509Certificate2ApiModel cert = default(X509Certificate2ApiModel), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Certificate Signing Request
         /// </summary>
-        /// <param name='id'>
+        /// <param name='groupId'>
         /// </param>
         /// <param name='sr'>
         /// </param>
@@ -237,12 +237,12 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse<X509Certificate2ApiModel>> SigningRequestWithHttpMessagesAsync(string id, SigningRequestApiModel sr = default(SigningRequestApiModel), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse<X509Certificate2ApiModel>> SigningRequestWithHttpMessagesAsync(string groupId, SigningRequestApiModel sr = default(SigningRequestApiModel), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Create New Key Pair
         /// </summary>
-        /// <param name='id'>
+        /// <param name='groupId'>
         /// </param>
         /// <param name='nkpr'>
         /// </param>
@@ -252,7 +252,89 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse<CertificateKeyPairApiModel>> NewKeyPairRequestWithHttpMessagesAsync(string id, NewKeyPairRequestApiModel nkpr = default(NewKeyPairRequestApiModel), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse<CertificateKeyPairApiModel>> NewKeyPairRequestWithHttpMessagesAsync(string groupId, NewKeyPairRequestApiModel nkpr = default(NewKeyPairRequestApiModel), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Create a new signing request.
+        /// </summary>
+        /// <param name='signingRequest'>
+        /// </param>
+        /// <param name='customHeaders'>
+        /// The headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        Task<HttpOperationResponse<string>> CreateSigningRequestWithHttpMessagesAsync(CreateSigningRequestApiModel signingRequest = default(CreateSigningRequestApiModel), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Create a new key pair request.
+        /// </summary>
+        /// <param name='newKeyPairRequest'>
+        /// </param>
+        /// <param name='customHeaders'>
+        /// The headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        Task<HttpOperationResponse<string>> CreateNewKeyPairRequestWithHttpMessagesAsync(CreateNewKeyPairRequestApiModel newKeyPairRequest = default(CreateNewKeyPairRequestApiModel), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Approve request.
+        /// </summary>
+        /// <param name='requestId'>
+        /// </param>
+        /// <param name='rejected'>
+        /// </param>
+        /// <param name='customHeaders'>
+        /// The headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        Task<HttpOperationResponse> ApproveCertificateRequestWithHttpMessagesAsync(string requestId, bool rejected, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Accept request.
+        /// </summary>
+        /// <param name='requestId'>
+        /// </param>
+        /// <param name='customHeaders'>
+        /// The headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        Task<HttpOperationResponse> AcceptCertificateRequestWithHttpMessagesAsync(string requestId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Read certificate request
+        /// </summary>
+        /// <param name='requestId'>
+        /// </param>
+        /// <param name='customHeaders'>
+        /// The headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        Task<HttpOperationResponse<ReadRequestApiModel>> ReadCertificateRequestWithHttpMessagesAsync(string requestId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Complete certificate request
+        /// </summary>
+        /// <param name='requestId'>
+        /// </param>
+        /// <param name='applicationId'>
+        /// </param>
+        /// <param name='customHeaders'>
+        /// The headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        Task<HttpOperationResponse<CompleteRequestApiModel>> CompleteCertificateRequestWithHttpMessagesAsync(string requestId, string applicationId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <param name='customHeaders'>
         /// The headers that will be added to request.
