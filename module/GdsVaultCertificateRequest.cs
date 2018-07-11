@@ -3,8 +3,6 @@
 //  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------
 
-// TODO: remove cosmosdb direct access
-
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.Models;
 using System;
@@ -22,8 +20,8 @@ namespace Opc.Ua.Gds.Server.GdsVault
         #region ICertificateRequest
         public void Initialize()
         {
-
         }
+
         public ushort NamespaceIndex { get; set; }
 
         public NodeId CreateSigningRequest(
@@ -58,53 +56,22 @@ namespace Opc.Ua.Gds.Server.GdsVault
             string privateKeyPassword,
             string authorityId)
         {
-            throw new NotImplementedException();
-#if TODO
+            string id = GdsVaultClientHelper.GetIdentifierStringFromNodeId(applicationId, NamespaceIndex);
 
-            Guid id = GetNodeIdGuid(applicationId);
+            var model = new CreateNewKeyPairRequestApiModel(
+                id,
+                certificateGroupId.ToString(),
+                certificateTypeId.ToString(),
+                subjectName,
+                domainNames,
+                privateKeyFormat,
+                privateKeyPassword,
+                authorityId
+                );
 
-            var application = Applications.GetAsync(id).Result;
+            string requestId = _gdsVaultServiceClient.CreateNewKeyPairRequest(model);
 
-            if (application == null)
-            {
-                throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
-            }
-
-            CertificateRequest request = null;
-            bool isNew = false;
-
-            if (request == null)
-            {
-                request = new CertificateRequest()
-                {
-                    RequestId = Guid.NewGuid(),
-                    AuthorityId = authorityId
-                };
-                isNew = true;
-            }
-
-            request.State = (int)CertificateRequestState.New;
-            request.CertificateGroupId = certificateGroupId.ToString();
-            request.CertificateTypeId = certificateTypeId.ToString();
-            request.SubjectName = subjectName;
-            request.DomainNames = domainNames;
-            request.PrivateKeyFormat = privateKeyFormat;
-            request.PrivateKeyPassword = privateKeyPassword;
-            request.CertificateSigningRequest = null;
-            request.ApplicationId = id.ToString();
-            request.RequestTime = DateTime.UtcNow;
-
-            if (isNew)
-            {
-                CertificateRequests.CreateAsync(request).Wait();
-            }
-            else
-            {
-                CertificateRequests.UpdateAsync(request.RequestId, request).Wait();
-            }
-
-            return new NodeId(request.RequestId, NamespaceIndex);
-#endif
+            return GdsVaultClientHelper.GetNodeIdFromIdentifierString(requestId, NamespaceIndex);
         }
 
         public void ApproveCertificateRequest(
@@ -112,70 +79,13 @@ namespace Opc.Ua.Gds.Server.GdsVault
             bool isRejected
             )
         {
-            throw new NotImplementedException();
-#if TODO
-
-            Guid id = GetNodeIdGuid(requestId);
-
-            var request = CertificateRequests.GetAsync(id).Result;
-            if (request == null)
-            {
-                throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
-            }
-
-            if (request.State != Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Models.CertificateRequestState.New)
-            {
-                throw new ServiceResultException(StatusCodes.BadInvalidState);
-            }
-
-            if (isRejected)
-            {
-                request.State = Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Models.CertificateRequestState.Rejected;
-                // erase information which is not required anymore
-                request.PrivateKeyFormat = null;
-                request.CertificateSigningRequest = null;
-                request.PrivateKeyPassword = null;
-            }
-            else
-            {
-                request.State = Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Models.CertificateRequestState.Approved;
-            }
-
-            request.ApproveRejectTime = DateTime.UtcNow;
-
-            CertificateRequests.UpdateAsync(request.RequestId, request).Wait();
-#endif
+            // intentionally ignore the auto approval, it is implemented in the GdsVault service
         }
 
         public void AcceptCertificateRequest(NodeId requestId, byte[] signedCertificate)
         {
-            throw new NotImplementedException();
-#if TODO
-
-            Guid id = GetNodeIdGuid(requestId);
-
-            var request = CertificateRequests.GetAsync(id).Result;
-            if (request == null)
-            {
-                throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
-            }
-
-            if (request.State != Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Models.CertificateRequestState.Approved)
-            {
-                throw new ServiceResultException(StatusCodes.BadInvalidState);
-            }
-
-            request.State = Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Models.CertificateRequestState.Accepted;
-
-            // erase information which is not required anymore
-            request.CertificateSigningRequest = null;
-            request.PrivateKeyFormat = null;
-            request.PrivateKeyPassword = null;
-            request.AcceptTime = DateTime.UtcNow;
-            request.Certificate = signedCertificate;
-
-            CertificateRequests.UpdateAsync(request.RequestId, request).Wait();
-#endif
+            string reqId = GdsVaultClientHelper.GetIdentifierStringFromNodeId(requestId, NamespaceIndex);
+            _gdsVaultServiceClient.AcceptCertificateRequest(reqId);
         }
 
         public CertificateRequestState CompleteCertificateRequest(
@@ -186,55 +96,29 @@ namespace Opc.Ua.Gds.Server.GdsVault
             out byte[] signedCertificate,
             out byte[] privateKey)
         {
-            throw new NotImplementedException();
-#if TODO
+            string reqId = GdsVaultClientHelper.GetIdentifierStringFromNodeId(requestId, NamespaceIndex);
+            string appId = GdsVaultClientHelper.GetIdentifierStringFromNodeId(applicationId, NamespaceIndex);
 
             certificateGroupId = null;
             certificateTypeId = null;
             signedCertificate = null;
             privateKey = null;
-            Guid reqId = GetNodeIdGuid(requestId);
-            Guid appId = GetNodeIdGuid(applicationId);
 
-            var application = Applications.GetAsync(appId).Result;
-            if (application == null)
+            var request = _gdsVaultServiceClient.CompleteCertificateRequest(reqId, appId);
+
+            var state = (CertificateRequestState)Enum.Parse(typeof(CertificateRequestState), request.State);
+
+            if (state == CertificateRequestState.Approved)
             {
-                throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
+                certificateGroupId = request.CertificateGroupId;
+                certificateTypeId = request.CertificateTypeId;
+                signedCertificate = Convert.FromBase64String(request.SignedCertificate);
+                privateKey = Convert.FromBase64String(request.PrivateKey);
             }
 
-            var request = CertificateRequests.GetAsync(reqId).Result;
-            if (request == null)
-            {
-                throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
-            }
-
-            switch (request.State)
-            {
-                case Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Models.CertificateRequestState.New:
-                    return CertificateRequestState.New;
-                case Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Models.CertificateRequestState.Rejected:
-                    return CertificateRequestState.Rejected;
-                case Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Models.CertificateRequestState.Accepted:
-                    return CertificateRequestState.Accepted;
-                case Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Models.CertificateRequestState.Approved:
-                    break;
-                default:
-                    throw new ServiceResultException(StatusCodes.BadInvalidArgument);
-            }
-
-            if (request.ApplicationId != appId.ToString())
-            {
-                throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
-            }
-
-            certificateGroupId = request.CertificateGroupId;
-            certificateTypeId = request.CertificateTypeId;
-            signedCertificate = request.Certificate;
-            privateKey = request.PrivateKey;
-
-            return CertificateRequestState.Approved;
-#endif
+            return state;
         }
+
         public CertificateRequestState ReadRequest(
             NodeId applicationId,
             NodeId requestId,
@@ -247,58 +131,6 @@ namespace Opc.Ua.Gds.Server.GdsVault
             out string privateKeyPassword)
         {
             throw new NotImplementedException();
-#if TODO
-            certificateGroupId = null;
-            certificateTypeId = null;
-            certificateRequest = null;
-            subjectName = null;
-            domainNames = null;
-            privateKeyFormat = null;
-            privateKeyPassword = null;
-            Guid reqId = GetNodeIdGuid(requestId);
-            Guid appId = GetNodeIdGuid(applicationId);
-
-            var application = Applications.GetAsync(appId).Result;
-            if (application == null)
-            {
-                throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
-            }
-
-            var request = CertificateRequests.GetAsync(reqId).Result;
-            if (request == null)
-            {
-                throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
-            }
-
-            switch (request.State)
-            {
-                case Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Models.CertificateRequestState.New:
-                    return CertificateRequestState.New;
-                case Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Models.CertificateRequestState.Rejected:
-                    return CertificateRequestState.Rejected;
-                case Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Models.CertificateRequestState.Accepted:
-                    return CertificateRequestState.Accepted;
-                case Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Models.CertificateRequestState.Approved:
-                    break;
-                default:
-                    throw new ServiceResultException(StatusCodes.BadInvalidArgument);
-            }
-
-            if (request.ApplicationId != appId.ToString())
-            {
-                throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
-            }
-
-            certificateGroupId = request.CertificateGroupId;
-            certificateTypeId = request.CertificateTypeId;
-            certificateRequest = request.CertificateSigningRequest;
-            subjectName = request.SubjectName;
-            domainNames = request.DomainNames;
-            privateKeyFormat = request.PrivateKeyFormat;
-            privateKeyPassword = request.PrivateKeyPassword;
-
-            return CertificateRequestState.Approved;
-#endif
         }
 #endregion
     }
