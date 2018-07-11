@@ -80,8 +80,6 @@ namespace Opc.Ua.Gds.Server
             bool showHelp = false;
             string gdsVault = null;
             string appID = null;
-            string cosmosDB = null;
-            string cosmosDBKey = null;
 
             Mono.Options.OptionSet options = new Mono.Options.OptionSet {
                 { "g|gdsvault=", "GdsVault Url", g => gdsVault = g },
