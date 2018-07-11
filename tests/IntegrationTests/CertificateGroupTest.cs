@@ -46,9 +46,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Test
         public NodeId CertificateTypeId;
         public NodeId CertificateRequestId;
         public StringCollection DomainNames;
-        public String Subject;
-        public String PrivateKeyFormat;
-        public String PrivateKeyPassword;
+        public string Subject;
+        public string PrivateKeyFormat;
+        public string PrivateKeyPassword;
         public byte[] Certificate;
         public byte[] PrivateKey;
         public byte[][] IssuerCertificates;
@@ -56,16 +56,16 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Test
 
     public class CertificateGroupTest
     {
-        ServicesConfig config = new ServicesConfig()
+        private ServicesConfig config = new ServicesConfig()
         {
             KeyVaultApiUrl = "https://iopgds.vault.azure.net"
         };
-        TraceLogger logger = new TraceLogger("Services.Test");
+        private TraceLogger logger = new TraceLogger("Services.Test");
         //logger.
 
         public CertificateGroupTest(ITestOutputHelper log)
         {
-            this._log = log;
+            _log = log;
             _randomSource = new RandomSource(randomStart);
             _dataGenerator = new DataGenerator(_randomSource);
         }
@@ -74,23 +74,23 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Test
         [Fact, Trait(Constants.Type, Constants.UnitTest)]
         public async Task KeyVaultInit()
         {
-            var keyVault = new CertificateGroup(config, logger);
+            KeyVaultCertificateGroup keyVault = new KeyVaultCertificateGroup(config, logger);
             await keyVault.Init();
         }
 
         [Fact, Trait(Constants.Type, Constants.UnitTest)]
         public async Task KeyVaultListOfCertGroups()
         {
-            var keyVault = new CertificateGroup(config, logger);
-            var groups = await keyVault.GetCertificateGroupIds();
+            KeyVaultCertificateGroup keyVault = new KeyVaultCertificateGroup(config, logger);
+            string[] groups = await keyVault.GetCertificateGroupIds();
         }
 
         [Fact, Trait(Constants.Type, Constants.UnitTest)]
         public async Task KeyVaultGroupConfigurationCollection()
         {
 
-            var keyVault = new CertificateGroup(config, logger);
-            var groupCollection = await keyVault.GetCertificateGroupConfigurationCollection();
+            KeyVaultCertificateGroup keyVault = new KeyVaultCertificateGroup(config, logger);
+            Opc.Ua.Gds.Server.CertificateGroupConfigurationCollection groupCollection = await keyVault.GetCertificateGroupConfigurationCollection();
             Assert.NotNull(groupCollection);
             Assert.NotEmpty(groupCollection);
         }
@@ -98,19 +98,19 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Test
         [Fact, Trait(Constants.Type, Constants.UnitTest)]
         public async Task KeyVaultGetCertificateAsync()
         {
-            var keyVault = new CertificateGroup(config, logger);
+            KeyVaultCertificateGroup keyVault = new KeyVaultCertificateGroup(config, logger);
             await keyVault.Init();
-            var groups = await keyVault.GetCertificateGroupIds();
-            foreach (var group in groups)
+            string[] groups = await keyVault.GetCertificateGroupIds();
+            foreach (string group in groups)
             {
-                var caChain = await keyVault.GetCACertificateChainAsync(group);
+                X509Certificate2Collection caChain = await keyVault.GetCACertificateChainAsync(group);
                 Assert.NotNull(caChain);
                 Assert.True(caChain.Count >= 1);
-                foreach (var caCert in caChain)
+                foreach (X509Certificate2 caCert in caChain)
                 {
                     Assert.False(caCert.HasPrivateKey);
                 }
-                var crlChain = await keyVault.GetCACrlChainAsync(group);
+                System.Collections.Generic.IList<X509CRL> crlChain = await keyVault.GetCACrlChainAsync(group);
                 Assert.NotNull(crlChain);
                 Assert.True(crlChain.Count >= 1);
                 for (int i = 0; i < caChain.Count; i++)
@@ -124,15 +124,15 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Test
         [Fact, Trait(Constants.Type, Constants.UnitTest)]
         public async Task KeyVaultCreateCACertificateAsync()
         {
-            var keyVault = new CertificateGroup(config, logger);
-            var groups = await keyVault.GetCertificateGroupIds();
-            foreach (var group in groups)
+            KeyVaultCertificateGroup keyVault = new KeyVaultCertificateGroup(config, logger);
+            string[] groups = await keyVault.GetCertificateGroupIds();
+            foreach (string group in groups)
             {
-                var result = await keyVault.CreateCACertificateAsync(group);
+                X509Certificate2 result = await keyVault.CreateCACertificateAsync(group);
                 Assert.NotNull(result);
                 Assert.False(result.HasPrivateKey);
                 Assert.True(Opc.Ua.Utils.CompareDistinguishedName(result.Issuer, result.Subject));
-                var basicConstraints = X509TestUtils.FindBasicConstraintsExtension(result);
+                X509BasicConstraintsExtension basicConstraints = X509TestUtils.FindBasicConstraintsExtension(result);
                 Assert.NotNull(basicConstraints);
                 Assert.True(basicConstraints.CertificateAuthority);
             }
@@ -141,12 +141,12 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Test
         [Fact, Trait(Constants.Type, Constants.UnitTest)]
         public async Task KeyVaultCreateNewKeyPairRequestAsync()
         {
-            var keyVault = new CertificateGroup(config, logger);
-            var groups = await keyVault.GetCertificateGroupIds();
-            foreach (var group in groups)
+            KeyVaultCertificateGroup keyVault = new KeyVaultCertificateGroup(config, logger);
+            string[] groups = await keyVault.GetCertificateGroupIds();
+            foreach (string group in groups)
             {
-                var randomApp = RandomApplicationTestData();
-                var newKeyPair = await keyVault.NewKeyPairRequestAsync(
+                ApplicationTestData randomApp = RandomApplicationTestData();
+                Opc.Ua.Gds.Server.X509Certificate2KeyPair newKeyPair = await keyVault.NewKeyPairRequestAsync(
                     group,
                     randomApp.ApplicationRecord.ApplicationUri,
                     randomApp.Subject,
@@ -157,7 +157,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Test
                 Assert.False(newKeyPair.Certificate.HasPrivateKey);
                 Assert.True(Opc.Ua.Utils.CompareDistinguishedName(randomApp.Subject, newKeyPair.Certificate.Subject));
                 Assert.False(Opc.Ua.Utils.CompareDistinguishedName(newKeyPair.Certificate.Issuer, newKeyPair.Certificate.Subject));
-                var issuerCerts = await keyVault.GetCACertificateChainAsync(group);
+                X509Certificate2Collection issuerCerts = await keyVault.GetCACertificateChainAsync(group);
                 Assert.NotNull(issuerCerts);
                 Assert.True(issuerCerts.Count >= 1);
 
@@ -174,13 +174,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Test
         [Fact, Trait(Constants.Type, Constants.UnitTest)]
         public async Task KeyVaultSigningRequestAsync()
         {
-            var keyVault = new CertificateGroup(config, logger);
-            var groups = await keyVault.GetCertificateGroupIds();
-            foreach (var group in groups)
+            KeyVaultCertificateGroup keyVault = new KeyVaultCertificateGroup(config, logger);
+            string[] groups = await keyVault.GetCertificateGroupIds();
+            foreach (string group in groups)
             {
-                var certificateGroupConfiguration = await keyVault.GetCertificateGroupConfiguration(group);
-                var randomApp = RandomApplicationTestData();
-                var csrCertificate = CertificateFactory.CreateCertificate(
+                Opc.Ua.Gds.Server.CertificateGroupConfiguration certificateGroupConfiguration = await keyVault.GetCertificateGroupConfiguration(group);
+                ApplicationTestData randomApp = RandomApplicationTestData();
+                X509Certificate2 csrCertificate = CertificateFactory.CreateCertificate(
                     null, null, null,
                     randomApp.ApplicationRecord.ApplicationUri,
                     null,
@@ -193,7 +193,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Test
                     );
                 byte[] certificateRequest = CertificateFactory.CreateSigningRequest(csrCertificate, randomApp.DomainNames);
 
-                var newCert = await keyVault.SigningRequestAsync(
+                X509Certificate2 newCert = await keyVault.SigningRequestAsync(
                     group,
                     randomApp.ApplicationRecord.ApplicationUri,
                     certificateRequest);
@@ -207,7 +207,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Test
                 }
 #endif
                 // get issuer cert used for signing
-                var issuerCerts = await keyVault.GetCACertificateChainAsync(group);
+                X509Certificate2Collection issuerCerts = await keyVault.GetCACertificateChainAsync(group);
                 Assert.NotNull(issuerCerts);
                 Assert.True(issuerCerts.Count >= 1);
                 X509TestUtils.VerifySignedApplicationCert(randomApp, newCert, issuerCerts);
@@ -218,13 +218,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Test
         [Fact, Trait(Constants.Type, Constants.UnitTest)]
         public async Task KeyVaultCreateNewKeyPairAndRevokeCertificateAsync()
         {
-            var keyVault = new CertificateGroup(config, logger);
+            KeyVaultCertificateGroup keyVault = new KeyVaultCertificateGroup(config, logger);
             await keyVault.Init();
-            var groups = await keyVault.GetCertificateGroupIds();
-            foreach (var group in groups)
+            string[] groups = await keyVault.GetCertificateGroupIds();
+            foreach (string group in groups)
             {
-                var randomApp = RandomApplicationTestData();
-                var newCert = await keyVault.NewKeyPairRequestAsync(
+                ApplicationTestData randomApp = RandomApplicationTestData();
+                Opc.Ua.Gds.Server.X509Certificate2KeyPair newCert = await keyVault.NewKeyPairRequestAsync(
                     group,
                     randomApp.ApplicationRecord.ApplicationUri,
                     randomApp.Subject,
@@ -236,12 +236,12 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Test
                 Assert.False(newCert.Certificate.HasPrivateKey);
                 Assert.True(Opc.Ua.Utils.CompareDistinguishedName(randomApp.Subject, newCert.Certificate.Subject));
                 Assert.False(Opc.Ua.Utils.CompareDistinguishedName(newCert.Certificate.Issuer, newCert.Certificate.Subject));
-                var cert = new X509Certificate2(newCert.Certificate.RawData);
-                var crl = await keyVault.RevokeCertificateAsync(group, cert);
+                X509Certificate2 cert = new X509Certificate2(newCert.Certificate.RawData);
+                X509CRL crl = await keyVault.RevokeCertificateAsync(group, cert);
                 Assert.NotNull(crl);
-                var caChain = await keyVault.GetCACertificateChainAsync(group);
+                X509Certificate2Collection caChain = await keyVault.GetCACertificateChainAsync(group);
                 Assert.NotNull(caChain);
-                var caCert = caChain[0];
+                X509Certificate2 caCert = caChain[0];
                 Assert.False(caCert.HasPrivateKey);
                 crl.VerifySignature(caCert, true);
                 Assert.True(Opc.Ua.Utils.CompareDistinguishedName(crl.Issuer, caCert.Issuer));
@@ -251,10 +251,10 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Test
         [Fact, Trait(Constants.Type, Constants.UnitTest)]
         public async Task GetTrustListAsync()
         {
-            var keyVault = new CertificateGroup(config, logger);
+            KeyVaultCertificateGroup keyVault = new KeyVaultCertificateGroup(config, logger);
             await keyVault.Init();
-            var groups = await keyVault.GetCertificateGroupIds();
-            foreach (var group in groups)
+            string[] groups = await keyVault.GetCertificateGroupIds();
+            foreach (string group in groups)
             {
                 await keyVault.GetTrustListAsync(group);
             }
@@ -300,7 +300,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Test
                     ServerCapabilities = serverCapabilities
                 },
                 DomainNames = domainNames,
-                Subject = String.Format("CN={0},DC={1},O=OPC Foundation", appName, localhost),
+                Subject = string.Format("CN={0},DC={1},O=OPC Foundation", appName, localhost),
                 PrivateKeyFormat = privateKeyFormat
             };
             return testData;
@@ -319,7 +319,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Test
         private string[] RandomDomainNames()
         {
             int count = _randomSource.NextInt32(8) + 1;
-            var result = new string[count];
+            string[] result = new string[count];
             for (int i = 0; i < count; i++)
             {
                 result[i] = RandomLocalHost();
@@ -329,21 +329,21 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Test
 
         private StringCollection RandomDiscoveryUrl(StringCollection domainNames, int port, string appUri)
         {
-            var result = new StringCollection();
-            foreach (var name in domainNames)
+            StringCollection result = new StringCollection();
+            foreach (string name in domainNames)
             {
                 int random = _randomSource.NextInt32(7);
                 if ((result.Count == 0) || (random & 1) == 0)
                 {
-                    result.Add(String.Format("opc.tcp://{0}:{1}/{2}", name, (port++).ToString(), appUri));
+                    result.Add(string.Format("opc.tcp://{0}:{1}/{2}", name, (port++).ToString(), appUri));
                 }
                 if ((random & 2) == 0)
                 {
-                    result.Add(String.Format("http://{0}:{1}/{2}", name, (port++).ToString(), appUri));
+                    result.Add(string.Format("http://{0}:{1}/{2}", name, (port++).ToString(), appUri));
                 }
                 if ((random & 4) == 0)
                 {
-                    result.Add(String.Format("https://{0}:{1}/{2}", name, (port++).ToString(), appUri));
+                    result.Add(string.Format("https://{0}:{1}/{2}", name, (port++).ToString(), appUri));
                 }
             }
             return result;

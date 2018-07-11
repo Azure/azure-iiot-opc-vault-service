@@ -57,7 +57,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
         {
             Environment = env;
 
-            var config = new ConfigurationBuilder()
+            IConfigurationRoot config = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", true, true)
@@ -122,13 +122,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
         /// <param name="loggerFactory"></param>
         /// <param name="appLifetime"></param>
         public void Configure(
-            IApplicationBuilder app, 
+            IApplicationBuilder app,
             IHostingEnvironment env,
-            ILoggerFactory loggerFactory, 
+            ILoggerFactory loggerFactory,
             IApplicationLifetime appLifetime)
         {
 
-            var log = ApplicationContainer.Resolve<ILogger>();
+            ILogger log = ApplicationContainer.Resolve<ILogger>();
             loggerFactory.AddConsole(Config.Configuration.GetSection("Logging"));
 
             if (Config.AuthRequired)
@@ -162,7 +162,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
         /// </summary>
         public IContainer ConfigureContainer(IServiceCollection services)
         {
-            var builder = new ContainerBuilder();
+            ContainerBuilder builder = new ContainerBuilder();
 
             // Populate from services di
             builder.Populate(services);
@@ -194,7 +194,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
                 .AsImplementedInterfaces();
 
             // Register endpoint services and ...
-            builder.RegisterType<CertificateGroup>()
+            builder.RegisterType<KeyVaultCertificateGroup>()
                 .AsImplementedInterfaces().SingleInstance();
             builder.RegisterType<CosmosDBApplicationsDatabase>()
                 .AsImplementedInterfaces().SingleInstance();

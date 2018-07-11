@@ -75,16 +75,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.KeyVault
             var result = await context.AcquireTokenAsync(resource, _assertionCert);
             return result.AccessToken;
         }
-#if IOTHUB
-        /// <summary>
-        /// Read the IoTHub connection string from keyVault.
-        /// </summary>
-        public async Task<string> GetIotHubSecretAsync(CancellationToken ct = default(CancellationToken))
-        {
-            SecretBundle secret = await _keyVaultClient.GetSecretAsync(_vaultBaseUrl + "/secrets/iothub", ct).ConfigureAwait(false);
-            return secret.Value;
-        }
-#endif
+
         /// <summary>
         /// Read the GdsVault CertificateConfigurationGroups as Json.
         /// </summary>

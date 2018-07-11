@@ -21,7 +21,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
 
         public CertificateRequestController(ICertificateRequest certificateRequest)
         {
-            this._certificateRequest = certificateRequest;
+            _certificateRequest = certificateRequest;
         }
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
             {
                 throw new ArgumentNullException(nameof(signingRequest));
             }
-            return await _certificateRequest.CreateSigningAsync(
+            return await _certificateRequest.CreateSigningRequestAsync(
                 signingRequest.ApplicationId,
                 signingRequest.CertificateGroupId,
                 signingRequest.CertificateTypeId,

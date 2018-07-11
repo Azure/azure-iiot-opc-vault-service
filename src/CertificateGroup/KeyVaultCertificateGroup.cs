@@ -17,11 +17,11 @@ using System.Threading.Tasks;
 namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
 {
 
-    public sealed class CertificateGroup : ICertificateGroup
+    public sealed class KeyVaultCertificateGroup : ICertificateGroup
     {
         private readonly KeyVaultServiceClient _keyVaultServiceClient;
         private readonly ILogger _log;
-        public CertificateGroup(
+        public KeyVaultCertificateGroup(
             IServicesConfig config,
             ILogger logger)
         {
@@ -37,10 +37,10 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
             var certificateGroupCollection = await GetCertificateGroupConfigurationCollection().ConfigureAwait(false);
             foreach (var certificateGroupConfiguration in certificateGroupCollection)
             {
-                KeyVaultCertificateGroup certificateGroup = null;
+                KeyVaultCertificateGroupProvider certificateGroup = null;
                 try
                 {
-                    certificateGroup = KeyVaultCertificateGroup.Create(_keyVaultServiceClient, certificateGroupConfiguration);
+                    certificateGroup = KeyVaultCertificateGroupProvider.Create(_keyVaultServiceClient, certificateGroupConfiguration);
                     await certificateGroup.Init().ConfigureAwait(false);
 #if LOADPRIVATEKEY
                     // test if private key can be loaded
@@ -68,12 +68,12 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
 
         public async Task<string[]> GetCertificateGroupIds()
         {
-            return await KeyVaultCertificateGroup.GetCertificateGroupIds(_keyVaultServiceClient).ConfigureAwait(false); ;
+            return await KeyVaultCertificateGroupProvider.GetCertificateGroupIds(_keyVaultServiceClient).ConfigureAwait(false); ;
         }
 
         public async Task<Opc.Ua.Gds.Server.CertificateGroupConfiguration> GetCertificateGroupConfiguration(string id)
         {
-            return await KeyVaultCertificateGroup.GetCertificateGroupConfiguration(_keyVaultServiceClient, id).ConfigureAwait(false);
+            return await KeyVaultCertificateGroupProvider.GetCertificateGroupConfiguration(_keyVaultServiceClient, id).ConfigureAwait(false);
         }
 
         public async Task<Opc.Ua.Gds.Server.CertificateGroupConfigurationCollection> GetCertificateGroupConfigurationCollection()
@@ -84,14 +84,14 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
 
         public async Task<Opc.Ua.X509CRL> RevokeCertificateAsync(string id, X509Certificate2 certificate)
         {
-            var certificateGroup = await KeyVaultCertificateGroup.Create(_keyVaultServiceClient, id).ConfigureAwait(false);
+            var certificateGroup = await KeyVaultCertificateGroupProvider.Create(_keyVaultServiceClient, id).ConfigureAwait(false);
             await certificateGroup.RevokeCertificateAsync(certificate).ConfigureAwait(false); ;
             return certificateGroup.Crl;
         }
 
         public async Task<X509Certificate2> CreateCACertificateAsync(string id)
         {
-            var certificateGroup = await KeyVaultCertificateGroup.Create(_keyVaultServiceClient, id).ConfigureAwait(false);
+            var certificateGroup = await KeyVaultCertificateGroupProvider.Create(_keyVaultServiceClient, id).ConfigureAwait(false);
             if (await certificateGroup.CreateCACertificateAsync().ConfigureAwait(false))
             {
                 return certificateGroup.Certificate;
@@ -105,7 +105,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
             byte[] certificateRequest
             )
         {
-            var certificateGroup = await KeyVaultCertificateGroup.Create(_keyVaultServiceClient, id).ConfigureAwait(false);
+            var certificateGroup = await KeyVaultCertificateGroupProvider.Create(_keyVaultServiceClient, id).ConfigureAwait(false);
             var app = new Opc.Ua.Gds.ApplicationRecordDataType
             {
                 ApplicationNames = new Opc.Ua.LocalizedTextCollection(),
@@ -123,7 +123,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
             string privateKeyPassword
             )
         {
-            var certificateGroup = await KeyVaultCertificateGroup.Create(_keyVaultServiceClient, id).ConfigureAwait(false); ;
+            var certificateGroup = await KeyVaultCertificateGroupProvider.Create(_keyVaultServiceClient, id).ConfigureAwait(false); ;
             var app = new Opc.Ua.Gds.ApplicationRecordDataType
             {
                 ApplicationNames = new Opc.Ua.LocalizedTextCollection(),
@@ -134,14 +134,14 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
 
         public async Task<X509Certificate2Collection> GetCACertificateChainAsync(string id)
         {
-            var certificateGroup = await KeyVaultCertificateGroup.Create(_keyVaultServiceClient, id).ConfigureAwait(false);
+            var certificateGroup = await KeyVaultCertificateGroupProvider.Create(_keyVaultServiceClient, id).ConfigureAwait(false);
             // TODO: return CA chain
             return new X509Certificate2Collection(await certificateGroup.GetCACertificateAsync(id).ConfigureAwait(false));
         }
 
         public async Task<IList<Opc.Ua.X509CRL>> GetCACrlChainAsync(string id)
         {
-            var certificateGroup = await KeyVaultCertificateGroup.Create(_keyVaultServiceClient, id).ConfigureAwait(false);
+            var certificateGroup = await KeyVaultCertificateGroupProvider.Create(_keyVaultServiceClient, id).ConfigureAwait(false);
             var crlList = new List<Opc.Ua.X509CRL>
             {
                 // TODO: return CA CRL chain

@@ -5,7 +5,6 @@
 
 
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Exceptions;
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.KeyVault;
 using Newtonsoft.Json;
 using Opc.Ua;
 using Opc.Ua.Gds;
@@ -17,14 +16,14 @@ using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using static Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.KeyVault.KeyVaultCertFactory;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
+namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.KeyVault
 {
-    public sealed class KeyVaultCertificateGroup : Opc.Ua.Gds.Server.CertificateGroup
+    public sealed class KeyVaultCertificateGroupProvider : Opc.Ua.Gds.Server.CertificateGroup
     {
         public X509CRL Crl;
         public X509SignatureGenerator x509SignatureGenerator;
 
-        private KeyVaultCertificateGroup(
+        private KeyVaultCertificateGroupProvider(
             KeyVaultServiceClient keyVaultServiceClient,
             CertificateGroupConfiguration certificateGroupConfiguration
             )
@@ -36,19 +35,19 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
             Crl = null;
         }
 
-        public static KeyVaultCertificateGroup Create(
+        public static KeyVaultCertificateGroupProvider Create(
             KeyVaultServiceClient keyVaultServiceClient,
             CertificateGroupConfiguration certificateGroupConfiguration)
         {
-            return new KeyVaultCertificateGroup(keyVaultServiceClient, certificateGroupConfiguration);
+            return new KeyVaultCertificateGroupProvider(keyVaultServiceClient, certificateGroupConfiguration);
         }
 
-        public static async Task<KeyVaultCertificateGroup> Create(
+        public static async Task<KeyVaultCertificateGroupProvider> Create(
             KeyVaultServiceClient keyVaultServiceClient,
             string id)
         {
             var certificateGroupConfiguration = await GetCertificateGroupConfiguration(keyVaultServiceClient, id);
-            return new KeyVaultCertificateGroup(keyVaultServiceClient, certificateGroupConfiguration);
+            return new KeyVaultCertificateGroupProvider(keyVaultServiceClient, certificateGroupConfiguration);
         }
 
         public static async Task<string[]> GetCertificateGroupIds(

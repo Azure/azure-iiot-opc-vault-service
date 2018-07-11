@@ -4,15 +4,15 @@
 // ------------------------------------------------------------
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.CosmosDB
-{ 
+{
+    using Microsoft.Azure.Documents;
+    using Microsoft.Azure.Documents.Client;
+    using Microsoft.Azure.Documents.Linq;
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Threading.Tasks;
-    using Microsoft.Azure.Documents;
-    using Microsoft.Azure.Documents.Client;
-    using Microsoft.Azure.Documents.Linq;
 
     public class DocumentDBCollection<T> : IDocumentDBCollection<T> where T : class
     {
@@ -49,7 +49,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.CosmosDB
 
         public async Task<IEnumerable<T>> GetAsync(Expression<Func<T, bool>> predicate)
         {
-            var feedOptions = new FeedOptions { MaxItemCount = -1 };
+            FeedOptions feedOptions = new FeedOptions { MaxItemCount = -1 };
             IDocumentQuery<T> query = db.Client.CreateDocumentQuery<T>(
                 UriFactory.CreateDocumentCollectionUri(db.DatabaseId, CollectionId),
                 feedOptions)
@@ -67,7 +67,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.CosmosDB
 
         public async Task<IEnumerable<T>> GetAsync(string predicate)
         {
-            var feedOptions = new FeedOptions { MaxItemCount = -1 };
+            FeedOptions feedOptions = new FeedOptions { MaxItemCount = -1 };
             IDocumentQuery<T> query = db.Client.CreateDocumentQuery<T>(
                 UriFactory.CreateDocumentCollectionUri(db.DatabaseId, CollectionId),
                 predicate,

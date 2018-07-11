@@ -15,7 +15,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
     public interface ICertificateRequest
     {
         Task Initialize();
-        Task<string> CreateSigningAsync(
+        Task<string> CreateSigningRequestAsync(
             string applicationId,
             string certificateGroupId,
             string certificateTypeId,

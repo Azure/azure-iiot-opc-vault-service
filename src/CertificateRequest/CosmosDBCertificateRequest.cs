@@ -9,37 +9,53 @@ using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Models;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Models;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Runtime;
 using Opc.Ua;
+using Opc.Ua.Gds.Server;
 using System;
 using System.Linq;
 using System.Security;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using CertificateRequest = Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Models.CertificateRequest;
+using CertificateRequestState = Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Models.CertificateRequestState;
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
 {
     internal sealed class CosmosDBCertificateRequest : ICertificateRequest
     {
+        private ExpandedNodeId DefaultApplicationGroupId;
+        private ExpandedNodeId DefaultHttpsGroupId;
+        private ExpandedNodeId DefaultUserTokenGroupId;
+
         private readonly ILogger _log;
         private readonly IApplicationsDatabase _database;
-        private readonly ICertificateGroup _group;
+        private readonly ICertificateGroup _certificateGroup;
         private readonly string _endpoint;
         private SecureString _authKeyOrResourceToken;
 
         public CosmosDBCertificateRequest(
             IApplicationsDatabase database,
+            ICertificateGroup certificateGroup,
             IServicesConfig config,
             ILogger logger)
         {
-            this._database = database;
-            this._endpoint = config.CosmosDBEndpoint;
-            this._authKeyOrResourceToken = new SecureString();
+            _database = database;
+            _certificateGroup = certificateGroup;
+            _endpoint = config.CosmosDBEndpoint;
+            _authKeyOrResourceToken = new SecureString();
             foreach (char ch in config.CosmosDBToken)
             {
-                this._authKeyOrResourceToken.AppendChar(ch);
+                _authKeyOrResourceToken.AppendChar(ch);
             }
             _log = logger;
             _log.Debug("Creating new instance of `CosmosDBApplicationsDatabase` service " + config.CosmosDBEndpoint, () => { });
             Initialize();
+
+            // well known groups
+            DefaultApplicationGroupId = Opc.Ua.Gds.ObjectIds.Directory_CertificateGroups_DefaultApplicationGroup;
+            DefaultHttpsGroupId = Opc.Ua.Gds.ObjectIds.Directory_CertificateGroups_DefaultHttpsGroup;
+            DefaultUserTokenGroupId = Opc.Ua.Gds.ObjectIds.Directory_CertificateGroups_DefaultUserTokenGroup;
+
         }
 
 
@@ -49,24 +65,35 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
         {
             db = new DocumentDBRepository(_endpoint, _authKeyOrResourceToken);
             Applications = new DocumentDBCollection<Application>(db);
-            CertificateRequests = new DocumentDBCollection<CertificateRequest>(db);
+            CertificateRequests = new DocumentDBCollection<Common.Models.CertificateRequest>(db);
             CertificateStores = new DocumentDBCollection<CertificateStore>(db);
             return Task.CompletedTask;
         }
-        public async Task<string> CreateSigningAsync(
+
+        public async Task<string> CreateSigningRequestAsync(
             string applicationId,
             string certificateGroupId,
             string certificateTypeId,
-            byte[] certificateRequest,
+            byte[] certificateSigningRequest,
             string authorityId)
         {
             Guid appId = GetIdFromString(applicationId);
 
             // TODO: use IApplicationsDatabase
-            var application = await Applications.GetAsync(appId);
+            Application application = await Applications.GetAsync(appId);
             if (application == null)
             {
-                throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
+                throw new ServiceResultException(StatusCodes.BadNotFound, "The ApplicationId does not refer to a valid application.");
+            }
+
+            if (string.IsNullOrEmpty(certificateGroupId))
+            {
+                //TODO:
+            }
+
+            if (string.IsNullOrEmpty(certificateTypeId))
+            {
+                //TODO
             }
 
             CertificateRequest request = null;
@@ -87,7 +114,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
             request.DomainNames = null;
             request.PrivateKeyFormat = null;
             request.PrivateKeyPassword = null;
-            request.CertificateSigningRequest = certificateRequest;
+            request.CertificateSigningRequest = certificateSigningRequest;
             request.ApplicationId = applicationId;
             request.RequestTime = DateTime.UtcNow;
 
@@ -115,10 +142,20 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
         {
             Guid appId = GetIdFromString(applicationId);
 
-            var application = await Applications.GetAsync(appId);
+            Application application = await Applications.GetAsync(appId);
             if (application == null)
             {
                 throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
+            }
+
+            if (string.IsNullOrEmpty(certificateGroupId))
+            {
+                //TODO:
+            }
+
+            if (string.IsNullOrEmpty(certificateTypeId))
+            {
+                //TODO
             }
 
             CertificateRequest request = null;
@@ -164,10 +201,10 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
         {
             Guid reqId = GetIdFromString(requestId);
 
-            var request = await CertificateRequests.GetAsync(reqId);
+            CertificateRequest request = await CertificateRequests.GetAsync(reqId);
             if (request == null)
             {
-                throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
+                throw new ServiceResultException(StatusCodes.BadNodeIdUnknown, "Unknown request id");
             }
 
             if (request.State != CertificateRequestState.New)
@@ -175,9 +212,16 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
                 throw new ServiceResultException(StatusCodes.BadInvalidState);
             }
 
+            Guid appId = new Guid(request.ApplicationId);
+            Application application = await Applications.GetAsync(appId);
+            if (application == null)
+            {
+                throw new ServiceResultException(StatusCodes.BadNodeIdUnknown, "Unknown application id");
+            }
+
             if (isRejected)
             {
-                request.State = CertificateRequestState.Rejected;
+                request.State = Common.Models.CertificateRequestState.Rejected;
                 // erase information which is not required anymore
                 request.PrivateKeyFormat = null;
                 request.CertificateSigningRequest = null;
@@ -186,6 +230,61 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
             else
             {
                 request.State = CertificateRequestState.Approved;
+
+                X509Certificate2 certificate;
+                if (request.CertificateSigningRequest != null)
+                {
+                    try
+                    {
+                        certificate = await _certificateGroup.SigningRequestAsync(
+                            request.CertificateGroupId,
+                            application.ApplicationUri,
+                            request.CertificateSigningRequest
+                            );
+
+                        request.Certificate = certificate.RawData;
+                        request.PrivateKey = null;
+                    }
+                    catch (Exception e)
+                    {
+                        StringBuilder error = new StringBuilder();
+
+                        error.Append("Error Generating Certificate=" + e.Message);
+                        error.Append("\r\nApplicationId=" + application.ApplicationId);
+                        error.Append("\r\nApplicationUri=" + application.ApplicationUri);
+                        error.Append("\r\nApplicationName=" + application.ApplicationNames[0].Text);
+
+                        throw new ServiceResultException(StatusCodes.BadConfigurationError, error.ToString());
+                    }
+                }
+                else
+                {
+                    X509Certificate2KeyPair newKeyPair = null;
+                    try
+                    {
+                        newKeyPair = await _certificateGroup.NewKeyPairRequestAsync(
+                            request.CertificateGroupId,
+                            application.ApplicationUri,
+                            request.SubjectName,
+                            request.DomainNames,
+                            request.PrivateKeyFormat,
+                            request.PrivateKeyPassword);
+                    }
+                    catch (Exception e)
+                    {
+                        StringBuilder error = new StringBuilder();
+
+                        error.Append("Error Generating New Key Pair Certificate=" + e.Message);
+                        error.Append("\r\nApplicationId=" + application.ApplicationId);
+                        error.Append("\r\nApplicationUri=" + application.ApplicationUri);
+
+                        throw new ServiceResultException(StatusCodes.BadConfigurationError, error.ToString());
+                    }
+
+                    request.Certificate = newKeyPair.Certificate.RawData;
+                    request.PrivateKey = newKeyPair.PrivateKey;
+
+                }
             }
 
             request.ApproveRejectTime = DateTime.UtcNow;
@@ -198,7 +297,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
         {
             Guid reqId = GetIdFromString(requestId);
 
-            var request = await CertificateRequests.GetAsync(reqId);
+            CertificateRequest request = await CertificateRequests.GetAsync(reqId);
             if (request == null)
             {
                 throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
@@ -227,13 +326,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
             Guid reqId = GetIdFromString(requestId);
             Guid appId = GetIdFromString(applicationId);
 
-            var application = await Applications.GetAsync(appId);
+            Application application = await Applications.GetAsync(appId);
             if (application == null)
             {
                 throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
             }
 
-            var request = await CertificateRequests.GetAsync(reqId);
+            CertificateRequest request = await CertificateRequests.GetAsync(reqId);
             if (request == null)
             {
                 throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
@@ -265,13 +364,14 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
                 request.Certificate,
                 request.PrivateKey);
         }
+
         public async Task<ReadRequestResultModel> ReadAsync(
             string requestId
             )
         {
             Guid reqId = GetIdFromString(requestId);
 
-            var request = await CertificateRequests.GetAsync(reqId);
+            CertificateRequest request = await CertificateRequests.GetAsync(reqId);
             if (request == null)
             {
                 throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
@@ -293,12 +393,12 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
                 request.ApplicationId,
                 requestId,
                 request.CertificateGroupId,
-            request.CertificateTypeId,
-            request.CertificateSigningRequest,
-            request.SubjectName,
-            request.DomainNames,
-             request.PrivateKeyFormat,
-             request.PrivateKeyPassword);
+                request.CertificateTypeId,
+                request.CertificateSigningRequest,
+                request.SubjectName,
+                request.DomainNames,
+                request.PrivateKeyFormat,
+                request.PrivateKeyPassword);
 
         }
         #endregion
@@ -309,15 +409,16 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
             string query;
             if (maxRecordsToQuery != 0)
             {
-                query = String.Format("SELECT TOP {0}", maxRecordsToQuery);
+                query = string.Format("SELECT TOP {0}", maxRecordsToQuery);
             }
             else
             {
-                query = String.Format("SELECT");
+                query = string.Format("SELECT");
             }
-            query += String.Format(" * FROM Applications a WHERE a.ID >= {0} ORDER BY a.ID", startingRecordId);
+            query += string.Format(" * FROM Applications a WHERE a.ID >= {0} ORDER BY a.ID", startingRecordId);
             return query;
         }
+
         private Guid VerifyRegisterApplication(Application application)
         {
             if (application == null)
@@ -341,12 +442,12 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
                 throw new ArgumentException(application.ApplicationType.ToString() + " is not a valid ApplicationType.", "ApplicationType");
             }
 
-            if (application.ApplicationNames == null || application.ApplicationNames.Length == 0 || String.IsNullOrEmpty(application.ApplicationNames[0].Text))
+            if (application.ApplicationNames == null || application.ApplicationNames.Length == 0 || string.IsNullOrEmpty(application.ApplicationNames[0].Text))
             {
                 throw new ArgumentException("At least one ApplicationName must be provided.", "ApplicationNames");
             }
 
-            if (String.IsNullOrEmpty(application.ProductUri))
+            if (string.IsNullOrEmpty(application.ProductUri))
             {
                 throw new ArgumentException("A ProductUri must be provided.", "ProductUri");
             }
@@ -358,9 +459,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
 
             if (application.DiscoveryUrls != null)
             {
-                foreach (var discoveryUrl in application.DiscoveryUrls)
+                foreach (string discoveryUrl in application.DiscoveryUrls)
                 {
-                    if (String.IsNullOrEmpty(discoveryUrl))
+                    if (string.IsNullOrEmpty(discoveryUrl))
                     {
                         continue;
                     }
@@ -414,11 +515,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
             StringBuilder capabilities = new StringBuilder();
             if (application.ServerCapabilities != null)
             {
-                var sortedCaps = application.ServerCapabilities.Split(",").ToList();
+                System.Collections.Generic.List<string> sortedCaps = application.ServerCapabilities.Split(",").ToList();
                 sortedCaps.Sort();
-                foreach (var capability in sortedCaps)
+                foreach (string capability in sortedCaps)
                 {
-                    if (String.IsNullOrEmpty(capability))
+                    if (string.IsNullOrEmpty(capability))
                     {
                         continue;
                     }
@@ -437,7 +538,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
 
         private Guid GetIdFromString(string id)
         {
-            if (String.IsNullOrEmpty(id))
+            if (string.IsNullOrEmpty(id))
             {
                 throw new ArgumentNullException(nameof(id));
             }
