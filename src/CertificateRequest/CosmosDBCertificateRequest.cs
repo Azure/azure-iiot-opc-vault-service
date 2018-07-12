@@ -362,7 +362,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
                 request.CertificateGroupId,
                 request.CertificateTypeId,
                 request.Certificate,
-                request.PrivateKey);
+                request.PrivateKey,
+                request.AuthorityId);
         }
 
         public async Task<ReadRequestResultModel> ReadAsync(

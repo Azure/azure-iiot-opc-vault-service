@@ -24,6 +24,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Models
 
         public byte[] PrivateKey { get; set; }
 
+        public string AuthorityId { get; set; }
+
         public CompleteRequestResultModel(
             CertificateRequestState state
             )
@@ -38,7 +40,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Models
             string certificateGroupId,
             string certificateTypeId,
             byte[] signedCertificate,
-            byte[] privateKey)
+            byte[] privateKey,
+            string authorityId)
         {
             this.State = state;
             this.ApplicationId = applicationId;
@@ -46,6 +49,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Models
             this.CertificateTypeId = certificateTypeId;
             this.SignedCertificate = signedCertificate;
             this.PrivateKey = privateKey;
+            this.AuthorityId = authorityId;
         }
     }
 }
