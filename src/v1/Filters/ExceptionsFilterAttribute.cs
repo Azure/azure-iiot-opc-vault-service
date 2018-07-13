@@ -1,119 +1,135 @@
-﻿// ------------------------------------------------------------
+// ------------------------------------------------------------
 //  Copyright (c) Microsoft Corporation.  All rights reserved.
 //  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------
 
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc.Formatters;
-using Microsoft.Azure.IIoT.Diagnostics;
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Exceptions;
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Exceptions;
-using Newtonsoft.Json;
-using System;
-using System.Buffers;
-using System.Collections.Generic;
-using System.Net;
-using System.Threading.Tasks;
-
 namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Filters
 {
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc.Filters;
+    using Microsoft.Azure.IIoT.Exceptions;
+    using Newtonsoft.Json;
+    using System;
+    using System.Linq;
+    using System.Net;
+    using System.Net.Sockets;
+    using System.Security;
+    using System.Threading.Tasks;
+
     /// <summary>
     /// Detect all the unhandled exceptions returned by the API controllers
     /// and decorate the response accordingly, managing the HTTP status code
     /// and preparing a JSON response with useful error details.
     /// When including the stack trace, split the text in multiple lines
     /// for an easier parsing.
+    /// @see https://docs.microsoft.com/en-us/aspnet/core/mvc/controllers/filters
     /// </summary>
-    public class ExceptionsFilterAttribute : ExceptionFilterAttribute
-    {
-        private readonly ILogger log;
+    public class ExceptionsFilterAttribute : ExceptionFilterAttribute {
 
-        public ExceptionsFilterAttribute(ILogger logger)
-        {
-            this.log = logger;
-        }
-
-        public override void OnException(ExceptionContext context)
-        {
-            if (context.Exception is ResourceNotFoundException)
-            {
-                context.Result = this.GetResponse(HttpStatusCode.NotFound, context.Exception);
-            }
-            else if (context.Exception is ConflictingResourceException
-                     || context.Exception is ResourceOutOfDateException)
-            {
-                context.Result = this.GetResponse(HttpStatusCode.Conflict, context.Exception);
-            }
-            else if (context.Exception is BadRequestException
-                     || context.Exception is InvalidInputException)
-            {
-                context.Result = this.GetResponse(HttpStatusCode.BadRequest, context.Exception);
-            }
-            else if (context.Exception is InvalidConfigurationException)
-            {
-                context.Result = this.GetResponse(HttpStatusCode.InternalServerError, context.Exception);
-            }
-            else if (context.Exception != null)
-            {
-                context.Result = this.GetResponse(HttpStatusCode.InternalServerError, context.Exception, true);
-            }
-            else
-            {
-                this.log.Error("Unknown exception", () => new
-                {
-                    ExceptionType = context.Exception.GetType().FullName,
-                    context.Exception.Message
-                });
+        /// <inheritdoc />
+        public override void OnException(ExceptionContext context) {
+            if (context.Exception == null) {
                 base.OnException(context);
+                return;
             }
-        }
-
-        public override Task OnExceptionAsync(ExceptionContext context)
-        {
-            try
-            {
-                this.OnException(context);
-            }
-            catch (Exception)
-            {
-                return base.OnExceptionAsync(context);
-            }
-
-            return Task.FromResult(new object());
-        }
-
-        private ObjectResult GetResponse(
-            HttpStatusCode code,
-            Exception e,
-            bool stackTrace = false)
-        {
-            var error = new Dictionary<string, object>
-            {
-                ["Message"] = "An error has occurred.",
-                ["ExceptionMessage"] = e.Message,
-                ["ExceptionType"] = e.GetType().FullName
-            };
-
-            if (stackTrace)
-            {
-                error["StackTrace"] = e.StackTrace.Split(new[] { "\n" }, StringSplitOptions.None);
-
-                if (e.InnerException != null)
-                {
-                    e = e.InnerException;
-                    error["InnerExceptionMessage"] = e.Message;
-                    error["InnerExceptionType"] = e.GetType().FullName;
-                    error["InnerExceptionStackTrace"] = e.StackTrace.Split(new[] { "\n" }, StringSplitOptions.None);
+            if (context.Exception is AggregateException ae) {
+                var root = ae.GetBaseException();
+                if (root is AggregateException) {
+                    context.Exception = ae.InnerExceptions.First();
+                }
+                else {
+                    context.Exception = root;
                 }
             }
+            switch (context.Exception) {
+                case ResourceNotFoundException re:
+                    context.Result = GetResponse(HttpStatusCode.NotFound,
+                        context.Exception);
+                    break;
+                case ConflictingResourceException ce:
+                    context.Result = GetResponse(HttpStatusCode.Conflict,
+                        context.Exception);
+                    break;
+                case UnauthorizedAccessException ue:
+                case SecurityException se:
+                    context.Result = GetResponse(HttpStatusCode.Unauthorized,
+                        context.Exception);
+                    break;
+                case JsonReaderException jre:
+                case BadRequestException br:
+                case ArgumentException are:
+                    context.Result = GetResponse(HttpStatusCode.BadRequest,
+                        context.Exception);
+                    break;
+                case NotImplementedException ne:
+                case NotSupportedException ns:
+                    context.Result = GetResponse(HttpStatusCode.NotImplemented,
+                        context.Exception);
+                    break;
+                case TimeoutException te:
+                    context.Result = GetResponse(HttpStatusCode.RequestTimeout,
+                        context.Exception);
+                    break;
+                case SocketException sex:
+                case CommunicationException ce:
+                    context.Result = GetResponse(HttpStatusCode.BadGateway,
+                        context.Exception);
+                    break;
 
-            var result = new ObjectResult(error);
-            result.StatusCode = (int) code;
-            result.Formatters.Add(new JsonOutputFormatter(new JsonSerializerSettings(), ArrayPool<char>.Shared));
+                //
+                // The following will most certainly be retried by our
+                // service client implementations and thus dependent
+                // services:
+                //
+                //      InternalServerError
+                //      BadGateway
+                //      ServiceUnavailable
+                //      GatewayTimeout
+                //      PreconditionFailed
+                //      TemporaryRedirect
+                //      429 (IoT Hub throttle)
+                //
+                // As such, if you want to terminate make sure exception
+                // is caught ahead of here and returns a status other than
+                // one of the above.
+                //
 
-            this.log.Error(e.Message, () => new { result.StatusCode });
+                case ResourceOutOfDateException re:
+                    context.Result = GetResponse(HttpStatusCode.PreconditionFailed,
+                        context.Exception);
+                    break;
+                case ExternalDependencyException ex:
+                    context.Result = GetResponse(HttpStatusCode.ServiceUnavailable,
+                        context.Exception);
+                    break;
+                default:
+                    context.Result = GetResponse(HttpStatusCode.InternalServerError,
+                        context.Exception);
+                    break;
+            }
+        }
 
+        /// <inheritdoc />
+        public override Task OnExceptionAsync(ExceptionContext context) {
+            try {
+                OnException(context);
+                return Task.CompletedTask;
+            }
+            catch (Exception) {
+                return base.OnExceptionAsync(context);
+            }
+        }
+
+        /// <summary>
+        /// Create result
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="exception"></param>
+        /// <returns></returns>
+        private ObjectResult GetResponse(HttpStatusCode code, Exception exception) {
+            var result = new ObjectResult(exception) {
+                StatusCode = (int)code
+            };
             return result;
         }
     }

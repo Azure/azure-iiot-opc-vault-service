@@ -4,8 +4,8 @@
 // ------------------------------------------------------------
 
 
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Exceptions;
 using Microsoft.Azure.IIoT.Diagnostics;
+using Microsoft.Azure.IIoT.Exceptions;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;

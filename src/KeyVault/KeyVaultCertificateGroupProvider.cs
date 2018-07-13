@@ -4,7 +4,7 @@
 // ------------------------------------------------------------
 
 
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Exceptions;
+using Microsoft.Azure.IIoT.Exceptions;
 using Newtonsoft.Json;
 using Opc.Ua;
 using Opc.Ua.Gds;

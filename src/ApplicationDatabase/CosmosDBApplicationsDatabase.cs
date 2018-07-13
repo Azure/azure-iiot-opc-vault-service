@@ -4,6 +4,7 @@
 // ------------------------------------------------------------
 
 using Microsoft.Azure.IIoT.Diagnostics;
+using Microsoft.Azure.IIoT.Exceptions;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.CosmosDB;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Models;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Runtime;
@@ -135,7 +136,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
             var application = await Applications.GetAsync(appId);
             if (application == null)
             {
-                throw new ArgumentException("A record with the specified application id does not exist.", nameof(appId));
+                throw new ResourceNotFoundException("A record with the specified application id does not exist.");
             }
 
             var certificateRequests = await CertificateRequests.GetAsync(ii => ii.ApplicationId == appId.ToString());
