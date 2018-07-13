@@ -51,8 +51,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models
             this.ApplicationId = applicationId;
             this.CertificateGroupId = certificateGroupId;
             this.CertificateTypeId = certificateTypeId;
-            this.SignedCertificate = Convert.ToBase64String(signedCertificate);
-            this.PrivateKey = Convert.ToBase64String(privateKey);
+            this.SignedCertificate = (signedCertificate != null) ? Convert.ToBase64String(signedCertificate) : null;
+            this.PrivateKey = (privateKey != null) ? Convert.ToBase64String(privateKey) : null;
             this.AuthorityId = authorityId;
         }
 
