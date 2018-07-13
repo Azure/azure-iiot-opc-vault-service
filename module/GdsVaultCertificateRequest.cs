@@ -98,7 +98,7 @@ namespace Opc.Ua.Gds.Server.GdsVault
                 domainNames,
                 privateKeyFormat,
                 privateKeyPassword,
-                certificateGroupId.Identifier.ToString()
+                certificateGroupId.ToString()
                 );
 
             string requestId = _gdsVaultServiceClient.CreateNewKeyPairRequest(model);
@@ -153,8 +153,7 @@ namespace Opc.Ua.Gds.Server.GdsVault
 
             if (state == CertificateRequestState.Approved)
             {
-                int id = int.Parse(request.AuthorityId);
-                certificateGroupId = new NodeId(id, NamespaceIndex);
+                certificateGroupId = new NodeId(request.AuthorityId);
                 certificateTypeId = _certTypeMap.FirstOrDefault(x => x.Value == request.CertificateTypeId).Key;
                 signedCertificate = request.SignedCertificate != null ? Convert.FromBase64String(request.SignedCertificate) : null;
                 privateKey = request.PrivateKey != null ? Convert.FromBase64String(request.PrivateKey) : null;
