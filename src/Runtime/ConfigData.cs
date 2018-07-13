@@ -16,18 +16,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Runtime
 {
     public interface IConfigData
     {
-#if mist
-        /// <summary>
-        /// Read a string value from configuration.
-        /// </summary>
-        /// <param name="key">The key of the configuration string.</param>
-        string GetString(string key);
-        /// <summary>
-        /// Read an integer value from configuration.
-        /// </summary>
-        /// <param name="key">The key of the configuration integer.</param>
-        int GetInt(string key);
-#endif
         /// <summary>
         /// Read variable and replace environment variable if needed
         /// </summary>
@@ -72,33 +60,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Runtime
         {
             this.configuration = configRoot;
         }
-#if mist
-        /// <summary>
-        /// Read a string value from configuration.
-        /// </summary>
-        /// <param name="key">The key of the configuration string.</param>
-        public string GetString(string key)
-        {
-            var value = this.configuration.GetValue<string>(key);
-            return ReplaceEnvironmentVariables(value);
-        }
-
-        /// <summary>
-        /// Read an integer value from configuration.
-        /// </summary>
-        /// <param name="key">The key of the configuration integer.</param>
-        public int GetInt(string key)
-        {
-            try
-            {
-                return Convert.ToInt32(this.GetString(key));
-            }
-            catch (Exception e)
-            {
-                throw new InvalidConfigurationException($"Unable to load configuration value for '{key}'", e);
-            }
-        }
-#endif
 
         /// <summary>
         /// Read string key and replace environment variable if needed.
@@ -182,29 +143,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Runtime
             return defaultValue;
         }
 
-#if mist
-        private static string ReplaceEnvironmentVariables(string value)
-        {
-            if (string.IsNullOrEmpty(value)) return value;
-
-            // Extract the name of all the substitutions required
-            // using the following pattern, e.g. ${VAR_NAME}
-            const string pattern = @"\${(?'key'[a-zA-Z_][a-zA-Z0-9_]*)}";
-            var keys = (from Match m
-                        in Regex.Matches(value, pattern)
-                        select m.Groups[1].Value).ToArray();
-
-            foreach (DictionaryEntry x in Environment.GetEnvironmentVariables())
-            {
-                if (keys.Contains(x.Key))
-                {
-                    value = value.Replace("${" + x.Key + "}", x.Value.ToString());
-                }
-            }
-
-            return value;
-        }
-#endif
         /// <summary>
         /// Replace all placeholders
         /// </summary>
