@@ -194,7 +194,7 @@ namespace Opc.Ua.Gds.Server
         }
 
         private async Task ConsoleGlobalDiscoveryServer(
-            string gdsVaultServiceUrl, 
+            string gdsVaultServiceUrl,
             string appId)
         {
             ApplicationInstance.MessageDlg = new ApplicationMessageDlg();
@@ -244,20 +244,9 @@ namespace Opc.Ua.Gds.Server
 
             IOpcGdsVault gdsServiceClient = new OpcGdsVault(new Uri(gdsVaultServiceUrl));
 
-            // The vault handler (TODO: authentication)
+            // The Gds Vault handler (TODO: authentication)
             var gdsVaultHandler = new GdsVaultClientHandler(gdsServiceClient);
-#if TODO
-            if (String.IsNullOrEmpty(appId))
-            {
-                // authenticate key vault with MSI (web app) or developer user account
-                gdsVaultHandler.SetTokenProvider();
-            }
-            else
-            {
-                // authenticate key vault with app cert
-                gdsVaultHandler.SetAssertionCertificate(appId, await config.SecurityConfiguration.ApplicationCertificate.LoadPrivateKey(string.Empty));
-            }
-#endif
+
             // read configurations from GdsVault
             gdsVaultConfiguration.CertificateGroups = await gdsVaultHandler.GetCertificateConfigurationGroupsAsync(gdsVaultConfiguration.BaseCertificateGroupStorePath);
             UpdateGDSConfigurationDocument(config.Extensions, gdsVaultConfiguration);

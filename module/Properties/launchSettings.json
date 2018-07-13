@@ -1,8 +1,12 @@
 {
   "profiles": {
-    "EdgeGlobalDiscoveryServer": {
+    "GdsVault.Edge.Service": {
       "commandName": "Project",
-      "commandLineArgs": "-g http://iopgds.azurewebsites.net/ -c https://iopgds.documents.azure.com -k UwVt6nZDJLft1plvJElWNzNbHlSsschIiA0KADBwfwI82JxG8XFFnUMAf90GrfTlfy8dA5R0GH5jtEDveLo0VQ=="
+      "commandLineArgs": "-g http://yourgdsvaultservice.azurewebsites.net/ 
+    },
+    "GdsVault.Edge.Local": {
+      "commandName": "Project",
+      "commandLineArgs": "-g http://localhost:58801/ "
     }
   }
 }

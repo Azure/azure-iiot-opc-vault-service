@@ -11,7 +11,7 @@ namespace Opc.Ua.Gds.Server.GdsVault
     {
         private static readonly int guidLength = Guid.Empty.ToString().Length;
 
-        public static string GetIdentifierStringFromNodeId(NodeId nodeId, ushort namespaceIndex)
+        public static string GetServiceIdFromNodeId(NodeId nodeId, ushort namespaceIndex)
         {
             if (NodeId.IsNull(nodeId))
             {
@@ -47,7 +47,7 @@ namespace Opc.Ua.Gds.Server.GdsVault
             }
         }
 
-        public static NodeId GetNodeIdFromIdentifierString(string nodeIdentifier, ushort namespaceIndex)
+        public static NodeId GetNodeIdFromServiceId(string nodeIdentifier, ushort namespaceIndex)
         {
             if (String.IsNullOrEmpty(nodeIdentifier))
             {

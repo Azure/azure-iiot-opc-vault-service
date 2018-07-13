@@ -6,15 +6,27 @@
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.Models;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Opc.Ua.Gds.Server.GdsVault
 {
     public class GdsVaultCertificateRequest : ICertificateRequest
     {
+        private Dictionary<NodeId, string> _certTypeMap;
+
         private IOpcGdsVault _gdsVaultServiceClient { get; }
         public GdsVaultCertificateRequest(IOpcGdsVault gdsVaultServiceClient)
         {
             this._gdsVaultServiceClient = gdsVaultServiceClient;
+            this._certTypeMap = new Dictionary<NodeId, string>();
+
+            // list of supported cert type mappings (V1.04)
+            this._certTypeMap.Add(Opc.Ua.ObjectTypeIds.HttpsCertificateType, "Https");
+            this._certTypeMap.Add(Opc.Ua.ObjectTypeIds.UserCredentialCertificateType, "User");
+            this._certTypeMap.Add(Opc.Ua.ObjectTypeIds.ApplicationCertificateType, "App");
+            this._certTypeMap.Add(Opc.Ua.ObjectTypeIds.RsaMinApplicationCertificateType, "AppRsaSha1");
+            this._certTypeMap.Add(Opc.Ua.ObjectTypeIds.RsaSha256ApplicationCertificateType, "AppRsaSha256");
         }
 
         #region ICertificateRequest
@@ -31,19 +43,29 @@ namespace Opc.Ua.Gds.Server.GdsVault
             byte[] certificateRequest,
             string authorityId)
         {
-            string id = GdsVaultClientHelper.GetIdentifierStringFromNodeId(applicationId, NamespaceIndex);
+            string appId = GdsVaultClientHelper.GetServiceIdFromNodeId(applicationId, NamespaceIndex);
+            if (string.IsNullOrEmpty(appId))
+            {
+                throw new ServiceResultException(StatusCodes.BadInvalidArgument, "The ApplicationId is invalid.");
+            }
+
+            string certTypeId;
+            if (!_certTypeMap.TryGetValue(certificateTypeId, out certTypeId))
+            {
+                throw new ServiceResultException(StatusCodes.BadInvalidArgument, "The CertificateTypeId does not refer to a supported CertificateType.");
+            }
 
             var model = new CreateSigningRequestApiModel(
-                id,
-                certificateGroupId.ToString(),
-                certificateTypeId.ToString(),
+                appId,
+                authorityId,
+                certTypeId,
                 Convert.ToBase64String(certificateRequest),
-                authorityId
+                certificateGroupId.ToString()
                 );
 
             string requestId = _gdsVaultServiceClient.CreateSigningRequest(model);
 
-            return GdsVaultClientHelper.GetNodeIdFromIdentifierString(requestId, NamespaceIndex);
+            return GdsVaultClientHelper.GetNodeIdFromServiceId(requestId, NamespaceIndex);
         }
 
         public NodeId CreateNewKeyPairRequest(
@@ -56,22 +78,32 @@ namespace Opc.Ua.Gds.Server.GdsVault
             string privateKeyPassword,
             string authorityId)
         {
-            string id = GdsVaultClientHelper.GetIdentifierStringFromNodeId(applicationId, NamespaceIndex);
+            string appId = GdsVaultClientHelper.GetServiceIdFromNodeId(applicationId, NamespaceIndex);
+            if (string.IsNullOrEmpty(appId))
+            {
+                throw new ServiceResultException(StatusCodes.BadInvalidArgument, "The ApplicationId is invalid.");
+            }
+
+            string certTypeId;
+            if (!_certTypeMap.TryGetValue(certificateTypeId, out certTypeId))
+            {
+                throw new ServiceResultException(StatusCodes.BadInvalidArgument, "The CertificateTypeId does not refer to a supported CertificateType.");
+            }
 
             var model = new CreateNewKeyPairRequestApiModel(
-                id,
-                certificateGroupId.ToString(),
-                certificateTypeId.ToString(),
+                appId,
+                authorityId,
+                certTypeId,
                 subjectName,
                 domainNames,
                 privateKeyFormat,
                 privateKeyPassword,
-                authorityId
+                certificateGroupId.Identifier.ToString()
                 );
 
             string requestId = _gdsVaultServiceClient.CreateNewKeyPairRequest(model);
 
-            return GdsVaultClientHelper.GetNodeIdFromIdentifierString(requestId, NamespaceIndex);
+            return GdsVaultClientHelper.GetNodeIdFromServiceId(requestId, NamespaceIndex);
         }
 
         public void ApproveCertificateRequest(
@@ -80,11 +112,13 @@ namespace Opc.Ua.Gds.Server.GdsVault
             )
         {
             // intentionally ignore the auto approval, it is implemented in the GdsVault service
+            string reqId = GdsVaultClientHelper.GetServiceIdFromNodeId(requestId, NamespaceIndex);
+            _gdsVaultServiceClient.ApproveCertificateRequest(reqId, isRejected);
         }
 
         public void AcceptCertificateRequest(NodeId requestId, byte[] signedCertificate)
         {
-            string reqId = GdsVaultClientHelper.GetIdentifierStringFromNodeId(requestId, NamespaceIndex);
+            string reqId = GdsVaultClientHelper.GetServiceIdFromNodeId(requestId, NamespaceIndex);
             _gdsVaultServiceClient.AcceptCertificateRequest(reqId);
         }
 
@@ -96,8 +130,17 @@ namespace Opc.Ua.Gds.Server.GdsVault
             out byte[] signedCertificate,
             out byte[] privateKey)
         {
-            string reqId = GdsVaultClientHelper.GetIdentifierStringFromNodeId(requestId, NamespaceIndex);
-            string appId = GdsVaultClientHelper.GetIdentifierStringFromNodeId(applicationId, NamespaceIndex);
+            string reqId = GdsVaultClientHelper.GetServiceIdFromNodeId(requestId, NamespaceIndex);
+            if (string.IsNullOrEmpty(reqId))
+            {
+                throw new ServiceResultException(StatusCodes.BadInvalidArgument, "The RequestId is invalid.");
+            }
+
+            string appId = GdsVaultClientHelper.GetServiceIdFromNodeId(applicationId, NamespaceIndex);
+            if (string.IsNullOrEmpty(appId))
+            {
+                throw new ServiceResultException(StatusCodes.BadInvalidArgument, "The ApplicationId is invalid.");
+            }
 
             certificateGroupId = null;
             certificateTypeId = null;
@@ -110,10 +153,11 @@ namespace Opc.Ua.Gds.Server.GdsVault
 
             if (state == CertificateRequestState.Approved)
             {
-                certificateGroupId = request.CertificateGroupId;
-                certificateTypeId = request.CertificateTypeId;
-                signedCertificate = Convert.FromBase64String(request.SignedCertificate);
-                privateKey = Convert.FromBase64String(request.PrivateKey);
+                int id = int.Parse(request.AuthorityId);
+                certificateGroupId = new NodeId(id, NamespaceIndex);
+                certificateTypeId = _certTypeMap.FirstOrDefault(x => x.Value == request.CertificateTypeId).Key;
+                signedCertificate = request.SignedCertificate != null ? Convert.FromBase64String(request.SignedCertificate) : null;
+                privateKey = request.PrivateKey != null ? Convert.FromBase64String(request.PrivateKey) : null;
             }
 
             return state;
