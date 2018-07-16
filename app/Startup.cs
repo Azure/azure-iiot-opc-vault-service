@@ -13,11 +13,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Azure.Documents.Client;
+using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.CosmosDB;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using System;
 using System.Threading.Tasks;
 
 namespace GdsVault.App
@@ -33,6 +35,17 @@ namespace GdsVault.App
             dbClient = new DocumentDBRepository(endpoint, authKeyOrResourceToken);
         }
     }
+
+    public class OpcGdsVaultConfigured : OpcGdsVault
+    {
+        public OpcGdsVaultConfigured(IConfiguration config)
+            :base(new Uri(config["GdsVault"]))
+
+        {
+        }
+
+    }
+
     public class Startup
     {
         public Startup(IConfiguration configuration)
@@ -51,6 +64,8 @@ namespace GdsVault.App
             services.AddTransient<IDocumentDBCollection<CertificateRequest>, DocumentDBCollection<CertificateRequest>>();
             services.AddTransient<IDocumentDBCollection<CertificateStore>, DocumentDBCollection<CertificateStore>>();
             services.AddTransient<IDocumentDBRepository, GdsVaultDocumentDBRepository>();
+
+            services.AddTransient<IOpcGdsVault, OpcGdsVaultConfigured>();
 
             services.Configure<CookiePolicyOptions>(options =>
             {

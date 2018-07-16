@@ -19,7 +19,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models
         [JsonProperty(PropertyName = "LastCounterResetTime", Order = 20)]
         public DateTime LastCounterResetTime { get; set; }
 
-        [JsonProperty(PropertyName = "NextRecordId", Order = 20)]
+        [JsonProperty(PropertyName = "NextRecordId", Order = 30)]
         public uint NextRecordId { get; set; }
 
         public QueryApplicationsResponseApiModel(

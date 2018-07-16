@@ -11,29 +11,33 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models
 {
     public sealed class ApplicationDescriptionApiModel
     {
-        [JsonProperty(PropertyName = "ApplicationUri", Order = 10)]
+        [JsonProperty(PropertyName = "ApplicationId", Order = 10)]
+        public string ApplicationId { get; set; }
+
+        [JsonProperty(PropertyName = "ApplicationUri", Order = 20)]
         public string ApplicationUri { get; set; }
 
-        [JsonProperty(PropertyName = "ProductUri", Order = 20)]
+        [JsonProperty(PropertyName = "ProductUri", Order = 30)]
         public string ProductUri { get; set; }
 
-        [JsonProperty(PropertyName = "ApplicationName", Order = 30)]
+        [JsonProperty(PropertyName = "ApplicationName", Order = 40)]
         public ApplicationNameApiModel ApplicationName { get; set; }
 
-        [JsonProperty(PropertyName = "ApplicationType", Order = 40)]
+        [JsonProperty(PropertyName = "ApplicationType", Order = 50)]
         public int ApplicationType { get; set; }
 
-        [JsonProperty(PropertyName = "GatewayServerUri", Order = 50)]
+        [JsonProperty(PropertyName = "GatewayServerUri", Order = 60)]
         public string GatewayServerUri { get; set; }
 
-        [JsonProperty(PropertyName = "DiscoveryProfileUri", Order = 60)]
+        [JsonProperty(PropertyName = "DiscoveryProfileUri", Order = 70)]
         public string[] DiscoveryProfileUri { get; set; }
 
-        [JsonProperty(PropertyName = "DiscoveryUrls", Order = 70)]
+        [JsonProperty(PropertyName = "DiscoveryUrls", Order = 80)]
         public string[] DiscoveryUrls { get; set; }
 
         public ApplicationDescriptionApiModel(Application application)
         {
+            this.ApplicationId = application.ApplicationId.ToString();
             this.ApplicationUri = application.ApplicationUri;
             if (application.ApplicationNames != null &&
                 application.ApplicationNames.Length >= 1)
@@ -47,6 +51,5 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models
             this.ApplicationType = application.ApplicationType;
             this.ProductUri = application.ProductUri;
         }
-
     }
 }

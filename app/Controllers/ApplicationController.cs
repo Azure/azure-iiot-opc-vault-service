@@ -5,8 +5,8 @@
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.CosmosDB;
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Models;
+using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api;
+using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.Models;
 using System;
 using System.Threading.Tasks;
 
@@ -15,35 +15,37 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Controllers
     [Authorize]
     public class ApplicationController : Controller
     {
-        private readonly IDocumentDBCollection<Application> db;
-        public ApplicationController(IDocumentDBCollection<Application> db)
+        private readonly IOpcGdsVault gdsVault;
+        public ApplicationController(IOpcGdsVault gdsVault)
         {
-            this.db = db;
+            this.gdsVault = gdsVault;
         }
+
 
         [ActionName("Index")]
         public async Task<ActionResult> IndexAsync()
         {
-            var applications = await db.GetAsync(x => true);
-            return View(applications);
+            var applications = await gdsVault.QueryApplicationsAsync();
+            return View(applications.Applications);
         }
 
+
 #pragma warning disable 1998
-        [ActionName("Create")]
-        public async Task<ActionResult> CreateAsync()
+        [ActionName("Register")]
+        public async Task<ActionResult> RegisterAsync()
         {
             return View();
         }
 #pragma warning restore 1998
 
         [HttpPost]
-        [ActionName("Create")]
+        [ActionName("Register")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> CreateAsync([Bind("ApplicationId,ApplicationName,ApplicationUri")] Application application)
+        public async Task<ActionResult> RegisterAsync([Bind("ApplicationId,ApplicationName,ApplicationUri")] ApplicationRecordApiModel application)
         {
             if (ModelState.IsValid)
             {
-                await db.CreateAsync(application);
+                await gdsVault.RegisterApplicationAsync(application);
                 return RedirectToAction("Index");
             }
 
@@ -53,11 +55,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Controllers
         [HttpPost]
         [ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> EditAsync([Bind("ApplicationId,ApplicationName,ApplicationUri")] Application application)
+        public async Task<ActionResult> EditAsync([Bind("ApplicationId,ApplicationName,ApplicationUri")] ApplicationRecordApiModel application)
         {
             if (ModelState.IsValid)
             {
-                await db.UpdateAsync(application.ApplicationId, application);
+                await gdsVault.UpdateApplicationAsync(application.ApplicationId, application);
                 return RedirectToAction("Index");
             }
 
@@ -65,14 +67,14 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Controllers
         }
 
         [ActionName("Edit")]
-        public async Task<ActionResult> EditAsync(Guid id)
+        public async Task<ActionResult> EditAsync(string id)
         {
-            if (id == null)
+            if (String.IsNullOrEmpty(id))
             {
                 return new BadRequestResult();
             }
 
-            Application application = await db.GetAsync(id);
+            var application = await gdsVault.GetApplicationAsync(id);
             if (application == null)
             {
                 return new NotFoundResult();
@@ -82,14 +84,14 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Controllers
         }
 
         [ActionName("Delete")]
-        public async Task<ActionResult> DeleteAsync(Guid id)
+        public async Task<ActionResult> DeleteAsync(string id)
         {
-            if (id == null)
+            if (String.IsNullOrEmpty(id))
             {
                 return new BadRequestResult();
             }
 
-            Application application = await db.GetAsync(id);
+            var application = await gdsVault.GetApplicationAsync(id);
             if (application == null)
             {
                 return new NotFoundResult();
@@ -101,17 +103,23 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Controllers
         [HttpPost]
         [ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> DeleteConfirmedAsync([Bind("Id")] Guid id)
+        public async Task<ActionResult> DeleteConfirmedAsync([Bind("Id")] string id)
         {
-            await db.DeleteAsync(id);
+
+            await gdsVault.UnregisterApplicationAsync(id);
             return RedirectToAction("Index");
         }
 
         [ActionName("Details")]
-        public async Task<ActionResult> DetailsAsync(Guid id)
+        public async Task<ActionResult> DetailsAsync(string id)
         {
-            Application application = await db.GetAsync(id);
+            var application = await gdsVault.GetApplicationAsync(id);
+            if (application == null)
+            {
+                return new NotFoundResult();
+            }
             return View(application);
         }
+
     }
 }

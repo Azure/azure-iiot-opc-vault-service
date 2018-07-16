@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\api-csharp\Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.csproj" />
     <ProjectReference Include="..\common\Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.csproj" />
   </ItemGroup>
 
