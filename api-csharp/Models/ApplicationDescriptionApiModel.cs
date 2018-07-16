@@ -30,8 +30,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.Models
         /// Initializes a new instance of the ApplicationDescriptionApiModel
         /// class.
         /// </summary>
-        public ApplicationDescriptionApiModel(string applicationUri = default(string), string productUri = default(string), ApplicationNameApiModel applicationName = default(ApplicationNameApiModel), int? applicationType = default(int?), string gatewayServerUri = default(string), IList<string> discoveryProfileUri = default(IList<string>), IList<string> discoveryUrls = default(IList<string>))
+        public ApplicationDescriptionApiModel(string applicationId = default(string), string applicationUri = default(string), string productUri = default(string), ApplicationNameApiModel applicationName = default(ApplicationNameApiModel), int? applicationType = default(int?), string gatewayServerUri = default(string), IList<string> discoveryProfileUri = default(IList<string>), IList<string> discoveryUrls = default(IList<string>))
         {
+            ApplicationId = applicationId;
             ApplicationUri = applicationUri;
             ProductUri = productUri;
             ApplicationName = applicationName;
@@ -46,6 +47,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.Models
         /// An initialization method that performs custom operations like setting defaults
         /// </summary>
         partial void CustomInit();
+
+        /// <summary>
+        /// </summary>
+        [JsonProperty(PropertyName = "ApplicationId")]
+        public string ApplicationId { get; set; }
 
         /// <summary>
         /// </summary>
