@@ -208,14 +208,15 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
             do
             {
                 uint queryRecords = complexQuery ? defaultRecordsPerQuery : maxRecordsToReturn;
-                // TODO: implement query with server side match...
                 string query = CreateServerQuery(startingRecordId, queryRecords);
-                var applications = Applications.GetAsync(query).Result;
+                nextRecordId = startingRecordId + 1;
+                var applications = await Applications.GetAsync(query);
                 lastQuery = queryRecords == 0 || applications.Count() < queryRecords || applications.Count() == 0;
 
                 foreach (var application in applications)
                 {
-                    startingRecordId = application.ID + 1;
+                    startingRecordId = (uint)application.ID + 1;
+                    nextRecordId = startingRecordId;
 
                     if (!String.IsNullOrEmpty(applicationName))
                     {
@@ -265,15 +266,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
                         }
                     }
 
-                    if (application.DiscoveryUrls != null)
-                    {
-                        foreach (var discoveryUrl in application.DiscoveryUrls)
-                        {
-                            records.Add(application);
-                        }
-                    }
+                    records.Add(application);
 
-                    if (--maxRecordsToReturn == 0)
+                    if (maxRecordsToReturn > 0 && --maxRecordsToReturn == 0)
                     {
                         break;
                     }

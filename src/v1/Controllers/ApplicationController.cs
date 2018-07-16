@@ -92,7 +92,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
             if (query == null)
             {
                 // query all
-                query = new QueryApplicationsApiModel(0, 0, null, null, 3, null, null);
+                query = new QueryApplicationsApiModel(0, 0, null, null, 0, null, null);
             }
             var result = await _applicationDatabase.QueryApplicationsAsync(
                 query.StartingRecordId,

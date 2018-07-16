@@ -15,40 +15,24 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models
     public sealed class QueryApplicationsResponseApiModel
     {
         [JsonProperty(PropertyName = "Applications", Order = 10)]
-        public ApplicationDescriptionApiModel[] Applications { get; set; }
+        public ApplicationRecordApiModel[] Applications { get; set; }
 
-        [JsonProperty(PropertyName = "LastCounterResetTime", Order = 20)]
+        [JsonProperty(PropertyName = "LastCounterResetTime", Required = Required.Always, Order = 20)]
         public DateTime LastCounterResetTime { get; set; }
 
-        [JsonProperty(PropertyName = "NextRecordId", Order = 30)]
-        public uint NextRecordId { get; set; }
-
-        public QueryApplicationsResponseApiModel(
-            Application[] applications,
-            DateTime lastCounterResetTime,
-            uint nextRecordId
-            )
-        {
-            var applicationsList = new List<ApplicationDescriptionApiModel>();
-            foreach (var application in applications)
-            {
-                applicationsList.Add(new ApplicationDescriptionApiModel(application));
-            }
-            this.Applications = applicationsList.ToArray();
-            this.LastCounterResetTime = lastCounterResetTime;
-            this.NextRecordId = nextRecordId;
-        }
+        [JsonProperty(PropertyName = "NextRecordId", Required = Required.Always, Order = 30)]
+        public int NextRecordId { get; set; }
 
         public QueryApplicationsResponseApiModel(QueryApplicationsResponseModel model)
         {
-            var applicationsList = new List<ApplicationDescriptionApiModel>();
-            foreach (var application in model.Applications)
+            var applicationsList = new List<ApplicationRecordApiModel>();
+            foreach (Application application in model.Applications)
             {
-                applicationsList.Add(new ApplicationDescriptionApiModel(application));
+                applicationsList.Add(new ApplicationRecordApiModel(application));
             }
-            this.Applications = applicationsList.ToArray();
-            this.LastCounterResetTime = model.LastCounterResetTime;
-            this.NextRecordId = model.NextRecordId;
+            Applications = applicationsList.ToArray();
+            LastCounterResetTime = model.LastCounterResetTime;
+            NextRecordId = model.NextRecordId;
         }
 
     }

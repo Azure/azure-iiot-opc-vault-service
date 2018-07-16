@@ -19,7 +19,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Models
     {
         [JsonProperty(PropertyName = "id")]
         public Guid ApplicationId { get; set; }
-        public uint ID { get; set; }
+        public int ID { get; set; }
         public string ApplicationUri { get; set; }
         public string ApplicationName { get; set; }
         public int ApplicationType { get; set; }
@@ -31,5 +31,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Models
         public Guid? HttpsTrustListId { get; set; }
         public ApplicationName[] ApplicationNames { get; set; }
         public string[] DiscoveryUrls { get; set; }
+        public string GatewayServerUri { get; set; }
+        public string DiscoveryProfileUri { get; set; }
     }
 }

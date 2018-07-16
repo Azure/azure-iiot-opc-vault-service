@@ -14,7 +14,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Models
 
         public DateTime LastCounterResetTime { get; set; }
 
-        public uint NextRecordId { get; set; }
+        public int NextRecordId { get; set; }
 
         public QueryApplicationsResponseModel(
             Application[] applications,
@@ -24,7 +24,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Models
         {
             this.Applications = applications;
             this.LastCounterResetTime = lastCounterResetTime;
-            this.NextRecordId = nextRecordId;
+            this.NextRecordId = (int)nextRecordId;
         }
     }
 }

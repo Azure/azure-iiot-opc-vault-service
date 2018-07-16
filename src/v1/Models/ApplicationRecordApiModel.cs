@@ -16,6 +16,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models
         [JsonProperty(PropertyName = "ApplicationId", Order = 10)]
         public string ApplicationId { get; set; }
 
+        [JsonProperty(PropertyName = "ID", Order = 15)]
+        public int? ID { get; }
+
         [JsonProperty(PropertyName = "ApplicationUri", Order = 20)]
         public string ApplicationUri { get; set; }
 
@@ -37,6 +40,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models
         [JsonProperty(PropertyName = "ServerCapabilities", Order = 80)]
         public string ServerCapabilities { get; set; }
 
+        [JsonProperty(PropertyName = "GatewayServerUri", Order = 90)]
+        public string GatewayServerUri { get; set; }
+
+        [JsonProperty(PropertyName = "DiscoveryProfileUri", Order = 100)]
+        public string DiscoveryProfileUri { get; set; }
+
+
         public ApplicationRecordApiModel()
         {
         }
@@ -44,6 +54,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models
         public ApplicationRecordApiModel(Application application)
         {
             this.ApplicationId = application.ApplicationId != Guid.Empty ? application.ApplicationId.ToString() : null;
+            this.ID = application.ID;
             this.ApplicationUri = application.ApplicationUri;
             this.ApplicationName = application.ApplicationName;
             this.ApplicationType = application.ApplicationType;
@@ -57,6 +68,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models
             this.ProductUri = application.ProductUri;
             this.DiscoveryUrls = application.DiscoveryUrls;
             this.ServerCapabilities = application.ServerCapabilities;
+            this.GatewayServerUri = application.GatewayServerUri;
+            this.DiscoveryProfileUri = application.DiscoveryProfileUri;
         }
 
         public Application ToServiceModel()
@@ -78,6 +91,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models
             application.ProductUri = this.ProductUri;
             application.DiscoveryUrls = this.DiscoveryUrls;
             application.ServerCapabilities = this.ServerCapabilities;
+            application.GatewayServerUri = this.GatewayServerUri;
+            application.DiscoveryProfileUri = this.DiscoveryProfileUri;
             return application;
         }
 
