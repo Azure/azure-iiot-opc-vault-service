@@ -206,6 +206,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
             {
                 builder.RegisterType<BehalfOfTokenProvider>()
                     .AsImplementedInterfaces().SingleInstance();
+                builder.RegisterType<DistributedTokenCache>()
+                   .AsImplementedInterfaces().SingleInstance();
                 builder.RegisterType<HttpBearerAuthentication>()
                     .AsImplementedInterfaces().SingleInstance();
             }

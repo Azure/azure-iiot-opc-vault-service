@@ -242,6 +242,7 @@ namespace Opc.Ua.Gds.Server
                 }
             }
 
+            // TODO: add authentication
             IOpcGdsVault gdsServiceClient = new OpcGdsVault(new Uri(gdsVaultServiceUrl));
 
             // The Gds Vault handler (TODO: authentication)
