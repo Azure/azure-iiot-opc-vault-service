@@ -89,8 +89,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
         [SwaggerOperation(operationId: "QueryApplications")]
         public async Task<QueryApplicationsResponseApiModel> QueryApplicationsAsync([FromBody] QueryApplicationsApiModel query)
         {
-            DateTime lastCounterResetTime;
-            uint nextRecordId;
+            if (query == null)
+            {
+                // query all
+                query = new QueryApplicationsApiModel(0, 0, null, null, 3, null, null);
+            }
             var result = await _applicationDatabase.QueryApplicationsAsync(
                 query.StartingRecordId,
                 query.MaxRecordsToReturn,
@@ -98,31 +101,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
                 query.ApplicationUri,
                 query.ApplicationType,
                 query.ProductUri,
-                query.ServerCapabilities,
-                out lastCounterResetTime,
-                out nextRecordId
+                query.ServerCapabilities
                 );
-            return new QueryApplicationsResponseApiModel(result, lastCounterResetTime, nextRecordId);
-        }
-
-        [HttpPost("servers")]
-        [SwaggerOperation(operationId: "QueryServers")]
-        public async Task<QueryServersResponseApiModel> QueryServersAsync([FromBody] QueryServersApiModel query)
-        {
-            DateTime lastCounterResetTime;
-            uint nextRecordId;
-            var result = await _applicationDatabase.QueryApplicationsAsync(
-                query.StartingRecordId,
-                query.MaxRecordsToReturn,
-                query.ApplicationName,
-                query.ApplicationUri,
-                0,
-                query.ProductUri,
-                query.ServerCapabilities,
-                out lastCounterResetTime,
-                out nextRecordId
-                );
-            return new QueryServersResponseApiModel(result, lastCounterResetTime);
+            return new QueryApplicationsResponseApiModel(result);
         }
     }
 }

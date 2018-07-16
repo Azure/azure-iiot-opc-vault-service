@@ -7,7 +7,9 @@ using Microsoft.Azure.IIoT.Diagnostics;
 using Microsoft.Azure.IIoT.Exceptions;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.CosmosDB;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Models;
+using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Models;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Runtime;
+using Opc.Ua.Gds.Server.Database;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -170,42 +172,22 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
             return results.ToArray();
         }
 
-        public Task<Application[]> QueryApplicationsAsync(
+        public async Task<QueryApplicationsResponseModel> QueryApplicationsAsync(
             uint startingRecordId,
             uint maxRecordsToReturn,
             string applicationName,
             string applicationUri,
             uint applicationType,
             string productUri,
-            string[] serverCapabilities,
-            out DateTime lastCounterResetTime,
-            out uint nextRecordId
+            string[] serverCapabilities
             )
         {
-            lastCounterResetTime = DateTime.MinValue;
-            nextRecordId = 0;
-            return Task.FromResult<Application[]>(null);
-        }
+            // TODO: implement last query time
+            DateTime lastCounterResetTime = DateTime.MinValue;
+            uint nextRecordId = 0;
 
-        public Task<Application[]> QueryServersAsync(
-            uint startingRecordId,
-            uint maxRecordsToReturn,
-            string applicationName,
-            string applicationUri,
-            string productUri,
-            string[] serverCapabilities,
-            out DateTime lastCounterResetTime
-            )
-        {
-            lastCounterResetTime = DateTime.MinValue;
-            return Task.FromResult<Application[]>(null);
-        }
-
-#if mist
-            List<ServerOnNetwork> records = new List<ServerOnNetwork>();
+            List<Application> records = new List<Application>();
             const uint defaultRecordsPerQuery = 10;
-
-            lastCounterResetTime = queryCounterResetTime;
 
             bool matchQuery = false;
             bool complexQuery =
@@ -216,11 +198,10 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
 
             if (complexQuery)
             {
-                // TODO: implement query with server side match...
                 matchQuery =
-                    IsMatchPattern(applicationName) ||
-                    IsMatchPattern(applicationUri) ||
-                    IsMatchPattern(productUri);
+                    ApplicationsDatabaseBase.IsMatchPattern(applicationName) ||
+                    ApplicationsDatabaseBase.IsMatchPattern(applicationUri) ||
+                    ApplicationsDatabaseBase.IsMatchPattern(productUri);
             }
 
             bool lastQuery = false;
@@ -232,13 +213,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
                 var applications = Applications.GetAsync(query).Result;
                 lastQuery = queryRecords == 0 || applications.Count() < queryRecords || applications.Count() == 0;
 
-                foreach (var result in applications)
+                foreach (var application in applications)
                 {
-                    startingRecordId = result.ID + 1;
+                    startingRecordId = application.ID + 1;
 
                     if (!String.IsNullOrEmpty(applicationName))
                     {
-                        if (!Match(result.ApplicationName, applicationName))
+                        if (!ApplicationsDatabaseBase.Match(application.ApplicationName, applicationName))
                         {
                             continue;
                         }
@@ -246,7 +227,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
 
                     if (!String.IsNullOrEmpty(applicationUri))
                     {
-                        if (!Match(result.ApplicationUri, applicationUri))
+                        if (!ApplicationsDatabaseBase.Match(application.ApplicationUri, applicationUri))
                         {
                             continue;
                         }
@@ -254,16 +235,16 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
 
                     if (!String.IsNullOrEmpty(productUri))
                     {
-                        if (!Match(result.ProductUri, productUri))
+                        if (!ApplicationsDatabaseBase.Match(application.ProductUri, productUri))
                         {
                             continue;
                         }
                     }
 
                     string[] capabilities = null;
-                    if (!String.IsNullOrEmpty(result.ServerCapabilities))
+                    if (!String.IsNullOrEmpty(application.ServerCapabilities))
                     {
-                        capabilities = result.ServerCapabilities.Split(',');
+                        capabilities = application.ServerCapabilities.Split(',');
                     }
 
                     if (serverCapabilities != null && serverCapabilities.Length > 0)
@@ -284,17 +265,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
                         }
                     }
 
-                    if (result.DiscoveryUrls != null)
+                    if (application.DiscoveryUrls != null)
                     {
-                        foreach (var discoveryUrl in result.DiscoveryUrls)
+                        foreach (var discoveryUrl in application.DiscoveryUrls)
                         {
-                            records.Add(new ServerOnNetwork()
-                            {
-                                RecordId = result.ID,
-                                ServerName = result.ApplicationName,
-                                DiscoveryUrl = discoveryUrl,
-                                ServerCapabilities = capabilities
-                            });
+                            records.Add(application);
                         }
                     }
 
@@ -305,8 +280,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
                 }
             } while (maxRecordsToReturn > 0 && !lastQuery);
 
-            return records.ToArray();
-#endif
+            return new QueryApplicationsResponseModel(records.ToArray(), lastCounterResetTime, nextRecordId);
+        }
+
 #if mist
         public override bool SetApplicationCertificate(
             NodeId applicationId,

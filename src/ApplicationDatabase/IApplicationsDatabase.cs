@@ -5,6 +5,7 @@
 
 
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Models;
+using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Models;
 using System;
 using System.Threading.Tasks;
 
@@ -17,26 +18,14 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
         Task UnregisterApplicationAsync(string id);
         Task<Application> GetApplicationAsync(string id);
         Task<Application[]> FindApplicationAsync(string uri);
-        Task<Application[]> QueryApplicationsAsync(
+        Task<QueryApplicationsResponseModel> QueryApplicationsAsync(
             uint startingRecordId,
             uint maxRecordsToReturn,
             string applicationName,
             string applicationUri,
             uint applicationType,
             string productUri,
-            string[] serverCapabilities,
-            out DateTime lastCounterResetTime,
-            out uint nextRecordId
+            string[] serverCapabilities
             );
-        Task<Application[]> QueryServersAsync(
-            uint startingRecordId,
-            uint maxRecordsToReturn,
-            string applicationName,
-            string applicationUri,
-            string productUri,
-            string[] serverCapabilities,
-            out DateTime lastCounterResetTime
-            );
-
     }
 }

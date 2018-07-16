@@ -5,6 +5,7 @@
 
 
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Models;
+using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -37,5 +38,20 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models
             this.LastCounterResetTime = lastCounterResetTime;
             this.NextRecordId = nextRecordId;
         }
+
+        public QueryApplicationsResponseApiModel(QueryApplicationsResponseModel model)
+        {
+            var applicationsList = new List<ApplicationDescriptionApiModel>();
+            foreach (var application in model.Applications)
+            {
+                applicationsList.Add(new ApplicationDescriptionApiModel(application));
+            }
+            this.Applications = applicationsList.ToArray();
+            this.LastCounterResetTime = model.LastCounterResetTime;
+            this.NextRecordId = model.NextRecordId;
+        }
+
     }
+
+
 }
