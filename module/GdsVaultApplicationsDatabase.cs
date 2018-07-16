@@ -8,6 +8,7 @@ using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.Models;
 using Opc.Ua.Gds.Server.GdsVault;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Opc.Ua.Gds.Server.Database.GdsVault
 {
@@ -87,6 +88,8 @@ namespace Opc.Ua.Gds.Server.Database.GdsVault
 
         public override void UnregisterApplication(NodeId applicationId)
         {
+            base.UnregisterApplication(applicationId);
+
             string id = GdsVaultClientHelper.GetServiceIdFromNodeId(applicationId, NamespaceIndex);
 
             try
@@ -103,6 +106,7 @@ namespace Opc.Ua.Gds.Server.Database.GdsVault
             NodeId applicationId
             )
         {
+            base.GetApplication(applicationId);
             string id = GdsVaultClientHelper.GetServiceIdFromNodeId(applicationId, NamespaceIndex);
             ApplicationRecordApiModel result;
 
@@ -157,6 +161,7 @@ namespace Opc.Ua.Gds.Server.Database.GdsVault
             string applicationUri
             )
         {
+            base.FindApplications(applicationUri);
             IList<ApplicationRecordApiModel> results;
 
             results = _gdsVaultServiceClient.FindApplication(applicationUri);
@@ -220,110 +225,38 @@ namespace Opc.Ua.Gds.Server.Database.GdsVault
         {
             lastCounterResetTime = DateTime.MinValue;
             List<ServerOnNetwork> records = new List<ServerOnNetwork>();
-            const uint defaultRecordsPerQuery = 10;
-#if TODO
-            lastCounterResetTime = queryCounterResetTime;
 
-            bool matchQuery = false;
-            bool complexQuery =
-                !String.IsNullOrEmpty(applicationName) ||
-                !String.IsNullOrEmpty(applicationUri) ||
-                !String.IsNullOrEmpty(productUri) ||
-                (serverCapabilities != null && serverCapabilities.Length > 0);
+            var query = new QueryApplicationsApiModel(
+                (int)startingRecordId,
+                (int)maxRecordsToReturn,
+                applicationName,
+                applicationUri,
+                1, // server only
+                productUri,
+                serverCapabilities?.ToList()
+                );
+            var resultModel = _gdsVaultServiceClient.QueryApplications(query);
 
-            if (complexQuery)
+            foreach (var application in resultModel.Applications)
             {
-                // TODO: implement query with server side match...
-                matchQuery =
-                    IsMatchPattern(applicationName) ||
-                    IsMatchPattern(applicationUri) ||
-                    IsMatchPattern(productUri);
-            }
-
-            bool lastQuery = false;
-            do
-            {
-                uint queryRecords = complexQuery ? defaultRecordsPerQuery : maxRecordsToReturn;
-                // TODO: implement query with server side match...
-                string query = CreateServerQuery(startingRecordId, queryRecords);
-                var applications = Applications.GetAsync(query).Result;
-                lastQuery = queryRecords == 0 || applications.Count() < queryRecords || applications.Count() == 0;
-
-                foreach (var result in applications)
+                if (application.DiscoveryUrls != null)
                 {
-                    startingRecordId = result.ID + 1;
-
-                    if (!String.IsNullOrEmpty(applicationName))
+                    foreach (var discoveryUrl in application.DiscoveryUrls)
                     {
-                        if (!Match(result.ApplicationName, applicationName))
+                        records.Add(new ServerOnNetwork()
                         {
-                            continue;
-                        }
-                    }
-
-                    if (!String.IsNullOrEmpty(applicationUri))
-                    {
-                        if (!Match(result.ApplicationUri, applicationUri))
-                        {
-                            continue;
-                        }
-                    }
-
-                    if (!String.IsNullOrEmpty(productUri))
-                    {
-                        if (!Match(result.ProductUri, productUri))
-                        {
-                            continue;
-                        }
-                    }
-
-                    string[] capabilities = null;
-                    if (!String.IsNullOrEmpty(result.ServerCapabilities))
-                    {
-                        capabilities = result.ServerCapabilities.Split(',');
-                    }
-
-                    if (serverCapabilities != null && serverCapabilities.Length > 0)
-                    {
-                        bool match = true;
-                        for (int ii = 0; ii < serverCapabilities.Length; ii++)
-                        {
-                            if (capabilities == null || !capabilities.Contains(serverCapabilities[ii]))
-                            {
-                                match = false;
-                                break;
-                            }
-                        }
-
-                        if (!match)
-                        {
-                            continue;
-                        }
-                    }
-
-                    if (result.DiscoveryUrls != null)
-                    {
-                        foreach (var discoveryUrl in result.DiscoveryUrls)
-                        {
-                            records.Add(new ServerOnNetwork()
-                            {
-                                RecordId = result.ID,
-                                ServerName = result.ApplicationName,
-                                DiscoveryUrl = discoveryUrl,
-                                ServerCapabilities = capabilities
-                            });
-                        }
-                    }
-
-                    if (--maxRecordsToReturn == 0)
-                    {
-                        break;
+                            RecordId = (uint)application.ID,
+                            ServerName = application.ApplicationName,
+                            DiscoveryUrl = discoveryUrl,
+                            ServerCapabilities = application.ServerCapabilities?.Split(",")
+                        });
                     }
                 }
-            } while (maxRecordsToReturn > 0 && !lastQuery);
+            }
+
+            lastCounterResetTime = resultModel.LastCounterResetTime != null ? resultModel.LastCounterResetTime : DateTime.MinValue;
+
             return records.ToArray();
-#endif
-            throw new ServiceResultException("Not Implemented");
         }
 #if TODO_REMOVE // ???
         public override bool SetApplicationCertificate(
@@ -397,6 +330,51 @@ namespace Opc.Ua.Gds.Server.Database.GdsVault
             return true;
         }
 #endif
+
+        public override ApplicationDescription[] QueryApplications(
+            uint startingRecordId,
+            uint maxRecordsToReturn,
+            string applicationName,
+            string applicationUri,
+            uint applicationType,
+            string productUri,
+            string[] serverCapabilities,
+            out DateTime lastCounterResetTime,
+            out uint nextRecordId)
+        {
+            lastCounterResetTime = DateTime.MinValue;
+            var records = new List<ApplicationDescription>();
+
+            var query = new QueryApplicationsApiModel(
+                (int)startingRecordId,
+                (int)maxRecordsToReturn,
+                applicationName,
+                applicationUri,
+                (int)applicationType,
+                productUri,
+                serverCapabilities?.ToList()
+                );
+            var resultModel = _gdsVaultServiceClient.QueryApplications(query);
+
+            foreach (var application in resultModel.Applications)
+            {
+                records.Add(new ApplicationDescription()
+                {
+                    ApplicationUri = application.ApplicationUri,
+                    ProductUri = application.ProductUri,
+                    ApplicationName = application.ApplicationName,
+                    ApplicationType = (ApplicationType)application.ApplicationType,
+                    GatewayServerUri = application.GatewayServerUri,
+                    DiscoveryProfileUri = application.DiscoveryProfileUri,
+                    DiscoveryUrls = new StringCollection(application.DiscoveryUrls)
+                });
+            }
+
+            lastCounterResetTime = resultModel.LastCounterResetTime;
+            nextRecordId = (uint)resultModel.NextRecordId;
+            return records.ToArray();
+        }
+
         #endregion
     }
 }
