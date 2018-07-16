@@ -217,32 +217,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
-            /// <param name='query'>
-            /// </param>
-            public static QueryServersResponseApiModel QueryServers(this IOpcGdsVault operations, QueryServersApiModel query = default(QueryServersApiModel))
-            {
-                return operations.QueryServersAsync(query).GetAwaiter().GetResult();
-            }
-
-            /// <param name='operations'>
-            /// The operations group for this extension method.
-            /// </param>
-            /// <param name='query'>
-            /// </param>
-            /// <param name='cancellationToken'>
-            /// The cancellation token.
-            /// </param>
-            public static async Task<QueryServersResponseApiModel> QueryServersAsync(this IOpcGdsVault operations, QueryServersApiModel query = default(QueryServersApiModel), CancellationToken cancellationToken = default(CancellationToken))
-            {
-                using (var _result = await operations.QueryServersWithHttpMessagesAsync(query, null, cancellationToken).ConfigureAwait(false))
-                {
-                    return _result.Body;
-                }
-            }
-
-            /// <param name='operations'>
-            /// The operations group for this extension method.
-            /// </param>
             public static CertificateGroupListApiModel GetCertificateGroupIds(this IOpcGdsVault operations)
             {
                 return operations.GetCertificateGroupIdsAsync().GetAwaiter().GetResult();
