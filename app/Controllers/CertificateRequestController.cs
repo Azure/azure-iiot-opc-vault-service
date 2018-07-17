@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api;
+using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.Models;
 using System;
 using System.Threading.Tasks;
 
@@ -14,99 +15,64 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Controllers
         {
             this.gdsVault = gdsVault;
         }
-#if TODO
+
         [ActionName("Index")]
         public async Task<ActionResult> IndexAsync()
         {
-            var requests = await db.GetAsync(x => true);
-            return View(requests);
+            var requests = await gdsVault.QueryRequestsAsync();
+            return View(requests.Requests);
         }
 
 #pragma warning disable 1998
-        [ActionName("Create")]
-        public async Task<ActionResult> CreateAsync()
+        [ActionName("CreateNewKeyPair")]
+        public async Task<ActionResult> CreateNewKeyPairAsync()
         {
             return View();
         }
 #pragma warning restore 1998
 
         [HttpPost]
-        [ActionName("Create")]
+        [ActionName("CreateNewKeyPair")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> CreateAsync([Bind("RequestId,ApplicationId,State")] CertificateRequest request)
+        public async Task<ActionResult> CreateNewKeyPairAsync([Bind("RequestId,ApplicationId,State")] CreateNewKeyPairRequestApiModel request)
         {
             if (ModelState.IsValid)
             {
-                await db.CreateAsync(request);
+                //await db.CreateAsync(request);
                 return RedirectToAction("Index");
             }
 
             return View(request);
         }
 
+#pragma warning disable 1998
+        [ActionName("CreateSigningRequest")]
+        public async Task<ActionResult> CreateSigningRequestAsync()
+        {
+            return View();
+        }
+#pragma warning restore 1998
+
         [HttpPost]
-        [ActionName("Edit")]
+        [ActionName("CreateSigningRequest")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> EditAsync([Bind("RequestId,ApplicationId,State")] CertificateRequest request)
+        public async Task<ActionResult> CreateSigningRequestAsync([Bind("RequestId,ApplicationId,State")] CreateSigningRequestApiModel request)
         {
             if (ModelState.IsValid)
             {
-                await db.UpdateAsync(request.RequestId, request);
+                //await db.CreateAsync(request);
                 return RedirectToAction("Index");
             }
 
             return View(request);
-        }
-
-        [ActionName("Edit")]
-        public async Task<ActionResult> EditAsync(Guid id)
-        {
-            if (id == null)
-            {
-                return new BadRequestResult();
-            }
-
-            CertificateRequest request = await db.GetAsync(id);
-            if (request == null)
-            {
-                return new NotFoundResult();
-            }
-
-            return View(request);
-        }
-
-        [ActionName("Delete")]
-        public async Task<ActionResult> DeleteAsync(Guid id)
-        {
-            if (id == null)
-            {
-                return new BadRequestResult();
-            }
-
-            CertificateRequest request = await db.GetAsync(id);
-            if (request == null)
-            {
-                return new NotFoundResult();
-            }
-
-            return View(request);
-        }
-
-        [HttpPost]
-        [ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> DeleteConfirmedAsync([Bind("RequestId")] Guid id)
-        {
-            await db.DeleteAsync(id);
-            return RedirectToAction("Index");
         }
 
         [ActionName("Details")]
-        public async Task<ActionResult> DetailsAsync(Guid id)
+        public async Task<ActionResult> DetailsAsync(string id)
         {
-            CertificateRequest request = await db.GetAsync(id);
+            var request = await gdsVault.ReadCertificateRequestAsync(id);
             return View(request);
         }
-#endif
+
     }
 }

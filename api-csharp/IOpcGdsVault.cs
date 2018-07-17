@@ -225,7 +225,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
         Task<HttpOperationResponse<X509CrlApiModel>> RevokeCertificateWithHttpMessagesAsync(string groupId, X509Certificate2ApiModel cert = default(X509Certificate2ApiModel), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
-        /// Certificate Signing Request
+        /// Signing Request
         /// </summary>
         /// <param name='groupId'>
         /// </param>
@@ -240,7 +240,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
         Task<HttpOperationResponse<X509Certificate2ApiModel>> SigningRequestWithHttpMessagesAsync(string groupId, SigningRequestApiModel sr = default(SigningRequestApiModel), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
-        /// Create New Key Pair
+        /// New Key Pair
         /// </summary>
         /// <param name='groupId'>
         /// </param>
@@ -356,7 +356,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse<ReadRequestApiModel>> ReadCertificateRequestWithHttpMessagesAsync(string requestId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse<CertificateRequestRecordApiModel>> ReadCertificateRequestWithHttpMessagesAsync(string requestId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Complete certificate request

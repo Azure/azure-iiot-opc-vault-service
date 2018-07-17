@@ -25,7 +25,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Controllers
         [ActionName("Index")]
         public async Task<ActionResult> IndexAsync()
         {
-            var applications = await gdsVault.QueryApplicationsAsync();
+            var applicationQuery = new QueryApplicationsApiModel();
+            var applications = await gdsVault.QueryApplicationsAsync(applicationQuery);
             return View(applications.Applications);
         }
 
@@ -41,7 +42,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Controllers
         [HttpPost]
         [ActionName("Register")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> RegisterAsync([Bind("ApplicationId,ApplicationName,ApplicationUri")] ApplicationRecordApiModel application)
+        public async Task<ActionResult> RegisterAsync([Bind("ApplicationId,ApplicationName,ApplicationUri,ApplicationType,ProductUri,ServerCapabilities")] ApplicationRecordApiModel application)
         {
             if (ModelState.IsValid)
             {
@@ -55,7 +56,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Controllers
         [HttpPost]
         [ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> EditAsync([Bind("ApplicationId,ApplicationName,ApplicationUri")] ApplicationRecordApiModel application)
+        public async Task<ActionResult> EditAsync([Bind("ApplicationId,ApplicationName,ApplicationUri,ApplicationType,ProductUri,ServerCapabilities")] ApplicationRecordApiModel application)
         {
             if (ModelState.IsValid)
             {

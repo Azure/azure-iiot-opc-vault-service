@@ -1,4 +1,4 @@
-﻿@model Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Models.CertificateStore
+﻿@model Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.Models.ApplicationRecordApiModel
 
 <h2>View To-Do Item Details</h2>
 
@@ -6,6 +6,7 @@
     <h4>Item</h4>
     <hr />
     <dl class="dl-horizontal">
+        <@*
         <dt>
             @Html.DisplayNameFor(model => model.TrustListId)
         </dt>
@@ -29,9 +30,15 @@
         <dd>
             @Html.DisplayFor(model => model.AuthorityId)
         </dd>
+             *@>
     </dl>
 </div>
 <p>
+    <@*
+
     @Html.ActionLink("Edit", "Edit", new { id = Model.TrustListId }) |
+         *@>
     @Html.ActionLink("Back to List", "Index")
 </p>
+
+

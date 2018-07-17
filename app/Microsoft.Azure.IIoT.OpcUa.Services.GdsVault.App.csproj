@@ -17,7 +17,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\api-csharp\Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.csproj" />
-    <ProjectReference Include="..\common\Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="Views\CertificateRequest\CreateSigningRequest.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
   </ItemGroup>
 
 </Project>

@@ -31,7 +31,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.Models
         /// class.
         /// </summary>
         /// <param name="continuationToken">Continuation token to use</param>
-        public QueryRequestsResponseApiModel(IList<ReadRequestApiModel> requests = default(IList<ReadRequestApiModel>), string continuationToken = default(string))
+        public QueryRequestsResponseApiModel(IList<CertificateRequestRecordApiModel> requests = default(IList<CertificateRequestRecordApiModel>), string continuationToken = default(string))
         {
             Requests = requests;
             ContinuationToken = continuationToken;
@@ -46,7 +46,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.Models
         /// <summary>
         /// </summary>
         [JsonProperty(PropertyName = "Requests")]
-        public IList<ReadRequestApiModel> Requests { get; set; }
+        public IList<CertificateRequestRecordApiModel> Requests { get; set; }
 
         /// <summary>
         /// Gets or sets continuation token to use

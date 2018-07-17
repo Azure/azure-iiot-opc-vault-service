@@ -461,7 +461,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
             }
 
             /// <summary>
-            /// Certificate Signing Request
+            /// Signing Request
             /// </summary>
             /// <param name='operations'>
             /// The operations group for this extension method.
@@ -476,7 +476,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
             }
 
             /// <summary>
-            /// Certificate Signing Request
+            /// Signing Request
             /// </summary>
             /// <param name='operations'>
             /// The operations group for this extension method.
@@ -497,7 +497,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
             }
 
             /// <summary>
-            /// Create New Key Pair
+            /// New Key Pair
             /// </summary>
             /// <param name='operations'>
             /// The operations group for this extension method.
@@ -512,7 +512,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
             }
 
             /// <summary>
-            /// Create New Key Pair
+            /// New Key Pair
             /// </summary>
             /// <param name='operations'>
             /// The operations group for this extension method.
@@ -758,7 +758,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
             /// </param>
             /// <param name='requestId'>
             /// </param>
-            public static ReadRequestApiModel ReadCertificateRequest(this IOpcGdsVault operations, string requestId)
+            public static CertificateRequestRecordApiModel ReadCertificateRequest(this IOpcGdsVault operations, string requestId)
             {
                 return operations.ReadCertificateRequestAsync(requestId).GetAwaiter().GetResult();
             }
@@ -774,7 +774,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<ReadRequestApiModel> ReadCertificateRequestAsync(this IOpcGdsVault operations, string requestId, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<CertificateRequestRecordApiModel> ReadCertificateRequestAsync(this IOpcGdsVault operations, string requestId, CancellationToken cancellationToken = default(CancellationToken))
             {
                 using (var _result = await operations.ReadCertificateRequestWithHttpMessagesAsync(requestId, null, cancellationToken).ConfigureAwait(false))
                 {

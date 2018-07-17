@@ -26,11 +26,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.Models
         /// <summary>
         /// Initializes a new instance of the CompleteRequestApiModel class.
         /// </summary>
-        public CompleteRequestApiModel(string state = default(string), string applicationId = default(string), string requestId = default(string), string certificateGroupId = default(string), string certificateTypeId = default(string), string signedCertificate = default(string), string privateKey = default(string), string authorityId = default(string))
+        public CompleteRequestApiModel(string requestId = default(string), string applicationId = default(string), string state = default(string), string certificateGroupId = default(string), string certificateTypeId = default(string), string signedCertificate = default(string), string privateKey = default(string), string authorityId = default(string))
         {
-            State = state;
-            ApplicationId = applicationId;
             RequestId = requestId;
+            ApplicationId = applicationId;
+            State = state;
             CertificateGroupId = certificateGroupId;
             CertificateTypeId = certificateTypeId;
             SignedCertificate = signedCertificate;
@@ -46,8 +46,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.Models
 
         /// <summary>
         /// </summary>
-        [JsonProperty(PropertyName = "State")]
-        public string State { get; set; }
+        [JsonProperty(PropertyName = "RequestId")]
+        public string RequestId { get; set; }
 
         /// <summary>
         /// </summary>
@@ -56,8 +56,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.Models
 
         /// <summary>
         /// </summary>
-        [JsonProperty(PropertyName = "RequestId")]
-        public string RequestId { get; set; }
+        [JsonProperty(PropertyName = "State")]
+        public string State { get; set; }
 
         /// <summary>
         /// </summary>

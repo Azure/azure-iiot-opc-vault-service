@@ -15,27 +15,29 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.Models
     using System.Collections.Generic;
     using System.Linq;
 
-    public partial class ReadRequestApiModel
+    public partial class CertificateRequestRecordApiModel
     {
         /// <summary>
-        /// Initializes a new instance of the ReadRequestApiModel class.
+        /// Initializes a new instance of the CertificateRequestRecordApiModel
+        /// class.
         /// </summary>
-        public ReadRequestApiModel()
+        public CertificateRequestRecordApiModel()
         {
             CustomInit();
         }
 
         /// <summary>
-        /// Initializes a new instance of the ReadRequestApiModel class.
+        /// Initializes a new instance of the CertificateRequestRecordApiModel
+        /// class.
         /// </summary>
-        public ReadRequestApiModel(string state = default(string), string applicationId = default(string), string requestId = default(string), string certificateGroupId = default(string), string certificateTypeId = default(string), string certificateRequest = default(string), string subjectName = default(string), IList<string> domainNames = default(IList<string>), string privateKeyFormat = default(string), string privateKeyPassword = default(string))
+        public CertificateRequestRecordApiModel(string requestId = default(string), string applicationId = default(string), string state = default(string), string certificateGroupId = default(string), string certificateTypeId = default(string), string signingRequest = default(string), string subjectName = default(string), IList<string> domainNames = default(IList<string>), string privateKeyFormat = default(string), string privateKeyPassword = default(string))
         {
-            State = state;
-            ApplicationId = applicationId;
             RequestId = requestId;
+            ApplicationId = applicationId;
+            State = state;
             CertificateGroupId = certificateGroupId;
             CertificateTypeId = certificateTypeId;
-            CertificateRequest = certificateRequest;
+            SigningRequest = signingRequest;
             SubjectName = subjectName;
             DomainNames = domainNames;
             PrivateKeyFormat = privateKeyFormat;
@@ -50,8 +52,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.Models
 
         /// <summary>
         /// </summary>
-        [JsonProperty(PropertyName = "State")]
-        public string State { get; set; }
+        [JsonProperty(PropertyName = "RequestId")]
+        public string RequestId { get; set; }
 
         /// <summary>
         /// </summary>
@@ -60,8 +62,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.Models
 
         /// <summary>
         /// </summary>
-        [JsonProperty(PropertyName = "RequestId")]
-        public string RequestId { get; set; }
+        [JsonProperty(PropertyName = "State")]
+        public string State { get; set; }
 
         /// <summary>
         /// </summary>
@@ -75,8 +77,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.Models
 
         /// <summary>
         /// </summary>
-        [JsonProperty(PropertyName = "CertificateRequest")]
-        public string CertificateRequest { get; set; }
+        [JsonProperty(PropertyName = "SigningRequest")]
+        public string SigningRequest { get; set; }
 
         /// <summary>
         /// </summary>

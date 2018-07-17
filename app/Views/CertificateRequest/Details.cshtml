@@ -1,4 +1,4 @@
-﻿@model Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Models.CertificateRequest
+﻿@model Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.Models.CertificateRequestApiModel
 
 <h2>View Certificate Request Details</h2>
 
@@ -37,7 +37,7 @@
         <dd>
             @Html.DisplayFor(model => model.SubjectName)
         </dd>
-
+        <@*
         <dt>
             @Html.DisplayNameFor(model => model.RequestTime)
         </dt>
@@ -61,10 +61,9 @@
         <dd>
             @Html.DisplayFor(model => model.AcceptTime)
         </dd>
-
+             *@>
     </dl>
 </div>
 <p>
-    @Html.ActionLink("Edit", "Edit", new { id = Model.RequestId }) |
     @Html.ActionLink("Back to List", "Index")
 </p>

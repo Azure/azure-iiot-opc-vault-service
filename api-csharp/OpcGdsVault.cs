@@ -2192,7 +2192,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
         }
 
         /// <summary>
-        /// Certificate Signing Request
+        /// Signing Request
         /// </summary>
         /// <param name='groupId'>
         /// </param>
@@ -2341,7 +2341,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
         }
 
         /// <summary>
-        /// Create New Key Pair
+        /// New Key Pair
         /// </summary>
         /// <param name='groupId'>
         /// </param>
@@ -3433,7 +3433,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
         /// <return>
         /// A response object containing the response body and response headers.
         /// </return>
-        public async Task<HttpOperationResponse<ReadRequestApiModel>> ReadCertificateRequestWithHttpMessagesAsync(string requestId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<HttpOperationResponse<CertificateRequestRecordApiModel>> ReadCertificateRequestWithHttpMessagesAsync(string requestId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (requestId == null)
             {
@@ -3519,7 +3519,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
                 throw ex;
             }
             // Create Result
-            var _result = new HttpOperationResponse<ReadRequestApiModel>();
+            var _result = new HttpOperationResponse<CertificateRequestRecordApiModel>();
             _result.Request = _httpRequest;
             _result.Response = _httpResponse;
             // Deserialize Response
@@ -3528,7 +3528,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
                 _responseContent = await _httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
                 try
                 {
-                    _result.Body = SafeJsonConvert.DeserializeObject<ReadRequestApiModel>(_responseContent, DeserializationSettings);
+                    _result.Body = SafeJsonConvert.DeserializeObject<CertificateRequestRecordApiModel>(_responseContent, DeserializationSettings);
                 }
                 catch (JsonException ex)
                 {

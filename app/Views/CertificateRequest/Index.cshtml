@@ -1,7 +1,7 @@
-﻿@model IEnumerable<Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Models.CertificateRequest>
+﻿@model IEnumerable<Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.Models.CertificateRequestApiModel>
 
 @{
-    ViewBag.Title = "List of Certificate Requests";
+    ViewBag.Title = "CertificateRequests";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -40,9 +40,7 @@
                 @Html.DisplayFor(requestItem => request.SubjectName)
             </td>
             <td>
-                @Html.ActionLink("Edit", "Edit", new { id = request.RequestId }) |
-                @Html.ActionLink("Details", "Details", new { id = request.RequestId }) |
-                @Html.ActionLink("Delete", "Delete", new { id = request.RequestId })
+                @Html.ActionLink("Details", "Details", new { id = request.RequestId })
             </td>
         </tr>
     }
@@ -50,5 +48,6 @@
 </table>
 
 <p>
-    @Html.ActionLink("Create New", "Create")
+    @Html.ActionLink("Create New Key Pair", "CreateNewKeyPair")
+    @Html.ActionLink("Create Signing Request", "CreateSigningRequest")
 </p>
