@@ -28,9 +28,10 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.Models
         /// <summary>
         /// Initializes a new instance of the ApplicationRecordApiModel class.
         /// </summary>
-        public ApplicationRecordApiModel(string applicationId = default(string), string applicationUri = default(string), string applicationName = default(string), int? applicationType = default(int?), IList<ApplicationNameApiModel> applicationNames = default(IList<ApplicationNameApiModel>), string productUri = default(string), IList<string> discoveryUrls = default(IList<string>), string serverCapabilities = default(string))
+        public ApplicationRecordApiModel(string applicationId = default(string), int? id = default(int?), string applicationUri = default(string), string applicationName = default(string), int? applicationType = default(int?), IList<ApplicationNameApiModel> applicationNames = default(IList<ApplicationNameApiModel>), string productUri = default(string), IList<string> discoveryUrls = default(IList<string>), string serverCapabilities = default(string), string gatewayServerUri = default(string), string discoveryProfileUri = default(string))
         {
             ApplicationId = applicationId;
+            ID = id;
             ApplicationUri = applicationUri;
             ApplicationName = applicationName;
             ApplicationType = applicationType;
@@ -38,6 +39,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.Models
             ProductUri = productUri;
             DiscoveryUrls = discoveryUrls;
             ServerCapabilities = serverCapabilities;
+            GatewayServerUri = gatewayServerUri;
+            DiscoveryProfileUri = discoveryProfileUri;
             CustomInit();
         }
 
@@ -50,6 +53,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.Models
         /// </summary>
         [JsonProperty(PropertyName = "ApplicationId")]
         public string ApplicationId { get; set; }
+
+        /// <summary>
+        /// </summary>
+        [JsonProperty(PropertyName = "ID")]
+        public int? ID { get; private set; }
 
         /// <summary>
         /// </summary>
@@ -85,6 +93,16 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.Models
         /// </summary>
         [JsonProperty(PropertyName = "ServerCapabilities")]
         public string ServerCapabilities { get; set; }
+
+        /// <summary>
+        /// </summary>
+        [JsonProperty(PropertyName = "GatewayServerUri")]
+        public string GatewayServerUri { get; set; }
+
+        /// <summary>
+        /// </summary>
+        [JsonProperty(PropertyName = "DiscoveryProfileUri")]
+        public string DiscoveryProfileUri { get; set; }
 
     }
 }

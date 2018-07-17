@@ -30,7 +30,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.Models
         /// Initializes a new instance of the QueryApplicationsResponseApiModel
         /// class.
         /// </summary>
-        public QueryApplicationsResponseApiModel(IList<ApplicationDescriptionApiModel> applications = default(IList<ApplicationDescriptionApiModel>), System.DateTime? lastCounterResetTime = default(System.DateTime?), int? nextRecordId = default(int?))
+        public QueryApplicationsResponseApiModel(System.DateTime lastCounterResetTime, int nextRecordId, IList<ApplicationRecordApiModel> applications = default(IList<ApplicationRecordApiModel>))
         {
             Applications = applications;
             LastCounterResetTime = lastCounterResetTime;
@@ -46,17 +46,26 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.Models
         /// <summary>
         /// </summary>
         [JsonProperty(PropertyName = "Applications")]
-        public IList<ApplicationDescriptionApiModel> Applications { get; set; }
+        public IList<ApplicationRecordApiModel> Applications { get; set; }
 
         /// <summary>
         /// </summary>
         [JsonProperty(PropertyName = "LastCounterResetTime")]
-        public System.DateTime? LastCounterResetTime { get; set; }
+        public System.DateTime LastCounterResetTime { get; set; }
 
         /// <summary>
         /// </summary>
         [JsonProperty(PropertyName = "NextRecordId")]
-        public int? NextRecordId { get; set; }
+        public int NextRecordId { get; set; }
 
+        /// <summary>
+        /// Validate the object.
+        /// </summary>
+        /// <exception cref="Rest.ValidationException">
+        /// Thrown if validation fails
+        /// </exception>
+        public virtual void Validate()
+        {
+        }
     }
 }
