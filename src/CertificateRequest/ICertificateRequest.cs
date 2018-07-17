@@ -40,8 +40,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
             string requestId);
 
         Task<CompleteRequestResultModel> CompleteAsync(
-            string applicationId,
-            string requestId);
+            string requestId,
+            string applicationId
+            );
 
         Task<ReadRequestResultModel> ReadAsync(
             string requestId);

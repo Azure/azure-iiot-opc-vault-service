@@ -320,8 +320,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
         }
 
         public async Task<CompleteRequestResultModel> CompleteAsync(
-            string applicationId,
-            string requestId)
+            string requestId,
+            string applicationId)
         {
             Guid reqId = GetIdFromString(requestId);
             Guid appId = GetIdFromString(applicationId);
@@ -390,9 +390,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
             }
 
             return new ReadRequestResultModel(
-                request.State,
-                request.ApplicationId,
                 requestId,
+                request.ApplicationId,
+                request.State,
                 request.CertificateGroupId,
                 request.CertificateTypeId,
                 request.SigningRequest,

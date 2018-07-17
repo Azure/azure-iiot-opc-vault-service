@@ -116,13 +116,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
         /// <summary>Read certificate request</summary>
         [HttpGet("{requestId}")]
         [SwaggerOperation(operationId: "ReadCertificateRequest")]
-        public async Task<ReadRequestApiModel> ReadCertificateRequestAsync(string requestId)
+        public async Task<CertificateRequestRecordApiModel> ReadCertificateRequestAsync(string requestId)
         {
             var result = await _certificateRequest.ReadAsync(requestId);
-            return new ReadRequestApiModel(
-                result.State,
-                result.ApplicationId,
+            return new CertificateRequestRecordApiModel(
                 requestId,
+                result.ApplicationId,
+                result.State,
                 result.CertificateGroupId,
                 result.CertificateTypeId,
                 result.SigningRequest,
@@ -138,13 +138,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
         public async Task<CompleteRequestApiModel> CompleteCertificateRequestAsync(string requestId, string applicationId)
         {
             var result = await _certificateRequest.CompleteAsync(
-                applicationId,
-                requestId
+                requestId,
+                applicationId
                 );
             return new CompleteRequestApiModel(
-                result.State,
-                applicationId,
                 requestId,
+                applicationId,
+                result.State,
                 result.CertificateGroupId,
                 result.CertificateTypeId,
                 result.SignedCertificate,

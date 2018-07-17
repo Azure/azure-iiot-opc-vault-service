@@ -97,7 +97,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
                     cert.ToServiceModel()));
         }
 
-        /// <summary>Certificate Signing Request</summary>
+        /// <summary>Signing Request</summary>
         [HttpPost("{groupId}/sign")]
         [SwaggerOperation(operationId: "SigningRequest")]
         public async Task<X509Certificate2ApiModel> PostSignAsync(string groupId, [FromBody] SigningRequestApiModel sr)
@@ -109,7 +109,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
                     sr.ToServiceModel()));
         }
 
-        /// <summary>Create New Key Pair</summary>
+        /// <summary>New Key Pair</summary>
         [HttpPost("{groupId}/newkey")]
         [SwaggerOperation(operationId: "NewKeyPairRequest")]
         public async Task<CertificateKeyPairApiModel> PostNewKeyAsync(string groupId, [FromBody] NewKeyPairRequestApiModel nkpr)

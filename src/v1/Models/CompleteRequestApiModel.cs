@@ -12,14 +12,14 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models
 {
     public sealed class CompleteRequestApiModel
     {
-        [JsonProperty(PropertyName = "State", Order = 5)]
-        public string State { get; set; }
+        [JsonProperty(PropertyName = "RequestId", Order = 5)]
+        public string RequestId { get; set; }
 
         [JsonProperty(PropertyName = "ApplicationId", Order = 10)]
         public string ApplicationId { get; set; }
 
-        [JsonProperty(PropertyName = "RequestId", Order = 15)]
-        public string RequestId { get; set; }
+        [JsonProperty(PropertyName = "State", Order = 15)]
+        public string State { get; set; }
 
         [JsonProperty(PropertyName = "CertificateGroupId", Order = 20)]
         public string CertificateGroupId { get; set; }
@@ -37,9 +37,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models
         public string AuthorityId { get; set; }
 
         public CompleteRequestApiModel(
-            CertificateRequestState state,
-            string applicationId,
             string requestId,
+            string applicationId,
+            CertificateRequestState state,
             string certificateGroupId,
             string certificateTypeId,
             byte[] signedCertificate,
@@ -47,8 +47,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models
             string authorityId
 )
         {
-            this.State = state.ToString();
+            this.RequestId = requestId;
             this.ApplicationId = applicationId;
+            this.State = state.ToString();
             this.CertificateGroupId = certificateGroupId;
             this.CertificateTypeId = certificateTypeId;
             this.SignedCertificate = (signedCertificate != null) ? Convert.ToBase64String(signedCertificate) : null;

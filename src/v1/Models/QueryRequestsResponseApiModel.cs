@@ -13,7 +13,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models
     public sealed class QueryRequestsResponseApiModel
     {
         [JsonProperty(PropertyName = "Requests", Order = 10)]
-        public ReadRequestApiModel[] Requests { get; set; }
+        public CertificateRequestRecordApiModel[] Requests { get; set; }
 
         /// <summary>
         /// Continuation token to use
@@ -23,13 +23,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models
 
         public QueryRequestsResponseApiModel(ReadRequestResultModel[] requests)
         {
-            List<ReadRequestApiModel> requestList = new List<ReadRequestApiModel>();
+            List<CertificateRequestRecordApiModel> requestList = new List<CertificateRequestRecordApiModel>();
             foreach (ReadRequestResultModel request in requests)
             {
-                requestList.Add(new ReadRequestApiModel(
-                request.State,
-                request.ApplicationId,
+                requestList.Add(new CertificateRequestRecordApiModel(
                 request.RequestId,
+                request.ApplicationId,
+                request.State,
                 request.CertificateGroupId,
                 request.CertificateTypeId,
                 request.SigningRequest,

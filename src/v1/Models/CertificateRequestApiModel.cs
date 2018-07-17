@@ -10,16 +10,16 @@ using System;
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models
 {
-    public sealed class ReadRequestApiModel
+    public sealed class CertificateRequestRecordApiModel
     {
-        [JsonProperty(PropertyName = "State", Order = 5)]
-        public string State { get; set; }
+        [JsonProperty(PropertyName = "RequestId", Order = 5)]
+        public string RequestId { get; set; }
 
         [JsonProperty(PropertyName = "ApplicationId", Order = 10)]
         public string ApplicationId { get; set; }
 
-        [JsonProperty(PropertyName = "RequestId", Order = 15)]
-        public string RequestId { get; set; }
+        [JsonProperty(PropertyName = "State", Order = 15)]
+        public string State { get; set; }
 
         [JsonProperty(PropertyName = "CertificateGroupId", Order = 20)]
         public string CertificateGroupId { get; set; }
@@ -27,8 +27,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models
         [JsonProperty(PropertyName = "CertificateTypeId", Order = 30)]
         public string CertificateTypeId { get; set; }
 
-        [JsonProperty(PropertyName = "CertificateRequest", Order = 35)]
-        public string CertificateRequest { get; set; }
+        [JsonProperty(PropertyName = "SigningRequest", Order = 35)]
+        public string SigningRequest { get; set; }
 
         [JsonProperty(PropertyName = "SubjectName", Order = 40)]
         public string SubjectName { get; set; }
@@ -44,23 +44,24 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models
         public string PrivateKeyPassword { get; set; }
 
 
-        public ReadRequestApiModel(
-            CertificateRequestState state,
-            string applicationId,
+        public CertificateRequestRecordApiModel(
             string requestId,
+            string applicationId,
+            CertificateRequestState state,
             string certificateGroupId,
             string certificateTypeId,
-            byte[] certificateRequest,
+            byte[] signingRequest,
             string subjectName,
             string[] domainNames,
             string privateKeyFormat,
             string privateKeyPassword)
         {
-            this.State = state.ToString();
+            this.RequestId = requestId;
             this.ApplicationId = applicationId;
+            this.State = state.ToString();
             this.CertificateGroupId = certificateGroupId;
             this.CertificateTypeId = certificateTypeId;
-            this.CertificateRequest = Convert.ToBase64String(certificateRequest); 
+            this.SigningRequest = (signingRequest != null) ? Convert.ToBase64String(signingRequest) : null; 
             this.SubjectName = subjectName;
             this.DomainNames = domainNames;
             this.PrivateKeyFormat = privateKeyFormat;

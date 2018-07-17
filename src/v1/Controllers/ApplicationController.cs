@@ -89,6 +89,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
         [SwaggerOperation(operationId: "QueryApplications")]
         public async Task<QueryApplicationsResponseApiModel> QueryApplicationsAsync([FromBody] QueryApplicationsApiModel query)
         {
+            if (query == null)
+            {
+                // query all
+                query = new QueryApplicationsApiModel(0, 0, null, null, 0, null, null);
+            }
             var result = await _applicationDatabase.QueryApplicationsAsync(
                 query.StartingRecordId,
                 query.MaxRecordsToReturn,

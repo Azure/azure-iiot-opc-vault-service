@@ -10,11 +10,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Models
 {
     public sealed class ReadRequestResultModel
     {
-        public CertificateRequestState State { get; set; }
+        public string RequestId { get; set; }
 
         public string ApplicationId { get; set; }
 
-        public string RequestId { get; set; }
+        public CertificateRequestState State { get; set; }
 
         public string CertificateGroupId { get; set; }
 
@@ -31,8 +31,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Models
                 CertificateRequest request
                 )
         {
-            this.State = request.State;
+            this.RequestId = request.RequestId.ToString();
             this.ApplicationId = request.ApplicationId;
+            this.State = request.State;
             this.CertificateGroupId = request.CertificateGroupId;
             this.CertificateTypeId = request.CertificateTypeId;
             this.SigningRequest = request.SigningRequest;
@@ -43,9 +44,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Models
         }
 
         public ReadRequestResultModel(
-                CertificateRequestState state,
-                string applicationId,
                 string requestId,
+                string applicationId,
+                CertificateRequestState state,
                 string certificateGroupId,
                 string certificateTypeId,
                 byte[] certificateRequest,
@@ -55,8 +56,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Models
                 string privateKeyPassword
                 )
         {
-            this.State = state;
+            this.RequestId = requestId;
             this.ApplicationId = applicationId;
+            this.State = state;
             this.CertificateGroupId = certificateGroupId;
             this.CertificateTypeId = certificateTypeId;
             this.SigningRequest = certificateRequest;
