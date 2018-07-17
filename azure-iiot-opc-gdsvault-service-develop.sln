@@ -26,8 +26,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.IIoT.OpcUa.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Edge", "module\Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Edge.csproj", "{427DAC72-EA9A-4E69-B08E-57D7F3D62201}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common", "common\Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.csproj", "{872D24D6-4A97-4FB5-8C85-D80C0CC3FC01}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api", "api-csharp\Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.csproj", "{A887CAA1-2C60-4E3A-91F8-DB60BBE4CC26}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Opc.Ua.Core", "..\UA-.NETStandard\Stack\Opc.Ua.Core\Opc.Ua.Core.csproj", "{E9EC142C-3837-4E52-BBF2-918567A4F838}"
@@ -51,8 +49,6 @@ Global
 		{77256077-5C07-48C6-B497-455C758A108F}.Develop|Any CPU.Build.0 = Develop|Any CPU
 		{427DAC72-EA9A-4E69-B08E-57D7F3D62201}.Develop|Any CPU.ActiveCfg = Develop|Any CPU
 		{427DAC72-EA9A-4E69-B08E-57D7F3D62201}.Develop|Any CPU.Build.0 = Develop|Any CPU
-		{872D24D6-4A97-4FB5-8C85-D80C0CC3FC01}.Develop|Any CPU.ActiveCfg = Develop|Any CPU
-		{872D24D6-4A97-4FB5-8C85-D80C0CC3FC01}.Develop|Any CPU.Build.0 = Develop|Any CPU
 		{A887CAA1-2C60-4E3A-91F8-DB60BBE4CC26}.Develop|Any CPU.ActiveCfg = Develop|Any CPU
 		{A887CAA1-2C60-4E3A-91F8-DB60BBE4CC26}.Develop|Any CPU.Build.0 = Develop|Any CPU
 		{E9EC142C-3837-4E52-BBF2-918567A4F838}.Develop|Any CPU.ActiveCfg = Develop|Any CPU
