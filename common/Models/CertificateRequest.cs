@@ -25,7 +25,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Models
         public CertificateRequestState State { get; set; }
         public string CertificateGroupId { get; set; }
         public string CertificateTypeId { get; set; }
-        public byte[] CertificateSigningRequest { get; set; }
+        public byte[] SigningRequest { get; set; }
         public string SubjectName { get; set; }
         public string[] DomainNames { get; set; }
         public string PrivateKeyFormat { get; set; }
