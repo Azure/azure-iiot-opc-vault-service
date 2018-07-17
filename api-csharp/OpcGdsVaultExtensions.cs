@@ -659,6 +659,98 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
             }
 
             /// <summary>
+            /// Query certificate requests
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            public static QueryRequestsResponseApiModel QueryRequests(this IOpcGdsVault operations)
+            {
+                return operations.QueryRequestsAsync().GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Query certificate requests
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<QueryRequestsResponseApiModel> QueryRequestsAsync(this IOpcGdsVault operations, CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.QueryRequestsWithHttpMessagesAsync(null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <summary>
+            /// Query certificate requests by appId
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='appId'>
+            /// </param>
+            public static QueryRequestsResponseApiModel QueryAppRequests(this IOpcGdsVault operations, string appId)
+            {
+                return operations.QueryAppRequestsAsync(appId).GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Query certificate requests by appId
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='appId'>
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<QueryRequestsResponseApiModel> QueryAppRequestsAsync(this IOpcGdsVault operations, string appId, CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.QueryAppRequestsWithHttpMessagesAsync(appId, null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <summary>
+            /// Query certificate requests by state
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='state'>
+            /// </param>
+            public static QueryRequestsResponseApiModel QueryAppRequests1(this IOpcGdsVault operations, string state)
+            {
+                return operations.QueryAppRequests1Async(state).GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Query certificate requests by state
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='state'>
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<QueryRequestsResponseApiModel> QueryAppRequests1Async(this IOpcGdsVault operations, string state, CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.QueryAppRequests1WithHttpMessagesAsync(state, null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <summary>
             /// Read certificate request
             /// </summary>
             /// <param name='operations'>
