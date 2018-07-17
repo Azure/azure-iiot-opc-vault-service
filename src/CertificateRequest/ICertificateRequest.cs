@@ -4,6 +4,7 @@
 // ------------------------------------------------------------
 
 
+using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Models;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Models;
 using System.Threading.Tasks;
 
@@ -44,6 +45,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
 
         Task<ReadRequestResultModel> ReadAsync(
             string requestId);
+
+        Task<ReadRequestResultModel[]> QueryAsync(
+            string appId, 
+            CertificateRequestState? state);
+
     }
 
 }

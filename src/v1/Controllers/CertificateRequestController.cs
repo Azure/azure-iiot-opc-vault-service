@@ -85,6 +85,34 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
             await _certificateRequest.AcceptAsync(requestId);
         }
 
+        /// <summary>Query certificate requests</summary>
+        [HttpGet]
+        [SwaggerOperation(operationId: "QueryRequests")]
+        public async Task<QueryRequestsResponseApiModel> QueryRequestsAsync()
+        {
+            var results = await _certificateRequest.QueryAsync(null, null);
+            return new QueryRequestsResponseApiModel(results);
+        }
+
+        /// <summary>Query certificate requests by appId</summary>
+        [HttpGet("app/{appId}")]
+        [SwaggerOperation(operationId: "QueryAppRequests")]
+        public async Task<QueryRequestsResponseApiModel> QueryAppRequestsAsync(string appId)
+        {
+            var results = await _certificateRequest.QueryAsync(appId, null);
+            return new QueryRequestsResponseApiModel(results);
+        }
+
+        /// <summary>Query certificate requests by state</summary>
+        [HttpGet("state/{state}")]
+        [SwaggerOperation(operationId: "QueryAppRequests")]
+        public async Task<QueryRequestsResponseApiModel> QueryStateRequestsAsync(string state)
+        {
+            // todo: parse state
+            var results = await _certificateRequest.QueryAsync(null, null);
+            return new QueryRequestsResponseApiModel(results);
+        }
+
         /// <summary>Read certificate request</summary>
         [HttpGet("{requestId}")]
         [SwaggerOperation(operationId: "ReadCertificateRequest")]
@@ -97,7 +125,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
                 requestId,
                 result.CertificateGroupId,
                 result.CertificateTypeId,
-                result.CertificateRequest,
+                result.SigningRequest,
                 result.SubjectName,
                 result.DomainNames,
                 result.PrivateKeyFormat,

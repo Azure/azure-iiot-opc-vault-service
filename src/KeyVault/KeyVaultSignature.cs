@@ -48,11 +48,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.KeyVault
                 throw new NotSupportedException(String.Format("Public key size {0} does not match expected key size {1}", publicKey.KeySize, keySize));
             }
 
-            if (publicKey.KeySize != keySize)
-            {
-                throw new NotSupportedException(String.Format("Public key size {0} does not match expected key size {1}", publicKey.KeySize, keySize));
-            }
-
             // set default values.
             X500DistinguishedName subjectDN = SetSuitableDefaults(
                 ref applicationUri,
@@ -673,6 +668,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.KeyVault
         }
     }
 
+    // TODO: replace with asnreader/writer
     public class ASN1Decoder //: IDisposable
     {
         internal enum DerTag : byte

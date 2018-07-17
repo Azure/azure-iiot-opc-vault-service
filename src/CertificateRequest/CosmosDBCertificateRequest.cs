@@ -11,6 +11,7 @@ using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Runtime;
 using Opc.Ua;
 using Opc.Ua.Gds.Server;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security;
 using System.Security.Cryptography.X509Certificates;
@@ -66,7 +67,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
             db = new DocumentDBRepository(_endpoint, _authKeyOrResourceToken);
             Applications = new DocumentDBCollection<Application>(db);
             CertificateRequests = new DocumentDBCollection<Common.Models.CertificateRequest>(db);
-            CertificateStores = new DocumentDBCollection<CertificateStore>(db);
             return Task.CompletedTask;
         }
 
@@ -114,7 +114,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
             request.DomainNames = null;
             request.PrivateKeyFormat = null;
             request.PrivateKeyPassword = null;
-            request.CertificateSigningRequest = certificateSigningRequest;
+            request.SigningRequest = certificateSigningRequest;
             request.ApplicationId = applicationId;
             request.RequestTime = DateTime.UtcNow;
 
@@ -178,7 +178,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
             request.DomainNames = domainNames;
             request.PrivateKeyFormat = privateKeyFormat;
             request.PrivateKeyPassword = privateKeyPassword;
-            request.CertificateSigningRequest = null;
+            request.SigningRequest = null;
             request.ApplicationId = appId.ToString();
             request.RequestTime = DateTime.UtcNow;
 
@@ -224,7 +224,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
                 request.State = Common.Models.CertificateRequestState.Rejected;
                 // erase information which is not required anymore
                 request.PrivateKeyFormat = null;
-                request.CertificateSigningRequest = null;
+                request.SigningRequest = null;
                 request.PrivateKeyPassword = null;
             }
             else
@@ -232,14 +232,14 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
                 request.State = CertificateRequestState.Approved;
 
                 X509Certificate2 certificate;
-                if (request.CertificateSigningRequest != null)
+                if (request.SigningRequest != null)
                 {
                     try
                     {
                         certificate = await _certificateGroup.SigningRequestAsync(
                             request.CertificateGroupId,
                             application.ApplicationUri,
-                            request.CertificateSigningRequest
+                            request.SigningRequest
                             );
 
                         request.Certificate = certificate.RawData;
@@ -311,7 +311,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
             request.State = CertificateRequestState.Accepted;
 
             // erase information which is not required anymore
-            request.CertificateSigningRequest = null;
+            request.SigningRequest = null;
             request.PrivateKeyFormat = null;
             request.PrivateKeyPassword = null;
             request.AcceptTime = DateTime.UtcNow;
@@ -395,12 +395,41 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
                 requestId,
                 request.CertificateGroupId,
                 request.CertificateTypeId,
-                request.CertificateSigningRequest,
+                request.SigningRequest,
                 request.SubjectName,
                 request.DomainNames,
                 request.PrivateKeyFormat,
                 request.PrivateKeyPassword);
 
+        }
+
+        public async Task<ReadRequestResultModel[]> QueryAsync(
+            string appId,
+            CertificateRequestState? state)
+        {
+            IEnumerable<CertificateRequest> requests;
+            if (appId == null && state == null)
+            {
+                requests = await CertificateRequests.GetAsync(x => true);
+            }
+            else if (appId != null && state != null)
+            {
+                requests = await CertificateRequests.GetAsync(x => x.ApplicationId == appId && x.State == state);
+            }
+            else if (appId != null)
+            {
+                requests = await CertificateRequests.GetAsync(x => x.ApplicationId == appId);
+            }
+            else
+            {
+                requests = await CertificateRequests.GetAsync(x => x.State == state);
+            }
+            List<ReadRequestResultModel> result = new List<ReadRequestResultModel>();
+            foreach (CertificateRequest request in requests)
+            {
+                result.Add(new ReadRequestResultModel(request));
+            }
+            return result.ToArray();
         }
         #endregion
 
@@ -503,7 +532,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
             return application.ApplicationId;
         }
 
-        public static string ServerCapabilities(Application application)
+        private static string ServerCapabilities(Application application)
         {
             if (application.ApplicationType != (int)Opc.Ua.ApplicationType.Client)
             {
@@ -565,7 +594,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
         private DocumentDBRepository db;
         private IDocumentDBCollection<Application> Applications;
         private IDocumentDBCollection<CertificateRequest> CertificateRequests;
-        private IDocumentDBCollection<CertificateStore> CertificateStores;
         #endregion
     }
 }

@@ -242,8 +242,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.KeyVault
                 IssuerParameters = new IssuerParameters
                 {
                     Name = "Self"
-                    //CertificateTransparency = true,
-                    //CertificateType = "OPC UA Root CA"
                 },
                 KeyProperties = new KeyProperties
                 {
@@ -260,19 +258,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.KeyVault
                 {
                     Subject = certificate.Subject
                 }
-#if CAUSESBADREQUEST
-                ,
-                // make sure key is not auto renewed, the auto 
-                // renewed cert would miss the CA basic constraint subtype
-                LifetimeActions = new List<LifetimeAction>
-                {
-                    new LifetimeAction
-                    {
-                        Trigger = new Trigger(80, 0),
-                        Action = new Microsoft.Azure.KeyVault.Models.Action(ActionType.EmailContacts)
-                    }
-                }
-#endif
             };
 
             Dictionary<string, string> tags = new Dictionary<string, string>
@@ -324,8 +309,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.KeyVault
                 {
                     Subject = certificate.Subject
                 },
-                Attributes = new CertificateAttributes()//,
-                //LifetimeActions = new LifetimeAction()
+                Attributes = new CertificateAttributes()
             };
 
             Dictionary<string, string> tags = new Dictionary<string, string>

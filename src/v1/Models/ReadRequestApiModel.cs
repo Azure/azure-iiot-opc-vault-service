@@ -39,6 +39,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models
         [JsonProperty(PropertyName = "PrivateKeyFormat", Order = 60)]
         public string PrivateKeyFormat { get; set; }
 
+        // TODO: do not expose Password?
         [JsonProperty(PropertyName = "PrivateKeyPassword", Order = 70)]
         public string PrivateKeyPassword { get; set; }
 

@@ -41,7 +41,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
         }
 
         #region IApplicationsDatabase 
-
         public async Task<string> RegisterApplicationAsync(Application application)
         {
             bool isNew = false;
@@ -278,7 +277,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
             return new QueryApplicationsResponseModel(records.ToArray(), lastCounterResetTime, nextRecordId);
         }
 
-#if mist
+#if TODO
         public override bool SetApplicationCertificate(
             NodeId applicationId,
             byte[] certificate,
