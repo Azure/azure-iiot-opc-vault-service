@@ -3,16 +3,13 @@
 //  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------
 
-
-using System;
-
-namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Concurrency
+namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.CosmosDB
 {
-    public class TimerNotInitializedException : Exception
+    using Microsoft.Azure.Documents.Client;
+
+    public interface IDocumentDBRepository
     {
-        public TimerNotInitializedException()
-            : base("Timer object not initialized. Call 'Setup()' first.")
-        {
-        }
+        DocumentClient Client { get; }
+        string DatabaseId { get; }
     }
 }

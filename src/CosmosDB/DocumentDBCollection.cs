@@ -3,7 +3,7 @@
 //  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.CosmosDB
+namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.CosmosDB
 {
     using Microsoft.Azure.Documents;
     using Microsoft.Azure.Documents.Client;

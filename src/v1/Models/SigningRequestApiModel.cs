@@ -3,7 +3,7 @@
 //  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------
 
-
+#if NOCERTSIGNER
 using Newtonsoft.Json;
 using System;
 
@@ -30,3 +30,4 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models
 
     }
 }
+#endif

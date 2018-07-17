@@ -5,7 +5,7 @@
 
 
 // TODO: remove / cleanup
-
+#if NOCERTSIGNER
 using Newtonsoft.Json;
 using System;
 
@@ -44,3 +44,4 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models
 
     }
 }
+#endif

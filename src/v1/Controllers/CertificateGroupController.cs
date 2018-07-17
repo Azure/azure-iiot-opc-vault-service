@@ -86,6 +86,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
                 await this.certificateGroups.CreateCACertificateAsync(groupId));
         }
 
+#if NOCERTSIGNER
         /// <summary>Revoke Certificate</summary>
         [HttpPost("{groupId}/revoke")]
         [SwaggerOperation(operationId: "RevokeCertificate")]
@@ -123,6 +124,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
                     nkpr.PrivateKeyFormat,
                     nkpr.PrivateKeyPassword));
         }
-
+#endif
     }
 }

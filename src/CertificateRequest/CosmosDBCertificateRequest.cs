@@ -4,8 +4,8 @@
 // ------------------------------------------------------------
 
 using Microsoft.Azure.IIoT.Diagnostics;
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.CosmosDB;
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Models;
+using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.CosmosDB;
+using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.CosmosDB.Models;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Models;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Runtime;
 using Opc.Ua;
@@ -17,8 +17,8 @@ using System.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
-using CertificateRequest = Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Models.CertificateRequest;
-using CertificateRequestState = Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Models.CertificateRequestState;
+using CertificateRequest = Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.CosmosDB.Models.CertificateRequest;
+using CertificateRequestState = Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.CosmosDB.Models.CertificateRequestState;
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
 {
@@ -66,7 +66,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
         {
             db = new DocumentDBRepository(_endpoint, _authKeyOrResourceToken);
             Applications = new DocumentDBCollection<Application>(db);
-            CertificateRequests = new DocumentDBCollection<Common.Models.CertificateRequest>(db);
+            CertificateRequests = new DocumentDBCollection<CosmosDB.Models.CertificateRequest>(db);
             return Task.CompletedTask;
         }
 
@@ -221,7 +221,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
 
             if (isRejected)
             {
-                request.State = Common.Models.CertificateRequestState.Rejected;
+                request.State = CertificateRequestState.Rejected;
                 // erase information which is not required anymore
                 request.PrivateKeyFormat = null;
                 request.SigningRequest = null;

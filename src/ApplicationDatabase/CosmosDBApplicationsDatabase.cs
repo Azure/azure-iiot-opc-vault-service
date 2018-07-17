@@ -5,8 +5,8 @@
 
 using Microsoft.Azure.IIoT.Diagnostics;
 using Microsoft.Azure.IIoT.Exceptions;
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.CosmosDB;
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Models;
+using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.CosmosDB;
+using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.CosmosDB.Models;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Models;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Runtime;
 using Opc.Ua.Gds.Server.Database;

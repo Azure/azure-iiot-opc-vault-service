@@ -4,9 +4,8 @@
 // ------------------------------------------------------------
 
 
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Models;
+using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.CosmosDB.Models;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Models;
-using System;
 using System.Threading.Tasks;
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
