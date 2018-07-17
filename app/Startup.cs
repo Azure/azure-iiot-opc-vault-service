@@ -12,10 +12,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
-using Microsoft.Azure.Documents.Client;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api;
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.CosmosDB;
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -24,18 +21,6 @@ using System.Threading.Tasks;
 
 namespace GdsVault.App
 {
-    public class GdsVaultDocumentDBRepository : IDocumentDBRepository
-    {
-        private static DocumentDBRepository dbClient;
-        public DocumentClient Client { get { return dbClient.Client; } }
-        public string DatabaseId { get { return dbClient.DatabaseId; } }
-
-        public static void Initialize(string endpoint, string authKeyOrResourceToken)
-        {
-            dbClient = new DocumentDBRepository(endpoint, authKeyOrResourceToken);
-        }
-    }
-
     public class OpcGdsVaultConfigured : OpcGdsVault
     {
         public OpcGdsVaultConfigured(IConfiguration config)
@@ -43,7 +28,6 @@ namespace GdsVault.App
 
         {
         }
-
     }
 
     public class Startup
@@ -58,13 +42,6 @@ namespace GdsVault.App
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            GdsVaultDocumentDBRepository.Initialize(Configuration["Endpoint"], Configuration["Key"]);
-
-            services.AddTransient<IDocumentDBCollection<Application>, DocumentDBCollection<Application>>();
-            services.AddTransient<IDocumentDBCollection<CertificateRequest>, DocumentDBCollection<CertificateRequest>>();
-            services.AddTransient<IDocumentDBCollection<CertificateStore>, DocumentDBCollection<CertificateStore>>();
-            services.AddTransient<IDocumentDBRepository, GdsVaultDocumentDBRepository>();
-
             services.AddTransient<IOpcGdsVault, OpcGdsVaultConfigured>();
 
             services.Configure<CookiePolicyOptions>(options =>

@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.CosmosDB;
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Models;
+using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api;
 using System;
 using System.Threading.Tasks;
 
@@ -10,12 +9,12 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Controllers
     [Authorize]
     public class CertificateRequestController : Controller
     {
-        private readonly IDocumentDBCollection<CertificateRequest> db;
-        public CertificateRequestController(IDocumentDBCollection<CertificateRequest> db)
+        private readonly IOpcGdsVault gdsVault;
+        public CertificateRequestController(IOpcGdsVault gdsVault)
         {
-            this.db = db;
+            this.gdsVault = gdsVault;
         }
-
+#if TODO
         [ActionName("Index")]
         public async Task<ActionResult> IndexAsync()
         {
@@ -108,5 +107,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Controllers
             CertificateRequest request = await db.GetAsync(id);
             return View(request);
         }
+#endif
     }
 }
