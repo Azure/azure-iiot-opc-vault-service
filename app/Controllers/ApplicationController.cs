@@ -42,7 +42,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Controllers
         [HttpPost]
         [ActionName("Register")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> RegisterAsync([Bind("ApplicationId,ApplicationName,ApplicationUri,ApplicationType,ProductUri,ServerCapabilities")] ApplicationRecordApiModel application)
+        public async Task<ActionResult> RegisterAsync(
+            [Bind("ApplicationUri,ApplicationName,ApplicationType,ProductUri,ServerCapabilities")]
+            ApplicationRecordApiModel application)
         {
             if (ModelState.IsValid)
             {
@@ -56,15 +58,28 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Controllers
         [HttpPost]
         [ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> EditAsync([Bind("ApplicationId,ApplicationName,ApplicationUri,ApplicationType,ProductUri,ServerCapabilities")] ApplicationRecordApiModel application)
+        public async Task<ActionResult> EditAsync(
+            [Bind("ApplicationId,ApplicationName,ApplicationType,ProductUri,ServerCapabilities")]
+            ApplicationRecordApiModel newApplication)
         {
             if (ModelState.IsValid)
             {
+                var application = await gdsVault.GetApplicationAsync(newApplication.ApplicationId);
+                if (application == null)
+                {
+                    return new NotFoundResult();
+                }
+
+                application.ApplicationName = newApplication.ApplicationName;
+                application.ApplicationType = newApplication.ApplicationType;
+                application.ProductUri = newApplication.ProductUri;
+                application.ServerCapabilities = newApplication.ServerCapabilities;
+
                 await gdsVault.UpdateApplicationAsync(application.ApplicationId, application);
                 return RedirectToAction("Index");
             }
 
-            return View(application);
+            return View(newApplication);
         }
 
         [ActionName("Edit")]
