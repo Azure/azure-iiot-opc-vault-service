@@ -28,6 +28,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.KeyVault
         // see RFC 2585
         const string ContentTypeCert = "application/pkix-cert";
         const string ContentTypeCrl = "application/pkix-crl";
+        const string ContentTypePfx = "application/x-pkcs12";
         // trust list tags
         const string TagIssuerList = "Issuer";
         const string TagTrustedList = "Trusted";

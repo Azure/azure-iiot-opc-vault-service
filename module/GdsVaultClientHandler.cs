@@ -69,6 +69,7 @@ namespace Opc.Ua.Gds.Server.GdsVault
             return groupCollection;
         }
 
+#if CERTSIGNER
         public async Task<X509Certificate2> SigningRequestAsync(
             string id,
             ApplicationRecordDataType application,
@@ -119,6 +120,7 @@ namespace Opc.Ua.Gds.Server.GdsVault
                 nkpModel.PrivateKeyFormat,
                 Convert.FromBase64String(nkpModel.PrivateKey));
         }
+#endif
     }
 }
 

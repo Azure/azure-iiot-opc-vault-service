@@ -362,6 +362,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
                 request.CertificateGroupId,
                 request.CertificateTypeId,
                 request.Certificate,
+                request.PrivateKeyFormat,
                 request.PrivateKey,
                 request.AuthorityId);
         }

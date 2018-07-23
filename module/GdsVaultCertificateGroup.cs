@@ -141,6 +141,7 @@ namespace Opc.Ua.Gds.Server.GdsVault
 
         }
 
+#if CERTSIGNER
         public override async Task<X509Certificate2KeyPair> NewKeyPairRequestAsync(
             ApplicationRecordDataType application,
             string subjectName,
@@ -237,7 +238,7 @@ namespace Opc.Ua.Gds.Server.GdsVault
                 throw new ServiceResultException(StatusCodes.BadInvalidArgument, ex.Message);
             }
         }
-
+#endif
         public override Task<X509Certificate2> CreateCACertificateAsync(
             string subjectName
             )
@@ -312,5 +313,5 @@ namespace Opc.Ua.Gds.Server.GdsVault
         }
 
     }
-    #endregion
+#endregion
 }

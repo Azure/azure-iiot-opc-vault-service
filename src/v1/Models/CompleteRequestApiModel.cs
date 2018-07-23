@@ -30,10 +30,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models
         [JsonProperty(PropertyName = "SignedCertificate", Order = 40)]
         public string SignedCertificate { get; set; }
 
-        [JsonProperty(PropertyName = "PrivateKey", Order = 50)]
+        [JsonProperty(PropertyName = "PrivateKeyFormat", Order = 50)]
+        public string PrivateKeyFormat { get; set; }
+
+        [JsonProperty(PropertyName = "PrivateKey", Order = 60)]
         public string PrivateKey { get; set; }
 
-        [JsonProperty(PropertyName = "AuthorityId", Order = 60)]
+        [JsonProperty(PropertyName = "AuthorityId", Order = 70)]
         public string AuthorityId { get; set; }
 
         public CompleteRequestApiModel(
@@ -43,6 +46,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models
             string certificateGroupId,
             string certificateTypeId,
             byte[] signedCertificate,
+            string privateKeyFormat,
             byte[] privateKey,
             string authorityId
 )
@@ -53,6 +57,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models
             this.CertificateGroupId = certificateGroupId;
             this.CertificateTypeId = certificateTypeId;
             this.SignedCertificate = (signedCertificate != null) ? Convert.ToBase64String(signedCertificate) : null;
+            this.PrivateKeyFormat = privateKeyFormat;
             this.PrivateKey = (privateKey != null) ? Convert.ToBase64String(privateKey) : null;
             this.AuthorityId = authorityId;
         }

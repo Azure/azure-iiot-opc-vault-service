@@ -5,7 +5,7 @@
 
 
 // TODO: remove / cleanup
-#if NOCERTSIGNER
+#if CERTSIGNER
 using Newtonsoft.Json;
 using System;
 

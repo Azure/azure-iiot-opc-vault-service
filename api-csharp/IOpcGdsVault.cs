@@ -210,51 +210,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
         Task<HttpOperationResponse<X509Certificate2ApiModel>> CreateCACertificateWithHttpMessagesAsync(string groupId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
-        /// Revoke Certificate
-        /// </summary>
-        /// <param name='groupId'>
-        /// </param>
-        /// <param name='cert'>
-        /// </param>
-        /// <param name='customHeaders'>
-        /// The headers that will be added to request.
-        /// </param>
-        /// <param name='cancellationToken'>
-        /// The cancellation token.
-        /// </param>
-        Task<HttpOperationResponse<X509CrlApiModel>> RevokeCertificateWithHttpMessagesAsync(string groupId, X509Certificate2ApiModel cert = default(X509Certificate2ApiModel), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
-
-        /// <summary>
-        /// Signing Request
-        /// </summary>
-        /// <param name='groupId'>
-        /// </param>
-        /// <param name='sr'>
-        /// </param>
-        /// <param name='customHeaders'>
-        /// The headers that will be added to request.
-        /// </param>
-        /// <param name='cancellationToken'>
-        /// The cancellation token.
-        /// </param>
-        Task<HttpOperationResponse<X509Certificate2ApiModel>> SigningRequestWithHttpMessagesAsync(string groupId, SigningRequestApiModel sr = default(SigningRequestApiModel), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
-
-        /// <summary>
-        /// New Key Pair
-        /// </summary>
-        /// <param name='groupId'>
-        /// </param>
-        /// <param name='nkpr'>
-        /// </param>
-        /// <param name='customHeaders'>
-        /// The headers that will be added to request.
-        /// </param>
-        /// <param name='cancellationToken'>
-        /// The cancellation token.
-        /// </param>
-        Task<HttpOperationResponse<CertificateKeyPairApiModel>> NewKeyPairRequestWithHttpMessagesAsync(string groupId, NewKeyPairRequestApiModel nkpr = default(NewKeyPairRequestApiModel), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
-
-        /// <summary>
         /// Create a new signing request.
         /// </summary>
         /// <param name='signingRequest'>

@@ -86,7 +86,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
                 await this.certificateGroups.CreateCACertificateAsync(groupId));
         }
 
-#if NOCERTSIGNER
+#if CERTSIGNER
         /// <summary>Revoke Certificate</summary>
         [HttpPost("{groupId}/revoke")]
         [SwaggerOperation(operationId: "RevokeCertificate")]

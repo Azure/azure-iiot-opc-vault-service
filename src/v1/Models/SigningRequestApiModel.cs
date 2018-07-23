@@ -3,7 +3,7 @@
 //  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------
 
-#if NOCERTSIGNER
+#if CERTSIGNER
 using Newtonsoft.Json;
 using System;
 

@@ -148,6 +148,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
                 result.CertificateGroupId,
                 result.CertificateTypeId,
                 result.SignedCertificate,
+                result.PrivateKeyFormat,
                 result.PrivateKey,
                 result.AuthorityId
                 );
