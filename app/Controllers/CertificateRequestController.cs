@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.Models;
 using System;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Controllers
@@ -127,7 +128,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Controllers
         [ActionName("CreateSigningRequest")]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> CreateSigningRequestAsync(
-            [Bind("ApplicationId,SigningRequest,CertificateGroupId,CertificateTypeId")]
             CreateSigningRequestApiModel request)
         {
             if (ModelState.IsValid)
@@ -175,7 +175,10 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Controllers
                 result.SignedCertificate != null)
             {
                 var byteArray = Convert.FromBase64String(result.SignedCertificate);
-                return new FileContentResult(byteArray, "application/pkix-cert");
+                return new FileContentResult(byteArray, "application/pkix-cert")
+                {
+                    FileDownloadName = CertFileName(result.SignedCertificate) + ".der"
+                };
             }
             return new NotFoundResult();
         }
@@ -190,15 +193,41 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Controllers
                 if (String.Compare(result.PrivateKeyFormat, "PFX", StringComparison.OrdinalIgnoreCase) == 0)
                 {
                     var byteArray = Convert.FromBase64String(result.PrivateKey);
-                    return new FileContentResult(byteArray, ContentTypePfx);
+                    return new FileContentResult(byteArray, ContentTypePfx)
+                    {
+                        FileDownloadName = CertFileName(result.SignedCertificate) + ".pfx"
+                    };
                 }
                 else if (String.Compare(result.PrivateKeyFormat, "PEM", StringComparison.OrdinalIgnoreCase) == 0)
                 {
                     var byteArray = Convert.FromBase64String(result.PrivateKey);
-                    return new FileContentResult(byteArray, ContentTypePem);
+                    return new FileContentResult(byteArray, ContentTypePem)
+                    {
+                        FileDownloadName = CertFileName(result.SignedCertificate) + ".pem"
+                    };
                 }
             }
             return new NotFoundResult();
+        }
+
+        [HttpPost]
+        public ActionResult UploadFile(object o)
+        {
+            return new NotFoundResult();
+        }
+
+        private string CertFileName(string signedCertificate)
+        {
+            try
+            {
+                var signedCertByteArray = Convert.FromBase64String(signedCertificate);
+                X509Certificate2 cert = new X509Certificate2(signedCertByteArray);
+                return cert.Subject + "[" + cert.Thumbprint + "]";
+            }
+            catch
+            {
+                return "Certificate";
+            }
         }
 
     }
