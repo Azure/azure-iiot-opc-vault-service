@@ -30,14 +30,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Controllers
             return View(applications.Applications);
         }
 
-
-#pragma warning disable 1998
         [ActionName("Register")]
-        public async Task<ActionResult> RegisterAsync()
+        public Task<ActionResult> RegisterAsync()
         {
-            return View();
+            return Task.FromResult<ActionResult>(View());
         }
-#pragma warning restore 1998
 
         [HttpPost]
         [ActionName("Register")]

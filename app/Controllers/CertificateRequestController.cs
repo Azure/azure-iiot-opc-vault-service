@@ -10,6 +10,14 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Controllers
     [Authorize]
     public class CertificateRequestController : Controller
     {
+        // see RFC 2585
+        const string ContentTypeCert = "application/pkix-cert";
+        const string ContentTypeCrl = "application/pkix-crl";
+        // see CertificateContentType.Pfx
+        const string ContentTypePfx = "application/x-pkcs12";
+        // see CertificateContentType.Pem
+        const string ContentTypePem = "application/x-pem-file";
+
         private readonly IOpcGdsVault gdsVault;
         public CertificateRequestController(IOpcGdsVault gdsVault)
         {
@@ -24,20 +32,53 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Controllers
         }
 
         [ActionName("CreateNewKeyPair")]
-        public Task<ActionResult> CreateNewKeyPairAsync()
+        public async Task<ActionResult> CreateNewKeyPairAsync(string id)
         {
-            return Task.FromResult<ActionResult>(View());
+            var groups = await gdsVault.GetCertificateGroupConfigurationCollectionAsync();
+            if (groups == null)
+            {
+                return new NotFoundResult();
+            }
+
+            string defaultGroupId, defaultTypeId;
+            if (groups.Groups.Count > 0)
+            {
+                defaultGroupId = groups.Groups[0].Name;
+                defaultTypeId = groups.Groups[0].CertificateType;
+            }
+            else
+            {
+                return new NotFoundResult();
+            }
+
+            var application = await gdsVault.GetApplicationAsync(id);
+            if (application == null)
+            {
+                return new NotFoundResult();
+            }
+
+            ViewData["Application"] = application;
+            ViewData["Groups"] = groups;
+
+            var request = new CreateNewKeyPairRequestApiModel()
+            {
+                ApplicationId = id,
+                CertificateGroupId = defaultGroupId,
+                CertificateTypeId = defaultTypeId
+            };
+
+            return View(request);
         }
 
         [HttpPost]
         [ActionName("CreateNewKeyPair")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> CreateNewKeyPairAsync([Bind("RequestId,ApplicationId,State")] CreateNewKeyPairRequestApiModel request)
+        public async Task<ActionResult> CreateNewKeyPairAsync(
+            CreateNewKeyPairRequestApiModel request)
         {
             if (ModelState.IsValid)
             {
-                //await db.CreateAsync(request);
-                await Task.Delay(100);
+                var id = await gdsVault.CreateNewKeyPairRequestAsync(request);
                 return RedirectToAction("Index");
             }
 
@@ -45,20 +86,53 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Controllers
         }
 
         [ActionName("CreateSigningRequest")]
-        public Task<ActionResult> CreateSigningRequestAsync()
+        public async Task<ActionResult> CreateSigningRequestAsync(string id)
         {
-            return Task.FromResult<ActionResult>(View());
+            var groups = await gdsVault.GetCertificateGroupConfigurationCollectionAsync();
+            if (groups == null)
+            {
+                return new NotFoundResult();
+            }
+
+            string defaultGroupId, defaultTypeId;
+            if (groups.Groups.Count > 0)
+            {
+                defaultGroupId = groups.Groups[0].Name;
+                defaultTypeId = groups.Groups[0].CertificateType;
+            }
+            else
+            {
+                return new NotFoundResult();
+            }
+
+            var application = await gdsVault.GetApplicationAsync(id);
+            if (application == null)
+            {
+                return new NotFoundResult();
+            }
+
+            ViewData["Application"] = application;
+
+            var request = new CreateSigningRequestApiModel()
+            {
+                ApplicationId = id,
+                CertificateGroupId = defaultGroupId,
+                CertificateTypeId = defaultTypeId
+            };
+
+            return View(request);
         }
 
         [HttpPost]
         [ActionName("CreateSigningRequest")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> CreateSigningRequestAsync([Bind("RequestId,ApplicationId,State")] CreateSigningRequestApiModel request)
+        public async Task<ActionResult> CreateSigningRequestAsync(
+            [Bind("ApplicationId,SigningRequest,CertificateGroupId,CertificateTypeId")]
+            CreateSigningRequestApiModel request)
         {
             if (ModelState.IsValid)
             {
-                //await db.CreateAsync(request);
-                await Task.Delay(100);
+                var id = await gdsVault.CreateSigningRequestAsync(request);
                 return RedirectToAction("Index");
             }
 
@@ -70,6 +144,61 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Controllers
         {
             var request = await gdsVault.ReadCertificateRequestAsync(id);
             return View(request);
+        }
+
+        [ActionName("Approve")]
+        public async Task<ActionResult> ApproveAsync(string id)
+        {
+            await gdsVault.ApproveCertificateRequestAsync(id, false);
+            return RedirectToAction("Details", new { id });
+        }
+
+        [ActionName("Reject")]
+        public async Task<ActionResult> RejectAsync(string id)
+        {
+            await gdsVault.ApproveCertificateRequestAsync(id, true);
+            return RedirectToAction("Details", new { id });
+        }
+
+        [ActionName("Accept")]
+        public async Task<ActionResult> AcceptAsync(string id)
+        {
+            await gdsVault.AcceptCertificateRequestAsync(id);
+            return RedirectToAction("Details", new { id });
+        }
+
+        [ActionName("DownloadCertificate")]
+        public async Task<ActionResult> DownloadCertificateAsync(string requestId, string applicationId)
+        {
+            var result = await gdsVault.CompleteCertificateRequestAsync(requestId, applicationId);
+            if (String.Compare(result.State, "Approved", StringComparison.OrdinalIgnoreCase) == 0 &&
+                result.SignedCertificate != null)
+            {
+                var byteArray = Convert.FromBase64String(result.SignedCertificate);
+                return new FileContentResult(byteArray, "application/pkix-cert");
+            }
+            return new NotFoundResult();
+        }
+
+        [ActionName("DownloadPrivateKey")]
+        public async Task<ActionResult> DownloadPrivateKeyAsync(string requestId, string applicationId)
+        {
+            var result = await gdsVault.CompleteCertificateRequestAsync(requestId, applicationId);
+            if (String.Compare(result.State, "Approved", StringComparison.OrdinalIgnoreCase) == 0 &&
+                result.PrivateKey != null)
+            {
+                if (String.Compare(result.PrivateKeyFormat, "PFX", StringComparison.OrdinalIgnoreCase) == 0)
+                {
+                    var byteArray = Convert.FromBase64String(result.PrivateKey);
+                    return new FileContentResult(byteArray, ContentTypePfx);
+                }
+                else if (String.Compare(result.PrivateKeyFormat, "PEM", StringComparison.OrdinalIgnoreCase) == 0)
+                {
+                    var byteArray = Convert.FromBase64String(result.PrivateKey);
+                    return new FileContentResult(byteArray, ContentTypePem);
+                }
+            }
+            return new NotFoundResult();
         }
 
     }

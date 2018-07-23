@@ -36,6 +36,9 @@
             <td>
                 @Html.ActionLink("Edit", "Edit", new { id = item.ApplicationId }) |
                 @Html.ActionLink("Details", "Details", new { id = item.ApplicationId }) |
+                @Html.ActionLink("NewKeyPair", "..\\CertificateRequest\\CreateNewKeyPair", new { id = item.ApplicationId }) |
+                @Html.ActionLink("SigningRequest", "..\\CertificateRequest\\CreateSigningRequest", new { id = item.ApplicationId }) |
+                @Html.ActionLink("Details", "Details", new { id = item.ApplicationId }) |
                 @Html.ActionLink("Delete", "Delete", new { id = item.ApplicationId })
             </td>
         </tr>

@@ -6,6 +6,7 @@
     <h4>Certificate Request</h4>
     <hr />
     <dl class="dl-horizontal">
+
         <dt>
             @Html.DisplayNameFor(model => model.RequestId)
         </dt>
@@ -23,6 +24,22 @@
         </dd>
 
         <dt>
+            @Html.DisplayNameFor(model => model.CertificateGroupId)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.CertificateGroupId)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.CertificateTypeId)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.CertificateTypeId)
+        </dd>
+
+        <dt>
             @Html.DisplayNameFor(model => model.State)
         </dt>
 
@@ -37,33 +54,26 @@
         <dd>
             @Html.DisplayFor(model => model.SubjectName)
         </dd>
-        <@*
-        <dt>
-            @Html.DisplayNameFor(model => model.RequestTime)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.RequestTime)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.ApproveRejectTime)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.ApproveRejectTime)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.AcceptTime)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.AcceptTime)
-        </dd>
-             *@>
     </dl>
 </div>
 <p>
+    @if (Model.State == "New")
+    {
+        @Html.ActionLink("Approve", "Approve", new { id = Model.RequestId },
+            new { onclick = "return confirm('Do you really want to approve the request " + @Model.RequestId + "?')" })
+        @Html.Raw("&nbsp;|&nbsp;");
+        @Html.ActionLink("Reject", "Reject", new { id = Model.RequestId },
+            new { onclick = "return confirm('Do you really want to reject the request " + @Model.RequestId + "?')" })
+        @Html.Raw("&nbsp;|&nbsp;");
+    }
+    @if (Model.State == "Approved")
+    {
+        @Html.ActionLink("Certificate", "DownloadCertificate", new { requestId = Model.RequestId, applicationId = Model.ApplicationId })
+        @Html.Raw("&nbsp;|&nbsp;");
+        @Html.ActionLink("PrivateKey", "DownloadPrivateKey", new { requestId = Model.RequestId, applicationId = Model.ApplicationId })
+        @Html.Raw("&nbsp;|&nbsp;");
+        @Html.ActionLink("Accept", "Accept", new { id = Model.RequestId })
+        @Html.Raw("&nbsp;|&nbsp;");
+    }
     @Html.ActionLink("Back to List", "Index")
 </p>
