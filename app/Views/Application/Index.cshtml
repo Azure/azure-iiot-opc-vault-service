@@ -18,9 +18,6 @@
         <th>
             @Html.DisplayNameFor(model => model.ApplicationUri)
         </th>
-        <th>
-            @Html.DisplayNameFor(model => model.ProductUri)
-        </th>
         <th></th>
     </tr>
 
@@ -35,9 +32,6 @@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.ApplicationUri)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ProductUri)
             </td>
             <td>
                 @Html.ActionLink("Edit", "Edit", new { id = item.ApplicationId }) |

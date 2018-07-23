@@ -23,13 +23,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Controllers
             return View(requests.Requests);
         }
 
-#pragma warning disable 1998
         [ActionName("CreateNewKeyPair")]
-        public async Task<ActionResult> CreateNewKeyPairAsync()
+        public Task<ActionResult> CreateNewKeyPairAsync()
         {
-            return View();
+            return Task.FromResult<ActionResult>(View());
         }
-#pragma warning restore 1998
 
         [HttpPost]
         [ActionName("CreateNewKeyPair")]
@@ -39,19 +37,18 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Controllers
             if (ModelState.IsValid)
             {
                 //await db.CreateAsync(request);
+                await Task.Delay(100);
                 return RedirectToAction("Index");
             }
 
             return View(request);
         }
 
-#pragma warning disable 1998
         [ActionName("CreateSigningRequest")]
-        public async Task<ActionResult> CreateSigningRequestAsync()
+        public Task<ActionResult> CreateSigningRequestAsync()
         {
-            return View();
+            return Task.FromResult<ActionResult>(View());
         }
-#pragma warning restore 1998
 
         [HttpPost]
         [ActionName("CreateSigningRequest")]
@@ -61,6 +58,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Controllers
             if (ModelState.IsValid)
             {
                 //await db.CreateAsync(request);
+                await Task.Delay(100);
                 return RedirectToAction("Index");
             }
 
