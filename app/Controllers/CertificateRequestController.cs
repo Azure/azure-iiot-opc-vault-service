@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.Models;
 using System;
+using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
@@ -114,7 +115,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Controllers
 
             ViewData["Application"] = application;
 
-            var request = new CreateSigningRequestApiModel()
+            var request = new CreateSigningRequestUploadModel()
             {
                 ApplicationId = id,
                 CertificateGroupId = defaultGroupId,
@@ -128,11 +129,24 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Controllers
         [ActionName("CreateSigningRequest")]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> CreateSigningRequestAsync(
-            CreateSigningRequestApiModel request)
+            CreateSigningRequestUploadModel request)
         {
-            if (ModelState.IsValid)
+            if (ModelState.IsValid && (request.CertificateRequestFile != null || request.CertificateRequest != null))
             {
-                var id = await gdsVault.CreateSigningRequestAsync(request);
+                CreateSigningRequestApiModel requestApi = new CreateSigningRequestApiModel(
+                    request.ApplicationId,
+                    request.CertificateGroupId,
+                    request.CertificateTypeId,
+                    request.CertificateRequest);
+                if (request.CertificateRequestFile != null)
+                {
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        await request.CertificateRequestFile.CopyToAsync(memoryStream);
+                        requestApi.CertificateRequest = Convert.ToBase64String(memoryStream.ToArray());
+                    }
+                }
+                var id = await gdsVault.CreateSigningRequestAsync(requestApi);
                 return RedirectToAction("Index");
             }
 
@@ -210,11 +224,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Controllers
             return new NotFoundResult();
         }
 
-        [HttpPost]
-        public ActionResult UploadFile(object o)
-        {
-            return new NotFoundResult();
-        }
 
         private string CertFileName(string signedCertificate)
         {
