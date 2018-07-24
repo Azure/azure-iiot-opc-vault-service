@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.Models;
 using System;
+using System.IO;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Controllers
@@ -113,7 +115,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Controllers
 
             ViewData["Application"] = application;
 
-            var request = new CreateSigningRequestApiModel()
+            var request = new CreateSigningRequestUploadModel()
             {
                 ApplicationId = id,
                 CertificateGroupId = defaultGroupId,
@@ -127,12 +129,24 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Controllers
         [ActionName("CreateSigningRequest")]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> CreateSigningRequestAsync(
-            [Bind("ApplicationId,SigningRequest,CertificateGroupId,CertificateTypeId")]
-            CreateSigningRequestApiModel request)
+            CreateSigningRequestUploadModel request)
         {
-            if (ModelState.IsValid)
+            if (ModelState.IsValid && (request.CertificateRequestFile != null || request.CertificateRequest != null))
             {
-                var id = await gdsVault.CreateSigningRequestAsync(request);
+                CreateSigningRequestApiModel requestApi = new CreateSigningRequestApiModel(
+                    request.ApplicationId,
+                    request.CertificateGroupId,
+                    request.CertificateTypeId,
+                    request.CertificateRequest);
+                if (request.CertificateRequestFile != null)
+                {
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        await request.CertificateRequestFile.CopyToAsync(memoryStream);
+                        requestApi.CertificateRequest = Convert.ToBase64String(memoryStream.ToArray());
+                    }
+                }
+                var id = await gdsVault.CreateSigningRequestAsync(requestApi);
                 return RedirectToAction("Index");
             }
 
@@ -175,7 +189,10 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Controllers
                 result.SignedCertificate != null)
             {
                 var byteArray = Convert.FromBase64String(result.SignedCertificate);
-                return new FileContentResult(byteArray, "application/pkix-cert");
+                return new FileContentResult(byteArray, "application/pkix-cert")
+                {
+                    FileDownloadName = CertFileName(result.SignedCertificate) + ".der"
+                };
             }
             return new NotFoundResult();
         }
@@ -190,15 +207,36 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Controllers
                 if (String.Compare(result.PrivateKeyFormat, "PFX", StringComparison.OrdinalIgnoreCase) == 0)
                 {
                     var byteArray = Convert.FromBase64String(result.PrivateKey);
-                    return new FileContentResult(byteArray, ContentTypePfx);
+                    return new FileContentResult(byteArray, ContentTypePfx)
+                    {
+                        FileDownloadName = CertFileName(result.SignedCertificate) + ".pfx"
+                    };
                 }
                 else if (String.Compare(result.PrivateKeyFormat, "PEM", StringComparison.OrdinalIgnoreCase) == 0)
                 {
                     var byteArray = Convert.FromBase64String(result.PrivateKey);
-                    return new FileContentResult(byteArray, ContentTypePem);
+                    return new FileContentResult(byteArray, ContentTypePem)
+                    {
+                        FileDownloadName = CertFileName(result.SignedCertificate) + ".pem"
+                    };
                 }
             }
             return new NotFoundResult();
+        }
+
+
+        private string CertFileName(string signedCertificate)
+        {
+            try
+            {
+                var signedCertByteArray = Convert.FromBase64String(signedCertificate);
+                X509Certificate2 cert = new X509Certificate2(signedCertByteArray);
+                return cert.Subject + "[" + cert.Thumbprint + "]";
+            }
+            catch
+            {
+                return "Certificate";
+            }
         }
 
     }

@@ -28,10 +28,10 @@
     {
         <tr>
             <td>
-                @Html.DisplayFor(requestItem => request.RequestId)
+                @Html.ActionLink(request.RequestId, "Details", new { id = request.RequestId })
             </td>
             <td>
-                @Html.DisplayFor(requestItem => request.ApplicationId)
+                @Html.ActionLink(request.ApplicationId, "..\\Application\\Details", new { id = request.ApplicationId })
             </td>
             <td>
                 @Html.DisplayFor(requestItem => request.State)
@@ -40,6 +40,15 @@
                 @Html.DisplayFor(requestItem => request.SubjectName)
             </td>
             <td>
+                @if (request.State == "New")
+                {
+                    @Html.ActionLink("Approve", "Approve", new { id = request.RequestId }/*,
+                        new { onclick = "return confirm('Do you really want to approve the request " + @request.RequestId + "?')" }*/)
+                    @Html.Raw("&nbsp;|&nbsp;");
+                    @Html.ActionLink("Reject", "Reject", new { id = request.RequestId }/*,
+                        new { onclick = "return confirm('Do you really want to reject the request " + @request.RequestId + "?')" }*/)
+                    @Html.Raw("&nbsp;|&nbsp;");
+                }
                 @Html.ActionLink("Details", "Details", new { id = request.RequestId })
             </td>
         </tr>
