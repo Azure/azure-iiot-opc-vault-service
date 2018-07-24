@@ -48,8 +48,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models
             byte[] signedCertificate,
             string privateKeyFormat,
             byte[] privateKey,
-            string authorityId
-)
+            string authorityId)
         {
             this.RequestId = requestId;
             this.ApplicationId = applicationId;

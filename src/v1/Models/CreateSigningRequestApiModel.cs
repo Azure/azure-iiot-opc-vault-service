@@ -36,13 +36,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models
             this.ApplicationId = applicationId;
             this.CertificateGroupId = certificateGroupId;
             this.CertificateTypeId = certificateTypeId;
-            this.CertificateRequest = Convert.ToBase64String(certificateRequest);
+            this.CertificateRequest = certificateRequest != null ? Convert.ToBase64String(certificateRequest) : null;
             this.AuthorityId = authorityId;
         }
 
         public byte [] ToServiceModel()
         {
-            return Convert.FromBase64String(CertificateRequest);
+            return CertificateRequest != null ? Convert.FromBase64String(CertificateRequest) : null;
         }
 
     }

@@ -35,8 +35,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models
                 request.SigningRequest,
                 request.SubjectName,
                 request.DomainNames,
-                request.PrivateKeyFormat,
-                request.PrivateKeyPassword));
+                request.PrivateKeyFormat));
             }
             Requests = requestList.ToArray();
         }

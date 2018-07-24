@@ -4,7 +4,6 @@
 // ------------------------------------------------------------
 
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api;
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;

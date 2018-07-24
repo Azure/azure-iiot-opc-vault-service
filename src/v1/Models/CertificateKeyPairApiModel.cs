@@ -7,9 +7,10 @@
 using Newtonsoft.Json;
 using System;
 using System.Security.Cryptography.X509Certificates;
-
+#if CERTSIGNER
 namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models
 {
+
     public sealed class CertificateKeyPairApiModel
     {
         [JsonProperty(PropertyName = "Subject", Order = 10)]
@@ -43,3 +44,4 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models
 
     }
 }
+#endif

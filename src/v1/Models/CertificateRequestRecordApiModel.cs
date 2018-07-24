@@ -39,11 +39,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models
         [JsonProperty(PropertyName = "PrivateKeyFormat", Order = 60)]
         public string PrivateKeyFormat { get; set; }
 
-        // TODO: do not expose Password?
-        [JsonProperty(PropertyName = "PrivateKeyPassword", Order = 70)]
-        public string PrivateKeyPassword { get; set; }
-
-
         public CertificateRequestRecordApiModel(
             string requestId,
             string applicationId,
@@ -53,8 +48,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models
             byte[] signingRequest,
             string subjectName,
             string[] domainNames,
-            string privateKeyFormat,
-            string privateKeyPassword)
+            string privateKeyFormat)
         {
             this.RequestId = requestId;
             this.ApplicationId = applicationId;
@@ -65,7 +59,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models
             this.SubjectName = subjectName;
             this.DomainNames = domainNames;
             this.PrivateKeyFormat = privateKeyFormat;
-            this.PrivateKeyPassword = privateKeyPassword;
         }
 
     }

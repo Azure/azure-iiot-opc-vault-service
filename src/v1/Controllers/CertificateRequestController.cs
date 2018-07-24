@@ -128,8 +128,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
                 result.SigningRequest,
                 result.SubjectName,
                 result.DomainNames,
-                result.PrivateKeyFormat,
-                result.PrivateKeyPassword);
+                result.PrivateKeyFormat);
         }
 
         /// <summary>Complete certificate request</summary>
