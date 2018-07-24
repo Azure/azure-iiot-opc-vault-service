@@ -197,6 +197,39 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Controllers
             return new NotFoundResult();
         }
 
+        [ActionName("DownloadIssuer")]
+        public async Task<ActionResult> DownloadIssuerAsync(string requestId)
+        {
+            var request = await gdsVault.ReadCertificateRequestAsync(requestId);
+            if (request != null)
+            {
+                var issuer = await gdsVault.GetCACertificateChainAsync(request.CertificateGroupId);
+                var byteArray = Convert.FromBase64String(issuer.Chain[0].Certificate);
+                return new FileContentResult(byteArray, ContentTypeCert)
+                {
+                    FileDownloadName = CertFileName(issuer.Chain[0].Certificate) + ".der"
+                };
+            }
+            return new NotFoundResult();
+        }
+
+        [ActionName("DownloadIssuerCrl")]
+        public async Task<ActionResult> DownloadIssuerCrlAsync(string requestId)
+        {
+            var request = await gdsVault.ReadCertificateRequestAsync(requestId);
+            if (request != null)
+            {
+                var issuer = await gdsVault.GetCACertificateChainAsync(request.CertificateGroupId);
+                var crl = await gdsVault.GetCACrlChainAsync(request.CertificateGroupId);
+                var byteArray = Convert.FromBase64String(crl.Chain[0].Crl);
+                return new FileContentResult(byteArray, ContentTypeCrl)
+                {
+                    FileDownloadName = CertFileName(issuer.Chain[0].Certificate) + ".crl"
+                };
+            }
+            return new NotFoundResult();
+        }
+
         [ActionName("DownloadPrivateKey")]
         public async Task<ActionResult> DownloadPrivateKeyAsync(string requestId, string applicationId)
         {

@@ -87,6 +87,10 @@
     {
         @Html.ActionLink("Certificate", "DownloadCertificate", new { requestId = Model.RequestId, applicationId = Model.ApplicationId })
         @Html.Raw("&nbsp;|&nbsp;");
+        @Html.ActionLink("Issuer", "DownloadIssuer", new { requestId = Model.RequestId })
+        @Html.Raw("&nbsp;|&nbsp;");
+        @Html.ActionLink("Crl", "DownloadIssuerCrl", new { requestId = Model.RequestId })
+        @Html.Raw("&nbsp;|&nbsp;");
     }
     @if (Model.State == "Approved")
     {
