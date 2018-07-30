@@ -63,7 +63,7 @@ namespace Opc.Ua.Gds.Server.GdsVault
                 certificateGroupId.ToString()
                 );
 
-            string requestId = _gdsVaultServiceClient.CreateSigningRequest(model);
+            string requestId = _gdsVaultServiceClient.StartSigningRequest(model);
 
             return GdsVaultClientHelper.GetNodeIdFromServiceId(requestId, NamespaceIndex);
         }
@@ -90,7 +90,7 @@ namespace Opc.Ua.Gds.Server.GdsVault
                 throw new ServiceResultException(StatusCodes.BadInvalidArgument, "The CertificateTypeId does not refer to a supported CertificateType.");
             }
 
-            var model = new CreateNewKeyPairRequestApiModel(
+            var model = new StartNewKeyPairRequestApiModel(
                 appId,
                 authorityId,
                 certTypeId,
@@ -101,7 +101,7 @@ namespace Opc.Ua.Gds.Server.GdsVault
                 certificateGroupId.ToString()
                 );
 
-            string requestId = _gdsVaultServiceClient.CreateNewKeyPairRequest(model);
+            string requestId = _gdsVaultServiceClient.StartNewKeyPairRequest(model);
 
             return GdsVaultClientHelper.GetNodeIdFromServiceId(requestId, NamespaceIndex);
         }
@@ -147,7 +147,7 @@ namespace Opc.Ua.Gds.Server.GdsVault
             signedCertificate = null;
             privateKey = null;
 
-            var request = _gdsVaultServiceClient.CompleteCertificateRequest(reqId, appId);
+            var request = _gdsVaultServiceClient.FinishRequest(reqId, appId);
 
             var state = (CertificateRequestState)Enum.Parse(typeof(CertificateRequestState), request.State);
 

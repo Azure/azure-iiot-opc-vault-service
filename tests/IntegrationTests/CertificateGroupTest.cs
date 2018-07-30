@@ -139,7 +139,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Test
         }
 
         [Fact, Trait(Constants.Type, Constants.UnitTest)]
-        public async Task KeyVaultCreateNewKeyPairRequestAsync()
+        public async Task KeyVaultNewKeyPairRequestAsync()
         {
             KeyVaultCertificateGroup keyVault = new KeyVaultCertificateGroup(config, logger);
             string[] groups = await keyVault.GetCertificateGroupIds();
@@ -216,7 +216,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Test
 
 
         [Fact, Trait(Constants.Type, Constants.UnitTest)]
-        public async Task KeyVaultCreateNewKeyPairAndRevokeCertificateAsync()
+        public async Task KeyVaultNewKeyPairAndRevokeCertificateAsync()
         {
             KeyVaultCertificateGroup keyVault = new KeyVaultCertificateGroup(config, logger);
             await keyVault.Init();

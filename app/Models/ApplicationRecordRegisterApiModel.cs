@@ -14,7 +14,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.Models
     public partial class ApplicationRecordRegisterApiModel
     {
         /// <summary>
-        /// Initializes a new instance of the CreateSigningRequestApiModel
+        /// Initializes a new instance of the ApplicationRecordRegisterApiModel
         /// class.
         /// </summary>
         public ApplicationRecordRegisterApiModel()
@@ -23,7 +23,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.Models
         }
 
         /// <summary>
-        /// Initializes a new instance of the CreateSigningRequestApiModel
+        /// Initializes a new instance of the ApplicationRecordRegisterApiModel
         /// class.
         /// </summary>
         public ApplicationRecordRegisterApiModel(ApplicationRecordApiModel apiModel)
