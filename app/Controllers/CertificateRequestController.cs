@@ -33,8 +33,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Controllers
             return View(requests.Requests);
         }
 
-        [ActionName("CreateNewKeyPair")]
-        public async Task<ActionResult> CreateNewKeyPairAsync(string id)
+        [ActionName("StartNewKeyPair")]
+        public async Task<ActionResult> StartNewKeyPairAsync(string id)
         {
             var groups = await gdsVault.GetCertificateGroupConfigurationCollectionAsync();
             if (groups == null)
@@ -73,9 +73,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Controllers
         }
 
         [HttpPost]
-        [ActionName("CreateNewKeyPair")]
+        [ActionName("StartNewKeyPair")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> CreateNewKeyPairAsync(
+        public async Task<ActionResult> StartNewKeyPairAsync(
             CreateNewKeyPairRequestApiModel request)
         {
             if (ModelState.IsValid)
@@ -87,8 +87,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Controllers
             return View(request);
         }
 
-        [ActionName("CreateSigningRequest")]
-        public async Task<ActionResult> CreateSigningRequestAsync(string id)
+        [ActionName("StartSigningRequest")]
+        public async Task<ActionResult> StartSigningRequestAsync(string id)
         {
             var groups = await gdsVault.GetCertificateGroupConfigurationCollectionAsync();
             if (groups == null)
@@ -115,29 +115,28 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Controllers
 
             ViewData["Application"] = application;
 
-            var request = new CreateSigningRequestUploadModel()
+            var request = new StartSigningRequestUploadModel()
             {
-                ApplicationId = id,
-                CertificateGroupId = defaultGroupId,
-                CertificateTypeId = defaultTypeId
+                ApiModel = new StartSigningRequestApiModel()
+                {
+                    ApplicationId = id,
+                    CertificateGroupId = defaultGroupId,
+                    CertificateTypeId = defaultTypeId
+                }
             };
 
             return View(request);
         }
 
         [HttpPost]
-        [ActionName("CreateSigningRequest")]
+        [ActionName("StartSigningRequest")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> CreateSigningRequestAsync(
-            CreateSigningRequestUploadModel request)
+        public async Task<ActionResult> StartSigningRequestAsync(
+            StartSigningRequestUploadModel request)
         {
-            if (ModelState.IsValid && (request.CertificateRequestFile != null || request.CertificateRequest != null))
+            if (ModelState.IsValid && (request.CertificateRequestFile != null || request.ApiModel.CertificateRequest != null))
             {
-                CreateSigningRequestApiModel requestApi = new CreateSigningRequestApiModel(
-                    request.ApplicationId,
-                    request.CertificateGroupId,
-                    request.CertificateTypeId,
-                    request.CertificateRequest);
+                var requestApi = request.ApiModel;
                 if (request.CertificateRequestFile != null)
                 {
                     using (var memoryStream = new MemoryStream())

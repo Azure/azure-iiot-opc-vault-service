@@ -16,13 +16,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
     public interface ICertificateRequest
     {
         Task Initialize();
-        Task<string> CreateSigningRequestAsync(
+        Task<string> StartSigningRequestAsync(
             string applicationId,
             string certificateGroupId,
             string certificateTypeId,
             byte[] certificateRequest,
             string authorityId);
-        Task<string> CreateNewKeyPairAsync(
+        Task<string> StartNewKeyPairRequestAsync(
             string applicationId,
             string certificateGroupId,
             string certificateTypeId,
@@ -39,7 +39,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
         Task AcceptAsync(
             string requestId);
 
-        Task<CompleteRequestResultModel> CompleteAsync(
+        Task<FinishRequestResultModel> FinishRequestAsync(
             string requestId,
             string applicationId
             );

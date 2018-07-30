@@ -10,7 +10,7 @@ using System;
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models
 {
-    public sealed class CompleteRequestApiModel
+    public sealed class FinishRequestApiModel
     {
         [JsonProperty(PropertyName = "RequestId", Order = 5)]
         public string RequestId { get; set; }
@@ -39,7 +39,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models
         [JsonProperty(PropertyName = "AuthorityId", Order = 70)]
         public string AuthorityId { get; set; }
 
-        public CompleteRequestApiModel(
+        public FinishRequestApiModel(
             string requestId,
             string applicationId,
             CertificateRequestState state,

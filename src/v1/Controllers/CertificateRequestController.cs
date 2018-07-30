@@ -25,17 +25,17 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
         }
 
         /// <summary>
-        /// Create a new signing request.
+        /// Start a new signing request.
         /// </summary>
         [HttpPost("sign")]
-        [SwaggerOperation(operationId: "CreateSigningRequest")]
-        public async Task<string> CreateSigningRequestAsync([FromBody] CreateSigningRequestApiModel signingRequest)
+        [SwaggerOperation(operationId: "StartSigningRequest")]
+        public async Task<string> StartSigningRequestAsync([FromBody] StartSigningRequestApiModel signingRequest)
         {
             if (signingRequest == null)
             {
                 throw new ArgumentNullException(nameof(signingRequest));
             }
-            return await _certificateRequest.CreateSigningRequestAsync(
+            return await _certificateRequest.StartSigningRequestAsync(
                 signingRequest.ApplicationId,
                 signingRequest.CertificateGroupId,
                 signingRequest.CertificateTypeId,
@@ -44,17 +44,17 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
         }
 
         /// <summary>
-        /// Create a new key pair request.
+        /// Start a new key pair request.
         /// </summary>
-        [HttpPost("keypair")]
-        [SwaggerOperation(operationId: "CreateNewKeyPairRequest")]
-        public async Task<string> CreateNewKeyPairRequestAsync([FromBody] CreateNewKeyPairRequestApiModel newKeyPairRequest)
+        [HttpPost("newkeypair")]
+        [SwaggerOperation(operationId: "StartNewKeyPairRequest")]
+        public async Task<string> StartNewKeyPairRequestAsync([FromBody] StartNewKeyPairRequestApiModel newKeyPairRequest)
         {
             if (newKeyPairRequest == null)
             {
                 throw new ArgumentNullException(nameof(newKeyPairRequest));
             }
-            return await _certificateRequest.CreateNewKeyPairAsync(
+            return await _certificateRequest.StartNewKeyPairRequestAsync(
                 newKeyPairRequest.ApplicationId,
                 newKeyPairRequest.CertificateGroupId,
                 newKeyPairRequest.CertificateTypeId,
@@ -132,15 +132,15 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
         }
 
         /// <summary>Complete certificate request</summary>
-        [HttpPost("{requestId}/{applicationId}/complete")]
-        [SwaggerOperation(operationId: "CompleteCertificateRequest")]
-        public async Task<CompleteRequestApiModel> CompleteCertificateRequestAsync(string requestId, string applicationId)
+        [HttpPost("{requestId}/{applicationId}/finish")]
+        [SwaggerOperation(operationId: "FinishRequest")]
+        public async Task<FinishRequestApiModel> FinishRequestAsync(string requestId, string applicationId)
         {
-            var result = await _certificateRequest.CompleteAsync(
+            var result = await _certificateRequest.FinishRequestAsync(
                 requestId,
                 applicationId
                 );
-            return new CompleteRequestApiModel(
+            return new FinishRequestApiModel(
                 requestId,
                 applicationId,
                 result.State,

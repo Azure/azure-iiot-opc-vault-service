@@ -9,7 +9,7 @@ using System;
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models
 {
-    public sealed class CreateNewKeyPairRequestApiModel
+    public sealed class StartSigningRequestApiModel
     {
         [JsonProperty(PropertyName = "ApplicationId", Order = 10)]
         public string ApplicationId { get; set; }
@@ -20,39 +20,29 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models
         [JsonProperty(PropertyName = "CertificateTypeId", Order = 30)]
         public string CertificateTypeId { get; set; }
 
-        [JsonProperty(PropertyName = "SubjectName", Order = 40)]
-        public string SubjectName { get; set; }
+        [JsonProperty(PropertyName = "CertificateRequest", Order = 40)]
+        public string CertificateRequest { get; set; }
 
-        [JsonProperty(PropertyName = "DomainNames", Order = 50)]
-        public string [] DomainNames { get; set; }
-
-        [JsonProperty(PropertyName = "PrivateKeyFormat", Order = 60)]
-        public string PrivateKeyFormat { get; set; }
-
-        [JsonProperty(PropertyName = "PrivateKeyPassword", Order = 70)]
-        public string PrivateKeyPassword { get; set; }
-
-        [JsonProperty(PropertyName = "AuthorityId", Order = 80)]
+        [JsonProperty(PropertyName = "AuthorityId", Order = 50)]
         public string AuthorityId { get; set; }
 
-        public CreateNewKeyPairRequestApiModel(
+        public StartSigningRequestApiModel(
             string applicationId,
             string certificateGroupId,
             string certificateTypeId,
-            string subjectName,
-            string[] domainNames,
-            string privateKeyFormat,
-            string privateKeyPassword,
+            byte[] certificateRequest,
             string authorityId)
         {
             this.ApplicationId = applicationId;
             this.CertificateGroupId = certificateGroupId;
             this.CertificateTypeId = certificateTypeId;
-            this.SubjectName = subjectName;
-            this.DomainNames = domainNames;
-            this.PrivateKeyFormat = privateKeyFormat;
-            this.PrivateKeyPassword = privateKeyPassword;
+            this.CertificateRequest = certificateRequest != null ? Convert.ToBase64String(certificateRequest) : null;
             this.AuthorityId = authorityId;
+        }
+
+        public byte [] ToServiceModel()
+        {
+            return CertificateRequest != null ? Convert.FromBase64String(CertificateRequest) : null;
         }
 
     }

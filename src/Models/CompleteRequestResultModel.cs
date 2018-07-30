@@ -9,7 +9,7 @@ using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.CosmosDB.Models;
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Models
 {
-    public sealed class CompleteRequestResultModel
+    public sealed class FinishRequestResultModel
     {
         public CertificateRequestState State { get; set; }
 
@@ -29,14 +29,14 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Models
 
         public string AuthorityId { get; set; }
 
-        public CompleteRequestResultModel(
+        public FinishRequestResultModel(
             CertificateRequestState state
             )
         {
             this.State = state;
         }
 
-        public CompleteRequestResultModel(
+        public FinishRequestResultModel(
             CertificateRequestState state,
             string applicationId,
             string requestId,

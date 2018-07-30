@@ -70,7 +70,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
             return Task.CompletedTask;
         }
 
-        public async Task<string> CreateSigningRequestAsync(
+        public async Task<string> StartSigningRequestAsync(
             string applicationId,
             string certificateGroupId,
             string certificateTypeId,
@@ -130,7 +130,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
             return request.RequestId.ToString();
         }
 
-        public async Task<string> CreateNewKeyPairAsync(
+        public async Task<string> StartNewKeyPairRequestAsync(
             string applicationId,
             string certificateGroupId,
             string certificateTypeId,
@@ -319,7 +319,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
             await CertificateRequests.UpdateAsync(request.RequestId, request);
         }
 
-        public async Task<CompleteRequestResultModel> CompleteAsync(
+        public async Task<FinishRequestResultModel> FinishRequestAsync(
             string requestId,
             string applicationId)
         {
@@ -343,7 +343,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
                 case CertificateRequestState.New:
                 case CertificateRequestState.Rejected:
                 case CertificateRequestState.Accepted:
-                    return new CompleteRequestResultModel(request.State);
+                    return new FinishRequestResultModel(request.State);
                 case CertificateRequestState.Approved:
                     break;
                 default:
@@ -355,7 +355,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
                 throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
             }
 
-            return new CompleteRequestResultModel(
+            return new FinishRequestResultModel(
                 request.State,
                 applicationId,
                 requestId,

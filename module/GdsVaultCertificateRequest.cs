@@ -25,7 +25,7 @@ namespace Opc.Ua.Gds.Server.GdsVault
             this._certTypeMap.Add(Opc.Ua.ObjectTypeIds.HttpsCertificateType, "Https");
             this._certTypeMap.Add(Opc.Ua.ObjectTypeIds.UserCredentialCertificateType, "User");
             this._certTypeMap.Add(Opc.Ua.ObjectTypeIds.ApplicationCertificateType, "App");
-            this._certTypeMap.Add(Opc.Ua.ObjectTypeIds.RsaMinApplicationCertificateType, "AppRsaSha1");
+            this._certTypeMap.Add(Opc.Ua.ObjectTypeIds.RsaMinApplicationCertificateType, "AppRsaMin");
             this._certTypeMap.Add(Opc.Ua.ObjectTypeIds.RsaSha256ApplicationCertificateType, "AppRsaSha256");
         }
 
@@ -36,7 +36,7 @@ namespace Opc.Ua.Gds.Server.GdsVault
 
         public ushort NamespaceIndex { get; set; }
 
-        public NodeId CreateSigningRequest(
+        public NodeId StartSigningRequest(
             NodeId applicationId,
             NodeId certificateGroupId,
             NodeId certificateTypeId,
@@ -55,7 +55,7 @@ namespace Opc.Ua.Gds.Server.GdsVault
                 throw new ServiceResultException(StatusCodes.BadInvalidArgument, "The CertificateTypeId does not refer to a supported CertificateType.");
             }
 
-            var model = new CreateSigningRequestApiModel(
+            var model = new StartSigningRequestApiModel(
                 appId,
                 authorityId,
                 certTypeId,
@@ -68,7 +68,7 @@ namespace Opc.Ua.Gds.Server.GdsVault
             return GdsVaultClientHelper.GetNodeIdFromServiceId(requestId, NamespaceIndex);
         }
 
-        public NodeId CreateNewKeyPairRequest(
+        public NodeId StartNewKeyPairRequest(
             NodeId applicationId,
             NodeId certificateGroupId,
             NodeId certificateTypeId,
@@ -106,7 +106,7 @@ namespace Opc.Ua.Gds.Server.GdsVault
             return GdsVaultClientHelper.GetNodeIdFromServiceId(requestId, NamespaceIndex);
         }
 
-        public void ApproveCertificateRequest(
+        public void ApproveRequest(
             NodeId requestId,
             bool isRejected
             )
@@ -116,13 +116,13 @@ namespace Opc.Ua.Gds.Server.GdsVault
             _gdsVaultServiceClient.ApproveCertificateRequest(reqId, isRejected);
         }
 
-        public void AcceptCertificateRequest(NodeId requestId, byte[] signedCertificate)
+        public void AcceptRequest(NodeId requestId, byte[] signedCertificate)
         {
             string reqId = GdsVaultClientHelper.GetServiceIdFromNodeId(requestId, NamespaceIndex);
             _gdsVaultServiceClient.AcceptCertificateRequest(reqId);
         }
 
-        public CertificateRequestState CompleteCertificateRequest(
+        public CertificateRequestState FinishRequest(
             NodeId applicationId,
             NodeId requestId,
             out NodeId certificateGroupId,

@@ -13,13 +13,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.Models
     using Newtonsoft.Json;
     using System.Linq;
 
-    public partial class CreateSigningRequestApiModel
+    public partial class StartSigningRequestApiModel
     {
         /// <summary>
         /// Initializes a new instance of the CreateSigningRequestApiModel
         /// class.
         /// </summary>
-        public CreateSigningRequestApiModel()
+        public StartSigningRequestApiModel()
         {
             CustomInit();
         }
@@ -28,7 +28,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.Models
         /// Initializes a new instance of the CreateSigningRequestApiModel
         /// class.
         /// </summary>
-        public CreateSigningRequestApiModel(string applicationId = default(string), string certificateGroupId = default(string), string certificateTypeId = default(string), string certificateRequest = default(string), string authorityId = default(string))
+        public StartSigningRequestApiModel(string applicationId = default(string), string certificateGroupId = default(string), string certificateTypeId = default(string), string certificateRequest = default(string), string authorityId = default(string))
         {
             ApplicationId = applicationId;
             CertificateGroupId = certificateGroupId;
