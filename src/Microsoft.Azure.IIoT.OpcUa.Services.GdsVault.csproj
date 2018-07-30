@@ -36,11 +36,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties" />
-    <Folder Include="v1\Exceptions\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Azure.DocumentDB.Core" Version="1.9.1" />
-    <PackageReference Include="Microsoft.Azure.IIoT.Services" Version="1.0.0-preview001" />
     <PackageReference Include="Microsoft.Azure.KeyVault" Version="2.3.2" />
     <PackageReference Include="Microsoft.Azure.Services.AppAuthentication" Version="1.0.3" />
     <PackageReference Include="Autofac" Version="4.6.2" />
@@ -60,7 +58,21 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="Opc.Ua.Gds.Server.Common" Version="1.4.354-preview180709" />
+        <PackageReference Include="Opc.Ua.Gds.Server.Common" Version="1.4.354-preview180731" />
+      </ItemGroup>
+    </Otherwise>
+  </Choose>
+  <Choose>
+    <When Condition="Exists('..\..\azure-iiot-common') and '$(Configuration)'=='Develop'">
+      <ItemGroup>
+        <ProjectReference Include="..\..\azure-iiot-common\src\Microsoft.Azure.IIoT.Services\src\Microsoft.Azure.IIoT.Services.csproj" />
+        <ProjectReference Include="..\..\azure-iiot-common\src\Microsoft.Azure.IIoT.Auth\src\Microsoft.Azure.IIoT.Auth.csproj" />
+        <ProjectReference Include="..\..\azure-iiot-common\src\Microsoft.Azure.IIoT\src\Microsoft.Azure.IIoT.csproj" />
+      </ItemGroup>
+    </When>
+    <Otherwise>
+      <ItemGroup>
+        <PackageReference Include="Microsoft.Azure.IIoT.Services" Version="1.0.0-preview001" />
       </ItemGroup>
     </Otherwise>
   </Choose>

@@ -20,7 +20,7 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="Opc.Ua.Gds.Server.Common" Version="1.4.354-preview180709" />
+        <PackageReference Include="Opc.Ua.Gds.Server.Common" Version="1.4.354-preview180731" />
       </ItemGroup>
     </Otherwise>
   </Choose>
