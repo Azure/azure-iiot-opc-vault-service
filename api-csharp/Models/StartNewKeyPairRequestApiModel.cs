@@ -11,29 +11,34 @@
 namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.Models
 {
     using Newtonsoft.Json;
+    using System.Collections;
+    using System.Collections.Generic;
     using System.Linq;
 
-    public partial class StartSigningRequestApiModel
+    public partial class StartNewKeyPairRequestApiModel
     {
         /// <summary>
-        /// Initializes a new instance of the CreateSigningRequestApiModel
+        /// Initializes a new instance of the StartNewKeyPairRequestApiModel
         /// class.
         /// </summary>
-        public StartSigningRequestApiModel()
+        public StartNewKeyPairRequestApiModel()
         {
             CustomInit();
         }
 
         /// <summary>
-        /// Initializes a new instance of the CreateSigningRequestApiModel
+        /// Initializes a new instance of the StartNewKeyPairRequestApiModel
         /// class.
         /// </summary>
-        public StartSigningRequestApiModel(string applicationId = default(string), string certificateGroupId = default(string), string certificateTypeId = default(string), string certificateRequest = default(string), string authorityId = default(string))
+        public StartNewKeyPairRequestApiModel(string applicationId = default(string), string certificateGroupId = default(string), string certificateTypeId = default(string), string subjectName = default(string), IList<string> domainNames = default(IList<string>), string privateKeyFormat = default(string), string privateKeyPassword = default(string), string authorityId = default(string))
         {
             ApplicationId = applicationId;
             CertificateGroupId = certificateGroupId;
             CertificateTypeId = certificateTypeId;
-            CertificateRequest = certificateRequest;
+            SubjectName = subjectName;
+            DomainNames = domainNames;
+            PrivateKeyFormat = privateKeyFormat;
+            PrivateKeyPassword = privateKeyPassword;
             AuthorityId = authorityId;
             CustomInit();
         }
@@ -60,8 +65,23 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.Models
 
         /// <summary>
         /// </summary>
-        [JsonProperty(PropertyName = "CertificateRequest")]
-        public string CertificateRequest { get; set; }
+        [JsonProperty(PropertyName = "SubjectName")]
+        public string SubjectName { get; set; }
+
+        /// <summary>
+        /// </summary>
+        [JsonProperty(PropertyName = "DomainNames")]
+        public IList<string> DomainNames { get; set; }
+
+        /// <summary>
+        /// </summary>
+        [JsonProperty(PropertyName = "PrivateKeyFormat")]
+        public string PrivateKeyFormat { get; set; }
+
+        /// <summary>
+        /// </summary>
+        [JsonProperty(PropertyName = "PrivateKeyPassword")]
+        public string PrivateKeyPassword { get; set; }
 
         /// <summary>
         /// </summary>

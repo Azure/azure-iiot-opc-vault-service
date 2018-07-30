@@ -2043,7 +2043,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
         }
 
         /// <summary>
-        /// Create a new signing request.
+        /// Start a new signing request.
         /// </summary>
         /// <param name='signingRequest'>
         /// </param>
@@ -2062,7 +2062,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
         /// <return>
         /// A response object containing the response body and response headers.
         /// </return>
-        public async Task<HttpOperationResponse<string>> CreateSigningRequestWithHttpMessagesAsync(CreateSigningRequestApiModel signingRequest = default(CreateSigningRequestApiModel), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<HttpOperationResponse<string>> StartSigningRequestWithHttpMessagesAsync(StartSigningRequestApiModel signingRequest = default(StartSigningRequestApiModel), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
         {
             // Tracing
             bool _shouldTrace = ServiceClientTracing.IsEnabled;
@@ -2073,7 +2073,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
                 Dictionary<string, object> tracingParameters = new Dictionary<string, object>();
                 tracingParameters.Add("signingRequest", signingRequest);
                 tracingParameters.Add("cancellationToken", cancellationToken);
-                ServiceClientTracing.Enter(_invocationId, this, "CreateSigningRequest", tracingParameters);
+                ServiceClientTracing.Enter(_invocationId, this, "StartSigningRequest", tracingParameters);
             }
             // Construct URL
             var _baseUrl = BaseUri.AbsoluteUri;
@@ -2178,7 +2178,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
         }
 
         /// <summary>
-        /// Create a new key pair request.
+        /// Start a new key pair request.
         /// </summary>
         /// <param name='newKeyPairRequest'>
         /// </param>
@@ -2197,7 +2197,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
         /// <return>
         /// A response object containing the response body and response headers.
         /// </return>
-        public async Task<HttpOperationResponse<string>> CreateNewKeyPairRequestWithHttpMessagesAsync(CreateNewKeyPairRequestApiModel newKeyPairRequest = default(CreateNewKeyPairRequestApiModel), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<HttpOperationResponse<string>> StartNewKeyPairRequestWithHttpMessagesAsync(StartNewKeyPairRequestApiModel newKeyPairRequest = default(StartNewKeyPairRequestApiModel), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
         {
             // Tracing
             bool _shouldTrace = ServiceClientTracing.IsEnabled;
@@ -2208,11 +2208,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
                 Dictionary<string, object> tracingParameters = new Dictionary<string, object>();
                 tracingParameters.Add("newKeyPairRequest", newKeyPairRequest);
                 tracingParameters.Add("cancellationToken", cancellationToken);
-                ServiceClientTracing.Enter(_invocationId, this, "CreateNewKeyPairRequest", tracingParameters);
+                ServiceClientTracing.Enter(_invocationId, this, "StartNewKeyPairRequest", tracingParameters);
             }
             // Construct URL
             var _baseUrl = BaseUri.AbsoluteUri;
-            var _url = new System.Uri(new System.Uri(_baseUrl + (_baseUrl.EndsWith("/") ? "" : "/")), "v1/request/keypair").ToString();
+            var _url = new System.Uri(new System.Uri(_baseUrl + (_baseUrl.EndsWith("/") ? "" : "/")), "v1/request/newkeypair").ToString();
             // Create HTTP transport objects
             var _httpRequest = new HttpRequestMessage();
             HttpResponseMessage _httpResponse = null;
@@ -3128,7 +3128,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
         /// <return>
         /// A response object containing the response body and response headers.
         /// </return>
-        public async Task<HttpOperationResponse<CompleteRequestApiModel>> CompleteCertificateRequestWithHttpMessagesAsync(string requestId, string applicationId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<HttpOperationResponse<FinishRequestApiModel>> FinishRequestWithHttpMessagesAsync(string requestId, string applicationId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (requestId == null)
             {
@@ -3148,11 +3148,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
                 tracingParameters.Add("requestId", requestId);
                 tracingParameters.Add("applicationId", applicationId);
                 tracingParameters.Add("cancellationToken", cancellationToken);
-                ServiceClientTracing.Enter(_invocationId, this, "CompleteCertificateRequest", tracingParameters);
+                ServiceClientTracing.Enter(_invocationId, this, "FinishRequest", tracingParameters);
             }
             // Construct URL
             var _baseUrl = BaseUri.AbsoluteUri;
-            var _url = new System.Uri(new System.Uri(_baseUrl + (_baseUrl.EndsWith("/") ? "" : "/")), "v1/request/{requestId}/{applicationId}/complete").ToString();
+            var _url = new System.Uri(new System.Uri(_baseUrl + (_baseUrl.EndsWith("/") ? "" : "/")), "v1/request/{requestId}/{applicationId}/finish").ToString();
             _url = _url.Replace("{requestId}", System.Uri.EscapeDataString(requestId));
             _url = _url.Replace("{applicationId}", System.Uri.EscapeDataString(applicationId));
             // Create HTTP transport objects
@@ -3220,7 +3220,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
                 throw ex;
             }
             // Create Result
-            var _result = new HttpOperationResponse<CompleteRequestApiModel>();
+            var _result = new HttpOperationResponse<FinishRequestApiModel>();
             _result.Request = _httpRequest;
             _result.Response = _httpResponse;
             // Deserialize Response
@@ -3229,7 +3229,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
                 _responseContent = await _httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
                 try
                 {
-                    _result.Body = SafeJsonConvert.DeserializeObject<CompleteRequestApiModel>(_responseContent, DeserializationSettings);
+                    _result.Body = SafeJsonConvert.DeserializeObject<FinishRequestApiModel>(_responseContent, DeserializationSettings);
                 }
                 catch (JsonException ex)
                 {

@@ -13,20 +13,20 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.Models
     using Newtonsoft.Json;
     using System.Linq;
 
-    public partial class CompleteRequestApiModel
+    public partial class FinishRequestApiModel
     {
         /// <summary>
-        /// Initializes a new instance of the CompleteRequestApiModel class.
+        /// Initializes a new instance of the FinishRequestApiModel class.
         /// </summary>
-        public CompleteRequestApiModel()
+        public FinishRequestApiModel()
         {
             CustomInit();
         }
 
         /// <summary>
-        /// Initializes a new instance of the CompleteRequestApiModel class.
+        /// Initializes a new instance of the FinishRequestApiModel class.
         /// </summary>
-        public CompleteRequestApiModel(string requestId = default(string), string applicationId = default(string), string state = default(string), string certificateGroupId = default(string), string certificateTypeId = default(string), string signedCertificate = default(string), string privateKeyFormat = default(string), string privateKey = default(string), string authorityId = default(string))
+        public FinishRequestApiModel(string requestId = default(string), string applicationId = default(string), string state = default(string), string certificateGroupId = default(string), string certificateTypeId = default(string), string signedCertificate = default(string), string privateKeyFormat = default(string), string privateKey = default(string), string authorityId = default(string))
         {
             RequestId = requestId;
             ApplicationId = applicationId;

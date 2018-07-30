@@ -30,7 +30,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.Models
         /// Initializes a new instance of the CertificateRequestRecordApiModel
         /// class.
         /// </summary>
-        public CertificateRequestRecordApiModel(string requestId = default(string), string applicationId = default(string), string state = default(string), string certificateGroupId = default(string), string certificateTypeId = default(string), string signingRequest = default(string), string subjectName = default(string), IList<string> domainNames = default(IList<string>), string privateKeyFormat = default(string), string privateKeyPassword = default(string))
+        public CertificateRequestRecordApiModel(string requestId = default(string), string applicationId = default(string), string state = default(string), string certificateGroupId = default(string), string certificateTypeId = default(string), string signingRequest = default(string), string subjectName = default(string), IList<string> domainNames = default(IList<string>), string privateKeyFormat = default(string))
         {
             RequestId = requestId;
             ApplicationId = applicationId;
@@ -41,7 +41,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.Models
             SubjectName = subjectName;
             DomainNames = domainNames;
             PrivateKeyFormat = privateKeyFormat;
-            PrivateKeyPassword = privateKeyPassword;
             CustomInit();
         }
 
@@ -94,11 +93,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.Models
         /// </summary>
         [JsonProperty(PropertyName = "PrivateKeyFormat")]
         public string PrivateKeyFormat { get; set; }
-
-        /// <summary>
-        /// </summary>
-        [JsonProperty(PropertyName = "PrivateKeyPassword")]
-        public string PrivateKeyPassword { get; set; }
 
     }
 }

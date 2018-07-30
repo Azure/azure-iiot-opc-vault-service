@@ -425,20 +425,20 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
             }
 
             /// <summary>
-            /// Create a new signing request.
+            /// Start a new signing request.
             /// </summary>
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
             /// <param name='signingRequest'>
             /// </param>
-            public static string CreateSigningRequest(this IOpcGdsVault operations, CreateSigningRequestApiModel signingRequest = default(CreateSigningRequestApiModel))
+            public static string StartSigningRequest(this IOpcGdsVault operations, StartSigningRequestApiModel signingRequest = default(StartSigningRequestApiModel))
             {
-                return operations.CreateSigningRequestAsync(signingRequest).GetAwaiter().GetResult();
+                return operations.StartSigningRequestAsync(signingRequest).GetAwaiter().GetResult();
             }
 
             /// <summary>
-            /// Create a new signing request.
+            /// Start a new signing request.
             /// </summary>
             /// <param name='operations'>
             /// The operations group for this extension method.
@@ -448,29 +448,29 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<string> CreateSigningRequestAsync(this IOpcGdsVault operations, CreateSigningRequestApiModel signingRequest = default(CreateSigningRequestApiModel), CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<string> StartSigningRequestAsync(this IOpcGdsVault operations, StartSigningRequestApiModel signingRequest = default(StartSigningRequestApiModel), CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.CreateSigningRequestWithHttpMessagesAsync(signingRequest, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.StartSigningRequestWithHttpMessagesAsync(signingRequest, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }
             }
 
             /// <summary>
-            /// Create a new key pair request.
+            /// Start a new key pair request.
             /// </summary>
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
             /// <param name='newKeyPairRequest'>
             /// </param>
-            public static string CreateNewKeyPairRequest(this IOpcGdsVault operations, CreateNewKeyPairRequestApiModel newKeyPairRequest = default(CreateNewKeyPairRequestApiModel))
+            public static string StartNewKeyPairRequest(this IOpcGdsVault operations, StartNewKeyPairRequestApiModel newKeyPairRequest = default(StartNewKeyPairRequestApiModel))
             {
-                return operations.CreateNewKeyPairRequestAsync(newKeyPairRequest).GetAwaiter().GetResult();
+                return operations.StartNewKeyPairRequestAsync(newKeyPairRequest).GetAwaiter().GetResult();
             }
 
             /// <summary>
-            /// Create a new key pair request.
+            /// Start a new key pair request.
             /// </summary>
             /// <param name='operations'>
             /// The operations group for this extension method.
@@ -480,9 +480,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<string> CreateNewKeyPairRequestAsync(this IOpcGdsVault operations, CreateNewKeyPairRequestApiModel newKeyPairRequest = default(CreateNewKeyPairRequestApiModel), CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<string> StartNewKeyPairRequestAsync(this IOpcGdsVault operations, StartNewKeyPairRequestApiModel newKeyPairRequest = default(StartNewKeyPairRequestApiModel), CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.CreateNewKeyPairRequestWithHttpMessagesAsync(newKeyPairRequest, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.StartNewKeyPairRequestWithHttpMessagesAsync(newKeyPairRequest, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }
@@ -684,9 +684,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
             /// </param>
             /// <param name='applicationId'>
             /// </param>
-            public static CompleteRequestApiModel CompleteCertificateRequest(this IOpcGdsVault operations, string requestId, string applicationId)
+            public static FinishRequestApiModel FinishRequest(this IOpcGdsVault operations, string requestId, string applicationId)
             {
-                return operations.CompleteCertificateRequestAsync(requestId, applicationId).GetAwaiter().GetResult();
+                return operations.FinishRequestAsync(requestId, applicationId).GetAwaiter().GetResult();
             }
 
             /// <summary>
@@ -702,9 +702,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<CompleteRequestApiModel> CompleteCertificateRequestAsync(this IOpcGdsVault operations, string requestId, string applicationId, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<FinishRequestApiModel> FinishRequestAsync(this IOpcGdsVault operations, string requestId, string applicationId, CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.CompleteCertificateRequestWithHttpMessagesAsync(requestId, applicationId, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.FinishRequestWithHttpMessagesAsync(requestId, applicationId, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }
