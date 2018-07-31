@@ -8,5 +8,8 @@ LICENSE             @mregen
 .gitignore          @mregen
 .travis.yml         @mregen
 
+api-csharp/         @mregen
+app/	            @mregen
+module/	            @mregen
 src/			    @mregen
 tests/	            @mregen
