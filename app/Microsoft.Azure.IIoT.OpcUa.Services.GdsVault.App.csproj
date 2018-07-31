@@ -20,7 +20,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Update="Views\CertificateRequest\CreateSigningRequest.cshtml">
+    <Content Update="Views\CertificateRequest\StartSigning.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\CertificateRequest\Complete.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
   </ItemGroup>
