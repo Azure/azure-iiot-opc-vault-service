@@ -1,0 +1,47 @@
+﻿@model IEnumerable<Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.Models.ApplicationRecordApiModel>
+
+@{
+    ViewBag.Title = "List Certificate Stores";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>List of To-Do Items</h2>
+<@*
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.TrustListId)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Path)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.AuthorityId)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.TrustListId)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Path)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.AuthorityId)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.TrustListId }) |
+            @Html.ActionLink("Details", "Details", new { id=item.TrustListId }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.TrustListId })
+        </td>
+    </tr>
+}
+     *@>
+</table>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
