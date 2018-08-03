@@ -47,34 +47,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Test.v1.Controllers
             // *Act*:     execute an action in the system under test (SUT)
             // *Assert*:  verify that the test succeeded
             var id = "Default";
-#if mist
-            // Arrange
-            // Note: for complex setups, where many dependencies need to be
-            // prepared before a test:
-            // 1. First try to reduce the complexity of the class under test
-            // 2. If #1 is not possible, use a context object, e.g.
-            //      see https://dzone.com/articles/introducing-unit-testing
-            // Prepare a fake response to be returned by Devices.GetAsync()
-            var etag = "foo";
-            var id = "123";
-            var date1 = DateTimeOffset.UtcNow;
-            var date2 = DateTimeOffset.MinValue;
-            var device = new Device(
-                eTag: etag,
-                id: id,
-                c2DMessageCount: 345,
-                lastActivity: date1,
-                connected: true,
-                enabled: true,
-                lastStatusUpdated: date2,
-                twin: new DeviceTwin(
-                    eTag: etag,
-                    deviceId: id,
-                    desiredProperties: new Dictionary<string, JToken>(),
-                    reportedProperties: new Dictionary<string, JToken>(),
-                    tags: new Dictionary<string, JToken>(),
-                    isSimulated: false));
-#endif
             var configuration = new Opc.Ua.Gds.Server.CertificateGroupConfiguration()
             {
                 Id = id
@@ -90,20 +62,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Test.v1.Controllers
             // public methods, i.e. to test code inside private methods, we
             // write a test that starts from a public method.
             CertificateGroupConfigurationApiModel result = this.target.GetAsync(id).Result;
-#if mist
-            // Assert
-            // Verify that the result looks like it should be, e.g. values and
-            // format are correct.
-            Assert.Equal(etag, result.Etag);
-            Assert.Equal(id, result.Id);
-            Assert.Equal(345, result.C2DMessageCount);
-            Assert.Equal(device.LastActivity.ToString(DateFormat), result.LastActivity);
-            Assert.Equal(device.LastStatusUpdated.ToString(DateFormat), result.LastStatusUpdated);
-            Assert.Equal(device.Enabled, result.IsEnabled);
-            Assert.Equal(device.Connected, result.IsConnected);
-            Assert.Equal(etag, result.Twin.ETag);
-            Assert.Equal(id, result.Twin.DeviceId);
-#endif
+
             // Verify that Devices.GetAsync() has been called, exactly once
             // with the correct parameters
             this.group.Verify(x => x.GetCertificateGroupConfiguration(It.Is<string>(s => s == id)), Times.Once);

@@ -73,6 +73,7 @@
     <Otherwise>
       <ItemGroup>
         <PackageReference Include="Microsoft.Azure.IIoT.Services" Version="1.0.0-preview001" />
+        <PackageReference Include="Microsoft.Azure.IIoT.Auth" Version="1.0.0-preview001" />
       </ItemGroup>
     </Otherwise>
   </Choose>
