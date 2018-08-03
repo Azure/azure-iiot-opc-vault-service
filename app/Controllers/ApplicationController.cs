@@ -38,16 +38,20 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Controllers
             application.ApplicationNames = new List<ApplicationNameApiModel>();
             application.DiscoveryUrls = new List<string>();
             application.DiscoveryUrls.Add("");
-            return Task.FromResult<ActionResult>(View(application));
+            var appRegisterModel = new ApplicationRecordRegisterApiModel()
+            {
+                ApiModel = application
+            };
+            return Task.FromResult<ActionResult>(View(appRegisterModel));
         }
 
         [HttpPost]
         [ActionName("Register")]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> RegisterAsync(
-            ApplicationRecordApiModel application)
+            ApplicationRecordRegisterApiModel appRegisterModel)
         {
-
+            var application = appRegisterModel.ApiModel;
             if (ModelState.IsValid)
             {
                 if (application.ApplicationNames == null)
@@ -62,7 +66,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Controllers
                 return RedirectToAction("Index");
             }
 
-            return View(application);
+            return View(appRegisterModel);
         }
 
         [HttpPost]
