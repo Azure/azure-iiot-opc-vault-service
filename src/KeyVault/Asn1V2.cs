@@ -2,12 +2,16 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+#define netcoreapp
+
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 
 namespace System.Security.Cryptography.Asn1
 {
+
+
     // ITU-T-REC.X.680-201508 sec 4.
     internal enum AsnEncodingRules
     {
