@@ -276,79 +276,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
 
             return new QueryApplicationsResponseModel(records.ToArray(), lastCounterResetTime, nextRecordId);
         }
-
-#if TODO
-        public override bool SetApplicationCertificate(
-            NodeId applicationId,
-            byte[] certificate,
-            bool isHttpsCertificate
-            )
-        {
-            Guid id = GetNodeIdGuid(applicationId);
-
-            var result = Applications.GetAsync(id).Result;
-            if (result == null)
-            {
-                return false;
-            }
-
-            if (isHttpsCertificate)
-            {
-                result.HttpsCertificate = certificate;
-            }
-            else
-            {
-                result.Certificate = certificate;
-            }
-
-            Applications.UpdateAsync(result.ApplicationId, result).Wait();
-
-            return true;
-        }
-
-        public override bool SetApplicationTrustLists(
-            NodeId applicationId,
-            NodeId trustListId,
-            NodeId httpsTrustListId
-            )
-        {
-            Guid id = GetNodeIdGuid(applicationId);
-
-            var result = Applications.GetAsync(id).Result;
-            if (result == null)
-            {
-                return false;
-            }
-
-            result.TrustListId = null;
-            result.HttpsTrustListId = null;
-
-            if (trustListId != null)
-            {
-                string storePath = trustListId.ToString();
-
-                var result2 = CertificateStores.GetAsync(x => x.Path == storePath).Result.SingleOrDefault();
-                if (result2 != null)
-                {
-                    result.TrustListId = result2.TrustListId;
-                }
-            }
-
-            if (httpsTrustListId != null)
-            {
-                string storePath = httpsTrustListId.ToString();
-                var result2 = CertificateStores.GetAsync(x => x.Path == storePath).Result.SingleOrDefault();
-                if (result2 != null)
-                {
-                    result.HttpsTrustListId = result2.TrustListId;
-                }
-            }
-
-            Applications.UpdateAsync(result.ApplicationId, result).Wait();
-
-            return true;
-        }
-#endif
         #endregion
         #region Private Members
         private void Initialize()
@@ -356,7 +283,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
             db = new DocumentDBRepository(Endpoint, AuthKeyOrResourceToken);
             Applications = new DocumentDBCollection<Application>(db);
             CertificateRequests = new DocumentDBCollection<CertificateRequest>(db);
-            CertificateStores = new DocumentDBCollection<CertificateStore>(db);
         }
 
         private string CreateServerQuery(uint startingRecordId, uint maxRecordsToQuery)
@@ -496,7 +422,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
         private DocumentDBRepository db;
         private IDocumentDBCollection<Application> Applications;
         private IDocumentDBCollection<CertificateRequest> CertificateRequests;
-        private IDocumentDBCollection<CertificateStore> CertificateStores;
         #endregion
     }
 }

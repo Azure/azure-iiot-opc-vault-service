@@ -155,14 +155,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
             return await _keyVaultServiceClient.GetTrustListAsync(id).ConfigureAwait(false);
         }
 
-#if IOTHUB
-        // TODO: just for testing, remove
-        public async Task<string> GetIotHubSecretAsync()
-        {
-            return await _keyVaultServiceClient.GetIotHubSecretAsync().ConfigureAwait(false);
-        }
-#endif
-
         private async Task<X509Certificate2Collection> GetCertificateVersionsAsync(string id)
         {
             return await _keyVaultServiceClient.GetCertificateVersionsAsync(id).ConfigureAwait(false);

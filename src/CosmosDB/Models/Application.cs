@@ -27,8 +27,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.CosmosDB.Models
         public string ServerCapabilities { get; set; }
         public byte[] Certificate { get; set; }
         public byte[] HttpsCertificate { get; set; }
-        public Guid? TrustListId { get; set; }
-        public Guid? HttpsTrustListId { get; set; }
         public ApplicationName[] ApplicationNames { get; set; }
         public string[] DiscoveryUrls { get; set; }
         public string GatewayServerUri { get; set; }

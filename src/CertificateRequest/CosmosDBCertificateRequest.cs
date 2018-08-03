@@ -120,11 +120,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
 
             if (isNew)
             {
-                CertificateRequests.CreateAsync(request).Wait();
+                await CertificateRequests.CreateAsync(request);
             }
             else
             {
-                CertificateRequests.UpdateAsync(request.RequestId, request).Wait();
+                await CertificateRequests.UpdateAsync(request.RequestId, request);
             }
 
             return request.RequestId.ToString();
@@ -593,6 +593,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
         #region Private Fields
         private DateTime queryCounterResetTime = DateTime.UtcNow;
         private DocumentDBRepository db;
+        // TODO: remove direct access to aplication DB
         private IDocumentDBCollection<Application> Applications;
         private IDocumentDBCollection<CertificateRequest> CertificateRequests;
         #endregion
