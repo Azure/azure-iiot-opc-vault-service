@@ -6,6 +6,7 @@
 
 using Microsoft.Azure.IIoT.Diagnostics;
 using Microsoft.Azure.IIoT.Exceptions;
+using Microsoft.Azure.IIoT.Services.Runtime;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -14,51 +15,13 @@ using System.Text.RegularExpressions;
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Runtime
 {
-    public interface IConfigData
+
+    public class ConfigData : ServiceConfig
     {
-        /// <summary>
-        /// Read variable and replace environment variable if needed
-        /// </summary>
-        /// <param name="key"></param>
-        /// <param name="defaultValue"></param>
-        string GetString(string key, string defaultValue = "");
 
-        /// <summary>
-        /// Read boolean
-        /// </summary>
-        /// <param name="key"></param>
-        /// <param name="defaultValue"></param>
-        bool GetBool(string key, bool defaultValue = false);
-
-        /// <summary>
-        /// Read int value from configuration.
-        /// </summary>
-        /// <param name="key"></param>
-        /// <param name="defaultValue"></param>
-        /// <returns></returns>
-        int GetInt(string key, int defaultValue = 0);
-
-        /// <summary>
-        /// Get log level
-        /// </summary>
-        /// <param name="key"></param>
-        /// <param name="defaultValue"></param>
-        /// <returns></returns>
-        LogLevel GetLogLevel(string key, LogLevel defaultValue);
-    }
-
-    public class ConfigData : IConfigData
-    {
-        private readonly IConfigurationRoot configuration;
-
-        /// <summary>
-        /// More info about configuration at
-        /// https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration
-        /// </summary>
-        /// <param name="configRoot">The IConfigurationRoot</param>
-        public ConfigData(IConfigurationRoot configRoot)
+        public ConfigData(string processId, string id, IConfigurationRoot configuration)
+             : base(processId, id, configuration)
         {
-            this.configuration = configRoot;
         }
 
         /// <summary>
@@ -69,7 +32,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Runtime
         /// <returns></returns>
         public string GetString(string key, string defaultValue = "")
         {
-            var value = this.configuration.GetValue(key, defaultValue);
+            var value = this.Configuration.GetValue(key, defaultValue);
             ReplaceEnvironmentVariables(ref value, defaultValue);
             return value;
         }
