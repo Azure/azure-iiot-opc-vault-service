@@ -11,7 +11,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
     using Microsoft.Azure.IIoT.Diagnostics;
     using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Filters;
     using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models;
-    using Swashbuckle.AspNetCore.SwaggerGen;
+    using Swashbuckle.AspNetCore.Annotations;
 
     [Route(VersionInfo.PATH + "/[controller]"), TypeFilter(typeof(ExceptionsFilterAttribute))]
     [Produces("application/json")]
@@ -26,7 +26,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
         }
 
         [HttpGet]
-        [SwaggerOperation(operationId: "GetStatus")]
+        [SwaggerOperation(OperationId = "GetStatus")]
         public StatusApiModel Get()
         {
             // TODO: calculate the actual service status

@@ -7,7 +7,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Filters;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models;
-using Swashbuckle.AspNetCore.SwaggerGen;
+using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -29,7 +29,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
         /// Register new application.
         /// </summary>
         [HttpPost]
-        [SwaggerOperation(operationId: "RegisterApplication")]
+        [SwaggerOperation(OperationId = "RegisterApplication")]
         public async Task<string> RegisterApplicationAsync([FromBody] ApplicationRecordApiModel application)
         {
             if (application == null)
@@ -43,7 +43,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
         /// Update application.
         /// </summary>
         [HttpPut("{applicationId}")]
-        [SwaggerOperation(operationId: "UpdateApplication")]
+        [SwaggerOperation(OperationId = "UpdateApplication")]
         public async Task<string> UpdateApplicationAsync(string applicationId, [FromBody] ApplicationRecordApiModel application)
         {
             if (application == null)
@@ -57,7 +57,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
         /// Unregister application
         /// </summary>
         [HttpDelete("{applicationId}")]
-        [SwaggerOperation(operationId: "UnregisterApplication")]
+        [SwaggerOperation(OperationId = "UnregisterApplication")]
         public async Task UnregisterApplicationAsync(string applicationId)
         {
             await _applicationDatabase.UnregisterApplicationAsync(applicationId);
@@ -65,7 +65,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
 
         /// <summary>Get application</summary>
         [HttpGet("{applicationId}")]
-        [SwaggerOperation(operationId: "GetApplication")]
+        [SwaggerOperation(OperationId = "GetApplication")]
         public async Task<ApplicationRecordApiModel> GetApplicationAsync(string applicationId)
         {
             return new ApplicationRecordApiModel(await _applicationDatabase.GetApplicationAsync(applicationId));
@@ -73,7 +73,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
 
         /// <summary>Find applications</summary>
         [HttpGet("find/{uri}")]
-        [SwaggerOperation(operationId: "FindApplication")]
+        [SwaggerOperation(OperationId = "FindApplication")]
         public async Task<ApplicationRecordApiModel[]> FindApplicationAsync(string uri)
         {
             var modelResult = new List<ApplicationRecordApiModel>();
@@ -86,7 +86,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
 
         /// <summary>Query applications</summary>
         [HttpPost("query")]
-        [SwaggerOperation(operationId: "QueryApplications")]
+        [SwaggerOperation(OperationId = "QueryApplications")]
         public async Task<QueryApplicationsResponseApiModel> QueryApplicationsAsync([FromBody] QueryApplicationsApiModel query)
         {
             if (query == null)
