@@ -4,7 +4,9 @@
 // ------------------------------------------------------------
 
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Auth;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Filters;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models;
 using Swashbuckle.AspNetCore.Annotations;
@@ -15,6 +17,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
 {
     [Route(VersionInfo.PATH + "/request"), TypeFilter(typeof(ExceptionsFilterAttribute))]
     [Produces("application/json")]
+    [Authorize(Policy = Policies.CanRead)]
+
     public sealed class CertificateRequestController : Controller
     {
         private readonly ICertificateRequest _certificateRequest;
@@ -29,6 +33,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
         /// </summary>
         [HttpPost("sign")]
         [SwaggerOperation(OperationId = "StartSigningRequest")]
+        [Authorize(Policy = Policies.CanManage)]
         public async Task<string> StartSigningRequestAsync([FromBody] StartSigningRequestApiModel signingRequest)
         {
             if (signingRequest == null)
@@ -48,6 +53,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
         /// </summary>
         [HttpPost("newkeypair")]
         [SwaggerOperation(OperationId = "StartNewKeyPairRequest")]
+        [Authorize(Policy = Policies.CanManage)]
         public async Task<string> StartNewKeyPairRequestAsync([FromBody] StartNewKeyPairRequestApiModel newKeyPairRequest)
         {
             if (newKeyPairRequest == null)
@@ -70,6 +76,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
         /// </summary>
         [HttpPost("{requestId}/approve/{rejected}")]
         [SwaggerOperation(OperationId = "ApproveCertificateRequest")]
+        [Authorize(Policy = Policies.CanManage)]
+
         public async Task ApproveCertificateRequestAsync(string requestId, bool rejected)
         {
             await _certificateRequest.ApproveAsync(requestId, rejected);
@@ -80,6 +88,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
         /// </summary>
         [HttpPost("{requestId}/accept")]
         [SwaggerOperation(OperationId = "AcceptCertificateRequest")]
+        [Authorize(Policy = Policies.CanManage)]
         public async Task AcceptCertificateRequestAsync(string requestId)
         {
             await _certificateRequest.AcceptAsync(requestId);
@@ -134,6 +143,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
         /// <summary>Complete certificate request</summary>
         [HttpPost("{requestId}/{applicationId}/finish")]
         [SwaggerOperation(OperationId = "FinishRequest")]
+        [Authorize(Policy = Policies.CanManage)]
         public async Task<FinishRequestApiModel> FinishRequestAsync(string requestId, string applicationId)
         {
             var result = await _certificateRequest.FinishRequestAsync(

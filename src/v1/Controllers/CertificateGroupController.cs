@@ -4,7 +4,9 @@
 // ------------------------------------------------------------
 
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Auth;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Filters;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models;
 using Swashbuckle.AspNetCore.Annotations;
@@ -14,6 +16,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
 {
     [Route(VersionInfo.PATH + "/groups"), TypeFilter(typeof(ExceptionsFilterAttribute))]
     [Produces("application/json")]
+    [Authorize(Policy = Policies.CanRead)]
 
     public sealed class CertificateGroupController : Controller
     {
@@ -80,6 +83,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
         /// <summary>Create new CA Certificate</summary>
         [HttpPost("{groupId}/create")]
         [SwaggerOperation(OperationId = "CreateCACertificate")]
+        [Authorize(Policy = Policies.CanManage)]
+
         public async Task<X509Certificate2ApiModel> PostCreateAsync(string groupId)
         {
             return new X509Certificate2ApiModel(
