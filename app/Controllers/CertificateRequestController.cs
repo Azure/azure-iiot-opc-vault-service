@@ -7,7 +7,7 @@ using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Controllers
+namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Controllers
 {
     [Authorize]
     public class CertificateRequestController : Controller
