@@ -27,11 +27,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Auth
             }
 
             // Otherwise, configure policies here to your liking
-            options.AddPolicy(Policies.CanBrowse, policy =>
+            options.AddPolicy(Policies.CanRead, policy =>
                 policy.RequireAuthenticatedUser());
-            options.AddPolicy(Policies.CanControl, policy =>
-                policy.RequireAuthenticatedUser().Require(AdminRights));
-            options.AddPolicy(Policies.CanPublish, policy =>
+            options.AddPolicy(Policies.CanManage, policy =>
                 policy.RequireAuthenticatedUser().Require(AdminRights));
         }
 

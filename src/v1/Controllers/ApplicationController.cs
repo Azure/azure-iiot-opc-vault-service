@@ -4,7 +4,9 @@
 // ------------------------------------------------------------
 
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Auth;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Filters;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models;
 using Swashbuckle.AspNetCore.Annotations;
@@ -16,6 +18,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
 {
     [Route(VersionInfo.PATH + "/app"), TypeFilter(typeof(ExceptionsFilterAttribute))]
     [Produces("application/json")]
+    [Authorize(Policy = Policies.CanRead)]
     public sealed class ApplicationController : Controller
     {
         private readonly IApplicationsDatabase _applicationDatabase;
@@ -30,6 +33,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
         /// </summary>
         [HttpPost]
         [SwaggerOperation(OperationId = "RegisterApplication")]
+        [Authorize(Policy = Policies.CanManage)]
         public async Task<string> RegisterApplicationAsync([FromBody] ApplicationRecordApiModel application)
         {
             if (application == null)
@@ -44,6 +48,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
         /// </summary>
         [HttpPut("{applicationId}")]
         [SwaggerOperation(OperationId = "UpdateApplication")]
+        [Authorize(Policy = Policies.CanManage)]
         public async Task<string> UpdateApplicationAsync(string applicationId, [FromBody] ApplicationRecordApiModel application)
         {
             if (application == null)
@@ -58,6 +63,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
         /// </summary>
         [HttpDelete("{applicationId}")]
         [SwaggerOperation(OperationId = "UnregisterApplication")]
+        [Authorize(Policy = Policies.CanManage)]
         public async Task UnregisterApplicationAsync(string applicationId)
         {
             await _applicationDatabase.UnregisterApplicationAsync(applicationId);
