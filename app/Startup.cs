@@ -1,7 +1,8 @@
-﻿// ------------------------------------------------------------
-//  Copyright (c) Microsoft Corporation.  All rights reserved.
-//  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
-// ------------------------------------------------------------
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for
+// license information.
+//
+
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Authentication;
@@ -14,32 +15,29 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api;
+using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.TokenStorage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
+using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using System;
 using System.Threading.Tasks;
 
-namespace GdsVault.App
+namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App
 {
-    public class OpcGdsVaultConfigured : OpcGdsVault
-    {
-        public OpcGdsVaultConfigured(IConfiguration config)
-            :base(new Uri(config["GdsVault"]))
-
-        {
-        }
-    }
-
     public class Startup
     {
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            GdsVaultOptions = new GdsVaultOptions();
+            Configuration.Bind("GdsVault", GdsVaultOptions);
+            AzureADOptions = new AzureADOptions();
+            Configuration.Bind("AzureAD", AzureADOptions);
         }
 
         public IConfiguration Configuration { get; }
+        public AzureADOptions AzureADOptions { get; }
+        public GdsVaultOptions GdsVaultOptions { get; }
 
         /// <summary>
         /// Di container - Initialized in `ConfigureServices`
@@ -49,7 +47,8 @@ namespace GdsVault.App
         // This method gets called by the runtime. Use this method to add services to the container.
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            services.AddTransient<IOpcGdsVault, OpcGdsVaultConfigured>();
+            services.AddSingleton(GdsVaultOptions);
+            services.AddSingleton(AzureADOptions);
 
             services.Configure<CookiePolicyOptions>(options =>
             {
@@ -59,35 +58,50 @@ namespace GdsVault.App
             });
 
             services.AddAuthentication(AzureADDefaults.AuthenticationScheme)
-                .AddAzureAD(options => Configuration.Bind("AzureAd", options));
-
+                .AddAzureAD(options => Configuration.Bind("AzureAd", options))
+                .AddAzureADBearer(options => Configuration.Bind("AzureAd", options));
+            ;
             services.Configure<OpenIdConnectOptions>(AzureADDefaults.OpenIdScheme, options =>
             {
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    // Instead of using the default validation (validating against a single issuer value, as we do in
-                    // line of business apps), we inject our own multitenant validation logic
-                    ValidateIssuer = false,
-
-                    // If the app is meant to be accessed by entire organizations, add your issuer validation logic here.
-                    //IssuerValidator = (issuer, securityToken, validationParameters) => {
-                    //    if (myIssuerValidationLogic(issuer)) return issuer;
-                    //}
-                };
+                // Without overriding the response type (which by default is id_token), the OnAuthorizationCodeReceived event is not called.
+                // but instead OnTokenValidated event is called. Here we request both so that OnTokenValidated is called first which 
+                // ensures that context.Principal has a non-null value when OnAuthorizeationCodeReceived is called
+                options.ResponseType = "id_token code";
 
                 options.Events = new OpenIdConnectEvents
                 {
                     OnTicketReceived = context =>
                     {
-                         // If your authentication logic is based on users then add your logic here
-                         return Task.CompletedTask;
+                        // If your authentication logic is based on users then add your logic here
+                        return Task.CompletedTask;
                     },
                     OnAuthenticationFailed = context =>
                     {
                         context.Response.Redirect("/Error");
                         context.HandleResponse(); // Suppress the exception
-                         return Task.CompletedTask;
-                    }
+                        return Task.CompletedTask;
+                    },
+                    /// <summary>
+                    /// Redeems the authorization code by calling AcquireTokenByAuthorizationCodeAsync in order to ensure
+                    /// that the cache has a token for the signed-in user, which will then enable the controllers 
+                    /// to call AcquireTokenSilentAsync successfully.
+                    /// </summary>
+                    OnAuthorizationCodeReceived = async context =>
+                    {
+                        // Acquire a Token for the API and cache it. In the GdsVaultController, we'll use the cache to acquire a token for the API
+                        string userObjectId = (context.Principal.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier"))?.Value;
+                        var credential = new ClientCredential(context.Options.ClientId, context.Options.ClientSecret);
+
+                        var tokenCacheService = context.HttpContext.RequestServices.GetRequiredService<ITokenCacheService>();
+                        var tokenCache = await tokenCacheService.GetCacheAsync(context.Principal);
+                        var authContext = new AuthenticationContext(context.Options.Authority, tokenCache);
+
+                        var authResult = await authContext.AcquireTokenByAuthorizationCodeAsync(context.TokenEndpointRequest.Code,
+                            new Uri(context.TokenEndpointRequest.RedirectUri, UriKind.RelativeOrAbsolute), credential, context.Options.Resource);
+
+                        // Notify the OIDC middleware that we already took care of code redemption.
+                        context.HandleCodeRedemption(authResult.AccessToken, context.ProtocolMessage.IdToken);
+                    },
                     // If your application needs to do authenticate single users, add your user validation below.
                     //OnTokenValidated = context =>
                     //{
@@ -104,6 +118,13 @@ namespace GdsVault.App
                 options.Filters.Add(new AuthorizeFilter(policy));
             })
             .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddSession();
+
+            // This will register IDistributedCache based token cache which ADAL will use for caching access tokens.
+            services.AddScoped<ITokenCacheService, DistributedTokenCacheService>();
+
+            //http://stackoverflow.com/questions/37371264/asp-net-core-rc2-invalidoperationexception-unable-to-resolve-service-for-type/37373557
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             // Prepare DI container
             ApplicationContainer = ConfigureContainer(services);
@@ -114,9 +135,8 @@ namespace GdsVault.App
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(
-            IApplicationBuilder app, 
-            IHostingEnvironment env, 
-            ILoggerFactory loggerFactory, 
+            IApplicationBuilder app,
+            IHostingEnvironment env,
             IApplicationLifetime appLifetime)
         {
             if (env.IsDevelopment())
@@ -162,51 +182,7 @@ namespace GdsVault.App
             // By default Autofac uses a request lifetime, creating new objects
             // for each request, which is good to reduce the risk of memory
             // leaks, but not so good for the overall performance.
-#if mist
             // Register configuration interfaces
-            builder.RegisterInstance(ClientConfig)
-                .AsImplementedInterfaces().SingleInstance();
-
-            // Register logger
-            builder.RegisterInstance(Logger)
-                .AsImplementedInterfaces().SingleInstance();
-            builder.RegisterInstance(DP)
-                .AsImplementedInterfaces().SingleInstance();
-
-            // Register configuration interfaces
-            builder.RegisterInstance(Config)
-                .AsImplementedInterfaces().SingleInstance();
-            builder.RegisterInstance(Config.ServicesConfig)
-                .AsImplementedInterfaces().SingleInstance();
-
-            // CORS setup
-            builder.RegisterType<CorsSetup>()
-                .AsImplementedInterfaces().SingleInstance();
-
-            // Register http client ...
-            builder.RegisterType<HttpClient>().SingleInstance()
-                .AsImplementedInterfaces();
-            builder.RegisterType<HttpHandlerFactory>().SingleInstance()
-                .AsImplementedInterfaces();
-            builder.RegisterType<HttpClientFactory>().SingleInstance()
-                .AsImplementedInterfaces();
-
-            // Register endpoint services and ...
-            builder.RegisterType<KeyVaultCertificateGroup>()
-                .AsImplementedInterfaces().SingleInstance();
-            builder.RegisterType<CosmosDBApplicationsDatabase>()
-                .AsImplementedInterfaces().SingleInstance();
-            builder.RegisterType<CosmosDBCertificateRequest>()
-                .AsImplementedInterfaces().SingleInstance();
-            builder.RegisterType<BehalfOfTokenProvider>()
-                .AsImplementedInterfaces().SingleInstance();
-            builder.RegisterType<DistributedTokenCache>()
-                .AsImplementedInterfaces().SingleInstance();
-            builder.RegisterType<DistributedTokenCacheService>()
-                .AsImplementedInterfaces().SingleInstance();
-            builder.RegisterType<DefaultTokenCacheProvider>()
-                .AsImplementedInterfaces().SingleInstance();
-#endif
 #if DEBUG
             builder.RegisterType<NoOpValidator>()
                 .AsImplementedInterfaces();

@@ -8,11 +8,35 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
 {
     using Microsoft.Rest;
 
+    public class GdsVaultOptions
+    {
+        public string ResourceId { get; set; }
+        public string BaseAddress { get; set; }
+    }
+
     /// <summary>
     /// OPC UA GdsVault Service
     /// </summary>
     public partial class OpcGdsVault : ServiceClient<OpcGdsVault>, IOpcGdsVault
     {
+        /// <summary>
+        /// Initializes a new instance of the OpcGdsVault class.
+        /// </summary>
+        /// <param name='options'>
+        /// GdsVaultOptions class.
+        /// </param>
+        /// <exception cref="System.ArgumentNullException">
+        /// Thrown when a required parameter is null
+        /// </exception>
+        public OpcGdsVault(GdsVaultOptions options)
+        {
+            if (options == null)
+            {
+                throw new System.ArgumentNullException("GdsVaultOptions");
+            }
+            BaseUri = new System.Uri(options.BaseAddress);
+        }
+
         /// <summary>
         /// Initializes a new instance of the OpcGdsVault class.
         /// </summary>
