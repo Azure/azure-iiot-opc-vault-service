@@ -5,6 +5,8 @@
 
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Utils;
+using Microsoft.Extensions.Configuration;
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App
 {
@@ -17,6 +19,19 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
+                .ConfigureAppConfiguration((context, config) =>
+                {
+                    var builtConfig = config.Build();
+                    if (builtConfig["KeyVault"] != null)
+                    {
+                        config.AddAzureKeyVault(
+                            $"{builtConfig["KeyVault"]}",
+                            builtConfig["AzureAD:ClientId"],
+                            builtConfig["AzureAD:ClientSecret"],
+                            new PrefixKeyVaultSecretManager("GdsVault.App")
+                            );
+                    }
+                })
                 .UseStartup<Startup>();
     }
 }

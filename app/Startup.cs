@@ -183,10 +183,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App
             // for each request, which is good to reduce the risk of memory
             // leaks, but not so good for the overall performance.
             // Register configuration interfaces
-#if DEBUG
-            builder.RegisterType<NoOpValidator>()
-                .AsImplementedInterfaces();
-#endif
 
             return builder.Build();
         }
