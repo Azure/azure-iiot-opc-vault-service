@@ -1,31 +1,47 @@
-﻿// ------------------------------------------------------------
-//  Copyright (c) Microsoft Corporation.  All rights reserved.
-//  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
-// ------------------------------------------------------------
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for
+// license information.
+//
 
+using Microsoft.AspNetCore.Authentication.AzureAD.UI;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.Models;
+using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Filters;
+using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.TokenStorage;
+using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Utils;
+using Microsoft.Rest;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Controllers
+namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Controllers
 {
     [Authorize]
+    [ExceptionsFilterAttribute]
     public class ApplicationController : Controller
     {
-        private readonly IOpcGdsVault gdsVault;
-        public ApplicationController(IOpcGdsVault gdsVault)
+        private IOpcGdsVault gdsVault;
+        private readonly GdsVaultOptions gdsVaultOptions;
+        private readonly AzureADOptions azureADOptions;
+        private readonly ITokenCacheService tokenCacheService;
+
+        public ApplicationController(
+            GdsVaultOptions gdsVaultOptions,
+            AzureADOptions azureADOptions,
+            ITokenCacheService tokenCacheService)
         {
-            this.gdsVault = gdsVault;
+            this.gdsVaultOptions = gdsVaultOptions;
+            this.azureADOptions = azureADOptions;
+            this.tokenCacheService = tokenCacheService;
         }
 
 
         [ActionName("Index")]
         public async Task<ActionResult> IndexAsync()
         {
+            AuthorizeGdsVaultClient();
             var applicationQuery = new QueryApplicationsApiModel();
             var applications = await gdsVault.QueryApplicationsAsync(applicationQuery);
             return View(applications.Applications);
@@ -62,6 +78,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Controllers
                 {
                     application.ApplicationNames.Add(new ApplicationNameApiModel(null, application.ApplicationName));
                 }
+                AuthorizeGdsVaultClient();
                 await gdsVault.RegisterApplicationAsync(application);
                 return RedirectToAction("Index");
             }
@@ -78,6 +95,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Controllers
         {
             if (ModelState.IsValid)
             {
+                AuthorizeGdsVaultClient();
                 var application = await gdsVault.GetApplicationAsync(newApplication.ApplicationId);
                 if (application == null)
                 {
@@ -88,7 +106,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Controllers
                 application.ApplicationType = newApplication.ApplicationType;
                 application.ProductUri = newApplication.ProductUri;
                 application.ServerCapabilities = newApplication.ServerCapabilities;
-
                 await gdsVault.UpdateApplicationAsync(application.ApplicationId, application);
                 return RedirectToAction("Index");
             }
@@ -103,7 +120,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Controllers
             {
                 return new BadRequestResult();
             }
-
+            AuthorizeGdsVaultClient();
             var application = await gdsVault.GetApplicationAsync(id);
             if (application == null)
             {
@@ -120,7 +137,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Controllers
             {
                 return new BadRequestResult();
             }
-
+            AuthorizeGdsVaultClient();
             var application = await gdsVault.GetApplicationAsync(id);
             if (application == null)
             {
@@ -135,7 +152,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmedAsync([Bind("Id")] string id)
         {
-
+            AuthorizeGdsVaultClient();
             await gdsVault.UnregisterApplicationAsync(id);
             return RedirectToAction("Index");
         }
@@ -143,12 +160,23 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Common.Controllers
         [ActionName("Details")]
         public async Task<ActionResult> DetailsAsync(string id)
         {
+            AuthorizeGdsVaultClient();
             var application = await gdsVault.GetApplicationAsync(id);
             if (application == null)
             {
                 return new NotFoundResult();
             }
             return View(application);
+        }
+
+        private void AuthorizeGdsVaultClient()
+        {
+            if (gdsVault == null)
+            {
+                ServiceClientCredentials serviceClientCredentials =
+                    new GdsVaultLoginCredentials(gdsVaultOptions, azureADOptions, tokenCacheService, User);
+                gdsVault = new OpcGdsVault(new Uri(gdsVaultOptions.BaseAddress), serviceClientCredentials);
+            }
         }
 
     }

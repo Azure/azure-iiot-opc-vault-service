@@ -514,12 +514,12 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.KeyVault
                     throw new ArgumentOutOfRangeException(nameof(hashAlgorithm));
                 }
                 var digest = hash.ComputeHash(data);
-                var resultKeyVaultPkcs = _keyVaultServiceClient.SignDigestAsync(_signingKey, digest, hashAlgorithm, RSASignaturePadding.Pkcs1).Result;
+                var resultKeyVaultPkcs = _keyVaultServiceClient.SignDigestAsync(_signingKey, digest, hashAlgorithm, RSASignaturePadding.Pkcs1).GetAwaiter().GetResult();
 #if TESTANDVERIFYTHEKEYVAULTSIGNER
                 // for testing only
                 if (_issuerCert.HasPrivateKey)
                 {
-                    var resultKeyVaultPss = _keyVaultServiceClient.SignDigestAsync(_signingKey, digest, hashAlgorithm, RSASignaturePadding.Pss).Result;
+                    var resultKeyVaultPss = _keyVaultServiceClient.SignDigestAsync(_signingKey, digest, hashAlgorithm, RSASignaturePadding.Pss).GetAwaiter().GetResult();
                     var resultLocalPkcs = _issuerCert.GetRSAPrivateKey().SignData(data, hashAlgorithm, RSASignaturePadding.Pkcs1);
                     var resultLocalPss = _issuerCert.GetRSAPrivateKey().SignData(data, hashAlgorithm, RSASignaturePadding.Pss);
                     for (int i = 0; i < resultKeyVaultPkcs.Length; i++)

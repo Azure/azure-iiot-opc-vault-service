@@ -210,10 +210,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
                 builder.RegisterType<HttpBearerAuthentication>()
                     .AsImplementedInterfaces().SingleInstance();
             }
-#if DEBUG
-            builder.RegisterType<NoOpValidator>()
-                .AsImplementedInterfaces();
-#endif
 
             return builder.Build();
         }
