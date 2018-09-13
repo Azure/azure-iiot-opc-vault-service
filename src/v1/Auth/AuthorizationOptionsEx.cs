@@ -30,7 +30,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Auth
             options.AddPolicy(Policies.CanRead, policy =>
                 policy.RequireAuthenticatedUser());
             options.AddPolicy(Policies.CanManage, policy =>
-                policy.RequireAuthenticatedUser().Require(AdminRights));
+                policy.RequireAuthenticatedUser());
+                // TODO: for now  ignore  RBAC 
+                //.Require(AdminRights));
         }
 
         /// <summary>

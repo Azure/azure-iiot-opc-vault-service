@@ -10,6 +10,7 @@ using Microsoft.Azure.KeyVault.Models;
 using Microsoft.Azure.KeyVault.WebKey;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
+using Microsoft.Rest;
 using Opc.Ua;
 using System;
 using System.Collections.Generic;
@@ -21,7 +22,9 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.KeyVault
 {
-
+    /// <summary>
+    /// 
+    /// </summary>
     public class KeyVaultServiceClient
     {
         const int MaxResults = 10;
@@ -48,6 +51,21 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.KeyVault
         }
 
         /// <summary>
+        /// Set appID and app secret for keyVault authentication.
+        /// </summary>
+        /// <param name="appId"></param>
+        /// <param name="appSecret"></param>
+        public void SetAuthenticationClientCredential(
+            string appId,
+            string appSecret)
+        {
+            _assertionCert = null;
+            _clientCredential = new ClientCredential(appId, appSecret);
+            _keyVaultClient = new KeyVaultClient(
+                new KeyVaultClient.AuthenticationCallback(GetAccessTokenAsync));
+        }
+
+        /// <summary>
         /// Set appID and client certificate for keyVault authentication.
         /// </summary>
         /// <param name="appId"></param>
@@ -56,6 +74,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.KeyVault
             string appId,
             X509Certificate2 clientAssertionCertPfx)
         {
+            _clientCredential = null;
             _assertionCert = new ClientAssertionCertificate(appId, clientAssertionCertPfx);
             _keyVaultClient = new KeyVaultClient(
                 new KeyVaultClient.AuthenticationCallback(GetAccessTokenAsync));
@@ -71,13 +90,30 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.KeyVault
                 new KeyVaultClient.AuthenticationCallback(azureServiceTokenProvider.KeyVaultTokenCallback));
         }
 
+        
+        /// <summary>
+        /// Service client credentials.
+        /// </summary>
+        public void SetServiceClientCredentials(ServiceClientCredentials credentials)
+        {
+            _keyVaultClient = new KeyVaultClient(credentials);
+        }
+
         /// <summary>
         /// Private callback for keyvault authentication.
         /// </summary>
         private async Task<string> GetAccessTokenAsync(string authority, string resource, string scope)
         {
             var context = new AuthenticationContext(authority, TokenCache.DefaultShared);
-            var result = await context.AcquireTokenAsync(resource, _assertionCert);
+            AuthenticationResult result;
+            if (_clientCredential != null)
+            {
+                result = await context.AcquireTokenAsync(resource, _clientCredential);
+            }
+            else
+            {
+                result = await context.AcquireTokenAsync(resource, _assertionCert);
+            }
             return result.AccessToken;
         }
 
@@ -225,7 +261,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.KeyVault
                 throw new ArgumentOutOfRangeException(nameof(padding));
             }
 
-            var result = await _keyVaultClient.SignAsync(signingKey, algorithm, digest, ct);
+            var result = await _keyVaultClient.SignAsync(signingKey, algorithm, digest, ct).ConfigureAwait(false);
             return result.Result;
         }
 
@@ -510,6 +546,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.KeyVault
         private IKeyVaultClient _keyVaultClient;
         private ILogger _logger;
         private ClientAssertionCertificate _assertionCert;
+        private ClientCredential _clientCredential;
     }
 }
 

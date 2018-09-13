@@ -12,7 +12,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
     using Microsoft.Azure.IIoT.Diagnostics;
     using Microsoft.Azure.IIoT.Http.Auth;
     using Microsoft.Azure.IIoT.Http.Default;
-    using Microsoft.Azure.IIoT.Http.Ssl;
     using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Runtime;
     using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1;
     using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Auth;

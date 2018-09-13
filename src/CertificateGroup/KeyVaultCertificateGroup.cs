@@ -4,6 +4,7 @@
 // ------------------------------------------------------------
 
 
+using Microsoft.Azure.IIoT.Auth.Azure;
 using Microsoft.Azure.IIoT.Diagnostics;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.KeyVault;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Models;
@@ -23,13 +24,32 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
         private readonly ILogger _log;
         public KeyVaultCertificateGroup(
             IServicesConfig config,
+            IClientConfig clientConfig,
             ILogger logger)
         {
             _keyVaultServiceClient = new KeyVaultServiceClient(config.KeyVaultApiUrl, logger);
-            // TODO: support AD App ID for authentication
-            _keyVaultServiceClient.SetAuthenticationTokenProvider();
+            if (clientConfig != null &&
+                clientConfig.ClientId != null && clientConfig.ClientSecret != null)
+            {
+                _keyVaultServiceClient.SetAuthenticationClientCredential(clientConfig.ClientId, clientConfig.ClientSecret);
+            }
+            else
+            {
+                // uses MSI or dev account
+                _keyVaultServiceClient.SetAuthenticationTokenProvider();
+            }
             _log = logger;
             _log.Debug("Creating new instance of `KeyVault` service " + config.KeyVaultApiUrl, () => { });
+        }
+
+        public KeyVaultCertificateGroup(
+            KeyVaultServiceClient keyVaultServiceClient,
+            ILogger logger
+            )
+        {
+            _keyVaultServiceClient = keyVaultServiceClient;
+            _log = logger;
+            _log.Debug("Creating new instance of `KeyVault` service " , () => { });
         }
 
         public async Task Init()
