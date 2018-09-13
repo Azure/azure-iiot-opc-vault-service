@@ -49,11 +49,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.TokenStorage
         /// <returns>Cache key for this item.</returns>
         private static string BuildCacheKey(ClaimsPrincipal claimsPrincipal)
         {
-            string clientId = claimsPrincipal.FindFirstValue("aud"/*, true*/);
             return string.Format(
-                "UserId:{0}::ClientId:{1}",
-                claimsPrincipal.Identity.Name,
-                clientId);
+                "UserId:{0}",
+                claimsPrincipal.Identity.Name);
         }
 
         /// <summary>

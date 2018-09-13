@@ -41,15 +41,21 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Utils
             var tokenCache = tokenCacheService.GetCacheAsync(claimsPrincipal).Result;
 
             var authenticationContext =
-                new AuthenticationContext(azureADOptions.Instance + azureADOptions.TenantId);
+                new AuthenticationContext(azureADOptions.Instance + azureADOptions.TenantId, tokenCache);
 
             var credential = new ClientCredential(
                 clientId: azureADOptions.ClientId,
                 clientSecret: azureADOptions.ClientSecret);
 
-            var result = authenticationContext.AcquireTokenAsync(
-                resource: gdsVaultOptions.ResourceId,
-                clientCredential: credential).Result;
+            var name = claimsPrincipal.FindFirstValue(ClaimTypes.Upn) ??
+                claimsPrincipal.FindFirstValue(ClaimTypes.Email);
+            string userObjectId = (claimsPrincipal.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier"))?.Value;
+            var user = new UserIdentifier(userObjectId, UserIdentifierType.UniqueId);
+
+            var result = authenticationContext.AcquireTokenSilentAsync(
+                        resource: gdsVaultOptions.ResourceId,
+                        clientCredential: credential,
+                        userId: user).GetAwaiter().GetResult();
 
             if (result == null)
             {

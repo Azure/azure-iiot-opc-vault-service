@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.Models;
+using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Filters;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.TokenStorage;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Utils;
 using Microsoft.Rest;
@@ -18,6 +19,7 @@ using System.Threading.Tasks;
 namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Controllers
 {
     [Authorize]
+    [ExceptionsFilterAttribute]
     public class ApplicationController : Controller
     {
         private IOpcGdsVault gdsVault;
@@ -176,5 +178,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Controllers
                 gdsVault = new OpcGdsVault(new Uri(gdsVaultOptions.BaseAddress), serviceClientCredentials);
             }
         }
+
     }
 }

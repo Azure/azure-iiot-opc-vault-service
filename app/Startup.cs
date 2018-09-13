@@ -59,7 +59,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App
 
             services.AddAuthentication(AzureADDefaults.AuthenticationScheme)
                 .AddAzureAD(options => Configuration.Bind("AzureAd", options))
-                .AddAzureADBearer(options => Configuration.Bind("AzureAd", options));
             ;
             services.Configure<OpenIdConnectOptions>(AzureADDefaults.OpenIdScheme, options =>
             {
@@ -67,6 +66,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App
                 // but instead OnTokenValidated event is called. Here we request both so that OnTokenValidated is called first which 
                 // ensures that context.Principal has a non-null value when OnAuthorizeationCodeReceived is called
                 options.ResponseType = "id_token code";
+                // set the resource id of the service api which needs to be accessed
+                options.Resource = GdsVaultOptions.ResourceId;
+                options.UseTokenLifetime = true;
 
                 options.Events = new OpenIdConnectEvents
                 {

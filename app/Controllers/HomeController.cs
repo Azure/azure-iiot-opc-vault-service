@@ -5,12 +5,15 @@
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Filters;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Models;
 using System.Diagnostics;
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Controllers
 {
     [Authorize]
+    [ExceptionsFilterAttribute]
+
     public class HomeController : Controller
     {
         public IActionResult Index()
