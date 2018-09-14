@@ -50,7 +50,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Controllers
         {
             AuthorizeGdsVaultClient();
             var requests = await gdsVault.GetCertificateGroupConfigurationCollectionAsync();
-            return View(requests);
+            return View(requests.Groups);
         }
 
         [ActionName("Details")]
