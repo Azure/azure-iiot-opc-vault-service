@@ -57,6 +57,29 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Filters
                     // 
                     context.Result = ReAuthenticateUser(context.HttpContext);
                     break;
+                case JsonReaderException jre:
+                case ArgumentException are:
+                    context.Result = GetResponse(HttpStatusCode.BadRequest,
+                        context.Exception);
+                    break;
+                case NotImplementedException ne:
+                case NotSupportedException ns:
+                    context.Result = GetResponse(HttpStatusCode.NotImplemented,
+                        context.Exception);
+                    break;
+                case TimeoutException te:
+                    context.Result = GetResponse(HttpStatusCode.RequestTimeout,
+                        context.Exception);
+                    break;
+                case SocketException sex:
+                    context.Result = GetResponse(HttpStatusCode.BadGateway,
+                        context.Exception);
+                    break;
+
+                default:
+                    context.Result = GetResponse(HttpStatusCode.InternalServerError,
+                        context.Exception);
+                    break;
             }
         }
 
