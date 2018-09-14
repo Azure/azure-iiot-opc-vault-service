@@ -33,6 +33,10 @@
             <td>
                 @Html.DisplayFor(groupItem => group.SubjectName)
             </td>
+            <td>
+                @Html.ActionLink("Issuer", "DownloadIssuer", new { id = group.Name }) |
+                @Html.ActionLink("Crl", "DownloadIssuerCrl", new { id = group.Name })
+            </td>
         </tr>
     }
 

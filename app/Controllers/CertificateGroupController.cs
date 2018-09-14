@@ -62,38 +62,28 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Controllers
         }
 
         [ActionName("DownloadIssuer")]
-        public async Task<ActionResult> DownloadIssuerAsync(string requestId)
+        public async Task<ActionResult> DownloadIssuerAsync(string id)
         {
             AuthorizeGdsVaultClient();
-            var request = await gdsVault.ReadCertificateRequestAsync(requestId);
-            if (request != null)
+            var issuer = await gdsVault.GetCACertificateChainAsync(id);
+            var byteArray = Convert.FromBase64String(issuer.Chain[0].Certificate);
+            return new FileContentResult(byteArray, ContentTypeCert)
             {
-                var issuer = await gdsVault.GetCACertificateChainAsync(request.CertificateGroupId);
-                var byteArray = Convert.FromBase64String(issuer.Chain[0].Certificate);
-                return new FileContentResult(byteArray, ContentTypeCert)
-                {
-                    FileDownloadName = CertFileName(issuer.Chain[0].Certificate) + ".der"
-                };
-            }
-            return new NotFoundResult();
+                FileDownloadName = CertFileName(issuer.Chain[0].Certificate) + ".der"
+            };
         }
 
         [ActionName("DownloadIssuerCrl")]
-        public async Task<ActionResult> DownloadIssuerCrlAsync(string requestId)
+        public async Task<ActionResult> DownloadIssuerCrlAsync(string id)
         {
             AuthorizeGdsVaultClient();
-            var request = await gdsVault.ReadCertificateRequestAsync(requestId);
-            if (request != null)
+            var issuer = await gdsVault.GetCACertificateChainAsync(id);
+            var crl = await gdsVault.GetCACrlChainAsync(id);
+            var byteArray = Convert.FromBase64String(crl.Chain[0].Crl);
+            return new FileContentResult(byteArray, ContentTypeCrl)
             {
-                var issuer = await gdsVault.GetCACertificateChainAsync(request.CertificateGroupId);
-                var crl = await gdsVault.GetCACrlChainAsync(request.CertificateGroupId);
-                var byteArray = Convert.FromBase64String(crl.Chain[0].Crl);
-                return new FileContentResult(byteArray, ContentTypeCrl)
-                {
-                    FileDownloadName = CertFileName(issuer.Chain[0].Certificate) + ".crl"
-                };
-            }
-            return new NotFoundResult();
+                FileDownloadName = CertFileName(issuer.Chain[0].Certificate) + ".crl"
+            };
         }
 
         private string CertFileName(string signedCertificate)
