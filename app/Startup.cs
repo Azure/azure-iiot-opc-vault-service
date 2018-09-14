@@ -3,8 +3,6 @@
 // license information.
 //
 
-using Autofac;
-using Autofac.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.AzureAD.UI;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -39,13 +37,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App
         public AzureADOptions AzureADOptions { get; }
         public GdsVaultOptions GdsVaultOptions { get; }
 
-        /// <summary>
-        /// Di container - Initialized in `ConfigureServices`
-        /// </summary>
-        public IContainer ApplicationContainer { get; private set; }
-
         // This method gets called by the runtime. Use this method to add services to the container.
-        public IServiceProvider ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton(GdsVaultOptions);
             services.AddSingleton(AzureADOptions);
@@ -58,8 +51,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App
             });
 
             services.AddAuthentication(AzureADDefaults.AuthenticationScheme)
-                .AddAzureAD(options => Configuration.Bind("AzureAd", options))
-            ;
+            .AddAzureAD(options => Configuration.Bind("AzureAd", options));
+
             services.Configure<OpenIdConnectOptions>(AzureADDefaults.OpenIdScheme, options =>
             {
                 // Without overriding the response type (which by default is id_token), the OnAuthorizationCodeReceived event is not called.
@@ -127,12 +120,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App
 
             //http://stackoverflow.com/questions/37371264/asp-net-core-rc2-invalidoperationexception-unable-to-resolve-service-for-type/37373557
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-
-            // Prepare DI container
-            ApplicationContainer = ConfigureContainer(services);
-
-            // Create the IServiceProvider based on the container
-            return new AutofacServiceProvider(ApplicationContainer);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -164,29 +151,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
 
-            // If you want to dispose of resources that have been resolved in the
-            // application container, register for the "ApplicationStopped" event.
-            appLifetime.ApplicationStopped.Register(ApplicationContainer.Dispose);
-
-        }
-
-        /// <summary>
-        /// Autofac configuration. Find more information here:
-        /// @see http://docs.autofac.org/en/latest/integration/aspnetcore.html
-        /// </summary>
-        public IContainer ConfigureContainer(IServiceCollection services)
-        {
-            ContainerBuilder builder = new ContainerBuilder();
-
-            // Populate from services di
-            builder.Populate(services);
-
-            // By default Autofac uses a request lifetime, creating new objects
-            // for each request, which is good to reduce the risk of memory
-            // leaks, but not so good for the overall performance.
-            // Register configuration interfaces
-
-            return builder.Build();
         }
 
     }
