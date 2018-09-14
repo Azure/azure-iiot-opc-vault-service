@@ -4,14 +4,17 @@
 // ------------------------------------------------------------
 
 
+using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.IIoT.Auth.Azure;
 using Microsoft.Azure.IIoT.Diagnostics;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.KeyVault;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Models;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Runtime;
+using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Auth;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
@@ -20,14 +23,18 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
 
     public sealed class KeyVaultCertificateGroup : ICertificateGroup
     {
+        private readonly IServicesConfig _servicesConfig;
+        private readonly IClientConfig _clientConfig;
         private readonly KeyVaultServiceClient _keyVaultServiceClient;
         private readonly ILogger _log;
         public KeyVaultCertificateGroup(
-            IServicesConfig config,
+            IServicesConfig servicesConfig,
             IClientConfig clientConfig,
             ILogger logger)
         {
-            _keyVaultServiceClient = new KeyVaultServiceClient(config.KeyVaultApiUrl, logger);
+            _servicesConfig = servicesConfig;
+            _clientConfig = clientConfig;
+            _keyVaultServiceClient = new KeyVaultServiceClient(servicesConfig.KeyVaultApiUrl, logger);
             if (clientConfig != null &&
                 clientConfig.ClientId != null && clientConfig.ClientSecret != null)
             {
@@ -39,17 +46,21 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
                 _keyVaultServiceClient.SetAuthenticationTokenProvider();
             }
             _log = logger;
-            _log.Debug("Creating new instance of `KeyVault` service " + config.KeyVaultApiUrl, () => { });
+            _log.Debug("Creating new instance of `KeyVault` service " + servicesConfig.KeyVaultApiUrl, () => { });
         }
 
         public KeyVaultCertificateGroup(
             KeyVaultServiceClient keyVaultServiceClient,
+            IServicesConfig servicesConfig,
+            IClientConfig clientConfig,
             ILogger logger
             )
         {
+            _servicesConfig = servicesConfig;
+            _clientConfig = clientConfig;
             _keyVaultServiceClient = keyVaultServiceClient;
             _log = logger;
-            _log.Debug("Creating new instance of `KeyVault` service " , () => { });
+            _log.Debug("Creating new on behalf of instance of `KeyVault` service " , () => { });
         }
 
         public async Task Init()
@@ -84,6 +95,36 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
                     _log.Error("Failed to create CA certificate. ", () => new { certificateGroup });
                 }
             }
+        }
+
+        public async Task<ICertificateGroup> OnBehalfOfRequest(HttpRequest request)
+        {
+            try
+            {
+                var accessToken = request.Headers["Authorization"];
+                var token = accessToken.First().Remove(0, "Bearer ".Length);
+                var serviceClientCredentials =
+                    new KeyVaultCredentials(
+                        token, 
+                        _clientConfig.Authority + _clientConfig.TenantId, 
+                        _servicesConfig.KeyVaultResourceID, 
+                        _clientConfig.ClientId, 
+                        _clientConfig.ClientSecret);
+                var keyVaultServiceClient = new KeyVaultServiceClient(_servicesConfig.KeyVaultApiUrl, _log);
+                keyVaultServiceClient.SetServiceClientCredentials(serviceClientCredentials);
+                return new KeyVaultCertificateGroup(
+                    keyVaultServiceClient,
+                    _servicesConfig,
+                    _clientConfig,
+                    _log
+                    );
+            }
+            catch (Exception ex)
+            {
+                // try default 
+                _log.Error("Failed to create on behalf Key Vault client. ", () => new { ex });
+            }
+            return this;
         }
 
         public async Task<string[]> GetCertificateGroupIds()

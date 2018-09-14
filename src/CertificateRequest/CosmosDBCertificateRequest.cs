@@ -3,6 +3,7 @@
 //  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------
 
+using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.IIoT.Diagnostics;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.CosmosDB;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.CosmosDB.Models;
@@ -19,18 +20,19 @@ using System.Text;
 using System.Threading.Tasks;
 using CertificateRequest = Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.CosmosDB.Models.CertificateRequest;
 using CertificateRequestState = Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.CosmosDB.Models.CertificateRequestState;
+using StatusCodes = Opc.Ua.StatusCodes;
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
 {
-    internal sealed class CosmosDBCertificateRequest : ICertificateRequest
+    internal sealed class CosmosDBCertificateRequest : Object, ICertificateRequest
     {
         private ExpandedNodeId DefaultApplicationGroupId;
         private ExpandedNodeId DefaultHttpsGroupId;
         private ExpandedNodeId DefaultUserTokenGroupId;
 
         private readonly ILogger _log;
-        private readonly IApplicationsDatabase _database;
-        private readonly ICertificateGroup _certificateGroup;
+        internal IApplicationsDatabase ApplicationsDatabase;
+        internal ICertificateGroup CertificateGroup;
         private readonly string _endpoint;
         private SecureString _authKeyOrResourceToken;
 
@@ -40,8 +42,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
             IServicesConfig config,
             ILogger logger)
         {
-            _database = database;
-            _certificateGroup = certificateGroup;
+            ApplicationsDatabase = database;
+            CertificateGroup = certificateGroup;
             _endpoint = config.CosmosDBEndpoint;
             _authKeyOrResourceToken = new SecureString();
             foreach (char ch in config.CosmosDBToken)
@@ -59,15 +61,30 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
 
         }
 
-
         #region ICertificateRequest
-
         public Task Initialize()
         {
-            db = new DocumentDBRepository(_endpoint, _authKeyOrResourceToken);
+            var db = new DocumentDBRepository(_endpoint, _authKeyOrResourceToken);
             Applications = new DocumentDBCollection<Application>(db);
             CertificateRequests = new DocumentDBCollection<CosmosDB.Models.CertificateRequest>(db);
             return Task.CompletedTask;
+        }
+
+        public async Task<ICertificateRequest> OnBehalfOfRequest(HttpRequest request)
+        {
+            try
+            {
+                var onBehalfOfCertificateGroup = await CertificateGroup.OnBehalfOfRequest(request);
+                var certRequest = (CosmosDBCertificateRequest)this.MemberwiseClone();
+                certRequest.CertificateGroup = onBehalfOfCertificateGroup;
+                return certRequest;
+            }
+            catch (Exception ex)
+            {
+                // try default 
+                _log.Error("Failed to create on behalf ICertificateRequest. ", () => new { ex });
+            }
+            return this;
         }
 
         public async Task<string> StartSigningRequestAsync(
@@ -236,7 +253,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
                 {
                     try
                     {
-                        certificate = await _certificateGroup.SigningRequestAsync(
+                        certificate = await CertificateGroup.SigningRequestAsync(
                             request.CertificateGroupId,
                             application.ApplicationUri,
                             request.SigningRequest
@@ -262,7 +279,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
                     X509Certificate2KeyPair newKeyPair = null;
                     try
                     {
-                        newKeyPair = await _certificateGroup.NewKeyPairRequestAsync(
+                        newKeyPair = await CertificateGroup.NewKeyPairRequestAsync(
                             request.CertificateGroupId,
                             application.ApplicationUri,
                             request.SubjectName,
@@ -592,7 +609,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
 
         #region Private Fields
         private DateTime queryCounterResetTime = DateTime.UtcNow;
-        private DocumentDBRepository db;
         // TODO: remove direct access to aplication DB
         private IDocumentDBCollection<Application> Applications;
         private IDocumentDBCollection<CertificateRequest> CertificateRequests;

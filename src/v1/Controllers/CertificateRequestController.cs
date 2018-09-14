@@ -6,6 +6,7 @@
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.IIoT.Auth.Azure;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Auth;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Filters;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models;
@@ -21,10 +22,14 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
 
     public sealed class CertificateRequestController : Controller
     {
+        private readonly IClientConfig _clientConfig;
         private readonly ICertificateRequest _certificateRequest;
 
-        public CertificateRequestController(ICertificateRequest certificateRequest)
+        public CertificateRequestController(
+            IClientConfig clientConfig,
+            ICertificateRequest certificateRequest)
         {
+            _clientConfig = clientConfig;
             _certificateRequest = certificateRequest;
         }
 
@@ -40,7 +45,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
             {
                 throw new ArgumentNullException(nameof(signingRequest));
             }
-            return await _certificateRequest.StartSigningRequestAsync(
+            return await this._certificateRequest.StartSigningRequestAsync(
                 signingRequest.ApplicationId,
                 signingRequest.CertificateGroupId,
                 signingRequest.CertificateTypeId,
@@ -80,7 +85,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
 
         public async Task ApproveCertificateRequestAsync(string requestId, bool rejected)
         {
-            await _certificateRequest.ApproveAsync(requestId, rejected);
+            var onBehalfOfCertificateRequest = await this._certificateRequest.OnBehalfOfRequest(Request);
+            await onBehalfOfCertificateRequest.ApproveAsync(requestId, rejected);
         }
 
         /// <summary>

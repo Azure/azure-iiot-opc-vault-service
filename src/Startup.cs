@@ -75,6 +75,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
         /// <returns></returns>
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
+            services.AddLogging(o => o.AddConsole().AddDebug());
 
             // Setup (not enabling yet) CORS
             services.AddCors();
@@ -170,28 +171,19 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
             // for each request, which is good to reduce the risk of memory
             // leaks, but not so good for the overall performance.
 
-            // Register logger
-            builder.RegisterInstance(Config.Logger)
-                .AsImplementedInterfaces().SingleInstance();
-
             // Register configuration interfaces
             builder.RegisterInstance(Config)
                 .AsImplementedInterfaces().SingleInstance();
             builder.RegisterInstance(Config.ServicesConfig)
                 .AsImplementedInterfaces().SingleInstance();
 
+            // Register logger
+            builder.RegisterType<TraceLogger>()
+                .AsImplementedInterfaces().SingleInstance();
+
             // CORS setup
             builder.RegisterType<CorsSetup>()
                 .AsImplementedInterfaces().SingleInstance();
-
-            // Register http client ...
-            builder.RegisterType<HttpClient>().SingleInstance()
-                .AsImplementedInterfaces();
-            builder.RegisterType<HttpHandlerFactory>().SingleInstance()
-                .AsImplementedInterfaces();
-            builder.RegisterType<HttpClientFactory>().SingleInstance()
-                .AsImplementedInterfaces();
-
             // Register endpoint services and ...
             builder.RegisterType<KeyVaultCertificateGroup>()
                 .AsImplementedInterfaces().SingleInstance();
@@ -199,18 +191,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
                 .AsImplementedInterfaces().SingleInstance();
             builder.RegisterType<CosmosDBCertificateRequest>()
                 .AsImplementedInterfaces().SingleInstance();
-
-            // ... with bearer auth
-            if (Config.AuthRequired)
-            {
-                builder.RegisterType<BehalfOfTokenProvider>()
-                    .AsImplementedInterfaces().SingleInstance();
-                builder.RegisterType<DistributedTokenCache>()
-                   .AsImplementedInterfaces().SingleInstance();
-                builder.RegisterType<HttpBearerAuthentication>()
-                    .AsImplementedInterfaces().SingleInstance();
-            }
-
             return builder.Build();
         }
     }

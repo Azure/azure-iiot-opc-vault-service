@@ -22,7 +22,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
     {
         private readonly ICertificateGroup certificateGroups;
 
-        public CertificateGroupController(ICertificateGroup certificateGroups)
+        public CertificateGroupController(
+            ICertificateGroup certificateGroups)
         {
             this.certificateGroups = certificateGroups;
         }
@@ -87,18 +88,22 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
 
         public async Task<X509Certificate2ApiModel> PostCreateAsync(string groupId)
         {
+            var onBehalfOfCertificateGroups = await this.certificateGroups.OnBehalfOfRequest(Request);
             return new X509Certificate2ApiModel(
-                await this.certificateGroups.CreateCACertificateAsync(groupId));
+                await onBehalfOfCertificateGroups.CreateCACertificateAsync(groupId));
         }
 
 #if CERTSIGNER
         /// <summary>Revoke Certificate</summary>
         [HttpPost("{groupId}/revoke")]
         [SwaggerOperation(OperationId = "RevokeCertificate")]
+        [Authorize(Policy = Policies.CanManage)]
+
         public async Task<X509CrlApiModel> PostRevokeAsync(string groupId, [FromBody] X509Certificate2ApiModel cert)
         {
+            var onBehalfOfCertificateGroups = await this.certificateGroups.OnBehalfOfRequest(Request);
             return new X509CrlApiModel(
-                await this.certificateGroups.RevokeCertificateAsync(
+                await onBehalfOfCertificateGroups.RevokeCertificateAsync(
                     groupId,
                     cert.ToServiceModel()));
         }
@@ -106,10 +111,12 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
         /// <summary>Signing Request</summary>
         [HttpPost("{groupId}/sign")]
         [SwaggerOperation(OperationId = "SigningRequest")]
+        [Authorize(Policy = Policies.CanManage)]
         public async Task<X509Certificate2ApiModel> PostSignAsync(string groupId, [FromBody] SigningRequestApiModel sr)
         {
+            var onBehalfOfCertificateGroups = await this.certificateGroups.OnBehalfOfRequest(Request);
             return new X509Certificate2ApiModel(
-                await this.certificateGroups.SigningRequestAsync(
+                await onBehalfOfCertificateGroups.SigningRequestAsync(
                     groupId,
                     sr.ApplicationURI,
                     sr.ToServiceModel()));
@@ -118,10 +125,12 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
         /// <summary>New Key Pair</summary>
         [HttpPost("{groupId}/newkey")]
         [SwaggerOperation(OperationId = "NewKeyPairRequest")]
+        [Authorize(Policy = Policies.CanManage)]
         public async Task<CertificateKeyPairApiModel> PostNewKeyAsync(string groupId, [FromBody] NewKeyPairRequestApiModel nkpr)
         {
+            var onBehalfOfCertificateGroups = await this.certificateGroups.OnBehalfOfRequest(Request);
             return new CertificateKeyPairApiModel(
-                await this.certificateGroups.NewKeyPairRequestAsync(
+                await onBehalfOfCertificateGroups.NewKeyPairRequestAsync(
                     groupId,
                     nkpr.ApplicationURI,
                     nkpr.SubjectName,
