@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api;
+using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Filters;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.TokenStorage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -114,6 +115,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App
 
             services.AddMvc(options =>
             {
+                options.Filters.Add(typeof(AdalTokenAcquisitionExceptionFilter));
                 var policy = new AuthorizationPolicyBuilder()
                     .RequireAuthenticatedUser()
                     .Build();
@@ -156,7 +158,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App
             app.UseCookiePolicy();
 
             app.UseAuthentication();
-
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
