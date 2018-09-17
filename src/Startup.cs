@@ -10,14 +10,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Azure.IIoT.Diagnostics;
-    using Microsoft.Azure.IIoT.Http.Auth;
-    using Microsoft.Azure.IIoT.Http.Default;
     using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Runtime;
     using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1;
     using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Auth;
     using Microsoft.Azure.IIoT.Services;
     using Microsoft.Azure.IIoT.Services.Auth;
-    using Microsoft.Azure.IIoT.Services.Auth.Azure;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
@@ -184,6 +181,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
             // CORS setup
             builder.RegisterType<CorsSetup>()
                 .AsImplementedInterfaces().SingleInstance();
+
             // Register endpoint services and ...
             builder.RegisterType<KeyVaultCertificateGroup>()
                 .AsImplementedInterfaces().SingleInstance();

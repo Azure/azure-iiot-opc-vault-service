@@ -58,7 +58,7 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="OPCFoundation.NetStandard.Opc.Ua.Symbols" Version="1.4.354.16-preview" />
+        <PackageReference Include="OPCFoundation.NetStandard.Opc.Ua.Symbols" Version="1.4.354.18-preview" />
       </ItemGroup>
     </Otherwise>
   </Choose>
@@ -66,7 +66,6 @@
     <When Condition="Exists('..\..\azure-iiot-common') and '$(Configuration)'=='Develop'">
       <ItemGroup>
         <ProjectReference Include="..\..\azure-iiot-common\src\Microsoft.Azure.IIoT.Services\src\Microsoft.Azure.IIoT.Services.csproj" />
-        <ProjectReference Include="..\..\azure-iiot-common\src\Microsoft.Azure.IIoT.Auth\src\Microsoft.Azure.IIoT.Auth.csproj" />
         <ProjectReference Include="..\..\azure-iiot-common\src\Microsoft.Azure.IIoT.Abstractions\src\Microsoft.Azure.IIoT.Abstractions.csproj" />
       </ItemGroup>
     </When>
@@ -74,7 +73,6 @@
       <ItemGroup>
         <PackageReference Include="Microsoft.Azure.IIoT.Services" Version="1.0.0-preview008" />
         <PackageReference Include="Microsoft.Azure.IIoT.Abstractions" Version="1.0.0-preview008" />
-        <PackageReference Include="Microsoft.Azure.IIoT.Auth" Version="1.0.0-preview008" />
       </ItemGroup>
     </Otherwise>
   </Choose>

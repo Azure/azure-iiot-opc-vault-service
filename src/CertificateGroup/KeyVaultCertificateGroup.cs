@@ -27,6 +27,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
         private readonly IClientConfig _clientConfig;
         private readonly KeyVaultServiceClient _keyVaultServiceClient;
         private readonly ILogger _log;
+        private const string kAuthority = "https://login.microsoftonline.com/";
         public KeyVaultCertificateGroup(
             IServicesConfig servicesConfig,
             IClientConfig clientConfig,
@@ -60,7 +61,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
             _clientConfig = clientConfig;
             _keyVaultServiceClient = keyVaultServiceClient;
             _log = logger;
-            _log.Debug("Creating new on behalf of instance of `KeyVault` service " , () => { });
+            _log.Debug("Creating new on behalf of instance of `KeyVault` service ", () => { });
         }
 
         public async Task Init()
@@ -105,10 +106,10 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
                 var token = accessToken.First().Remove(0, "Bearer ".Length);
                 var serviceClientCredentials =
                     new KeyVaultCredentials(
-                        token, 
-                        _clientConfig.Authority + _clientConfig.TenantId, 
-                        _servicesConfig.KeyVaultResourceID, 
-                        _clientConfig.ClientId, 
+                        token,
+                        (String.IsNullOrEmpty(_clientConfig.Authority) ? kAuthority : _clientConfig.Authority) + _clientConfig.TenantId,
+                        _servicesConfig.KeyVaultResourceID,
+                        _clientConfig.ClientId,
                         _clientConfig.ClientSecret);
                 var keyVaultServiceClient = new KeyVaultServiceClient(_servicesConfig.KeyVaultApiUrl, _log);
                 keyVaultServiceClient.SetServiceClientCredentials(serviceClientCredentials);
