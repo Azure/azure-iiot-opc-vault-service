@@ -69,7 +69,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App
                 options.ResponseType = "id_token code";
                 // set the resource id of the service api which needs to be accessed
                 options.Resource = GdsVaultOptions.ResourceId;
-                options.UseTokenLifetime = true;
+                // refresh token
+                options.Scope.Add("offline_access");
 
                 options.Events = new OpenIdConnectEvents
                 {
