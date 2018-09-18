@@ -76,7 +76,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.KeyVault
             // Key Usage
             request.CertificateExtensions.Add(
                 new X509KeyUsageExtension(
-                    X509KeyUsageFlags.DigitalSignature | X509KeyUsageFlags.DataEncipherment |
+                    X509KeyUsageFlags.DigitalSignature | X509KeyUsageFlags.DataEncipherment | X509KeyUsageFlags.KeyCertSign |
                     X509KeyUsageFlags.NonRepudiation | X509KeyUsageFlags.KeyEncipherment, true));
 
             // Enhanced key usage
