@@ -52,7 +52,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Auth
             var result = authenticationContext.AcquireTokenAsync(
                 resource: resourceId,
                 clientCredential: credential,
-                userAssertion: user).Result;
+                userAssertion: user).GetAwaiter().GetResult();
 
             if (result == null)
             {

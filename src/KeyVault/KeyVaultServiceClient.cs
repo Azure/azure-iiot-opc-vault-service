@@ -318,7 +318,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.KeyVault
         }
 
         /// <summary>
-        /// Imports a new CA certificate in group id, tags it for trusted or issuer store.
+        /// Creates a new CA certificate in group id, tags it for trusted or issuer store.
         /// </summary>
         public async Task CreateCACertificateAsync(string id, X509Certificate2 certificate, bool trusted, CancellationToken ct = default(CancellationToken))
         {
@@ -339,7 +339,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.KeyVault
                 {
                     Exportable = false,
                     KeySize = certificate.GetRSAPublicKey().KeySize,
-                    KeyType = "RSAHSM",
+                    KeyType = "RSA-HSM",
                     ReuseKey = false
                 },
                 SecretProperties = new SecretProperties

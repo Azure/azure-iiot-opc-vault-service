@@ -8,7 +8,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Filters
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Filters;
     using Microsoft.Azure.IIoT.Exceptions;
+    using Microsoft.Azure.KeyVault.Models;
     using Newtonsoft.Json;
+    using Opc.Ua;
     using System;
     using System.Linq;
     using System.Net;
@@ -51,6 +53,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Filters
                         context.Exception);
                     break;
                 case UnauthorizedAccessException ue:
+                case KeyVaultErrorException ke:
                 case SecurityException se:
                     context.Result = GetResponse(HttpStatusCode.Unauthorized,
                         context.Exception);
@@ -59,6 +62,10 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Filters
                 case BadRequestException br:
                 case ArgumentException are:
                     context.Result = GetResponse(HttpStatusCode.BadRequest,
+                        context.Exception);
+                    break;
+                case ServiceResultException sre:
+                    context.Result = GetResponse(HttpStatusCode.InternalServerError,
                         context.Exception);
                     break;
                 case NotImplementedException ne:
