@@ -28,12 +28,12 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Controllers
         const string ContentTypePem = "application/x-pem-file";
 
         private IOpcGdsVault gdsVault;
-        private readonly GdsVaultOptions gdsVaultOptions;
+        private readonly GdsVaultApiOptions gdsVaultOptions;
         private readonly AzureADOptions azureADOptions;
         private readonly ITokenCacheService tokenCacheService;
 
         public CertificateGroupController(
-            GdsVaultOptions gdsVaultOptions,
+            GdsVaultApiOptions gdsVaultOptions,
             AzureADOptions azureADOptions,
             ITokenCacheService tokenCacheService)
         {

@@ -21,12 +21,12 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Controllers
     public class ApplicationController : Controller
     {
         private IOpcGdsVault gdsVault;
-        private readonly GdsVaultOptions gdsVaultOptions;
+        private readonly GdsVaultApiOptions gdsVaultOptions;
         private readonly AzureADOptions azureADOptions;
         private readonly ITokenCacheService tokenCacheService;
 
         public ApplicationController(
-            GdsVaultOptions gdsVaultOptions,
+            GdsVaultApiOptions gdsVaultOptions,
             AzureADOptions azureADOptions,
             ITokenCacheService tokenCacheService)
         {

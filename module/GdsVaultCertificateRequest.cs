@@ -5,6 +5,7 @@
 
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.Models;
+using Microsoft.Rest;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -46,7 +47,7 @@ namespace Opc.Ua.Gds.Server.GdsVault
             string appId = GdsVaultClientHelper.GetServiceIdFromNodeId(applicationId, NamespaceIndex);
             if (string.IsNullOrEmpty(appId))
             {
-                throw new ServiceResultException(StatusCodes.BadInvalidArgument, "The ApplicationId is invalid.");
+                throw new ServiceResultException(StatusCodes.BadNotFound, "The ApplicationId is invalid.");
             }
 
             string certTypeId;
@@ -55,17 +56,29 @@ namespace Opc.Ua.Gds.Server.GdsVault
                 throw new ServiceResultException(StatusCodes.BadInvalidArgument, "The CertificateTypeId does not refer to a supported CertificateType.");
             }
 
-            var model = new StartSigningRequestApiModel(
-                appId,
-                authorityId,
-                certTypeId,
-                Convert.ToBase64String(certificateRequest),
-                certificateGroupId.ToString()
-                );
+            try
+            {
+                var model = new StartSigningRequestApiModel(
+                    appId,
+                    authorityId,
+                    certTypeId,
+                    Convert.ToBase64String(certificateRequest),
+                    certificateGroupId.ToString()
+                    );
 
-            string requestId = _gdsVaultServiceClient.StartSigningRequest(model);
-
-            return GdsVaultClientHelper.GetNodeIdFromServiceId(requestId, NamespaceIndex);
+                string requestId = _gdsVaultServiceClient.StartSigningRequest(model);
+                return GdsVaultClientHelper.GetNodeIdFromServiceId(requestId, NamespaceIndex);
+            }
+            catch (HttpOperationException httpEx)
+            {
+                // TODO: return matching ServiceResultException
+                //throw new ServiceResultException(StatusCodes.BadNotFound);
+                //throw new ServiceResultException(StatusCodes.BadInvalidArgument);
+                //throw new ServiceResultException(StatusCodes.BadUserAccessDenied);
+                //throw new ServiceResultException(StatusCodes.BadRequestNotAllowed);
+                //throw new ServiceResultException(StatusCodes.BadCertificateUriInvalid);
+                throw new ServiceResultException(httpEx, StatusCodes.BadNotSupported);
+            }
         }
 
         public NodeId StartNewKeyPairRequest(
@@ -89,21 +102,32 @@ namespace Opc.Ua.Gds.Server.GdsVault
             {
                 throw new ServiceResultException(StatusCodes.BadInvalidArgument, "The CertificateTypeId does not refer to a supported CertificateType.");
             }
+            try
+            {
+                var model = new StartNewKeyPairRequestApiModel(
+                    appId,
+                    authorityId,
+                    certTypeId,
+                    subjectName,
+                    domainNames,
+                    privateKeyFormat,
+                    privateKeyPassword,
+                    certificateGroupId.ToString()
+                    );
 
-            var model = new StartNewKeyPairRequestApiModel(
-                appId,
-                authorityId,
-                certTypeId,
-                subjectName,
-                domainNames,
-                privateKeyFormat,
-                privateKeyPassword,
-                certificateGroupId.ToString()
-                );
+                string requestId = _gdsVaultServiceClient.StartNewKeyPairRequest(model);
 
-            string requestId = _gdsVaultServiceClient.StartNewKeyPairRequest(model);
+                return GdsVaultClientHelper.GetNodeIdFromServiceId(requestId, NamespaceIndex);
+            }
+            catch (HttpOperationException httpEx)
+            {
+                // TODO: return matching ServiceResultException
+                //throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
+                //throw new ServiceResultException(StatusCodes.BadInvalidArgument);
+                //throw new ServiceResultException(StatusCodes.BadUserAccessDenied);
+                throw new ServiceResultException(httpEx, StatusCodes.BadRequestNotAllowed);
+            }
 
-            return GdsVaultClientHelper.GetNodeIdFromServiceId(requestId, NamespaceIndex);
         }
 
         public void ApproveRequest(
@@ -111,15 +135,30 @@ namespace Opc.Ua.Gds.Server.GdsVault
             bool isRejected
             )
         {
-            // intentionally ignore the auto approval, it is implemented in the GdsVault service
-            string reqId = GdsVaultClientHelper.GetServiceIdFromNodeId(requestId, NamespaceIndex);
-            _gdsVaultServiceClient.ApproveCertificateRequest(reqId, isRejected);
+            try
+            {
+                // intentionally ignore the auto approval, it is implemented in the GdsVault service
+                string reqId = GdsVaultClientHelper.GetServiceIdFromNodeId(requestId, NamespaceIndex);
+                _gdsVaultServiceClient.ApproveCertificateRequest(reqId, isRejected);
+            }
+            catch (HttpOperationException httpEx)
+            {
+                throw new ServiceResultException(httpEx, StatusCodes.BadUserAccessDenied);
+            }
         }
 
         public void AcceptRequest(NodeId requestId, byte[] signedCertificate)
         {
-            string reqId = GdsVaultClientHelper.GetServiceIdFromNodeId(requestId, NamespaceIndex);
-            _gdsVaultServiceClient.AcceptCertificateRequest(reqId);
+            try
+            {
+                string reqId = GdsVaultClientHelper.GetServiceIdFromNodeId(requestId, NamespaceIndex);
+                _gdsVaultServiceClient.AcceptCertificateRequest(reqId);
+            }
+            catch (HttpOperationException httpEx)
+            {
+                throw new ServiceResultException(httpEx, StatusCodes.BadUserAccessDenied);
+            }
+
         }
 
         public CertificateRequestState FinishRequest(
@@ -146,20 +185,29 @@ namespace Opc.Ua.Gds.Server.GdsVault
             certificateTypeId = null;
             signedCertificate = null;
             privateKey = null;
-
-            var request = _gdsVaultServiceClient.FinishRequest(reqId, appId);
-
-            var state = (CertificateRequestState)Enum.Parse(typeof(CertificateRequestState), request.State);
-
-            if (state == CertificateRequestState.Approved)
+            try
             {
-                certificateGroupId = new NodeId(request.AuthorityId);
-                certificateTypeId = _certTypeMap.FirstOrDefault(x => x.Value == request.CertificateTypeId).Key;
-                signedCertificate = request.SignedCertificate != null ? Convert.FromBase64String(request.SignedCertificate) : null;
-                privateKey = request.PrivateKey != null ? Convert.FromBase64String(request.PrivateKey) : null;
-            }
+                var request = _gdsVaultServiceClient.FinishRequest(reqId, appId);
 
-            return state;
+                var state = (CertificateRequestState)Enum.Parse(typeof(CertificateRequestState), request.State);
+
+                if (state == CertificateRequestState.Approved)
+                {
+                    certificateGroupId = new NodeId(request.AuthorityId);
+                    certificateTypeId = _certTypeMap.FirstOrDefault(x => x.Value == request.CertificateTypeId).Key;
+                    signedCertificate = request.SignedCertificate != null ? Convert.FromBase64String(request.SignedCertificate) : null;
+                    privateKey = request.PrivateKey != null ? Convert.FromBase64String(request.PrivateKey) : null;
+                }
+                return state;
+            }
+            catch (HttpOperationException httpEx)
+            {
+                //throw new ServiceResultException(StatusCodes.BadNotFound);
+                //throw new ServiceResultException(StatusCodes.BadInvalidArgument);
+                //throw new ServiceResultException(StatusCodes.BadUserAccessDenied);
+                //throw new ServiceResultException(StatusCodes.BadNothingToDo);
+                throw new ServiceResultException(httpEx, StatusCodes.BadRequestNotAllowed);
+            }
         }
 
         public CertificateRequestState ReadRequest(

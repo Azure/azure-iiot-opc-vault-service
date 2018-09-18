@@ -20,7 +20,7 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="OPCFoundation.NetStandard.Opc.Ua.Symbols" Version="1.4.354.16-preview" />
+        <PackageReference Include="OPCFoundation.NetStandard.Opc.Ua.Symbols" Version="1.4.354.18-preview" />
       </ItemGroup>
     </Otherwise>
   </Choose>
@@ -32,6 +32,10 @@
     <None Update="Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Edge.Config.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
   </ItemGroup>
 
 </Project>

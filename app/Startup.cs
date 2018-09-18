@@ -30,7 +30,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            GdsVaultOptions = new GdsVaultOptions();
+            GdsVaultOptions = new GdsVaultApiOptions();
             Configuration.Bind("GdsVault", GdsVaultOptions);
             AzureADOptions = new AzureADOptions();
             Configuration.Bind("AzureAD", AzureADOptions);
@@ -38,7 +38,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App
 
         public IConfiguration Configuration { get; }
         public AzureADOptions AzureADOptions { get; }
-        public GdsVaultOptions GdsVaultOptions { get; }
+        public GdsVaultApiOptions GdsVaultOptions { get; }
 
         /// <summary>
         /// Di container - Initialized in `ConfigureServices`

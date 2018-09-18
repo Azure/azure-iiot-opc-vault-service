@@ -3,65 +3,79 @@
 // license information.
 //
 
-using Microsoft.AspNetCore.Authentication.AzureAD.UI;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api;
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.TokenStorage;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Microsoft.Rest;
 using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Utils
+namespace Opc.Ua.Gds.Server.GdsVault
 {
+    // Summary:
+    //     Options for configuring authentication using Azure Active Directory.
+    public class GdsEdgeAzureADOptions
+    {
+        //
+        // Summary:
+        //     Gets or sets the client Id.
+        public string ClientId { get; set; }
+        //
+        // Summary:
+        //     Gets or sets the client secret.
+        public string ClientSecret { get; set; }
+        //
+        // Summary:
+        //     Gets or sets the tenant Id.
+        public string TenantId { get; set; }
+        //
+        // Summary:
+        //     Gets or sets the Azure Active Directory instance.
+        public string Authority { get; set; }
+    }
+
     public class GdsVaultLoginCredentials : ServiceClientCredentials
     {
         private GdsVaultApiOptions gdsVaultOptions;
-        private AzureADOptions azureADOptions;
-        private ITokenCacheService tokenCacheService;
-        private ClaimsPrincipal claimsPrincipal;
+        private GdsEdgeAzureADOptions azureADOptions;
+        private const string kAuthority = "https://login.microsoftonline.com/";
+        private string AuthenticationToken { get; set; }
+        private DateTimeOffset ExpiresOn { get; set; }
 
         public GdsVaultLoginCredentials(
             GdsVaultApiOptions gdsVaultOptions,
-            AzureADOptions azureADOptions,
-            ITokenCacheService tokenCacheService,
-            ClaimsPrincipal claimsPrincipal)
+            GdsEdgeAzureADOptions azureADOptions)
         {
             this.gdsVaultOptions = gdsVaultOptions;
             this.azureADOptions = azureADOptions;
-            this.tokenCacheService = tokenCacheService;
-            this.claimsPrincipal = claimsPrincipal;
         }
-        private string AuthenticationToken { get; set; }
+
         public override void InitializeServiceClient<T>(ServiceClient<T> client)
         {
-            var tokenCache = tokenCacheService.GetCacheAsync(claimsPrincipal).Result;
-
+            InternalInitializeServiceClient();
+        }
+        private void InternalInitializeServiceClient()
+        {
             var authenticationContext =
-                new AuthenticationContext(azureADOptions.Instance + azureADOptions.TenantId, tokenCache);
+                new AuthenticationContext(
+                    (String.IsNullOrEmpty(azureADOptions.Authority) ? kAuthority : azureADOptions.Authority) + azureADOptions.TenantId);
 
-            var credential = new ClientCredential(
+            ClientCredential clientCredential = new ClientCredential(
                 clientId: azureADOptions.ClientId,
                 clientSecret: azureADOptions.ClientSecret);
 
-            var name = claimsPrincipal.FindFirstValue(ClaimTypes.Upn) ??
-                claimsPrincipal.FindFirstValue(ClaimTypes.Email);
-            string userObjectId = (claimsPrincipal.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier"))?.Value;
-            var user = new UserIdentifier(userObjectId, UserIdentifierType.UniqueId);
-
-            var result = authenticationContext.AcquireTokenSilentAsync(
+            var result = authenticationContext.AcquireTokenAsync(
                         resource: gdsVaultOptions.ResourceId,
-                        clientCredential: credential,
-                        userId: user).GetAwaiter().GetResult();
+                        clientCredential: clientCredential).GetAwaiter().GetResult();
 
             if (result == null)
             {
                 throw new InvalidOperationException("Failed to obtain the JWT token");
             }
 
+            ExpiresOn = result.ExpiresOn;
             AuthenticationToken = result.AccessToken;
         }
 
@@ -70,6 +84,12 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Utils
             if (request == null)
             {
                 throw new ArgumentNullException("request");
+            }
+
+            DateTime now = DateTime.UtcNow;
+            if (now.Add(TimeSpan.FromMinutes(2)) >= ExpiresOn)
+            {
+                InternalInitializeServiceClient();
             }
 
             if (AuthenticationToken == null)

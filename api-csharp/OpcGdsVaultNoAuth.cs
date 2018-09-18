@@ -8,7 +8,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
 {
     using Microsoft.Rest;
 
-    public class GdsVaultOptions
+    public class GdsVaultApiOptions
     {
         public string ResourceId { get; set; }
         public string BaseAddress { get; set; }
@@ -28,11 +28,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api
         /// <exception cref="System.ArgumentNullException">
         /// Thrown when a required parameter is null
         /// </exception>
-        public OpcGdsVault(GdsVaultOptions options)
+        public OpcGdsVault(GdsVaultApiOptions options)
         {
             if (options == null)
             {
-                throw new System.ArgumentNullException("GdsVaultOptions");
+                throw new System.ArgumentNullException("GdsVaultApiOptions");
             }
             BaseUri = new System.Uri(options.BaseAddress);
         }

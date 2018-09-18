@@ -4,6 +4,7 @@
 // ------------------------------------------------------------
 
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api;
+using Microsoft.Rest;
 using Mono.Options;
 using Opc.Ua.Configuration;
 using Opc.Ua.Gds.Server.Database.GdsVault;
@@ -78,12 +79,16 @@ namespace Opc.Ua.Gds.Server
 
             // command line options
             bool showHelp = false;
-            string gdsVault = null;
-            string appID = null;
+            var gdsVaultOptions = new GdsVaultApiOptions();
+            var azureADOptions = new GdsEdgeAzureADOptions();
 
             Mono.Options.OptionSet options = new Mono.Options.OptionSet {
-                { "g|gdsvault=", "GdsVault Url", g => gdsVault = g },
-                { "a|appid=", "Active Directory Application Id", a => appID = a },
+                { "g|gdsvault=", "GdsVault Url", g => gdsVaultOptions.BaseAddress = g },
+                { "r|resource=", "GdsVault Resource Id", r => gdsVaultOptions.ResourceId = r },
+                { "c|clientid=", "AD Client Id", c => azureADOptions.ClientId = c },
+                { "s|secret=", "AD Client Secret", s => azureADOptions.ClientSecret = s },
+                { "a|authority", "Authority", a => azureADOptions.Authority = a },
+                { "t|tenantid", "Tenant Id", t => azureADOptions.TenantId = t },
                 { "h|help", "show this message and exit", h => showHelp = h != null },
             };
 
@@ -113,7 +118,7 @@ namespace Opc.Ua.Gds.Server
             }
 
             EdgeGlobalDiscoveryServer server = new EdgeGlobalDiscoveryServer();
-            server.Run(gdsVault, appID);
+            server.Run(gdsVaultOptions, azureADOptions);
 
             return (int)EdgeGlobalDiscoveryServer.ExitCode;
         }
@@ -130,13 +135,15 @@ namespace Opc.Ua.Gds.Server
         {
         }
 
-        public void Run(string gdsVault, string appID)
+        public void Run(
+            GdsVaultApiOptions gdsVaultOptions,
+            GdsEdgeAzureADOptions azureADOptions)
         {
 
             try
             {
                 exitCode = ExitCode.ErrorServerNotStarted;
-                ConsoleGlobalDiscoveryServer(gdsVault, appID).Wait();
+                ConsoleGlobalDiscoveryServer(gdsVaultOptions, azureADOptions).Wait();
                 Console.WriteLine("Server started. Press Ctrl-C to exit...");
                 exitCode = ExitCode.ErrorServerRunning;
             }
@@ -194,8 +201,8 @@ namespace Opc.Ua.Gds.Server
         }
 
         private async Task ConsoleGlobalDiscoveryServer(
-            string gdsVaultServiceUrl,
-            string appId)
+            GdsVaultApiOptions gdsVaultOptions, 
+            GdsEdgeAzureADOptions azureADOptions)
         {
             ApplicationInstance.MessageDlg = new ApplicationMessageDlg();
             ApplicationInstance application = new ApplicationInstance
@@ -227,23 +234,57 @@ namespace Opc.Ua.Gds.Server
             string[] keyVaultConfig = gdsVaultConfiguration.DatabaseStorePath?.Split(',');
             if (keyVaultConfig != null)
             {
-                if (String.IsNullOrEmpty(gdsVaultServiceUrl))
+                if (String.IsNullOrEmpty(gdsVaultOptions.BaseAddress))
                 {
                     // try configuration using XML config
-                    gdsVaultServiceUrl = keyVaultConfig[0];
+                    gdsVaultOptions.BaseAddress = keyVaultConfig[0];
                 }
 
-                if (String.IsNullOrEmpty(appId))
+                if (String.IsNullOrEmpty(gdsVaultOptions.ResourceId))
                 {
                     if (keyVaultConfig.Length > 1 && !String.IsNullOrEmpty(keyVaultConfig[1]))
                     {
-                        appId = keyVaultConfig[1];
+                        gdsVaultOptions.ResourceId = keyVaultConfig[1];
                     }
                 }
+
+                if (String.IsNullOrEmpty(azureADOptions.ClientId))
+                {
+                    if (keyVaultConfig.Length > 2 && !String.IsNullOrEmpty(keyVaultConfig[2]))
+                    {
+                        azureADOptions.ClientId = keyVaultConfig[2];
+                    }
+                }
+
+                if (String.IsNullOrEmpty(azureADOptions.ClientSecret))
+                {
+                    if (keyVaultConfig.Length > 3 && !String.IsNullOrEmpty(keyVaultConfig[3]))
+                    {
+                        azureADOptions.ClientSecret = keyVaultConfig[3];
+                    }
+                }
+
+                if (String.IsNullOrEmpty(azureADOptions.TenantId))
+                {
+                    if (keyVaultConfig.Length > 4 && !String.IsNullOrEmpty(keyVaultConfig[4]))
+                    {
+                        azureADOptions.TenantId = keyVaultConfig[4];
+                    }
+                }
+
+                if (String.IsNullOrEmpty(azureADOptions.Authority))
+                {
+                    if (keyVaultConfig.Length > 5 && !String.IsNullOrEmpty(keyVaultConfig[5]))
+                    {
+                        azureADOptions.Authority = keyVaultConfig[5];
+                    }
+                }
+
             }
 
-            // TODO: add authentication
-            IOpcGdsVault gdsServiceClient = new OpcGdsVault(new Uri(gdsVaultServiceUrl));
+            var serviceClient = new GdsVaultLoginCredentials(gdsVaultOptions, azureADOptions);
+            ServiceClientTracing.IsEnabled = true;
+            IOpcGdsVault gdsServiceClient = new OpcGdsVault(new Uri(gdsVaultOptions.BaseAddress), serviceClient);
 
             // The Gds Vault handler (TODO: authentication)
             var gdsVaultHandler = new GdsVaultClientHandler(gdsServiceClient);
