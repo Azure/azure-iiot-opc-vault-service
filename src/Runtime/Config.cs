@@ -16,7 +16,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Runtime
         private const string KeyVaultKey = "KeyVault:";
         private const string KeyVaultApiUrlKey = KeyVaultKey + "ServiceUri";
         private const string KeyVaultResourceIDKey = KeyVaultKey + "ResourceID";
-        private const string KeyVaultApiTimeoutKey = KeyVaultKey + "Timeout";
+        private const string KeyVaultHSMKey = KeyVaultKey + "HSM";
         private const string CosmosDBKey = "CosmosDB:";
         private const string CosmosDBEndpointKey = CosmosDBKey + "EndPoint";
         private const string CosmosDBTokenKey = CosmosDBKey + "Token";
@@ -36,7 +36,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Runtime
             {
                 KeyVaultApiUrl = this.GetString(KeyVaultApiUrlKey),
                 KeyVaultResourceID = this.GetString(KeyVaultResourceIDKey),
-                KeyVaultApiTimeout = this.GetInt(KeyVaultApiTimeoutKey),
+                KeyVaultHSM = this.GetBool(KeyVaultHSMKey, true),
                 CosmosDBEndpoint = this.GetString(CosmosDBEndpointKey),
                 CosmosDBToken = this.GetString(CosmosDBTokenKey)
             };

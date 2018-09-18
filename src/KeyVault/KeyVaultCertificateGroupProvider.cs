@@ -100,39 +100,36 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.KeyVault
         public async Task<bool> CreateCACertificateAsync()
         {
             DateTime now = DateTime.UtcNow;
-            try
+            using (var caCert = CertificateFactory.CreateCertificate(
+                null,
+                null,
+                null,
+                null,
+                null,
+                Configuration.SubjectName,
+                null,
+                Configuration.CACertificateKeySize,
+                now,
+                Configuration.CACertificateLifetime,
+                Configuration.CACertificateHashSize,
+                true,
+                null,
+                null))
             {
-                using (var caCert = CertificateFactory.CreateCertificate(
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    Configuration.SubjectName,
-                    null,
-                    Configuration.CACertificateKeySize,
-                    now,
-                    Configuration.CACertificateLifetime,
-                    Configuration.CACertificateHashSize,
-                    true,
-                    null,
-                    null))
+
+                // save only public key
+                Certificate = new X509Certificate2(caCert.RawData);
+
+                // initialize revocation list
+                Crl = CertificateFactory.RevokeCertificate(caCert, null, null);
+                if (Crl == null)
                 {
-
-                    // save only public key
-                    Certificate = new X509Certificate2(caCert.RawData);
-
-                    // initialize revocation list
-                    Crl = CertificateFactory.RevokeCertificate(caCert, null, null);
-
-                    // upload ca cert with private key
-                    await _keyVaultServiceClient.ImportCACertificate(Configuration.Id, new X509Certificate2Collection(caCert), true).ConfigureAwait(false);
-                    await _keyVaultServiceClient.ImportCACrl(Configuration.Id, Certificate, Crl).ConfigureAwait(false);
+                    return false;
                 }
-            }
-            catch
-            {
-                return false;
+
+                // upload ca cert with private key
+                await _keyVaultServiceClient.ImportCACertificate(Configuration.Id, new X509Certificate2Collection(caCert), true).ConfigureAwait(false);
+                await _keyVaultServiceClient.ImportCACrl(Configuration.Id, Certificate, Crl).ConfigureAwait(false);
             }
             return true;
         }

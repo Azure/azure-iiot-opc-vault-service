@@ -12,7 +12,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Runtime
     {
         string KeyVaultApiUrl { get; set; }
         string KeyVaultResourceID { get; set; }
-        int KeyVaultApiTimeout { get; set; }
+        bool KeyVaultHSM { get; set; }
         string CosmosDBEndpoint { get; set; }
         string CosmosDBToken { get; set; }
     }
@@ -21,7 +21,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Runtime
     {
         public string KeyVaultApiUrl { get; set; }
         public string KeyVaultResourceID { get; set; }
-        public int KeyVaultApiTimeout { get; set; }
+        public bool KeyVaultHSM { get; set; }
         public string CosmosDBEndpoint { get; set; }
         public string CosmosDBToken { get; set; }
 

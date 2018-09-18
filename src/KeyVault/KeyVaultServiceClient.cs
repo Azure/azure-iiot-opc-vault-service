@@ -44,9 +44,12 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.KeyVault
         /// 
         /// </summary>
         /// <param name="vaultBaseUrl">The Url of the Key Vault.</param>
-        public KeyVaultServiceClient(string vaultBaseUrl, ILogger logger)
+        /// <param name="keyStoreHSM">The KeyVault is HSM backed.</param>
+        /// <param name="logger">The logger.</param>
+        public KeyVaultServiceClient(string vaultBaseUrl, bool keyStoreHSM, ILogger logger)
         {
             _vaultBaseUrl = vaultBaseUrl;
+            _keyStoreHSM = keyStoreHSM;
             _logger = logger;
         }
 
@@ -288,7 +291,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.KeyVault
                 {
                     Exportable = false,
                     KeySize = certificate.GetRSAPublicKey().KeySize,
-                    KeyType = "RSA-HSM",
+                    KeyType = _keyStoreHSM ? "RSA-HSM" : "RSA",
                     ReuseKey = false
                 },
                 SecretProperties = new SecretProperties
@@ -339,7 +342,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.KeyVault
                 {
                     Exportable = false,
                     KeySize = certificate.GetRSAPublicKey().KeySize,
-                    KeyType = "RSA-HSM",
+                    KeyType = _keyStoreHSM ? "RSA-HSM" : "RSA",
                     ReuseKey = false
                 },
                 SecretProperties = new SecretProperties
@@ -543,6 +546,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.KeyVault
         }
 
         private string _vaultBaseUrl;
+        private bool _keyStoreHSM;
         private IKeyVaultClient _keyVaultClient;
         private ILogger _logger;
         private ClientAssertionCertificate _assertionCert;

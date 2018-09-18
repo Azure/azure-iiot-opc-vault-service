@@ -35,7 +35,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
         {
             _servicesConfig = servicesConfig;
             _clientConfig = clientConfig;
-            _keyVaultServiceClient = new KeyVaultServiceClient(servicesConfig.KeyVaultApiUrl, logger);
+            _keyVaultServiceClient = new KeyVaultServiceClient(servicesConfig.KeyVaultApiUrl, servicesConfig.KeyVaultHSM, logger);
             if (clientConfig != null &&
                 clientConfig.ClientId != null && clientConfig.ClientSecret != null)
             {
@@ -111,7 +111,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
                         _servicesConfig.KeyVaultResourceID,
                         _clientConfig.ClientId,
                         _clientConfig.ClientSecret);
-                var keyVaultServiceClient = new KeyVaultServiceClient(_servicesConfig.KeyVaultApiUrl, _log);
+                var keyVaultServiceClient = new KeyVaultServiceClient(_servicesConfig.KeyVaultApiUrl, _servicesConfig.KeyVaultHSM, _log);
                 keyVaultServiceClient.SetServiceClientCredentials(serviceClientCredentials);
                 return new KeyVaultCertificateGroup(
                     keyVaultServiceClient,
