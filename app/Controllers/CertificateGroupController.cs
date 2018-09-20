@@ -12,6 +12,7 @@ using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.TokenStorage;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Utils;
 using Microsoft.Rest;
 using System;
+using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
@@ -57,6 +58,14 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Controllers
             AuthorizeGdsVaultClient();
             var request = await gdsVault.GetCertificateGroupConfigurationAsync(id);
             return View(request);
+        }
+
+        [ActionName("Renew")]
+        public async Task<ActionResult> Renew(string id)
+        {
+            AuthorizeGdsVaultClient();
+            var request = await gdsVault.CreateCACertificateAsync(id);
+            return RedirectToAction("IssuerDetails", new { id });
         }
 
         [HttpPost]
@@ -105,6 +114,32 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Controllers
             }
 
             return View(group);
+        }
+
+        [ActionName("IssuerDetails")]
+        public async Task<ActionResult> IssuerDetailsAsync(string id)
+        {
+            AuthorizeGdsVaultClient();
+            var issuer = await gdsVault.GetCACertificateChainAsync(id);
+            var certList = new List<CertificateDetailsApiModel>();
+            foreach (var certificate in issuer.Chain)
+            {
+                var byteArray = Convert.FromBase64String(certificate.Certificate);
+                X509Certificate2 cert = new X509Certificate2(byteArray);
+                var model = new CertificateDetailsApiModel()
+                {
+                    Subject = cert.Subject,
+                    Issuer = cert.Issuer,
+                    Thumbprint = cert.Thumbprint,
+                    SerialNumber = cert.SerialNumber,
+                    NotBefore = cert.NotBefore,
+                    NotAfter = cert.NotAfter
+                };
+                certList.Add(model);
+            }
+            var modelCollection = new CertificateDetailsCollectionApiModel(id);
+            modelCollection.Certificates = certList.ToArray();
+            return View(modelCollection);
         }
 
 

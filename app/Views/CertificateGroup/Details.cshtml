@@ -86,6 +86,11 @@
     @Html.Raw("&nbsp;|&nbsp;")
     @Html.ActionLink("Edit", "Edit", new { id = Model.Name })
     @Html.Raw("&nbsp;|&nbsp;")
+    @Html.ActionLink("Renew", "Renew", new { id = Model.Name },
+            new { onclick = "return confirm('Do you really want to renew the CA certificate for group " + Model.Name + "?')" })
+    @Html.Raw("&nbsp;|&nbsp;")
+    @Html.ActionLink("Issuer Details", "IssuerDetails", new { id = Model.Name })
+    @Html.Raw("&nbsp;|&nbsp;")
     @Html.ActionLink("Download Issuer", "DownloadIssuer", new { id = Model.Name })
     @Html.Raw("&nbsp;|&nbsp;")
     @Html.ActionLink("Download Crl", "DownloadIssuerCrl", new { id = Model.Name })
