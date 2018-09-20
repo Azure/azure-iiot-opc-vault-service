@@ -176,27 +176,42 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Controllers
         }
 
         [ActionName("Details")]
-        public async Task<ActionResult> DetailsAsync(string id)
+        public async Task<ActionResult> DetailsAsync(string id, string message)
         {
             AuthorizeGdsVaultClient();
             var request = await gdsVault.ReadCertificateRequestAsync(id);
-            return View(request);
+            var model = new CertificateRequestRecordDetailsApiModel(request, message);
+            return View(model);
         }
 
         [ActionName("Approve")]
         public async Task<ActionResult> ApproveAsync(string id)
         {
             AuthorizeGdsVaultClient();
-            await gdsVault.ApproveCertificateRequestAsync(id, false);
-            return RedirectToAction("Details", new { id });
+            try
+            {
+                await gdsVault.ApproveCertificateRequestAsync(id, false);
+                return RedirectToAction("Details", new { id , message = "CertificateRequest approved!"});
+            }
+            catch (Exception ex)
+            {
+                return RedirectToAction("Details", new { id, message = ex.Message });
+            }
         }
 
         [ActionName("Reject")]
         public async Task<ActionResult> RejectAsync(string id)
         {
             AuthorizeGdsVaultClient();
-            await gdsVault.ApproveCertificateRequestAsync(id, true);
-            return RedirectToAction("Details", new { id });
+            try
+            {
+                await gdsVault.ApproveCertificateRequestAsync(id, true);
+                return RedirectToAction("Details", new { id, message = "CertificateRequest rejected!" });
+            }
+            catch (Exception ex)
+            {
+                return RedirectToAction("Details", new { id, message = ex.Message });
+            }
         }
 
         [ActionName("Accept")]
