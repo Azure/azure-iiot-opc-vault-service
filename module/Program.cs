@@ -283,10 +283,7 @@ namespace Opc.Ua.Gds.Server
             }
 
             var serviceClient = new GdsVaultLoginCredentials(gdsVaultOptions, azureADOptions);
-            ServiceClientTracing.IsEnabled = true;
             IOpcGdsVault gdsServiceClient = new OpcGdsVault(new Uri(gdsVaultOptions.BaseAddress), serviceClient);
-
-            // The Gds Vault handler (TODO: authentication)
             var gdsVaultHandler = new GdsVaultClientHandler(gdsServiceClient);
 
             // read configurations from GdsVault
@@ -298,7 +295,7 @@ namespace Opc.Ua.Gds.Server
             var appDB = new GdsVaultApplicationsDatabase(gdsServiceClient);
 
             requestDB.Initialize();
-            server = new GlobalDiscoverySampleServer(appDB, requestDB, certGroup);
+            server = new GlobalDiscoverySampleServer(appDB, requestDB, certGroup, false);
 
             // start the server.
             await application.Start(server);
