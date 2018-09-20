@@ -53,9 +53,12 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Filters
                         context.Exception);
                     break;
                 case UnauthorizedAccessException ue:
-                case KeyVaultErrorException ke:
                 case SecurityException se:
                     context.Result = GetResponse(HttpStatusCode.Unauthorized,
+                        context.Exception);
+                    break;
+                case KeyVaultErrorException ke:
+                    context.Result = GetResponse(HttpStatusCode.Forbidden,
                         context.Exception);
                     break;
                 case JsonReaderException jre:
@@ -65,8 +68,26 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Filters
                         context.Exception);
                     break;
                 case ServiceResultException sre:
-                    context.Result = GetResponse(HttpStatusCode.InternalServerError,
-                        context.Exception);
+                    {
+                        HttpStatusCode statusCode;
+                        switch (sre.StatusCode)
+                        {
+                            case StatusCodes.BadNodeIdUnknown:
+                                statusCode = HttpStatusCode.NotFound;
+                                break;
+                            case StatusCodes.BadInvalidArgument:
+                                statusCode = HttpStatusCode.BadRequest;
+                                break;
+                            case StatusCodes.BadInvalidState:
+                            case StatusCodes.BadConfigurationError:
+                            case StatusCodes.BadCertificateUriInvalid:
+                            default:
+                                statusCode = HttpStatusCode.Forbidden;
+                                break;
+                        }
+                        context.Result = GetResponse(statusCode,
+                            context.Exception);
+                    }
                     break;
                 case NotImplementedException ne:
                 case NotSupportedException ns:

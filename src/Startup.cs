@@ -13,6 +13,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
     using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Runtime;
     using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1;
     using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Auth;
+    using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Filters;
     using Microsoft.Azure.IIoT.Services;
     using Microsoft.Azure.IIoT.Services.Auth;
     using Microsoft.Extensions.Configuration;
@@ -88,13 +89,17 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
             });
 
             // Add controllers as services so they'll be resolved.
-            services.AddMvc().AddControllersAsServices().AddJsonOptions(options =>
-            {
-                options.SerializerSettings.Formatting = Formatting.Indented;
-                options.SerializerSettings.Converters.Add(new ExceptionConverter(
-                    Environment.IsDevelopment()));
-                options.SerializerSettings.MaxDepth = 10;
-            });
+            services.AddMvc(options =>
+                options.Filters.Add(typeof(ExceptionsFilterAttribute))
+                )
+                .AddControllersAsServices()
+                .AddJsonOptions(options =>
+                {
+                    options.SerializerSettings.Formatting = Formatting.Indented;
+                    options.SerializerSettings.Converters.Add(new ExceptionConverter(
+                        Environment.IsDevelopment()));
+                    options.SerializerSettings.MaxDepth = 10;
+                });
 
             services.AddSwagger(Config, new Info
             {
