@@ -34,12 +34,19 @@
                 @Html.DisplayFor(groupItem => group.SubjectName)
             </td>
             <td>
+                @Html.ActionLink("Details", "Details", new { id = group.Name }) |
+                @Html.ActionLink("Edit", "Edit", new { id = group.Name }) |
                 @Html.ActionLink("Issuer", "DownloadIssuer", new { id = group.Name }) |
                 @Html.ActionLink("Crl", "DownloadIssuerCrl", new { id = group.Name })
             </td>
         </tr>
     }
-
+    <tr>
+        <th />
+        <th />
+        <th />
+        <th />
+    </tr>
 </table>
 
 <p>

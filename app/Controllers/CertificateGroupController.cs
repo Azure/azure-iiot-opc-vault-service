@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.AzureAD.UI;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api;
+using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.Models;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.TokenStorage;
 using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Utils;
 using Microsoft.Rest;
@@ -57,6 +58,55 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Controllers
             var request = await gdsVault.GetCertificateGroupConfigurationAsync(id);
             return View(request);
         }
+
+        [HttpPost]
+        [ActionName("Edit")]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> EditAsync(
+            CertificateGroupConfigurationApiModel newGroup)
+        {
+            if (ModelState.IsValid)
+            {
+                AuthorizeGdsVaultClient();
+                var group = await gdsVault.GetCertificateGroupConfigurationAsync(newGroup.Name);
+                if (group == null)
+                {
+                    return new NotFoundResult();
+                }
+
+                group.SubjectName = newGroup.SubjectName;
+                group.DefaultCertificateLifetime = newGroup.DefaultCertificateLifetime;
+                //group.DefaultCertificateKeySize = newGroup.DefaultCertificateKeySize;
+                //group.DefaultCertificateHashSize = newGroup.DefaultCertificateHashSize;
+                group.CACertificateLifetime = newGroup.CACertificateLifetime;
+                //group.CACertificateKeySize = newGroup.CACertificateKeySize;
+                //group.CACertificateHashSize = newGroup.CACertificateHashSize;
+                // TODO: service call
+                //await gdsVault.UpdateGroupAsync(group.Name, group);
+
+                return RedirectToAction("Index");
+            }
+
+            return View(newGroup);
+        }
+
+        [ActionName("Edit")]
+        public async Task<ActionResult> EditAsync(string id)
+        {
+            if (String.IsNullOrEmpty(id))
+            {
+                return new BadRequestResult();
+            }
+            AuthorizeGdsVaultClient();
+            var group = await gdsVault.GetCertificateGroupConfigurationAsync(id);
+            if (group == null)
+            {
+                return new NotFoundResult();
+            }
+
+            return View(group);
+        }
+
 
         [ActionName("DownloadIssuer")]
         public async Task<ActionResult> DownloadIssuerAsync(string id)

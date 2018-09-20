@@ -84,6 +84,8 @@
 <p>
     @Html.ActionLink("Back to List", "Index")
     @Html.Raw("&nbsp;|&nbsp;")
+    @Html.ActionLink("Edit", "Edit", new { id = Model.Name })
+    @Html.Raw("&nbsp;|&nbsp;")
     @Html.ActionLink("Download Issuer", "DownloadIssuer", new { id = Model.Name })
     @Html.Raw("&nbsp;|&nbsp;")
     @Html.ActionLink("Download Crl", "DownloadIssuerCrl", new { id = Model.Name })
