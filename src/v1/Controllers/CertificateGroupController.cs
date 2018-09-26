@@ -98,7 +98,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
         [HttpPost("{groupId}/revoke")]
         [SwaggerOperation(OperationId = "RevokeCertificate")]
         [Authorize(Policy = Policies.CanManage)]
-
         public async Task<X509CrlApiModel> PostRevokeAsync(string groupId, [FromBody] X509Certificate2ApiModel cert)
         {
             var onBehalfOfCertificateGroups = await this.certificateGroups.OnBehalfOfRequest(Request);

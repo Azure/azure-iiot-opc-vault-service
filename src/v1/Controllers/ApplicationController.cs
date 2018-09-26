@@ -33,7 +33,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
         /// </summary>
         [HttpPost]
         [SwaggerOperation(OperationId = "RegisterApplication")]
-        [Authorize(Policy = Policies.CanManage)]
+        [Authorize(Policy = Policies.CanWrite)]
         public async Task<string> RegisterApplicationAsync([FromBody] ApplicationRecordApiModel application)
         {
             if (application == null)
@@ -48,7 +48,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
         /// </summary>
         [HttpPut("{applicationId}")]
         [SwaggerOperation(OperationId = "UpdateApplication")]
-        [Authorize(Policy = Policies.CanManage)]
+        [Authorize(Policy = Policies.CanWrite)]
         public async Task<string> UpdateApplicationAsync(string applicationId, [FromBody] ApplicationRecordApiModel application)
         {
             if (application == null)
@@ -63,6 +63,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
         /// </summary>
         [HttpDelete("{applicationId}")]
         [SwaggerOperation(OperationId = "UnregisterApplication")]
+        // manage, because a deleted app may require a CRL update with sign
         [Authorize(Policy = Policies.CanManage)]
         public async Task UnregisterApplicationAsync(string applicationId)
         {

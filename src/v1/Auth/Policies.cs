@@ -19,6 +19,12 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Auth {
             nameof(CanRead);
 
         /// <summary>
+        /// Allowed to create, update and delete applications and cert requests
+        /// </summary>
+        public const string CanWrite =
+            nameof(CanWrite);
+
+        /// <summary>
         /// Allowed to manage applications and cert requests
         /// </summary>
         public const string CanManage =
@@ -30,6 +36,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Auth {
         /// <returns></returns>
         public static IEnumerable<string> All() {
             yield return CanRead;
+            yield return CanWrite;
             yield return CanManage;
         }
     }
