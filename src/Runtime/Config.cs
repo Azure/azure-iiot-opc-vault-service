@@ -7,7 +7,7 @@
 using Microsoft.Azure.IIoT.Services.Runtime;
 using Microsoft.Extensions.Configuration;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Runtime
+namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Runtime
 {
     /// <summary>Web service configuration</summary>
     public class Config : ServiceConfig

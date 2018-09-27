@@ -3,12 +3,12 @@
 //  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------
 
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api;
+using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Api;
 using Microsoft.Rest;
 using Mono.Options;
 using Opc.Ua.Configuration;
-using Opc.Ua.Gds.Server.Database.GdsVault;
-using Opc.Ua.Gds.Server.GdsVault;
+using Opc.Ua.Gds.Server.Database.OpcVault;
+using Opc.Ua.Gds.Server.OpcVault;
 using Opc.Ua.Server;
 using System;
 using System.Collections.Generic;
@@ -79,7 +79,7 @@ namespace Opc.Ua.Gds.Server
 
             // command line options
             bool showHelp = false;
-            var gdsVaultOptions = new GdsVaultApiOptions();
+            var gdsVaultOptions = new OpcVaultApiOptions();
             var azureADOptions = new GdsEdgeAzureADOptions();
 
             Mono.Options.OptionSet options = new Mono.Options.OptionSet {
@@ -109,7 +109,7 @@ namespace Opc.Ua.Gds.Server
 
             if (showHelp)
             {
-                Console.WriteLine("Usage: dotnet Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Edge.dll [OPTIONS]");
+                Console.WriteLine("Usage: dotnet Microsoft.Azure.IIoT.OpcUa.Services.Vault.Edge.dll [OPTIONS]");
                 Console.WriteLine();
 
                 Console.WriteLine("Options:");
@@ -136,7 +136,7 @@ namespace Opc.Ua.Gds.Server
         }
 
         public void Run(
-            GdsVaultApiOptions gdsVaultOptions,
+            OpcVaultApiOptions gdsVaultOptions,
             GdsEdgeAzureADOptions azureADOptions)
         {
 
@@ -201,7 +201,7 @@ namespace Opc.Ua.Gds.Server
         }
 
         private async Task ConsoleGlobalDiscoveryServer(
-            GdsVaultApiOptions gdsVaultOptions, 
+            OpcVaultApiOptions gdsVaultOptions, 
             GdsEdgeAzureADOptions azureADOptions)
         {
             ApplicationInstance.MessageDlg = new ApplicationMessageDlg();
@@ -209,7 +209,7 @@ namespace Opc.Ua.Gds.Server
             {
                 ApplicationName = Program.Name,
                 ApplicationType = ApplicationType.Server,
-                ConfigSectionName = "Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Edge"
+                ConfigSectionName = "Microsoft.Azure.IIoT.OpcUa.Services.Vault.Edge"
             };
 
             // load the application configuration.
@@ -282,20 +282,21 @@ namespace Opc.Ua.Gds.Server
 
             }
 
-            var serviceClient = new GdsVaultLoginCredentials(gdsVaultOptions, azureADOptions);
-            IOpcGdsVault gdsServiceClient = new OpcGdsVault(new Uri(gdsVaultOptions.BaseAddress), serviceClient);
-            var gdsVaultHandler = new GdsVaultClientHandler(gdsServiceClient);
+            var serviceClient = new OpcVaultLoginCredentials(gdsVaultOptions, azureADOptions);
+            IOpcVault opcVaultServiceClient = new Microsoft.Azure.IIoT.OpcUa.Services.Vault.Api.OpcVault(new Uri(gdsVaultOptions.BaseAddress), serviceClient);
+            var gdsVaultHandler = new OpcVaultClientHandler(opcVaultServiceClient);
 
             // read configurations from GdsVault
             gdsVaultConfiguration.CertificateGroups = await gdsVaultHandler.GetCertificateConfigurationGroupsAsync(gdsVaultConfiguration.BaseCertificateGroupStorePath);
             UpdateGDSConfigurationDocument(config.Extensions, gdsVaultConfiguration);
 
-            var certGroup = new GdsVaultCertificateGroup(gdsVaultHandler);
-            var requestDB = new GdsVaultCertificateRequest(gdsServiceClient);
-            var appDB = new GdsVaultApplicationsDatabase(gdsServiceClient);
+            var certGroup = new OpcVaultCertificateGroup(gdsVaultHandler);
+            var requestDB = new OpcVaultCertificateRequest(opcVaultServiceClient);
+            var appDB = new OpcVaultApplicationsDatabase(opcVaultServiceClient);
 
             requestDB.Initialize();
-            server = new GlobalDiscoverySampleServer(appDB, requestDB, certGroup, false);
+            // TODO: disable auto approve once new nuget  is available
+            server = new GlobalDiscoverySampleServer(appDB, requestDB, certGroup/*, false*/);
 
             // start the server.
             await application.Start(server);

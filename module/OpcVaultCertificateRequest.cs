@@ -3,23 +3,23 @@
 //  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------
 
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api;
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.Models;
+using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Api;
+using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Api.Models;
 using Microsoft.Rest;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Opc.Ua.Gds.Server.GdsVault
+namespace Opc.Ua.Gds.Server.OpcVault
 {
-    public class GdsVaultCertificateRequest : ICertificateRequest
+    public class OpcVaultCertificateRequest : ICertificateRequest
     {
         private Dictionary<NodeId, string> _certTypeMap;
 
-        private IOpcGdsVault _gdsVaultServiceClient { get; }
-        public GdsVaultCertificateRequest(IOpcGdsVault gdsVaultServiceClient)
+        private IOpcVault _opcVaultServiceClient { get; }
+        public OpcVaultCertificateRequest(IOpcVault opcVaultServiceClient)
         {
-            this._gdsVaultServiceClient = gdsVaultServiceClient;
+            this._opcVaultServiceClient = opcVaultServiceClient;
             this._certTypeMap = new Dictionary<NodeId, string>();
 
             // list of supported cert type mappings (V1.04)
@@ -44,7 +44,7 @@ namespace Opc.Ua.Gds.Server.GdsVault
             byte[] certificateRequest,
             string authorityId)
         {
-            string appId = GdsVaultClientHelper.GetServiceIdFromNodeId(applicationId, NamespaceIndex);
+            string appId = OpcVaultClientHelper.GetServiceIdFromNodeId(applicationId, NamespaceIndex);
             if (string.IsNullOrEmpty(appId))
             {
                 throw new ServiceResultException(StatusCodes.BadNotFound, "The ApplicationId is invalid.");
@@ -66,8 +66,8 @@ namespace Opc.Ua.Gds.Server.GdsVault
                     certificateGroupId.ToString()
                     );
 
-                string requestId = _gdsVaultServiceClient.StartSigningRequest(model);
-                return GdsVaultClientHelper.GetNodeIdFromServiceId(requestId, NamespaceIndex);
+                string requestId = _opcVaultServiceClient.StartSigningRequest(model);
+                return OpcVaultClientHelper.GetNodeIdFromServiceId(requestId, NamespaceIndex);
             }
             catch (HttpOperationException httpEx)
             {
@@ -91,7 +91,7 @@ namespace Opc.Ua.Gds.Server.GdsVault
             string privateKeyPassword,
             string authorityId)
         {
-            string appId = GdsVaultClientHelper.GetServiceIdFromNodeId(applicationId, NamespaceIndex);
+            string appId = OpcVaultClientHelper.GetServiceIdFromNodeId(applicationId, NamespaceIndex);
             if (string.IsNullOrEmpty(appId))
             {
                 throw new ServiceResultException(StatusCodes.BadInvalidArgument, "The ApplicationId is invalid.");
@@ -115,9 +115,9 @@ namespace Opc.Ua.Gds.Server.GdsVault
                     certificateGroupId.ToString()
                     );
 
-                string requestId = _gdsVaultServiceClient.StartNewKeyPairRequest(model);
+                string requestId = _opcVaultServiceClient.StartNewKeyPairRequest(model);
 
-                return GdsVaultClientHelper.GetNodeIdFromServiceId(requestId, NamespaceIndex);
+                return OpcVaultClientHelper.GetNodeIdFromServiceId(requestId, NamespaceIndex);
             }
             catch (HttpOperationException httpEx)
             {
@@ -138,8 +138,8 @@ namespace Opc.Ua.Gds.Server.GdsVault
             try
             {
                 // intentionally ignore the auto approval, it is implemented in the GdsVault service
-                string reqId = GdsVaultClientHelper.GetServiceIdFromNodeId(requestId, NamespaceIndex);
-                _gdsVaultServiceClient.ApproveCertificateRequest(reqId, isRejected);
+                string reqId = OpcVaultClientHelper.GetServiceIdFromNodeId(requestId, NamespaceIndex);
+                _opcVaultServiceClient.ApproveCertificateRequest(reqId, isRejected);
             }
             catch (HttpOperationException httpEx)
             {
@@ -151,8 +151,8 @@ namespace Opc.Ua.Gds.Server.GdsVault
         {
             try
             {
-                string reqId = GdsVaultClientHelper.GetServiceIdFromNodeId(requestId, NamespaceIndex);
-                _gdsVaultServiceClient.AcceptCertificateRequest(reqId);
+                string reqId = OpcVaultClientHelper.GetServiceIdFromNodeId(requestId, NamespaceIndex);
+                _opcVaultServiceClient.AcceptCertificateRequest(reqId);
             }
             catch (HttpOperationException httpEx)
             {
@@ -169,13 +169,13 @@ namespace Opc.Ua.Gds.Server.GdsVault
             out byte[] signedCertificate,
             out byte[] privateKey)
         {
-            string reqId = GdsVaultClientHelper.GetServiceIdFromNodeId(requestId, NamespaceIndex);
+            string reqId = OpcVaultClientHelper.GetServiceIdFromNodeId(requestId, NamespaceIndex);
             if (string.IsNullOrEmpty(reqId))
             {
                 throw new ServiceResultException(StatusCodes.BadInvalidArgument, "The RequestId is invalid.");
             }
 
-            string appId = GdsVaultClientHelper.GetServiceIdFromNodeId(applicationId, NamespaceIndex);
+            string appId = OpcVaultClientHelper.GetServiceIdFromNodeId(applicationId, NamespaceIndex);
             if (string.IsNullOrEmpty(appId))
             {
                 throw new ServiceResultException(StatusCodes.BadInvalidArgument, "The ApplicationId is invalid.");
@@ -187,7 +187,7 @@ namespace Opc.Ua.Gds.Server.GdsVault
             privateKey = null;
             try
             {
-                var request = _gdsVaultServiceClient.FinishRequest(reqId, appId);
+                var request = _opcVaultServiceClient.FinishRequest(reqId, appId);
 
                 var state = (CertificateRequestState)Enum.Parse(typeof(CertificateRequestState), request.State);
 

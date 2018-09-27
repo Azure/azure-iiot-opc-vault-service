@@ -9,7 +9,7 @@ using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using System;
 using System.Security.Claims;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.TokenStorage
+namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.TokenStorage
 {
     public class DistributedTokenCache : TokenCache
     {

@@ -2,25 +2,25 @@
   <PropertyGroup>
     <LangVersion>7.2</LangVersion>
     <TargetFramework>netcoreapp2.1</TargetFramework>
-    <AssemblyName>Microsoft.Azure.IIoT.OpcUa.Services.GdsVault</AssemblyName>
-    <RootNamespace>Microsoft.Azure.IIoT.OpcUa.Services.GdsVault</RootNamespace>
-    <Product>Microsoft Azure Industrial IoT OPC UA GDS Vault Service</Product>
+    <AssemblyName>Microsoft.Azure.IIoT.OpcUa.Services.Vault</AssemblyName>
+    <RootNamespace>Microsoft.Azure.IIoT.OpcUa.Services.Vault</RootNamespace>
+    <Product>Microsoft Azure Industrial IoT OPC UA Vault Service</Product>
     <Authors>Azure Industrial IoT</Authors>
     <Company>Microsoft</Company>
-    <PackageLicenseUrl>https://github.com/Azure/azure-iiot-opc-gds-service/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageLicenseUrl>https://github.com/Azure/azure-iiot-opc-vault-service/blob/master/LICENSE</PackageLicenseUrl>
     <Copyright>Microsoft Corp. All rights reserved.</Copyright>
-    <Description>Azure Industrial IoT OPC UA GDS Vault component</Description>
+    <Description>Azure Industrial IoT OPC UA Vault service component</Description>
     <UserSecretsId>71f9c347-48d7-4f74-8f1b-c3df149c26c8</UserSecretsId>
     <Configurations>Debug;Release;Develop</Configurations>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\netcoreapp2.1\Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\netcoreapp2.1\Microsoft.Azure.IIoT.OpcUa.Services.Vault.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Develop|AnyCPU'">
-    <DocumentationFile>bin\Debug\netcoreapp2.1\Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.xml</DocumentationFile>
+    <DocumentationFile>bin\Develop\netcoreapp2.1\Microsoft.Azure.IIoT.OpcUa.Services.Vault.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin\Release\netcoreapp2.1\Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\netcoreapp2.1\Microsoft.Azure.IIoT.OpcUa.Services.Vault.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>

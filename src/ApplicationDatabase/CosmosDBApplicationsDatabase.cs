@@ -5,10 +5,10 @@
 
 using Microsoft.Azure.IIoT.Diagnostics;
 using Microsoft.Azure.IIoT.Exceptions;
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.CosmosDB;
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.CosmosDB.Models;
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Models;
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Runtime;
+using Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB;
+using Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB.Models;
+using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Models;
+using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Runtime;
 using Opc.Ua.Gds.Server.Database;
 using System;
 using System.Collections.Generic;
@@ -17,7 +17,7 @@ using System.Security;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
+namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
 {
     internal sealed class CosmosDBApplicationsDatabase : IApplicationsDatabase
     {

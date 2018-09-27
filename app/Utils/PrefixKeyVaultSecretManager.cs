@@ -7,7 +7,7 @@ using Microsoft.Azure.KeyVault.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.AzureKeyVault;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Utils
+namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Utils
 {
     public class PrefixKeyVaultSecretManager : IKeyVaultSecretManager
     {

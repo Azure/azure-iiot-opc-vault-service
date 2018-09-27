@@ -6,14 +6,14 @@
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Auth;
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Filters;
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models;
+using Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Auth;
+using Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Filters;
+using Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Models;
 using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Threading.Tasks;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Controllers
+namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Controllers
 {
     [Route(VersionInfo.PATH + "/request"), TypeFilter(typeof(ExceptionsFilterAttribute))]
     [Produces("application/json")]

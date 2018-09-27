@@ -3,17 +3,17 @@
 //  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
+namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
 {
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Azure.IIoT.Diagnostics;
-    using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Runtime;
-    using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1;
-    using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Auth;
-    using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Filters;
+    using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Runtime;
+    using Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1;
+    using Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Auth;
+    using Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Filters;
     using Microsoft.Azure.IIoT.Services;
     using Microsoft.Azure.IIoT.Services.Auth;
     using Microsoft.Extensions.Configuration;

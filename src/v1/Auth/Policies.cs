@@ -4,11 +4,11 @@
 // ------------------------------------------------------------
 
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Auth {
+namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Auth {
     using System.Collections.Generic;
 
     /// <summary>
-    /// Defines gdsvault api policies.
+    /// Defines opcvault api policies.
     /// </summary>
     public static class Policies {
 

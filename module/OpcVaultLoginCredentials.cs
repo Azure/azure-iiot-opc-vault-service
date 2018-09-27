@@ -3,7 +3,7 @@
 // license information.
 //
 
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api;
+using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Api;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Microsoft.Rest;
 using System;
@@ -12,7 +12,7 @@ using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Opc.Ua.Gds.Server.GdsVault
+namespace Opc.Ua.Gds.Server.OpcVault
 {
     // Summary:
     //     Options for configuring authentication using Azure Active Directory.
@@ -36,16 +36,16 @@ namespace Opc.Ua.Gds.Server.GdsVault
         public string Authority { get; set; }
     }
 
-    public class GdsVaultLoginCredentials : ServiceClientCredentials
+    public class OpcVaultLoginCredentials : ServiceClientCredentials
     {
-        private GdsVaultApiOptions gdsVaultOptions;
+        private OpcVaultApiOptions gdsVaultOptions;
         private GdsEdgeAzureADOptions azureADOptions;
         private const string kAuthority = "https://login.microsoftonline.com/";
         private string AuthenticationToken { get; set; }
         private DateTimeOffset ExpiresOn { get; set; }
 
-        public GdsVaultLoginCredentials(
-            GdsVaultApiOptions gdsVaultOptions,
+        public OpcVaultLoginCredentials(
+            OpcVaultApiOptions gdsVaultOptions,
             GdsEdgeAzureADOptions azureADOptions)
         {
             this.gdsVaultOptions = gdsVaultOptions;

@@ -12,7 +12,7 @@ using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Auth
+namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Auth
 {
     public class KeyVaultCredentials : ServiceClientCredentials
     {

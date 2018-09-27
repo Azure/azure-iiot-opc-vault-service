@@ -14,31 +14,31 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api;
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Filters;
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.TokenStorage;
+using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Api;
+using Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Filters;
+using Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.TokenStorage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using System;
 using System.Threading.Tasks;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App
+namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App
 {
     public class Startup
     {
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            GdsVaultOptions = new GdsVaultApiOptions();
-            Configuration.Bind("GdsVault", GdsVaultOptions);
+            OpcVaultOptions = new OpcVaultApiOptions();
+            Configuration.Bind("OpcVault", OpcVaultOptions);
             AzureADOptions = new AzureADOptions();
             Configuration.Bind("AzureAD", AzureADOptions);
         }
 
         public IConfiguration Configuration { get; }
         public AzureADOptions AzureADOptions { get; }
-        public GdsVaultApiOptions GdsVaultOptions { get; }
+        public OpcVaultApiOptions OpcVaultOptions { get; }
 
         /// <summary>
         /// Di container - Initialized in `ConfigureServices`
@@ -48,7 +48,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App
         // This method gets called by the runtime. Use this method to add services to the container.
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton(GdsVaultOptions);
+            services.AddSingleton(OpcVaultOptions);
             services.AddSingleton(AzureADOptions);
 
             services.Configure<CookiePolicyOptions>(options =>
@@ -68,7 +68,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App
                 // ensures that context.Principal has a non-null value when OnAuthorizeationCodeReceived is called
                 options.ResponseType = "id_token code";
                 // set the resource id of the service api which needs to be accessed
-                options.Resource = GdsVaultOptions.ResourceId;
+                options.Resource = OpcVaultOptions.ResourceId;
                 // refresh token
                 options.Scope.Add("offline_access");
 

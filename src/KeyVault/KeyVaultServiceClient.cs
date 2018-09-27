@@ -20,7 +20,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.KeyVault
+namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
 {
     /// <summary>
     /// 
@@ -121,7 +121,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.KeyVault
         }
 
         /// <summary>
-        /// Read the GdsVault CertificateConfigurationGroups as Json.
+        /// Read the OpcVault CertificateConfigurationGroups as Json.
         /// </summary>
         public async Task<string> GetCertificateConfigurationGroupsAsync(CancellationToken ct = default(CancellationToken))
         {

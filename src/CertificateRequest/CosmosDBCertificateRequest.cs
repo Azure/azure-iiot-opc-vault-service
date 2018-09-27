@@ -5,10 +5,10 @@
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.IIoT.Diagnostics;
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.CosmosDB;
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.CosmosDB.Models;
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Models;
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Runtime;
+using Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB;
+using Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB.Models;
+using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Models;
+using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Runtime;
 using Opc.Ua;
 using Opc.Ua.Gds.Server;
 using System;
@@ -18,11 +18,11 @@ using System.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
-using CertificateRequest = Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.CosmosDB.Models.CertificateRequest;
-using CertificateRequestState = Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.CosmosDB.Models.CertificateRequestState;
+using CertificateRequest = Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB.Models.CertificateRequest;
+using CertificateRequestState = Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB.Models.CertificateRequestState;
 using StatusCodes = Opc.Ua.StatusCodes;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
+namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
 {
     internal sealed class CosmosDBCertificateRequest : Object, ICertificateRequest
     {

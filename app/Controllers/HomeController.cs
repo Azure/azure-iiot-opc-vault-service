@@ -5,10 +5,10 @@
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Models;
+using Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Models;
 using System.Diagnostics;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Controllers
+namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
 {
     [Authorize]
     public class HomeController : Controller

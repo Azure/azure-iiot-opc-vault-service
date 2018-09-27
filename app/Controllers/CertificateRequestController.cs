@@ -6,17 +6,17 @@
 using Microsoft.AspNetCore.Authentication.AzureAD.UI;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api;
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.Models;
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.TokenStorage;
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Utils;
+using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Api;
+using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Api.Models;
+using Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.TokenStorage;
+using Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Utils;
 using Microsoft.Rest;
 using System;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Controllers
+namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
 {
     [Authorize]
     public class CertificateRequestController : Controller
@@ -29,13 +29,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Controllers
         // see CertificateContentType.Pem
         const string ContentTypePem = "application/x-pem-file";
 
-        private IOpcGdsVault gdsVault;
-        private readonly GdsVaultApiOptions gdsVaultOptions;
+        private IOpcVault opcVault;
+        private readonly OpcVaultApiOptions gdsVaultOptions;
         private readonly AzureADOptions azureADOptions;
         private readonly ITokenCacheService tokenCacheService;
 
         public CertificateRequestController(
-            GdsVaultApiOptions gdsVaultOptions,
+            OpcVaultApiOptions gdsVaultOptions,
             AzureADOptions azureADOptions,
             ITokenCacheService tokenCacheService)
         {
@@ -48,7 +48,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Controllers
         public async Task<ActionResult> IndexAsync()
         {
             AuthorizeGdsVaultClient();
-            var requests = await gdsVault.QueryRequestsAsync();
+            var requests = await opcVault.QueryRequestsAsync();
             return View(requests.Requests);
         }
 
@@ -56,7 +56,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Controllers
         public async Task<ActionResult> StartNewKeyPairAsync(string id)
         {
             AuthorizeGdsVaultClient();
-            var groups = await gdsVault.GetCertificateGroupConfigurationCollectionAsync();
+            var groups = await opcVault.GetCertificateGroupConfigurationCollectionAsync();
             if (groups == null)
             {
                 return new NotFoundResult();
@@ -73,7 +73,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Controllers
                 return new NotFoundResult();
             }
 
-            var application = await gdsVault.GetApplicationAsync(id);
+            var application = await opcVault.GetApplicationAsync(id);
             if (application == null)
             {
                 return new NotFoundResult();
@@ -101,7 +101,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Controllers
             if (ModelState.IsValid)
             {
                 AuthorizeGdsVaultClient();
-                var id = await gdsVault.StartNewKeyPairRequestAsync(request);
+                var id = await opcVault.StartNewKeyPairRequestAsync(request);
                 return RedirectToAction("Index");
             }
 
@@ -112,7 +112,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Controllers
         public async Task<ActionResult> StartSigningAsync(string id)
         {
             AuthorizeGdsVaultClient();
-            var groups = await gdsVault.GetCertificateGroupConfigurationCollectionAsync();
+            var groups = await opcVault.GetCertificateGroupConfigurationCollectionAsync();
             if (groups == null)
             {
                 return new NotFoundResult();
@@ -129,7 +129,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Controllers
                 return new NotFoundResult();
             }
 
-            var application = await gdsVault.GetApplicationAsync(id);
+            var application = await opcVault.GetApplicationAsync(id);
             if (application == null)
             {
                 return new NotFoundResult();
@@ -168,7 +168,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Controllers
                     }
                 }
                 AuthorizeGdsVaultClient();
-                var id = await gdsVault.StartSigningRequestAsync(requestApi);
+                var id = await opcVault.StartSigningRequestAsync(requestApi);
                 return RedirectToAction("Index");
             }
 
@@ -179,7 +179,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Controllers
         public async Task<ActionResult> DetailsAsync(string id, string message)
         {
             AuthorizeGdsVaultClient();
-            var request = await gdsVault.ReadCertificateRequestAsync(id);
+            var request = await opcVault.ReadCertificateRequestAsync(id);
             var model = new CertificateRequestRecordDetailsApiModel(request, message);
             return View(model);
         }
@@ -190,7 +190,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Controllers
             AuthorizeGdsVaultClient();
             try
             {
-                await gdsVault.ApproveCertificateRequestAsync(id, false);
+                await opcVault.ApproveCertificateRequestAsync(id, false);
                 return RedirectToAction("Details", new { id , message = "CertificateRequest approved!"});
             }
             catch (Exception ex)
@@ -205,7 +205,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Controllers
             AuthorizeGdsVaultClient();
             try
             {
-                await gdsVault.ApproveCertificateRequestAsync(id, true);
+                await opcVault.ApproveCertificateRequestAsync(id, true);
                 return RedirectToAction("Details", new { id, message = "CertificateRequest rejected!" });
             }
             catch (Exception ex)
@@ -218,7 +218,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Controllers
         public async Task<ActionResult> AcceptAsync(string id)
         {
             AuthorizeGdsVaultClient();
-            await gdsVault.AcceptCertificateRequestAsync(id);
+            await opcVault.AcceptCertificateRequestAsync(id);
             return RedirectToAction("Details", new { id });
         }
 
@@ -226,7 +226,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Controllers
         public async Task<ActionResult> DownloadCertificateAsync(string requestId, string applicationId)
         {
             AuthorizeGdsVaultClient();
-            var result = await gdsVault.FinishRequestAsync(requestId, applicationId);
+            var result = await opcVault.FinishRequestAsync(requestId, applicationId);
             if (String.Compare(result.State, "Approved", StringComparison.OrdinalIgnoreCase) == 0 &&
                 result.SignedCertificate != null)
             {
@@ -243,10 +243,10 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Controllers
         public async Task<ActionResult> DownloadIssuerAsync(string requestId)
         {
             AuthorizeGdsVaultClient();
-            var request = await gdsVault.ReadCertificateRequestAsync(requestId);
+            var request = await opcVault.ReadCertificateRequestAsync(requestId);
             if (request != null)
             {
-                var issuer = await gdsVault.GetCACertificateChainAsync(request.CertificateGroupId);
+                var issuer = await opcVault.GetCACertificateChainAsync(request.CertificateGroupId);
                 var byteArray = Convert.FromBase64String(issuer.Chain[0].Certificate);
                 return new FileContentResult(byteArray, ContentTypeCert)
                 {
@@ -260,11 +260,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Controllers
         public async Task<ActionResult> DownloadIssuerCrlAsync(string requestId)
         {
             AuthorizeGdsVaultClient();
-            var request = await gdsVault.ReadCertificateRequestAsync(requestId);
+            var request = await opcVault.ReadCertificateRequestAsync(requestId);
             if (request != null)
             {
-                var issuer = await gdsVault.GetCACertificateChainAsync(request.CertificateGroupId);
-                var crl = await gdsVault.GetCACrlChainAsync(request.CertificateGroupId);
+                var issuer = await opcVault.GetCACertificateChainAsync(request.CertificateGroupId);
+                var crl = await opcVault.GetCACrlChainAsync(request.CertificateGroupId);
                 var byteArray = Convert.FromBase64String(crl.Chain[0].Crl);
                 return new FileContentResult(byteArray, ContentTypeCrl)
                 {
@@ -278,7 +278,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Controllers
         public async Task<ActionResult> DownloadPrivateKeyAsync(string requestId, string applicationId)
         {
             AuthorizeGdsVaultClient();
-            var result = await gdsVault.FinishRequestAsync(requestId, applicationId);
+            var result = await opcVault.FinishRequestAsync(requestId, applicationId);
             if (String.Compare(result.State, "Approved", StringComparison.OrdinalIgnoreCase) == 0 &&
                 result.PrivateKey != null)
             {
@@ -319,11 +319,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Controllers
 
         private void AuthorizeGdsVaultClient()
         {
-            if (gdsVault == null)
+            if (opcVault == null)
             {
                 ServiceClientCredentials serviceClientCredentials =
-                    new GdsVaultLoginCredentials(gdsVaultOptions, azureADOptions, tokenCacheService, User);
-                gdsVault = new OpcGdsVault(new Uri(gdsVaultOptions.BaseAddress), serviceClientCredentials);
+                    new OpcVaultLoginCredentials(gdsVaultOptions, azureADOptions, tokenCacheService, User);
+                opcVault = new OpcVault(new Uri(gdsVaultOptions.BaseAddress), serviceClientCredentials);
             }
         }
 

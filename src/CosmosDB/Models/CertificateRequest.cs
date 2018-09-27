@@ -6,7 +6,7 @@
 using Newtonsoft.Json;
 using System;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.CosmosDB.Models
+namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB.Models
 {
     public enum CertificateRequestState
     {

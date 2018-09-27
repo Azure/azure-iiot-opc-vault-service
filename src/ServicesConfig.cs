@@ -6,7 +6,7 @@
 
 using Microsoft.Azure.IIoT.Utils;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Runtime
+namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Runtime
 {
     public interface IServicesConfig
     {

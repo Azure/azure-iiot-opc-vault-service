@@ -6,31 +6,31 @@
 using Microsoft.AspNetCore.Authentication.AzureAD.UI;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api;
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.Models;
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.TokenStorage;
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Utils;
+using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Api;
+using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Api.Models;
+using Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.TokenStorage;
+using Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Utils;
 using Microsoft.Rest;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Controllers
+namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
 {
     [Authorize]
     public class ApplicationController : Controller
     {
-        private IOpcGdsVault gdsVault;
-        private readonly GdsVaultApiOptions gdsVaultOptions;
+        private IOpcVault opcVault;
+        private readonly OpcVaultApiOptions opcVaultOptions;
         private readonly AzureADOptions azureADOptions;
         private readonly ITokenCacheService tokenCacheService;
 
         public ApplicationController(
-            GdsVaultApiOptions gdsVaultOptions,
+            OpcVaultApiOptions opcVaultOptions,
             AzureADOptions azureADOptions,
             ITokenCacheService tokenCacheService)
         {
-            this.gdsVaultOptions = gdsVaultOptions;
+            this.opcVaultOptions = opcVaultOptions;
             this.azureADOptions = azureADOptions;
             this.tokenCacheService = tokenCacheService;
         }
@@ -39,9 +39,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Controllers
         [ActionName("Index")]
         public async Task<ActionResult> IndexAsync()
         {
-            AuthorizeGdsVaultClient();
+            AuthorizeOpcVaultClient();
             var applicationQuery = new QueryApplicationsApiModel();
-            var applications = await gdsVault.QueryApplicationsAsync(applicationQuery);
+            var applications = await opcVault.QueryApplicationsAsync(applicationQuery);
             return View(applications.Applications);
         }
 
@@ -76,8 +76,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Controllers
                 {
                     application.ApplicationNames.Add(new ApplicationNameApiModel(null, application.ApplicationName));
                 }
-                AuthorizeGdsVaultClient();
-                await gdsVault.RegisterApplicationAsync(application);
+                AuthorizeOpcVaultClient();
+                await opcVault.RegisterApplicationAsync(application);
                 return RedirectToAction("Index");
             }
 
@@ -93,8 +93,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Controllers
         {
             if (ModelState.IsValid)
             {
-                AuthorizeGdsVaultClient();
-                var application = await gdsVault.GetApplicationAsync(newApplication.ApplicationId);
+                AuthorizeOpcVaultClient();
+                var application = await opcVault.GetApplicationAsync(newApplication.ApplicationId);
                 if (application == null)
                 {
                     return new NotFoundResult();
@@ -104,7 +104,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Controllers
                 application.ApplicationType = newApplication.ApplicationType;
                 application.ProductUri = newApplication.ProductUri;
                 application.ServerCapabilities = newApplication.ServerCapabilities;
-                await gdsVault.UpdateApplicationAsync(application.ApplicationId, application);
+                await opcVault.UpdateApplicationAsync(application.ApplicationId, application);
                 return RedirectToAction("Index");
             }
 
@@ -118,8 +118,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Controllers
             {
                 return new BadRequestResult();
             }
-            AuthorizeGdsVaultClient();
-            var application = await gdsVault.GetApplicationAsync(id);
+            AuthorizeOpcVaultClient();
+            var application = await opcVault.GetApplicationAsync(id);
             if (application == null)
             {
                 return new NotFoundResult();
@@ -135,8 +135,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Controllers
             {
                 return new BadRequestResult();
             }
-            AuthorizeGdsVaultClient();
-            var application = await gdsVault.GetApplicationAsync(id);
+            AuthorizeOpcVaultClient();
+            var application = await opcVault.GetApplicationAsync(id);
             if (application == null)
             {
                 return new NotFoundResult();
@@ -150,16 +150,16 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmedAsync([Bind("Id")] string id)
         {
-            AuthorizeGdsVaultClient();
-            await gdsVault.UnregisterApplicationAsync(id);
+            AuthorizeOpcVaultClient();
+            await opcVault.UnregisterApplicationAsync(id);
             return RedirectToAction("Index");
         }
 
         [ActionName("Details")]
         public async Task<ActionResult> DetailsAsync(string id)
         {
-            AuthorizeGdsVaultClient();
-            var application = await gdsVault.GetApplicationAsync(id);
+            AuthorizeOpcVaultClient();
+            var application = await opcVault.GetApplicationAsync(id);
             if (application == null)
             {
                 return new NotFoundResult();
@@ -167,13 +167,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Controllers
             return View(application);
         }
 
-        private void AuthorizeGdsVaultClient()
+        private void AuthorizeOpcVaultClient()
         {
-            if (gdsVault == null)
+            if (opcVault == null)
             {
                 ServiceClientCredentials serviceClientCredentials =
-                    new GdsVaultLoginCredentials(gdsVaultOptions, azureADOptions, tokenCacheService, User);
-                gdsVault = new OpcGdsVault(new Uri(gdsVaultOptions.BaseAddress), serviceClientCredentials);
+                    new OpcVaultLoginCredentials(opcVaultOptions, azureADOptions, tokenCacheService, User);
+                opcVault = new OpcVault(new Uri(opcVaultOptions.BaseAddress), serviceClientCredentials);
             }
         }
 

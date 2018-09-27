@@ -6,7 +6,7 @@
 using System;
 using Microsoft.Extensions.Logging;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.TokenStorage
+namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.TokenStorage
 {
     /// <summary>
     /// ILogger extensions for events which occur in the RedisTokenCache

@@ -8,15 +8,15 @@ using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
-namespace Opc.Ua.Gds.Server.GdsVault
+namespace Opc.Ua.Gds.Server.OpcVault
 {
 
-    public class GdsVaultCertificateGroup : CertificateGroup
+    public class OpcVaultCertificateGroup : CertificateGroup
     {
-        private GdsVaultClientHandler _gdsVaultHandler;
+        private OpcVaultClientHandler _gdsVaultHandler;
 
-        private GdsVaultCertificateGroup(
-            GdsVaultClientHandler gdsVaultHandler,
+        private OpcVaultCertificateGroup(
+            OpcVaultClientHandler gdsVaultHandler,
             string authoritiesStorePath,
             CertificateGroupConfiguration certificateGroupConfiguration) :
             base(authoritiesStorePath, certificateGroupConfiguration)
@@ -24,7 +24,7 @@ namespace Opc.Ua.Gds.Server.GdsVault
             _gdsVaultHandler = gdsVaultHandler;
         }
 
-        public GdsVaultCertificateGroup(GdsVaultClientHandler gdsVaultHandler)
+        public OpcVaultCertificateGroup(OpcVaultClientHandler gdsVaultHandler)
         {
             _gdsVaultHandler = gdsVaultHandler;
         }
@@ -34,7 +34,7 @@ namespace Opc.Ua.Gds.Server.GdsVault
             string storePath,
             CertificateGroupConfiguration certificateGroupConfiguration)
         {
-            return new GdsVaultCertificateGroup(_gdsVaultHandler, storePath, certificateGroupConfiguration);
+            return new OpcVaultCertificateGroup(_gdsVaultHandler, storePath, certificateGroupConfiguration);
         }
 
         public override async Task Init()

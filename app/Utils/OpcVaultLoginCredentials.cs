@@ -4,8 +4,8 @@
 //
 
 using Microsoft.AspNetCore.Authentication.AzureAD.UI;
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api;
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.TokenStorage;
+using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Api;
+using Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.TokenStorage;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Microsoft.Rest;
 using System;
@@ -15,17 +15,17 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Utils
+namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Utils
 {
-    public class GdsVaultLoginCredentials : ServiceClientCredentials
+    public class OpcVaultLoginCredentials : ServiceClientCredentials
     {
-        private GdsVaultApiOptions gdsVaultOptions;
+        private OpcVaultApiOptions gdsVaultOptions;
         private AzureADOptions azureADOptions;
         private ITokenCacheService tokenCacheService;
         private ClaimsPrincipal claimsPrincipal;
 
-        public GdsVaultLoginCredentials(
-            GdsVaultApiOptions gdsVaultOptions,
+        public OpcVaultLoginCredentials(
+            OpcVaultApiOptions gdsVaultOptions,
             AzureADOptions azureADOptions,
             ITokenCacheService tokenCacheService,
             ClaimsPrincipal claimsPrincipal)

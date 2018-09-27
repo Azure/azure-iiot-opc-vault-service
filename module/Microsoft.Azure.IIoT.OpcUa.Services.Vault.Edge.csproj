@@ -22,18 +22,19 @@
       </ItemGroup>
     </Otherwise>
   </Choose>
-  <ItemGroup>
-    <ProjectReference Include="..\api-csharp\Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.csproj" />
-  </ItemGroup>
 
   <ItemGroup>
-    <None Update="Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Edge.Config.xml">
+    <None Update="Microsoft.Azure.IIoT.OpcUa.Services.Vault.Edge.Config.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Properties\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\api-csharp\Microsoft.Azure.IIoT.OpcUa.Services.Vault.Api.csproj" />
   </ItemGroup>
 
 </Project>

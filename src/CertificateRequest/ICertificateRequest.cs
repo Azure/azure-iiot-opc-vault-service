@@ -5,11 +5,11 @@
 
 
 using Microsoft.AspNetCore.Http;
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.CosmosDB.Models;
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Models;
+using Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB.Models;
+using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Models;
 using System.Threading.Tasks;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault
+namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
 {
     /// <summary>
     /// An abstract interface to the certificate request database

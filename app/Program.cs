@@ -5,10 +5,10 @@
 
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App.Utils;
+using Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Utils;
 using Microsoft.Extensions.Configuration;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.App
+namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App
 {
     public class Program
     {

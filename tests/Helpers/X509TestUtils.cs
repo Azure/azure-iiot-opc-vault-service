@@ -9,7 +9,7 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using Xunit;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Test
+namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
 {
 
     public class X509TestUtils

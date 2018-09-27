@@ -6,8 +6,8 @@
 
 using Microsoft.Azure.IIoT.Auth.Azure;
 using Microsoft.Azure.IIoT.Diagnostics;
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Runtime;
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Test.Helpers;
+using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Runtime;
+using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test.Helpers;
 using Opc.Ua;
 using Opc.Ua.Gds;
 using Opc.Ua.Test;
@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Test
+namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
 {
     public class ApplicationTestData
     {
@@ -86,7 +86,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Test
             get { return LogLevel.Debug; }
         }
 
-        public string ProcessId => "GdsVault.Test";
+        public string ProcessId => "Vault.Test";
     }
 
     public class CertificateGroupTest
@@ -94,11 +94,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Test
         private ServicesConfig serviceConfig = new ServicesConfig()
         {
             KeyVaultResourceID =  "https://vault.azure.net",
+            // TODO: new test vault
             KeyVaultApiUrl = "https://gdsvault-test.vault.azure.net"
         };
 
         private IClientConfig clientConfig = new ClientConfig()
         {
+            // TODO: new OpcVault app service
             // use GDSVault.Service.Test
             ClientId = "f70b169e-8d98-40df-8581-f61fa48faa8f",
             ClientSecret = "ifhuwDuz+Wy4zgwvVG7xVqMsMnNQYtBLGEQrA+1DVvc=",

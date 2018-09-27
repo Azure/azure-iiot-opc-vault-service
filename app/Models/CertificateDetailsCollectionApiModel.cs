@@ -4,7 +4,7 @@
 //
 
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Api.Models
+namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Api.Models
 {
     using Newtonsoft.Json;
     using System;

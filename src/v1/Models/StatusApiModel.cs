@@ -7,10 +7,10 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.Runtime;
+using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Runtime;
 using Newtonsoft.Json;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models
+namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Models
 {
     public sealed class StatusApiModel
     {
@@ -19,7 +19,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.GdsVault.v1.Models
         private string kvMessage;
 
         [JsonProperty(PropertyName = "Name", Order = 10)]
-        public string Name => "GdsVault";
+        public string Name => "OpcVault";
 
         [JsonProperty(PropertyName = "Status", Order = 20)]
         public string Status { get; set; }
