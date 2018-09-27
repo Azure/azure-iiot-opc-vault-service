@@ -4,6 +4,7 @@
 // ------------------------------------------------------------
 
 using Microsoft.AspNetCore.Http;
+using Microsoft.Azure.Documents;
 using Microsoft.Azure.IIoT.Diagnostics;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB.Models;
@@ -14,6 +15,7 @@ using Opc.Ua.Gds.Server;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -65,7 +67,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
         public Task Initialize()
         {
             var db = new DocumentDBRepository(_endpoint, _authKeyOrResourceToken);
-            Applications = new DocumentDBCollection<Application>(db);
             CertificateRequests = new DocumentDBCollection<CosmosDB.Models.CertificateRequest>(db);
             return Task.CompletedTask;
         }
@@ -94,10 +95,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             byte[] certificateSigningRequest,
             string authorityId)
         {
-            Guid appId = GetIdFromString(applicationId);
-
-            // TODO: use IApplicationsDatabase
-            Application application = await Applications.GetAsync(appId);
+            Application application = await ApplicationsDatabase.GetApplicationAsync(applicationId);
             if (application == null)
             {
                 throw new ServiceResultException(StatusCodes.BadNotFound, "The ApplicationId does not refer to a valid application.");
@@ -115,8 +113,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
 
             CertificateRequest request = null;
             bool isNew = false;
-
-            // TODO: do we need updates?
 
             if (request == null)
             {
@@ -139,10 +135,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             {
                 await CertificateRequests.CreateAsync(request);
             }
-            else
-            {
-                await CertificateRequests.UpdateAsync(request.RequestId, request);
-            }
 
             return request.RequestId.ToString();
         }
@@ -157,9 +149,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             string privateKeyPassword,
             string authorityId)
         {
-            Guid appId = GetIdFromString(applicationId);
-
-            Application application = await Applications.GetAsync(appId);
+            Application application = await ApplicationsDatabase.GetApplicationAsync(applicationId);
             if (application == null)
             {
                 throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
@@ -196,16 +186,12 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             request.PrivateKeyFormat = privateKeyFormat;
             request.PrivateKeyPassword = privateKeyPassword;
             request.SigningRequest = null;
-            request.ApplicationId = appId.ToString();
+            request.ApplicationId = application.ApplicationId.ToString();
             request.RequestTime = DateTime.UtcNow;
 
             if (isNew)
             {
                 await CertificateRequests.CreateAsync(request);
-            }
-            else
-            {
-                await CertificateRequests.UpdateAsync(request.RequestId, request);
             }
 
             return request.RequestId.ToString();
@@ -218,122 +204,154 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
         {
             Guid reqId = GetIdFromString(requestId);
 
-            CertificateRequest request = await CertificateRequests.GetAsync(reqId);
-            if (request == null)
+            bool retryUpdate;
+            do
             {
-                throw new ServiceResultException(StatusCodes.BadNodeIdUnknown, "Unknown request id");
-            }
+                retryUpdate = false;
+                CertificateRequest request = await CertificateRequests.GetAsync(reqId);
 
-            if (request.State != CertificateRequestState.New)
-            {
-                throw new ServiceResultException(StatusCodes.BadInvalidState);
-            }
-
-            Guid appId = new Guid(request.ApplicationId);
-            Application application = await Applications.GetAsync(appId);
-            if (application == null)
-            {
-                throw new ServiceResultException(StatusCodes.BadNodeIdUnknown, "Unknown application id");
-            }
-
-            if (isRejected)
-            {
-                request.State = CertificateRequestState.Rejected;
-                // erase information which is not required anymore
-                request.PrivateKeyFormat = null;
-                request.SigningRequest = null;
-                request.PrivateKeyPassword = null;
-            }
-            else
-            {
-                request.State = CertificateRequestState.Approved;
-
-                X509Certificate2 certificate;
-                if (request.SigningRequest != null)
+                if (request == null)
                 {
-                    try
-                    {
-                        certificate = await CertificateGroup.SigningRequestAsync(
-                            request.CertificateGroupId,
-                            application.ApplicationUri,
-                            request.SigningRequest
-                            );
+                    throw new ServiceResultException(StatusCodes.BadNodeIdUnknown, "Unknown request id");
+                }
 
-                        request.Certificate = certificate.RawData;
-                        request.PrivateKey = null;
-                    }
-                    catch (Exception e)
-                    {
-                        StringBuilder error = new StringBuilder();
+                if (request.State != CertificateRequestState.New)
+                {
+                    throw new ServiceResultException(StatusCodes.BadInvalidState);
+                }
 
-                        error.Append("Error Generating Certificate=" + e.Message);
-                        error.Append("\r\nApplicationId=" + application.ApplicationId);
-                        error.Append("\r\nApplicationUri=" + application.ApplicationUri);
-                        error.Append("\r\nApplicationName=" + application.ApplicationNames[0].Text);
+                Application application = await ApplicationsDatabase.GetApplicationAsync(request.ApplicationId);
+                if (application == null)
+                {
+                    throw new ServiceResultException(StatusCodes.BadNodeIdUnknown, "Unknown application id");
+                }
 
-                        throw new ServiceResultException(StatusCodes.BadConfigurationError, error.ToString());
-                    }
+                if (isRejected)
+                {
+                    request.State = CertificateRequestState.Rejected;
+                    // erase information which is not required anymore
+                    request.PrivateKeyFormat = null;
+                    request.SigningRequest = null;
+                    request.PrivateKeyPassword = null;
                 }
                 else
                 {
-                    X509Certificate2KeyPair newKeyPair = null;
-                    try
+                    request.State = CertificateRequestState.Approved;
+
+                    X509Certificate2 certificate;
+                    if (request.SigningRequest != null)
                     {
-                        newKeyPair = await CertificateGroup.NewKeyPairRequestAsync(
-                            request.CertificateGroupId,
-                            application.ApplicationUri,
-                            request.SubjectName,
-                            request.DomainNames,
-                            request.PrivateKeyFormat,
-                            request.PrivateKeyPassword);
+                        try
+                        {
+                            certificate = await CertificateGroup.SigningRequestAsync(
+                                request.CertificateGroupId,
+                                application.ApplicationUri,
+                                request.SigningRequest
+                                );
+
+                            request.Certificate = certificate.RawData;
+                            request.PrivateKey = null;
+                        }
+                        catch (Exception e)
+                        {
+                            StringBuilder error = new StringBuilder();
+
+                            error.Append("Error Generating Certificate=" + e.Message);
+                            error.Append("\r\nApplicationId=" + application.ApplicationId);
+                            error.Append("\r\nApplicationUri=" + application.ApplicationUri);
+                            error.Append("\r\nApplicationName=" + application.ApplicationNames[0].Text);
+
+                            throw new ServiceResultException(StatusCodes.BadConfigurationError, error.ToString());
+                        }
                     }
-                    catch (Exception e)
+                    else
                     {
-                        StringBuilder error = new StringBuilder();
+                        X509Certificate2KeyPair newKeyPair = null;
+                        try
+                        {
+                            newKeyPair = await CertificateGroup.NewKeyPairRequestAsync(
+                                request.CertificateGroupId,
+                                application.ApplicationUri,
+                                request.SubjectName,
+                                request.DomainNames,
+                                request.PrivateKeyFormat,
+                                request.PrivateKeyPassword);
+                        }
+                        catch (Exception e)
+                        {
+                            StringBuilder error = new StringBuilder();
 
-                        error.Append("Error Generating New Key Pair Certificate=" + e.Message);
-                        error.Append("\r\nApplicationId=" + application.ApplicationId);
-                        error.Append("\r\nApplicationUri=" + application.ApplicationUri);
+                            error.Append("Error Generating New Key Pair Certificate=" + e.Message);
+                            error.Append("\r\nApplicationId=" + application.ApplicationId);
+                            error.Append("\r\nApplicationUri=" + application.ApplicationUri);
 
-                        throw new ServiceResultException(StatusCodes.BadConfigurationError, error.ToString());
+                            throw new ServiceResultException(StatusCodes.BadConfigurationError, error.ToString());
+                        }
+
+                        request.Certificate = newKeyPair.Certificate.RawData;
+                        request.PrivateKey = newKeyPair.PrivateKey;
+
                     }
-
-                    request.Certificate = newKeyPair.Certificate.RawData;
-                    request.PrivateKey = newKeyPair.PrivateKey;
-
                 }
-            }
 
-            request.ApproveRejectTime = DateTime.UtcNow;
+                request.ApproveRejectTime = DateTime.UtcNow;
+                try
+                {
+                    await CertificateRequests.UpdateAsync(reqId, request, request.ETag);
+                }
+                catch (DocumentClientException dce)
+                {
+                    if (dce.StatusCode == HttpStatusCode.PreconditionFailed)
+                    {
+                        retryUpdate = true;
+                    }
+                }
+            } while (retryUpdate);
 
-            await CertificateRequests.UpdateAsync(reqId, request);
         }
 
         public async Task AcceptAsync(
-            string requestId)
+                string requestId)
         {
             Guid reqId = GetIdFromString(requestId);
 
-            CertificateRequest request = await CertificateRequests.GetAsync(reqId);
-            if (request == null)
+            bool retryUpdate;
+            do
             {
-                throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
-            }
+                retryUpdate = false;
 
-            if (request.State != CertificateRequestState.Approved)
-            {
-                throw new ServiceResultException(StatusCodes.BadInvalidState);
-            }
+                CertificateRequest request = await CertificateRequests.GetAsync(reqId);
+                if (request == null)
+                {
+                    throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
+                }
 
-            request.State = CertificateRequestState.Accepted;
+                if (request.State != CertificateRequestState.Approved)
+                {
+                    throw new ServiceResultException(StatusCodes.BadInvalidState);
+                }
 
-            // erase information which is not required anymore
-            request.SigningRequest = null;
-            request.PrivateKeyFormat = null;
-            request.PrivateKeyPassword = null;
-            request.AcceptTime = DateTime.UtcNow;
+                request.State = CertificateRequestState.Accepted;
 
-            await CertificateRequests.UpdateAsync(request.RequestId, request);
+                // erase information which is not required anymore
+                request.SigningRequest = null;
+                request.PrivateKeyFormat = null;
+                request.PrivateKeyPassword = null;
+                request.AcceptTime = DateTime.UtcNow;
+                try
+                {
+                    await CertificateRequests.UpdateAsync(request.RequestId, request, request.ETag);
+                }
+                catch (DocumentClientException dce)
+                {
+                    if (dce.StatusCode == HttpStatusCode.PreconditionFailed)
+                    {
+                        retryUpdate = true;
+                    }
+                }
+            } while (retryUpdate);
+
+
         }
 
         public async Task<FinishRequestResultModel> FinishRequestAsync(
@@ -341,9 +359,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             string applicationId)
         {
             Guid reqId = GetIdFromString(requestId);
-            Guid appId = GetIdFromString(applicationId);
 
-            Application application = await Applications.GetAsync(appId);
+            Application application = await ApplicationsDatabase.GetApplicationAsync(applicationId);
             if (application == null)
             {
                 throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
@@ -367,7 +384,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                     throw new ServiceResultException(StatusCodes.BadInvalidArgument);
             }
 
-            if (request.ApplicationId != appId.ToString())
+            if (request.ApplicationId != application.ApplicationId.ToString())
             {
                 throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
             }
@@ -609,8 +626,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
 
         #region Private Fields
         private DateTime queryCounterResetTime = DateTime.UtcNow;
-        // TODO: remove direct access to aplication DB
-        private IDocumentDBCollection<Application> Applications;
         private IDocumentDBCollection<CertificateRequest> CertificateRequests;
         #endregion
     }
