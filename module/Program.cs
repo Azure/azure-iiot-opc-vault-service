@@ -79,12 +79,12 @@ namespace Opc.Ua.Gds.Server
 
             // command line options
             bool showHelp = false;
-            var gdsVaultOptions = new OpcVaultApiOptions();
-            var azureADOptions = new GdsEdgeAzureADOptions();
+            var opcVaultOptions = new OpcVaultApiOptions();
+            var azureADOptions = new OpcEdgeAzureADOptions();
 
             Mono.Options.OptionSet options = new Mono.Options.OptionSet {
-                { "g|gdsvault=", "GdsVault Url", g => gdsVaultOptions.BaseAddress = g },
-                { "r|resource=", "GdsVault Resource Id", r => gdsVaultOptions.ResourceId = r },
+                { "v|vault=", "OpcVault Url", g => opcVaultOptions.BaseAddress = g },
+                { "r|resource=", "OpcVault Resource Id", r => opcVaultOptions.ResourceId = r },
                 { "c|clientid=", "AD Client Id", c => azureADOptions.ClientId = c },
                 { "s|secret=", "AD Client Secret", s => azureADOptions.ClientSecret = s },
                 { "a|authority", "Authority", a => azureADOptions.Authority = a },
@@ -118,7 +118,7 @@ namespace Opc.Ua.Gds.Server
             }
 
             EdgeGlobalDiscoveryServer server = new EdgeGlobalDiscoveryServer();
-            server.Run(gdsVaultOptions, azureADOptions);
+            server.Run(opcVaultOptions, azureADOptions);
 
             return (int)EdgeGlobalDiscoveryServer.ExitCode;
         }
@@ -136,14 +136,14 @@ namespace Opc.Ua.Gds.Server
         }
 
         public void Run(
-            OpcVaultApiOptions gdsVaultOptions,
-            GdsEdgeAzureADOptions azureADOptions)
+            OpcVaultApiOptions opcVaultOptions,
+            OpcEdgeAzureADOptions azureADOptions)
         {
 
             try
             {
                 exitCode = ExitCode.ErrorServerNotStarted;
-                ConsoleGlobalDiscoveryServer(gdsVaultOptions, azureADOptions).Wait();
+                ConsoleGlobalDiscoveryServer(opcVaultOptions, azureADOptions).Wait();
                 Console.WriteLine("Server started. Press Ctrl-C to exit...");
                 exitCode = ExitCode.ErrorServerRunning;
             }
@@ -201,8 +201,8 @@ namespace Opc.Ua.Gds.Server
         }
 
         private async Task ConsoleGlobalDiscoveryServer(
-            OpcVaultApiOptions gdsVaultOptions, 
-            GdsEdgeAzureADOptions azureADOptions)
+            OpcVaultApiOptions opcVaultOptions, 
+            OpcEdgeAzureADOptions azureADOptions)
         {
             ApplicationInstance.MessageDlg = new ApplicationMessageDlg();
             ApplicationInstance application = new ApplicationInstance
@@ -228,23 +228,23 @@ namespace Opc.Ua.Gds.Server
             }
 
             // get the DatabaseStorePath configuration parameter.
-            GlobalDiscoveryServerConfiguration gdsVaultConfiguration = config.ParseExtension<GlobalDiscoveryServerConfiguration>();
+            GlobalDiscoveryServerConfiguration opcVaultConfiguration = config.ParseExtension<GlobalDiscoveryServerConfiguration>();
 
             // extract appId and vault name from database storage path
-            string[] keyVaultConfig = gdsVaultConfiguration.DatabaseStorePath?.Split(',');
+            string[] keyVaultConfig = opcVaultConfiguration.DatabaseStorePath?.Split(',');
             if (keyVaultConfig != null)
             {
-                if (String.IsNullOrEmpty(gdsVaultOptions.BaseAddress))
+                if (String.IsNullOrEmpty(opcVaultOptions.BaseAddress))
                 {
                     // try configuration using XML config
-                    gdsVaultOptions.BaseAddress = keyVaultConfig[0];
+                    opcVaultOptions.BaseAddress = keyVaultConfig[0];
                 }
 
-                if (String.IsNullOrEmpty(gdsVaultOptions.ResourceId))
+                if (String.IsNullOrEmpty(opcVaultOptions.ResourceId))
                 {
                     if (keyVaultConfig.Length > 1 && !String.IsNullOrEmpty(keyVaultConfig[1]))
                     {
-                        gdsVaultOptions.ResourceId = keyVaultConfig[1];
+                        opcVaultOptions.ResourceId = keyVaultConfig[1];
                     }
                 }
 
@@ -282,13 +282,13 @@ namespace Opc.Ua.Gds.Server
 
             }
 
-            var serviceClient = new OpcVaultLoginCredentials(gdsVaultOptions, azureADOptions);
-            IOpcVault opcVaultServiceClient = new Microsoft.Azure.IIoT.OpcUa.Services.Vault.Api.OpcVault(new Uri(gdsVaultOptions.BaseAddress), serviceClient);
+            var serviceClient = new OpcVaultLoginCredentials(opcVaultOptions, azureADOptions);
+            IOpcVault opcVaultServiceClient = new Microsoft.Azure.IIoT.OpcUa.Services.Vault.Api.OpcVault(new Uri(opcVaultOptions.BaseAddress), serviceClient);
             var gdsVaultHandler = new OpcVaultClientHandler(opcVaultServiceClient);
 
             // read configurations from GdsVault
-            gdsVaultConfiguration.CertificateGroups = await gdsVaultHandler.GetCertificateConfigurationGroupsAsync(gdsVaultConfiguration.BaseCertificateGroupStorePath);
-            UpdateGDSConfigurationDocument(config.Extensions, gdsVaultConfiguration);
+            opcVaultConfiguration.CertificateGroups = await gdsVaultHandler.GetCertificateConfigurationGroupsAsync(opcVaultConfiguration.BaseCertificateGroupStorePath);
+            UpdateGDSConfigurationDocument(config.Extensions, opcVaultConfiguration);
 
             var certGroup = new OpcVaultCertificateGroup(gdsVaultHandler);
             var requestDB = new OpcVaultCertificateRequest(opcVaultServiceClient);

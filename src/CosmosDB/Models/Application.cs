@@ -19,8 +19,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB.Models
     {
         [JsonProperty(PropertyName = "id")]
         public Guid ApplicationId { get; set; }
-        [JsonProperty(PropertyName = "ETag")]
-        public string ETag { get; }
+        [JsonProperty(PropertyName = "_etag")]
+        public string ETag { get; set; }
         public int ID { get; set; }
         public string ApplicationUri { get; set; }
         public string ApplicationName { get; set; }

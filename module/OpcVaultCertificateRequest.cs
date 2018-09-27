@@ -137,7 +137,7 @@ namespace Opc.Ua.Gds.Server.OpcVault
         {
             try
             {
-                // intentionally ignore the auto approval, it is implemented in the GdsVault service
+                // intentionally ignore the auto approval, it is implemented in the OpcVault service
                 string reqId = OpcVaultClientHelper.GetServiceIdFromNodeId(requestId, NamespaceIndex);
                 _opcVaultServiceClient.ApproveCertificateRequest(reqId, isRejected);
             }

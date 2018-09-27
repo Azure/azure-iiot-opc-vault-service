@@ -19,18 +19,18 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Utils
 {
     public class OpcVaultLoginCredentials : ServiceClientCredentials
     {
-        private OpcVaultApiOptions gdsVaultOptions;
+        private OpcVaultApiOptions opcVaultOptions;
         private AzureADOptions azureADOptions;
         private ITokenCacheService tokenCacheService;
         private ClaimsPrincipal claimsPrincipal;
 
         public OpcVaultLoginCredentials(
-            OpcVaultApiOptions gdsVaultOptions,
+            OpcVaultApiOptions opcVaultOptions,
             AzureADOptions azureADOptions,
             ITokenCacheService tokenCacheService,
             ClaimsPrincipal claimsPrincipal)
         {
-            this.gdsVaultOptions = gdsVaultOptions;
+            this.opcVaultOptions = opcVaultOptions;
             this.azureADOptions = azureADOptions;
             this.tokenCacheService = tokenCacheService;
             this.claimsPrincipal = claimsPrincipal;
@@ -53,7 +53,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Utils
             var user = new UserIdentifier(userObjectId, UserIdentifierType.UniqueId);
 
             var result = authenticationContext.AcquireTokenSilentAsync(
-                        resource: gdsVaultOptions.ResourceId,
+                        resource: opcVaultOptions.ResourceId,
                         clientCredential: credential,
                         userId: user).GetAwaiter().GetResult();
 

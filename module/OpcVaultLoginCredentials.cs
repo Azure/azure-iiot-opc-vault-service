@@ -16,7 +16,7 @@ namespace Opc.Ua.Gds.Server.OpcVault
 {
     // Summary:
     //     Options for configuring authentication using Azure Active Directory.
-    public class GdsEdgeAzureADOptions
+    public class OpcEdgeAzureADOptions
     {
         //
         // Summary:
@@ -38,17 +38,17 @@ namespace Opc.Ua.Gds.Server.OpcVault
 
     public class OpcVaultLoginCredentials : ServiceClientCredentials
     {
-        private OpcVaultApiOptions gdsVaultOptions;
-        private GdsEdgeAzureADOptions azureADOptions;
+        private OpcVaultApiOptions opcVaultOptions;
+        private OpcEdgeAzureADOptions azureADOptions;
         private const string kAuthority = "https://login.microsoftonline.com/";
         private string AuthenticationToken { get; set; }
         private DateTimeOffset ExpiresOn { get; set; }
 
         public OpcVaultLoginCredentials(
-            OpcVaultApiOptions gdsVaultOptions,
-            GdsEdgeAzureADOptions azureADOptions)
+            OpcVaultApiOptions opcVaultOptions,
+            OpcEdgeAzureADOptions azureADOptions)
         {
-            this.gdsVaultOptions = gdsVaultOptions;
+            this.opcVaultOptions = opcVaultOptions;
             this.azureADOptions = azureADOptions;
         }
 
@@ -67,7 +67,7 @@ namespace Opc.Ua.Gds.Server.OpcVault
                 clientSecret: azureADOptions.ClientSecret);
 
             var result = authenticationContext.AcquireTokenAsync(
-                        resource: gdsVaultOptions.ResourceId,
+                        resource: opcVaultOptions.ResourceId,
                         clientCredential: clientCredential).GetAwaiter().GetResult();
 
             if (result == null)

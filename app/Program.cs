@@ -28,7 +28,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App
                             $"{builtConfig["KeyVault"]}",
                             builtConfig["AzureAD:ClientId"],
                             builtConfig["AzureAD:ClientSecret"],
-                            new PrefixKeyVaultSecretManager("GdsVault.App")
+                            new PrefixKeyVaultSecretManager("OpcVault.App")
                             );
                     }
                 })

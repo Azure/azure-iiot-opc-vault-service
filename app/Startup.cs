@@ -92,7 +92,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App
                     /// </summary>
                     OnAuthorizationCodeReceived = async context =>
                     {
-                        // Acquire a Token for the API and cache it. In the GdsVaultController, we'll use the cache to acquire a token for the API
+                        // Acquire a Token for the API and cache it. In the OpcVaultController, we'll use the cache to acquire a token for the API
                         string userObjectId = (context.Principal.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier"))?.Value;
                         var credential = new ClientCredential(context.Options.ClientId, context.Options.ClientSecret);
 

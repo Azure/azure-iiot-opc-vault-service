@@ -35,11 +35,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
         private readonly ITokenCacheService tokenCacheService;
 
         public CertificateGroupController(
-            OpcVaultApiOptions gdsVaultOptions,
+            OpcVaultApiOptions opcVaultOptions,
             AzureADOptions azureADOptions,
             ITokenCacheService tokenCacheService)
         {
-            this.opcVaultOptions = gdsVaultOptions;
+            this.opcVaultOptions = opcVaultOptions;
             this.azureADOptions = azureADOptions;
             this.tokenCacheService = tokenCacheService;
         }
@@ -47,7 +47,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
         [ActionName("Index")]
         public async Task<ActionResult> IndexAsync()
         {
-            AuthorizeGdsVaultClient();
+            AuthorizeClient();
             var requests = await opcVault.GetCertificateGroupConfigurationCollectionAsync();
             return View(requests.Groups);
         }
@@ -55,7 +55,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
         [ActionName("Details")]
         public async Task<ActionResult> DetailsAsync(string id)
         {
-            AuthorizeGdsVaultClient();
+            AuthorizeClient();
             var request = await opcVault.GetCertificateGroupConfigurationAsync(id);
             return View(request);
         }
@@ -63,7 +63,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
         [ActionName("Renew")]
         public async Task<ActionResult> Renew(string id)
         {
-            AuthorizeGdsVaultClient();
+            AuthorizeClient();
             var request = await opcVault.CreateCACertificateAsync(id);
             return RedirectToAction("IssuerDetails", new { id });
         }
@@ -76,7 +76,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
         {
             if (ModelState.IsValid)
             {
-                AuthorizeGdsVaultClient();
+                AuthorizeClient();
                 var group = await opcVault.GetCertificateGroupConfigurationAsync(newGroup.Name);
                 if (group == null)
                 {
@@ -106,7 +106,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
             {
                 return new BadRequestResult();
             }
-            AuthorizeGdsVaultClient();
+            AuthorizeClient();
             var group = await opcVault.GetCertificateGroupConfigurationAsync(id);
             if (group == null)
             {
@@ -119,7 +119,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
         [ActionName("IssuerDetails")]
         public async Task<ActionResult> IssuerDetailsAsync(string id)
         {
-            AuthorizeGdsVaultClient();
+            AuthorizeClient();
             var issuer = await opcVault.GetCACertificateChainAsync(id);
             var certList = new List<CertificateDetailsApiModel>();
             foreach (var certificate in issuer.Chain)
@@ -146,7 +146,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
         [ActionName("DownloadIssuer")]
         public async Task<ActionResult> DownloadIssuerAsync(string id)
         {
-            AuthorizeGdsVaultClient();
+            AuthorizeClient();
             var issuer = await opcVault.GetCACertificateChainAsync(id);
             var byteArray = Convert.FromBase64String(issuer.Chain[0].Certificate);
             return new FileContentResult(byteArray, ContentTypeCert)
@@ -158,7 +158,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
         [ActionName("DownloadIssuerCrl")]
         public async Task<ActionResult> DownloadIssuerCrlAsync(string id)
         {
-            AuthorizeGdsVaultClient();
+            AuthorizeClient();
             var issuer = await opcVault.GetCACertificateChainAsync(id);
             var crl = await opcVault.GetCACrlChainAsync(id);
             var byteArray = Convert.FromBase64String(crl.Chain[0].Crl);
@@ -182,7 +182,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
             }
         }
 
-        private void AuthorizeGdsVaultClient()
+        private void AuthorizeClient()
         {
             if (opcVault == null)
             {
