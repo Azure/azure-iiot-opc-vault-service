@@ -40,6 +40,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         const string TagIssuerList = "Issuer";
         const string TagTrustedList = "Trusted";
 
+        const string GroupSecret = "/secrets/groups";
+
         /// <summary>
         /// 
         /// </summary>
@@ -125,7 +127,16 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         /// </summary>
         public async Task<string> GetCertificateConfigurationGroupsAsync(CancellationToken ct = default(CancellationToken))
         {
-            SecretBundle secret = await _keyVaultClient.GetSecretAsync(_vaultBaseUrl + "/secrets/groups", ct).ConfigureAwait(false);
+            SecretBundle secret = await _keyVaultClient.GetSecretAsync(_vaultBaseUrl + GroupSecret, ct).ConfigureAwait(false);
+            return secret.Value;
+        }
+
+        /// <summary>
+        /// Write the OpcVault CertificateConfigurationGroups as Json.
+        /// </summary>
+        public async Task<string> PutCertificateConfigurationGroupsAsync(string json, CancellationToken ct = default(CancellationToken))
+        {
+            SecretBundle secret = await _keyVaultClient.SetSecretAsync(_vaultBaseUrl, GroupSecret, json, null, null, null, ct).ConfigureAwait(false);
             return secret.Value;
         }
 

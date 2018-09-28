@@ -50,5 +50,20 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Models
             this.CACertificateKeySize = config.CACertificateKeySize;
             this.CACertificateHashSize = config.CACertificateHashSize;
         }
+
+        public Opc.Ua.Gds.Server.CertificateGroupConfiguration ToServiceModel()
+        {
+            var serviceModel = new Opc.Ua.Gds.Server.CertificateGroupConfiguration();
+            serviceModel.Id = this.Id;
+            serviceModel.CertificateType = this.CertificateType;
+            serviceModel.SubjectName = this.SubjectName;
+            serviceModel.DefaultCertificateLifetime = this.DefaultCertificateLifetime;
+            serviceModel.DefaultCertificateKeySize = this.DefaultCertificateKeySize;
+            serviceModel.DefaultCertificateHashSize = this.DefaultCertificateHashSize;
+            serviceModel.CACertificateLifetime = this.CACertificateLifetime;
+            serviceModel.CACertificateKeySize = this.CACertificateKeySize;
+            serviceModel.CACertificateHashSize = this.CACertificateHashSize;
+            return serviceModel;
+        }
     }
 }

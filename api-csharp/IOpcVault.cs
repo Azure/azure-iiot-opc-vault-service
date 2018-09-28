@@ -147,6 +147,21 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Api
         Task<HttpOperationResponse<CertificateGroupConfigurationApiModel>> GetCertificateGroupConfigurationWithHttpMessagesAsync(string groupId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
+        /// Update group configuration
+        /// </summary>
+        /// <param name='groupId'>
+        /// </param>
+        /// <param name='config'>
+        /// </param>
+        /// <param name='customHeaders'>
+        /// The headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        Task<HttpOperationResponse<CertificateGroupConfigurationApiModel>> PutCertificateGroupConfigurationWithHttpMessagesAsync(string groupId, CertificateGroupConfigurationApiModel config = default(CertificateGroupConfigurationApiModel), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
         /// Get group configuration
         /// </summary>
         /// <param name='customHeaders'>

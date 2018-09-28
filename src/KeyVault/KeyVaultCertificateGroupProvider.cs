@@ -68,6 +68,31 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
             return certificateGroupCollection.SingleOrDefault(cg => String.Equals(cg.Id, id, StringComparison.OrdinalIgnoreCase));
         }
 
+        public static async Task<CertificateGroupConfiguration> UpdateCertificateGroupConfiguration(
+            KeyVaultServiceClient keyVaultServiceClient,
+            string id,
+            CertificateGroupConfiguration config)
+        {
+            if (id.ToLower() != config.Id.ToLower())
+            {
+                throw new ArgumentException("groupid doesn't match config id");
+            }
+            string json = await keyVaultServiceClient.GetCertificateConfigurationGroupsAsync().ConfigureAwait(false);
+            List<Opc.Ua.Gds.Server.CertificateGroupConfiguration> certificateGroupCollection = JsonConvert.DeserializeObject<List<Opc.Ua.Gds.Server.CertificateGroupConfiguration>>(json);
+            var original = certificateGroupCollection.SingleOrDefault(cg => String.Equals(cg.Id, id, StringComparison.OrdinalIgnoreCase));
+            if (original == null)
+            {
+                throw new ArgumentException("invalid groupid");
+            }
+
+            // update config
+            json = await keyVaultServiceClient.PutCertificateConfigurationGroupsAsync(json).ConfigureAwait(false);
+
+            // read it back to verify
+            certificateGroupCollection = JsonConvert.DeserializeObject<List<Opc.Ua.Gds.Server.CertificateGroupConfiguration>>(json);
+            return certificateGroupCollection.SingleOrDefault(cg => String.Equals(cg.Id, id, StringComparison.OrdinalIgnoreCase));
+        }
+
         #region ICertificateGroupProvider
         public override async Task Init()
         {

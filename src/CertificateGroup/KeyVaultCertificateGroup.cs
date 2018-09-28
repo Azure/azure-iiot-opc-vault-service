@@ -138,6 +138,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             return await KeyVaultCertificateGroupProvider.GetCertificateGroupConfiguration(_keyVaultServiceClient, id).ConfigureAwait(false);
         }
 
+        public async Task<Opc.Ua.Gds.Server.CertificateGroupConfiguration> UpdateCertificateGroupConfiguration(string id, Opc.Ua.Gds.Server.CertificateGroupConfiguration config)
+        {
+            return await KeyVaultCertificateGroupProvider.UpdateCertificateGroupConfiguration(_keyVaultServiceClient, id, config).ConfigureAwait(false);
+        }
+
         public async Task<Opc.Ua.Gds.Server.CertificateGroupConfigurationCollection> GetCertificateGroupConfigurationCollection()
         {
             string json = await _keyVaultServiceClient.GetCertificateConfigurationGroupsAsync().ConfigureAwait(false);

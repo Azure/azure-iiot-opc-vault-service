@@ -17,6 +17,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
         Task <ICertificateGroup> OnBehalfOfRequest(HttpRequest request);
         Task<string[]> GetCertificateGroupIds();
         Task<Opc.Ua.Gds.Server.CertificateGroupConfiguration> GetCertificateGroupConfiguration(string id);
+        Task<Opc.Ua.Gds.Server.CertificateGroupConfiguration> UpdateCertificateGroupConfiguration(string id, Opc.Ua.Gds.Server.CertificateGroupConfiguration config);
         Task<Opc.Ua.Gds.Server.CertificateGroupConfigurationCollection> GetCertificateGroupConfigurationCollection();
         Task<X509Certificate2Collection> GetCACertificateChainAsync(string id);
         Task<IList<Opc.Ua.X509CRL>> GetCACrlChainAsync(string id);

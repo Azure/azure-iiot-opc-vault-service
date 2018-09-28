@@ -46,6 +46,19 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Controllers
                 await this.certificateGroups.GetCertificateGroupConfiguration(groupId));
         }
 
+        /// <summary>Update group configuration</summary>
+        [HttpPut("{groupId}")]
+        [SwaggerOperation(OperationId = "PutCertificateGroupConfiguration")]
+        [Authorize(Policy = Policies.CanManage)]
+
+        public async Task<CertificateGroupConfigurationApiModel> PutAsync(string groupId, [FromBody] CertificateGroupConfigurationApiModel config)
+        {
+            var onBehalfOfCertificateGroups = await this.certificateGroups.OnBehalfOfRequest(Request);
+            return new CertificateGroupConfigurationApiModel(
+                groupId,
+                await onBehalfOfCertificateGroups.UpdateCertificateGroupConfiguration(groupId, config.ToServiceModel()));
+        }
+
         /// <summary>Get group configuration</summary>
         [HttpGet("config")]
         [SwaggerOperation(OperationId = "GetCertificateGroupConfigurationCollection")]

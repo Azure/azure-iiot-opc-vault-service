@@ -269,6 +269,42 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Api
             }
 
             /// <summary>
+            /// Update group configuration
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='groupId'>
+            /// </param>
+            /// <param name='config'>
+            /// </param>
+            public static CertificateGroupConfigurationApiModel PutCertificateGroupConfiguration(this IOpcVault operations, string groupId, CertificateGroupConfigurationApiModel config = default(CertificateGroupConfigurationApiModel))
+            {
+                return operations.PutCertificateGroupConfigurationAsync(groupId, config).GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Update group configuration
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='groupId'>
+            /// </param>
+            /// <param name='config'>
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<CertificateGroupConfigurationApiModel> PutCertificateGroupConfigurationAsync(this IOpcVault operations, string groupId, CertificateGroupConfigurationApiModel config = default(CertificateGroupConfigurationApiModel), CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.PutCertificateGroupConfigurationWithHttpMessagesAsync(groupId, config, null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <summary>
             /// Get group configuration
             /// </summary>
             /// <param name='operations'>
