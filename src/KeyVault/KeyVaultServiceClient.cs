@@ -28,6 +28,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
     public class KeyVaultServiceClient
     {
         const int MaxResults = 10;
+        const string ContentTypeJson = "application/json";
         // see RFC 2585
         const string ContentTypeCert = "application/pkix-cert";
         const string ContentTypeCrl = "application/pkix-crl";
@@ -40,7 +41,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         const string TagIssuerList = "Issuer";
         const string TagTrustedList = "Trusted";
 
-        const string GroupSecret = "/secrets/groups";
+        const string GroupSecret = "groups";
 
         /// <summary>
         /// 
@@ -127,7 +128,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         /// </summary>
         public async Task<string> GetCertificateConfigurationGroupsAsync(CancellationToken ct = default(CancellationToken))
         {
-            SecretBundle secret = await _keyVaultClient.GetSecretAsync(_vaultBaseUrl + GroupSecret, ct).ConfigureAwait(false);
+            SecretBundle secret = await _keyVaultClient.GetSecretAsync(_vaultBaseUrl, GroupSecret, ct).ConfigureAwait(false);
             return secret.Value;
         }
 
@@ -136,7 +137,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         /// </summary>
         public async Task<string> PutCertificateConfigurationGroupsAsync(string json, CancellationToken ct = default(CancellationToken))
         {
-            SecretBundle secret = await _keyVaultClient.SetSecretAsync(_vaultBaseUrl, GroupSecret, json, null, null, null, ct).ConfigureAwait(false);
+            SecretBundle secret = await _keyVaultClient.SetSecretAsync(_vaultBaseUrl, GroupSecret, json, null, ContentTypeJson, null, ct).ConfigureAwait(false);
             return secret.Value;
         }
 

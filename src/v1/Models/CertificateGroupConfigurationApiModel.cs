@@ -37,6 +37,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Models
         [JsonProperty(PropertyName = "CACertificateHashSize", Order = 80)]
         public ushort CACertificateHashSize { get; set; }
 
+        public CertificateGroupConfigurationApiModel() { }
 
         public CertificateGroupConfigurationApiModel(string id, Opc.Ua.Gds.Server.CertificateGroupConfiguration config)
         {

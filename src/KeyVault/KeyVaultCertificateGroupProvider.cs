@@ -36,8 +36,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         }
 
         public static KeyVaultCertificateGroupProvider Create(
-            KeyVaultServiceClient keyVaultServiceClient,
-            CertificateGroupConfiguration certificateGroupConfiguration)
+                KeyVaultServiceClient keyVaultServiceClient,
+                CertificateGroupConfiguration certificateGroupConfiguration)
         {
             return new KeyVaultCertificateGroupProvider(keyVaultServiceClient, certificateGroupConfiguration);
         }
@@ -79,11 +79,19 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
             }
             string json = await keyVaultServiceClient.GetCertificateConfigurationGroupsAsync().ConfigureAwait(false);
             List<Opc.Ua.Gds.Server.CertificateGroupConfiguration> certificateGroupCollection = JsonConvert.DeserializeObject<List<Opc.Ua.Gds.Server.CertificateGroupConfiguration>>(json);
+
             var original = certificateGroupCollection.SingleOrDefault(cg => String.Equals(cg.Id, id, StringComparison.OrdinalIgnoreCase));
             if (original == null)
             {
                 throw new ArgumentException("invalid groupid");
             }
+
+            ValidateConfiguration(config);
+
+            var index = certificateGroupCollection.IndexOf(original);
+            certificateGroupCollection[index] = config;
+
+            json = JsonConvert.SerializeObject(certificateGroupCollection);
 
             // update config
             json = await keyVaultServiceClient.PutCertificateConfigurationGroupsAsync(json).ConfigureAwait(false);
@@ -170,7 +178,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
 #endif
             var certificates = new X509Certificate2Collection() { certificate };
             var crls = new List<X509CRL>() { Crl };
-            Crl = RevokeCertificate(issuerCert, crls, certificates, 
+            Crl = RevokeCertificate(issuerCert, crls, certificates,
                 new KeyVaultSignatureGenerator(_keyVaultServiceClient, _caCertKeyIdentifier, Certificate),
                 this.Configuration.CACertificateHashSize);
             await _keyVaultServiceClient.ImportCACrl(Configuration.Id, Certificate, Crl).ConfigureAwait(false);
@@ -314,7 +322,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
             await LoadPublicAssets().ConfigureAwait(false);
             return Crl;
         }
-#endregion
+        #endregion
 
         public override Task<X509Certificate2> LoadSigningKeyAsync(
             X509Certificate2 signingCertificate,
@@ -331,12 +339,109 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         }
         private async Task LoadPublicAssets()
         {
-            if (Certificate == null || 
+            if (Certificate == null ||
                 _caCertSecretIdentifier == null ||
                 _caCertKeyIdentifier == null)
             {
                 await Init();
             }
+        }
+
+        private Opc.Ua.Gds.Server.CertificateGroupConfiguration DefaultConfiguration(string id)
+        {
+            var config = new Opc.Ua.Gds.Server.CertificateGroupConfiguration()
+            {
+                Id = id,
+                SubjectName = "CN=Azure IoT Vault CA, O=Microsoft Corp.",
+                CertificateType = CertTypeMap()[Opc.Ua.ObjectTypeIds.RsaSha256ApplicationCertificateType],
+                DefaultCertificateLifetime = 12,
+                DefaultCertificateHashSize = 256,
+                DefaultCertificateKeySize = 2048,
+                CACertificateLifetime = 60,
+                CACertificateHashSize = 256,
+                CACertificateKeySize = 2048
+            };
+            ValidateConfiguration(config);
+            return config;
+        }
+
+        private static void ValidateConfiguration(Opc.Ua.Gds.Server.CertificateGroupConfiguration update)
+        {
+            if (!update.Id.All(char.IsLetterOrDigit))
+            {
+                throw new ArgumentException("Invalid Id");
+            }
+
+            // verify subject 
+            var subjectList = Opc.Ua.Utils.ParseDistinguishedName(update.SubjectName);
+            if (subjectList == null ||
+                subjectList.Count == 0)
+            {
+                throw new ArgumentException("Invalid Subject");
+            }
+
+            try
+            {
+                // only allow specific cert types for now
+                var certType = CertTypeMap().Where(c => c.Value.ToLower() == update.CertificateType.ToLower()).Single();
+                update.CertificateType = certType.Value;
+            }
+            catch (Exception)
+            {
+                throw new ArgumentException("Invalid CertificateType");
+            }
+
+            // specify ranges for lifetime (months)
+            if (update.DefaultCertificateLifetime < 1 ||
+                    update.CACertificateLifetime < 1 ||
+                    update.DefaultCertificateLifetime * 2 > update.CACertificateLifetime ||
+                    update.DefaultCertificateLifetime > 60 ||
+                    update.CACertificateLifetime > 1200)
+            {
+                throw new ArgumentException("Invalid lifetime");
+            }
+
+            if (update.DefaultCertificateKeySize < 2048 ||
+                update.DefaultCertificateKeySize % 1024 != 0 ||
+                update.DefaultCertificateKeySize > 2048)
+            {
+                throw new ArgumentException("Invalid key size");
+            }
+
+            if (update.CACertificateKeySize < 2048 ||
+                update.CACertificateKeySize % 1024 != 0 ||
+                update.CACertificateKeySize > 4096)
+            {
+                throw new ArgumentException("Invalid key size");
+            }
+
+            if (update.DefaultCertificateHashSize < 256 ||
+                update.DefaultCertificateHashSize % 128 != 0 ||
+                update.DefaultCertificateHashSize > 512)
+            {
+                throw new ArgumentException("Invalid hash size");
+            }
+
+            if (update.CACertificateHashSize < 256 ||
+                update.CACertificateHashSize % 128 != 0 ||
+                update.CACertificateHashSize > 512)
+            {
+                throw new ArgumentException("Invalid hash size");
+            }
+
+            update.BaseStorePath = "/" + update.Id.ToLower();
+        }
+
+        private static Dictionary<NodeId, string> CertTypeMap()
+        {
+            var certTypeMap = new Dictionary<NodeId, string>();
+            // FUTURE: support more cert types
+            //CertTypeMap.Add(Opc.Ua.ObjectTypeIds.HttpsCertificateType, "HttpsCertificateType");
+            //CertTypeMap.Add(Opc.Ua.ObjectTypeIds.UserCredentialCertificateType, "UserCredentialCertificateType");
+            certTypeMap.Add(Opc.Ua.ObjectTypeIds.ApplicationCertificateType, "ApplicationCertificateType");
+            //CertTypeMap.Add(Opc.Ua.ObjectTypeIds.RsaMinApplicationCertificateType, "RsaMinApplicationCertificateType");
+            certTypeMap.Add(Opc.Ua.ObjectTypeIds.RsaSha256ApplicationCertificateType, "RsaSha256ApplicationCertificateType");
+            return certTypeMap;
         }
 
         private KeyVaultServiceClient _keyVaultServiceClient;
