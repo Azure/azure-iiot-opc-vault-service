@@ -278,9 +278,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Api
             /// </param>
             /// <param name='config'>
             /// </param>
-            public static CertificateGroupConfigurationApiModel PutCertificateGroupConfiguration(this IOpcVault operations, string groupId, CertificateGroupConfigurationApiModel config = default(CertificateGroupConfigurationApiModel))
+            public static CertificateGroupConfigurationApiModel UpdateCertificateGroupConfiguration(this IOpcVault operations, string groupId, CertificateGroupConfigurationApiModel config = default(CertificateGroupConfigurationApiModel))
             {
-                return operations.PutCertificateGroupConfigurationAsync(groupId, config).GetAwaiter().GetResult();
+                return operations.UpdateCertificateGroupConfigurationAsync(groupId, config).GetAwaiter().GetResult();
             }
 
             /// <summary>
@@ -296,9 +296,49 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Api
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<CertificateGroupConfigurationApiModel> PutCertificateGroupConfigurationAsync(this IOpcVault operations, string groupId, CertificateGroupConfigurationApiModel config = default(CertificateGroupConfigurationApiModel), CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<CertificateGroupConfigurationApiModel> UpdateCertificateGroupConfigurationAsync(this IOpcVault operations, string groupId, CertificateGroupConfigurationApiModel config = default(CertificateGroupConfigurationApiModel), CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.PutCertificateGroupConfigurationWithHttpMessagesAsync(groupId, config, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.UpdateCertificateGroupConfigurationWithHttpMessagesAsync(groupId, config, null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <summary>
+            /// Create new group configuration
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='groupId'>
+            /// </param>
+            /// <param name='subject'>
+            /// </param>
+            /// <param name='certType'>
+            /// </param>
+            public static CertificateGroupConfigurationApiModel CreateCertificateGroupConfiguration(this IOpcVault operations, string groupId, string subject, string certType)
+            {
+                return operations.CreateCertificateGroupConfigurationAsync(groupId, subject, certType).GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Create new group configuration
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='groupId'>
+            /// </param>
+            /// <param name='subject'>
+            /// </param>
+            /// <param name='certType'>
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<CertificateGroupConfigurationApiModel> CreateCertificateGroupConfigurationAsync(this IOpcVault operations, string groupId, string subject, string certType, CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.CreateCertificateGroupConfigurationWithHttpMessagesAsync(groupId, subject, certType, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }

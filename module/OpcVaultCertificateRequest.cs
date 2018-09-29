@@ -23,11 +23,11 @@ namespace Opc.Ua.Gds.Server.OpcVault
             this._certTypeMap = new Dictionary<NodeId, string>();
 
             // list of supported cert type mappings (V1.04)
-            this._certTypeMap.Add(Opc.Ua.ObjectTypeIds.HttpsCertificateType, "Https");
-            this._certTypeMap.Add(Opc.Ua.ObjectTypeIds.UserCredentialCertificateType, "User");
-            this._certTypeMap.Add(Opc.Ua.ObjectTypeIds.ApplicationCertificateType, "App");
-            this._certTypeMap.Add(Opc.Ua.ObjectTypeIds.RsaMinApplicationCertificateType, "AppRsaMin");
-            this._certTypeMap.Add(Opc.Ua.ObjectTypeIds.RsaSha256ApplicationCertificateType, "AppRsaSha256");
+            this._certTypeMap.Add(Opc.Ua.ObjectTypeIds.HttpsCertificateType, "HttpsCertificateType");
+            this._certTypeMap.Add(Opc.Ua.ObjectTypeIds.UserCredentialCertificateType, "UserCredentialCertificateType");
+            this._certTypeMap.Add(Opc.Ua.ObjectTypeIds.ApplicationCertificateType, "ApplicationCertificateType");
+            this._certTypeMap.Add(Opc.Ua.ObjectTypeIds.RsaMinApplicationCertificateType, "RsaMinApplicationCertificateType");
+            this._certTypeMap.Add(Opc.Ua.ObjectTypeIds.RsaSha256ApplicationCertificateType, "RsaSha256ApplicationCertificateType");
         }
 
         #region ICertificateRequest

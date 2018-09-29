@@ -101,6 +101,40 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
             return certificateGroupCollection.SingleOrDefault(cg => String.Equals(cg.Id, id, StringComparison.OrdinalIgnoreCase));
         }
 
+        public static async Task<CertificateGroupConfiguration> CreateCertificateGroupConfiguration(
+            KeyVaultServiceClient keyVaultServiceClient,
+            string id,
+            string subject,
+            string certType)
+        {
+            var config = DefaultConfiguration(id, subject, certType);
+            if (id.ToLower() != config.Id.ToLower())
+            {
+                throw new ArgumentException("groupid doesn't match config id");
+            }
+            string json = await keyVaultServiceClient.GetCertificateConfigurationGroupsAsync().ConfigureAwait(false);
+            List<Opc.Ua.Gds.Server.CertificateGroupConfiguration> certificateGroupCollection = JsonConvert.DeserializeObject<List<Opc.Ua.Gds.Server.CertificateGroupConfiguration>>(json);
+
+            var original = certificateGroupCollection.SingleOrDefault(cg => String.Equals(cg.Id, id, StringComparison.OrdinalIgnoreCase));
+            if (original != null)
+            {
+                throw new ArgumentException("groupid already exists");
+            }
+
+            ValidateConfiguration(config);
+
+            certificateGroupCollection.Add(config);
+
+            json = JsonConvert.SerializeObject(certificateGroupCollection);
+
+            // update config
+            json = await keyVaultServiceClient.PutCertificateConfigurationGroupsAsync(json).ConfigureAwait(false);
+
+            // read it back to verify
+            certificateGroupCollection = JsonConvert.DeserializeObject<List<Opc.Ua.Gds.Server.CertificateGroupConfiguration>>(json);
+            return certificateGroupCollection.SingleOrDefault(cg => String.Equals(cg.Id, id, StringComparison.OrdinalIgnoreCase));
+        }
+
         #region ICertificateGroupProvider
         public override async Task Init()
         {
@@ -347,12 +381,12 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
             }
         }
 
-        private Opc.Ua.Gds.Server.CertificateGroupConfiguration DefaultConfiguration(string id)
+        private static Opc.Ua.Gds.Server.CertificateGroupConfiguration DefaultConfiguration(string id, string subject, string certType)
         {
             var config = new Opc.Ua.Gds.Server.CertificateGroupConfiguration()
             {
                 Id = id,
-                SubjectName = "CN=Azure IoT Vault CA, O=Microsoft Corp.",
+                SubjectName = subject,
                 CertificateType = CertTypeMap()[Opc.Ua.ObjectTypeIds.RsaSha256ApplicationCertificateType],
                 DefaultCertificateLifetime = 12,
                 DefaultCertificateHashSize = 256,
@@ -361,6 +395,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
                 CACertificateHashSize = 256,
                 CACertificateKeySize = 2048
             };
+            if (certType != null)
+            {
+                var checkedCertType = CertTypeMap().Where(c => c.Value.ToLower() == certType.ToLower()).Single();
+                config.CertificateType = checkedCertType.Value;
+            }
             ValidateConfiguration(config);
             return config;
         }
