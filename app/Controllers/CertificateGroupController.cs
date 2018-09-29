@@ -83,6 +83,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
                     return new NotFoundResult();
                 }
 
+                // at this point only allow lifetime and Subject update
                 group.SubjectName = newGroup.SubjectName;
                 group.DefaultCertificateLifetime = newGroup.DefaultCertificateLifetime;
                 //group.DefaultCertificateKeySize = newGroup.DefaultCertificateKeySize;
@@ -90,8 +91,14 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
                 group.CACertificateLifetime = newGroup.CACertificateLifetime;
                 //group.CACertificateKeySize = newGroup.CACertificateKeySize;
                 //group.CACertificateHashSize = newGroup.CACertificateHashSize;
-                // TODO: service call
-                //await gdsVault.UpdateGroupAsync(group.Name, group);
+                try
+                {
+                    await opcVault.UpdateCertificateGroupConfigurationAsync(group.Name, group).ConfigureAwait(false);
+                }
+                catch (HttpOperationException http)
+                {
+                    return View(newGroup);
+                }
 
                 return RedirectToAction("Index");
             }
