@@ -37,9 +37,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             _clientConfig = clientConfig;
             _keyVaultServiceClient = new KeyVaultServiceClient(servicesConfig.KeyVaultApiUrl, servicesConfig.KeyVaultHSM, logger);
             if (clientConfig != null &&
-                clientConfig.ClientId != null && clientConfig.ClientSecret != null)
+                clientConfig.AppId != null && clientConfig.AppSecret != null)
             {
-                _keyVaultServiceClient.SetAuthenticationClientCredential(clientConfig.ClientId, clientConfig.ClientSecret);
+                _keyVaultServiceClient.SetAuthenticationClientCredential(clientConfig.AppId, clientConfig.AppSecret);
             }
             else
             {
@@ -109,8 +109,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                         token,
                         (String.IsNullOrEmpty(_clientConfig.Authority) ? kAuthority : _clientConfig.Authority) + _clientConfig.TenantId,
                         _servicesConfig.KeyVaultResourceID,
-                        _clientConfig.ClientId,
-                        _clientConfig.ClientSecret);
+                        _clientConfig.AppId,
+                        _clientConfig.AppSecret);
                 var keyVaultServiceClient = new KeyVaultServiceClient(_servicesConfig.KeyVaultApiUrl, _servicesConfig.KeyVaultHSM, _log);
                 keyVaultServiceClient.SetServiceClientCredentials(serviceClientCredentials);
                 return new KeyVaultCertificateGroup(
@@ -122,7 +122,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             }
             catch (Exception ex)
             {
-                // try default 
+                // try default
                 _log.Error("Failed to create on behalf Key Vault client. ", () => new { ex });
             }
             return this;
