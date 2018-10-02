@@ -11,6 +11,7 @@
     <Copyright>Microsoft Corp. All rights reserved.</Copyright>
     <Description>Azure Industrial IoT OPC UA Vault service component</Description>
     <UserSecretsId>71f9c347-48d7-4f74-8f1b-c3df149c26c8</UserSecretsId>
+    <HighEntropyVA>true</HighEntropyVA>
     <Configurations>Debug;Release;Develop</Configurations>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
