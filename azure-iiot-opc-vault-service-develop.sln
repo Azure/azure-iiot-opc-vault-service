@@ -3,9 +3,10 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27130.2036
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "solution", "solution", "{8289AFAE-0933-40EF-9D19-6FFA2DB04837}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8289AFAE-0933-40EF-9D19-6FFA2DB04837}"
 	ProjectSection(SolutionItems) = preProject
 		.dockerignore = .dockerignore
+		.editorconfig = .editorconfig
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
 		.travis.yml = .travis.yml
@@ -127,15 +128,5 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F947AAE7-2D6B-43C0-B5E6-824B8E4D7992}
-	EndGlobalSection
-	GlobalSection(MonoDevelopProperties) = preSolution
-		Policies = $0
-		$0.DotNetNamingPolicy = $1
-		$0.TextStylePolicy = $2
-		$2.inheritsSet = null
-		$2.scope = text/x-csharp
-		$0.CSharpFormattingPolicy = $3
-		$3.scope = text/x-csharp
-		$0.VersionControlPolicy = $4
 	EndGlobalSection
 EndGlobal

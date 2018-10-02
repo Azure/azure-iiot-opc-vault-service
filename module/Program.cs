@@ -284,13 +284,13 @@ namespace Opc.Ua.Gds.Server
 
             var serviceClient = new OpcVaultLoginCredentials(opcVaultOptions, azureADOptions);
             IOpcVault opcVaultServiceClient = new Microsoft.Azure.IIoT.OpcUa.Services.Vault.Api.OpcVault(new Uri(opcVaultOptions.BaseAddress), serviceClient);
-            var gdsVaultHandler = new OpcVaultClientHandler(opcVaultServiceClient);
+            var opcVaultHandler = new OpcVaultClientHandler(opcVaultServiceClient);
 
-            // read configurations from GdsVault
-            opcVaultConfiguration.CertificateGroups = await gdsVaultHandler.GetCertificateConfigurationGroupsAsync(opcVaultConfiguration.BaseCertificateGroupStorePath);
+            // read configurations from OpcVault secret
+            opcVaultConfiguration.CertificateGroups = await opcVaultHandler.GetCertificateConfigurationGroupsAsync(opcVaultConfiguration.BaseCertificateGroupStorePath);
             UpdateGDSConfigurationDocument(config.Extensions, opcVaultConfiguration);
 
-            var certGroup = new OpcVaultCertificateGroup(gdsVaultHandler);
+            var certGroup = new OpcVaultCertificateGroup(opcVaultHandler);
             var requestDB = new OpcVaultCertificateRequest(opcVaultServiceClient);
             var appDB = new OpcVaultApplicationsDatabase(opcVaultServiceClient);
 

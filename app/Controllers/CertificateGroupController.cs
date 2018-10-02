@@ -21,14 +21,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
     [Authorize]
     public class CertificateGroupController : Controller
     {
-        // see RFC 2585
-        const string ContentTypeCert = "application/pkix-cert";
-        const string ContentTypeCrl = "application/pkix-crl";
-        // see CertificateContentType.Pfx
-        const string ContentTypePfx = "application/x-pkcs12";
-        // see CertificateContentType.Pem
-        const string ContentTypePem = "application/x-pem-file";
-
         private IOpcVault opcVault;
         private readonly OpcVaultApiOptions opcVaultOptions;
         private readonly AzureADOptions azureADOptions;
@@ -156,7 +148,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
             AuthorizeClient();
             var issuer = await opcVault.GetCACertificateChainAsync(id);
             var byteArray = Convert.FromBase64String(issuer.Chain[0].Certificate);
-            return new FileContentResult(byteArray, ContentTypeCert)
+            return new FileContentResult(byteArray, ContentType.Cert)
             {
                 FileDownloadName = CertFileName(issuer.Chain[0].Certificate) + ".der"
             };
@@ -169,7 +161,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
             var issuer = await opcVault.GetCACertificateChainAsync(id);
             var crl = await opcVault.GetCACrlChainAsync(id);
             var byteArray = Convert.FromBase64String(crl.Chain[0].Crl);
-            return new FileContentResult(byteArray, ContentTypeCrl)
+            return new FileContentResult(byteArray, ContentType.Crl)
             {
                 FileDownloadName = CertFileName(issuer.Chain[0].Certificate) + ".crl"
             };

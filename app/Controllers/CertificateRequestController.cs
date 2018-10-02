@@ -21,14 +21,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
     [Authorize]
     public class CertificateRequestController : Controller
     {
-        // see RFC 2585
-        const string ContentTypeCert = "application/pkix-cert";
-        const string ContentTypeCrl = "application/pkix-crl";
-        // see CertificateContentType.Pfx
-        const string ContentTypePfx = "application/x-pkcs12";
-        // see CertificateContentType.Pem
-        const string ContentTypePem = "application/x-pem-file";
-
         private IOpcVault opcVault;
         private readonly OpcVaultApiOptions opcVaultOptions;
         private readonly AzureADOptions azureADOptions;
@@ -248,7 +240,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
             {
                 var issuer = await opcVault.GetCACertificateChainAsync(request.CertificateGroupId);
                 var byteArray = Convert.FromBase64String(issuer.Chain[0].Certificate);
-                return new FileContentResult(byteArray, ContentTypeCert)
+                return new FileContentResult(byteArray, ContentType.Cert)
                 {
                     FileDownloadName = CertFileName(issuer.Chain[0].Certificate) + ".der"
                 };
@@ -266,7 +258,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
                 var issuer = await opcVault.GetCACertificateChainAsync(request.CertificateGroupId);
                 var crl = await opcVault.GetCACrlChainAsync(request.CertificateGroupId);
                 var byteArray = Convert.FromBase64String(crl.Chain[0].Crl);
-                return new FileContentResult(byteArray, ContentTypeCrl)
+                return new FileContentResult(byteArray, ContentType.Crl)
                 {
                     FileDownloadName = CertFileName(issuer.Chain[0].Certificate) + ".crl"
                 };
@@ -285,7 +277,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
                 if (String.Compare(result.PrivateKeyFormat, "PFX", StringComparison.OrdinalIgnoreCase) == 0)
                 {
                     var byteArray = Convert.FromBase64String(result.PrivateKey);
-                    return new FileContentResult(byteArray, ContentTypePfx)
+                    return new FileContentResult(byteArray, ContentType.Pfx)
                     {
                         FileDownloadName = CertFileName(result.SignedCertificate) + ".pfx"
                     };
@@ -293,7 +285,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
                 else if (String.Compare(result.PrivateKeyFormat, "PEM", StringComparison.OrdinalIgnoreCase) == 0)
                 {
                     var byteArray = Convert.FromBase64String(result.PrivateKey);
-                    return new FileContentResult(byteArray, ContentTypePem)
+                    return new FileContentResult(byteArray, ContentType.Pem)
                     {
                         FileDownloadName = CertFileName(result.SignedCertificate) + ".pem"
                     };

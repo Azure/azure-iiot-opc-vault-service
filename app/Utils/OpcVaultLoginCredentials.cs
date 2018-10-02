@@ -80,7 +80,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Utils
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthenticationToken);
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            //request.Version = new Version(apiVersion);
             await base.ProcessHttpRequestAsync(request, cancellationToken);
         }
     }

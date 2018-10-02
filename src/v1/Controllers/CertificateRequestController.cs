@@ -99,29 +99,29 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Controllers
         /// <summary>Query certificate requests</summary>
         [HttpGet]
         [SwaggerOperation(OperationId = "QueryRequests")]
-        public async Task<QueryRequestsResponseApiModel> QueryRequestsAsync()
+        public async Task<CertificateRequestRecordQueryResponseApiModel> QueryRequestsAsync()
         {
             var results = await _certificateRequest.QueryAsync(null, null);
-            return new QueryRequestsResponseApiModel(results);
+            return new CertificateRequestRecordQueryResponseApiModel(results);
         }
 
         /// <summary>Query certificate requests by appId</summary>
         [HttpGet("app/{appId}")]
         [SwaggerOperation(OperationId = "QueryAppRequests")]
-        public async Task<QueryRequestsResponseApiModel> QueryAppRequestsAsync(string appId)
+        public async Task<CertificateRequestRecordQueryResponseApiModel> QueryAppRequestsAsync(string appId)
         {
             var results = await _certificateRequest.QueryAsync(appId, null);
-            return new QueryRequestsResponseApiModel(results);
+            return new CertificateRequestRecordQueryResponseApiModel(results);
         }
 
         /// <summary>Query certificate requests by state</summary>
         [HttpGet("state/{state}")]
         [SwaggerOperation(OperationId = "QueryAppRequests")]
-        public async Task<QueryRequestsResponseApiModel> QueryStateRequestsAsync(string state)
+        public async Task<CertificateRequestRecordQueryResponseApiModel> QueryStateRequestsAsync(string state)
         {
             // todo: parse state
             var results = await _certificateRequest.QueryAsync(null, null);
-            return new QueryRequestsResponseApiModel(results);
+            return new CertificateRequestRecordQueryResponseApiModel(results);
         }
 
         /// <summary>Read certificate request</summary>

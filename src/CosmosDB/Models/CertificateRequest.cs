@@ -38,5 +38,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB.Models
         public DateTime RequestTime { get; set; }
         public DateTime ApproveRejectTime { get; set; }
         public DateTime AcceptTime { get; set; }
+        public string Authority { get; set; }
+
     }
 }

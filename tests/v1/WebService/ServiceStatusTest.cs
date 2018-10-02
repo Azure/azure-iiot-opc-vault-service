@@ -26,7 +26,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test.WebService
         /// Bootstrap a real HTTP server and test a request to the
         /// status endpoint.
         /// </summary>
-        [Fact, Trait(Constants.Type, Constants.IntegrationTest)]
+        [Fact(Skip = "not yet implemented"), Trait(Constants.Type, Constants.IntegrationTest)]
         public void TheServiceIsHealthyViaHttpServer()
         {
             // Arrange
@@ -52,7 +52,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test.WebService
         /// Bootstrap a test server and test a request to the
         /// status endpoint
         /// </summary>
-        [Fact, Trait(Constants.Type, Constants.IntegrationTest)]
+        [Fact(Skip = "not yet implemented"), Trait(Constants.Type, Constants.IntegrationTest)]
         public void TheServiceIsHealthyViaTestServer()
         {
             // Arrange
