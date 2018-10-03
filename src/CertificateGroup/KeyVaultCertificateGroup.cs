@@ -137,7 +137,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
         /// <inheritdoc/>
         public async Task<string[]> GetCertificateGroupIds()
         {
-            return await KeyVaultCertificateGroupProvider.GetCertificateGroupIds(_keyVaultServiceClient).ConfigureAwait(false); ;
+            return await KeyVaultCertificateGroupProvider.GetCertificateGroupIds(_keyVaultServiceClient).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -169,7 +169,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
         public async Task<Opc.Ua.X509CRL> RevokeCertificateAsync(string id, X509Certificate2 certificate)
         {
             var certificateGroup = await KeyVaultCertificateGroupProvider.Create(_keyVaultServiceClient, id).ConfigureAwait(false);
-            await certificateGroup.RevokeCertificateAsync(certificate).ConfigureAwait(false); ;
+            await certificateGroup.RevokeCertificateAsync(certificate).ConfigureAwait(false);
             return certificateGroup.Crl;
         }
 
@@ -210,13 +210,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             string privateKeyPassword
             )
         {
-            var certificateGroup = await KeyVaultCertificateGroupProvider.Create(_keyVaultServiceClient, id).ConfigureAwait(false); ;
+            var certificateGroup = await KeyVaultCertificateGroupProvider.Create(_keyVaultServiceClient, id).ConfigureAwait(false);
             var app = new Opc.Ua.Gds.ApplicationRecordDataType
             {
                 ApplicationNames = new Opc.Ua.LocalizedTextCollection(),
                 ApplicationUri = applicationUri
             };
-            return await certificateGroup.NewKeyPairRequestAsync(app, subjectName, domainNames, privateKeyFormat, privateKeyPassword).ConfigureAwait(false); ;
+            return await certificateGroup.NewKeyPairRequestAsync(app, subjectName, domainNames, privateKeyFormat, privateKeyPassword).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>

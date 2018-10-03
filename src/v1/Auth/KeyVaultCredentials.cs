@@ -70,7 +70,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Auth
         {
             if (request == null)
             {
-                throw new ArgumentNullException("request");
+                throw new ArgumentNullException(nameof(request));
             }
 
             if (AuthenticationToken == null)

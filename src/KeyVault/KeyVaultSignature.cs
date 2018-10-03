@@ -34,8 +34,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
             ushort hashSizeInBits,
             X509Certificate2 issuerCAKeyCert,
             RSA publicKey,
-            X509SignatureGenerator generator,
-            bool isCA = false
+            X509SignatureGenerator generator
             )
         {
             if (publicKey == null || issuerCAKeyCert == null)
@@ -225,7 +224,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
                 Org.BouncyCastle.Asn1.Asn1Object asn1Object = GetExtensionValue(crl, Org.BouncyCastle.Asn1.X509.X509Extensions.CrlNumber);
                 if (asn1Object != null)
                 {
-                    crlNumber = Org.BouncyCastle.Asn1.X509.CrlNumber.GetInstance(asn1Object).PositiveValue;
+                    crlNumber = Org.BouncyCastle.Asn1.DerInteger.GetInstance(asn1Object).PositiveValue;
                 }
             }
             finally
@@ -300,7 +299,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
 
             if (keySize % 1024 != 0)
             {
-                throw new ArgumentNullException("keySize", "KeySize must be a multiple of 1024.");
+                throw new ArgumentNullException(nameof(keySize), "KeySize must be a multiple of 1024.");
             }
 
             // enforce minimum lifetime.
@@ -322,13 +321,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
             {
                 if (subjectNameEntries == null)
                 {
-                    throw new ArgumentNullException("applicationName", "Must specify a applicationName or a subjectName.");
+                    throw new ArgumentNullException(nameof(applicationName), "Must specify a applicationName or a subjectName.");
                 }
 
                 // use the common name as the application name.
                 for (int ii = 0; ii < subjectNameEntries.Count; ii++)
                 {
-                    if (subjectNameEntries[ii].StartsWith("CN="))
+                    if (subjectNameEntries[ii].StartsWith("CN=", StringComparison.InvariantCulture))
                     {
                         applicationName = subjectNameEntries[ii].Substring(3).Trim();
                         break;
@@ -338,7 +337,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
 
             if (String.IsNullOrEmpty(applicationName))
             {
-                throw new ArgumentNullException("applicationName", "Must specify a applicationName or a subjectName.");
+                throw new ArgumentNullException(nameof(applicationName), "Must specify a applicationName or a subjectName.");
             }
 
             // remove special characters from name.
@@ -548,6 +547,10 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
 
             internal static PublicKey BuildPublicKey(RSA rsa)
             {
+                if (rsa == null) {
+                    throw new ArgumentNullException(nameof(rsa));
+                }
+
                 return null;
             }
 
@@ -721,7 +724,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
                 _reader.Read(oidBytes, 0, oidBytes.Length);
                 if (!oidBytes.SequenceEqual(oidRSAEncryption))
                 {
-                    new CryptographicException("No RSA Encryption key.");
+                    throw new CryptographicException("No RSA Encryption key.");
                 }
                 int remainingBytes = identifierSize - 2 - oidBytes.Length;
                 _reader.ReadBytes(remainingBytes);
