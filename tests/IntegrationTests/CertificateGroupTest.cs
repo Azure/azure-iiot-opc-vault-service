@@ -8,10 +8,12 @@ using Microsoft.Azure.IIoT.Auth.Azure;
 using Microsoft.Azure.IIoT.Diagnostics;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Runtime;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test.Helpers;
+using Microsoft.Extensions.Configuration;
 using Opc.Ua;
 using Opc.Ua.Gds;
 using Opc.Ua.Test;
 using System;
+using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -91,23 +93,10 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
 
     public class CertificateGroupTest
     {
-        private ServicesConfig serviceConfig = new ServicesConfig()
-        {
-            KeyVaultResourceID =  "https://vault.azure.net",
-            // TODO: new test vault
-            KeyVaultApiUrl = "https://gdsvault-test.vault.azure.net"
-        };
+        IConfigurationRoot Configuration;
 
-        private IClientConfig clientConfig = new ClientConfig()
-        {
-            // TODO: new OpcVault app service
-            // use GDSVault.Service.Test
-            ClientId = "f70b169e-8d98-40df-8581-f61fa48faa8f",
-            ClientSecret = "ifhuwDuz+Wy4zgwvVG7xVqMsMnNQYtBLGEQrA+1DVvc=",
-            TenantId = "72f988bf-86f1-41af-91ab-2d7cd011db47",
-            Authority = "https://login.microsoftonline.com/"
-        };
-
+        private ServicesConfig serviceConfig = new ServicesConfig();
+        private IClientConfig clientConfig = new ClientConfig();
         private TraceLogger logger = new TraceLogger(new LogConfig());
 
         public CertificateGroupTest(ITestOutputHelper log)
@@ -115,15 +104,21 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
             _log = log;
             _randomSource = new RandomSource(randomStart);
             _dataGenerator = new DataGenerator(_randomSource);
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("testsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile("testsettings.Development.json", optional: true, reloadOnChange: true)
+                .AddEnvironmentVariables();
+            Configuration = builder.Build();
+            Configuration.Bind("Vault", serviceConfig);
+            Configuration.Bind("Auth", clientConfig);
         }
-
 
         [Fact, Trait(Constants.Type, Constants.UnitTest)]
         public async Task KeyVaultInit()
         {
             KeyVaultCertificateGroup keyVault = new KeyVaultCertificateGroup(serviceConfig, clientConfig, logger);
             await keyVault.Init();
-            
         }
 
         [Fact, Trait(Constants.Type, Constants.UnitTest)]
