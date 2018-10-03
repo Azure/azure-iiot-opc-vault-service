@@ -95,9 +95,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
     {
         IConfigurationRoot Configuration;
 
-        private ServicesConfig serviceConfig = new ServicesConfig();
-        private IClientConfig clientConfig = new ClientConfig();
-        private TraceLogger logger = new TraceLogger(new LogConfig());
+        ServicesConfig ServiceConfig = new ServicesConfig();
+        IClientConfig ClientConfig = new ClientConfig();
+        TraceLogger Logger = new TraceLogger(new LogConfig());
 
         public CertificateGroupTest(ITestOutputHelper log)
         {
@@ -110,38 +110,41 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
                 .AddJsonFile("testsettings.Development.json", optional: true, reloadOnChange: true)
                 .AddEnvironmentVariables();
             Configuration = builder.Build();
-            Configuration.Bind("Vault", serviceConfig);
-            Configuration.Bind("Auth", clientConfig);
+            Configuration.Bind("Vault", ServiceConfig);
+            Configuration.Bind("Auth", ClientConfig);
         }
 
-        [Fact, Trait(Constants.Type, Constants.UnitTest)]
+        [SkippableFact, Trait(Constants.Type, Constants.UnitTest)]
         public async Task KeyVaultInit()
         {
-            KeyVaultCertificateGroup keyVault = new KeyVaultCertificateGroup(serviceConfig, clientConfig, logger);
+            SkipOnInvalidConfiguration();
+            KeyVaultCertificateGroup keyVault = new KeyVaultCertificateGroup(ServiceConfig, ClientConfig, Logger);
             await keyVault.Init();
         }
 
-        [Fact, Trait(Constants.Type, Constants.UnitTest)]
+        [SkippableFact, Trait(Constants.Type, Constants.UnitTest)]
         public async Task KeyVaultListOfCertGroups()
         {
-            KeyVaultCertificateGroup keyVault = new KeyVaultCertificateGroup(serviceConfig, clientConfig, logger);
+            SkipOnInvalidConfiguration();
+            KeyVaultCertificateGroup keyVault = new KeyVaultCertificateGroup(ServiceConfig, ClientConfig, Logger);
             string[] groups = await keyVault.GetCertificateGroupIds();
         }
 
-        [Fact, Trait(Constants.Type, Constants.UnitTest)]
+        [SkippableFact, Trait(Constants.Type, Constants.UnitTest)]
         public async Task KeyVaultGroupConfigurationCollection()
         {
-
-            KeyVaultCertificateGroup keyVault = new KeyVaultCertificateGroup(serviceConfig, clientConfig, logger);
+            SkipOnInvalidConfiguration();
+            KeyVaultCertificateGroup keyVault = new KeyVaultCertificateGroup(ServiceConfig, ClientConfig, Logger);
             Opc.Ua.Gds.Server.CertificateGroupConfigurationCollection groupCollection = await keyVault.GetCertificateGroupConfigurationCollection();
             Assert.NotNull(groupCollection);
             Assert.NotEmpty(groupCollection);
         }
 
-        [Fact, Trait(Constants.Type, Constants.UnitTest)]
+        [SkippableFact, Trait(Constants.Type, Constants.UnitTest)]
         public async Task KeyVaultGetCertificateAsync()
         {
-            KeyVaultCertificateGroup keyVault = new KeyVaultCertificateGroup(serviceConfig, clientConfig, logger);
+            SkipOnInvalidConfiguration();
+            KeyVaultCertificateGroup keyVault = new KeyVaultCertificateGroup(ServiceConfig, ClientConfig, Logger);
             await keyVault.Init();
             string[] groups = await keyVault.GetCertificateGroupIds();
             foreach (string group in groups)
@@ -164,10 +167,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
             }
         }
 
-        [Fact, Trait(Constants.Type, Constants.UnitTest)]
+        [SkippableFact, Trait(Constants.Type, Constants.UnitTest)]
         public async Task KeyVaultCreateCACertificateAsync()
         {
-            KeyVaultCertificateGroup keyVault = new KeyVaultCertificateGroup(serviceConfig, clientConfig, logger);
+            SkipOnInvalidConfiguration();
+            KeyVaultCertificateGroup keyVault = new KeyVaultCertificateGroup(ServiceConfig, ClientConfig, Logger);
             string[] groups = await keyVault.GetCertificateGroupIds();
             foreach (string group in groups)
             {
@@ -181,10 +185,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
             }
         }
 
-        [Fact, Trait(Constants.Type, Constants.UnitTest)]
+        [SkippableFact, Trait(Constants.Type, Constants.UnitTest)]
         public async Task KeyVaultNewKeyPairRequestAsync()
         {
-            KeyVaultCertificateGroup keyVault = new KeyVaultCertificateGroup(serviceConfig, clientConfig, logger);
+            SkipOnInvalidConfiguration();
+            KeyVaultCertificateGroup keyVault = new KeyVaultCertificateGroup(ServiceConfig, ClientConfig, Logger);
             string[] groups = await keyVault.GetCertificateGroupIds();
             foreach (string group in groups)
             {
@@ -214,10 +219,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
             }
         }
 
-        [Fact, Trait(Constants.Type, Constants.UnitTest)]
+        [SkippableFact, Trait(Constants.Type, Constants.UnitTest)]
         public async Task KeyVaultSigningRequestAsync()
         {
-            KeyVaultCertificateGroup keyVault = new KeyVaultCertificateGroup(serviceConfig, clientConfig, logger);
+            SkipOnInvalidConfiguration();
+            KeyVaultCertificateGroup keyVault = new KeyVaultCertificateGroup(ServiceConfig, ClientConfig, Logger);
             string[] groups = await keyVault.GetCertificateGroupIds();
             foreach (string group in groups)
             {
@@ -258,10 +264,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
         }
 
 
-        [Fact, Trait(Constants.Type, Constants.UnitTest)]
+        [SkippableFact, Trait(Constants.Type, Constants.UnitTest)]
         public async Task KeyVaultNewKeyPairAndRevokeCertificateAsync()
         {
-            KeyVaultCertificateGroup keyVault = new KeyVaultCertificateGroup(serviceConfig, clientConfig, logger);
+            SkipOnInvalidConfiguration();
+            KeyVaultCertificateGroup keyVault = new KeyVaultCertificateGroup(ServiceConfig, ClientConfig, Logger);
             await keyVault.Init();
             string[] groups = await keyVault.GetCertificateGroupIds();
             foreach (string group in groups)
@@ -291,10 +298,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
             }
         }
 
-        [Fact, Trait(Constants.Type, Constants.UnitTest)]
+        [SkippableFact, Trait(Constants.Type, Constants.UnitTest)]
         public async Task GetTrustListAsync()
         {
-            KeyVaultCertificateGroup keyVault = new KeyVaultCertificateGroup(serviceConfig, clientConfig, logger);
+            SkipOnInvalidConfiguration();
+            KeyVaultCertificateGroup keyVault = new KeyVaultCertificateGroup(ServiceConfig, ClientConfig, Logger);
             await keyVault.Init();
             string[] groups = await keyVault.GetCertificateGroupIds();
             foreach (string group in groups)
@@ -390,6 +398,16 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
                 }
             }
             return result;
+        }
+
+        private void SkipOnInvalidConfiguration()
+        {
+            Skip.If(
+                ServiceConfig.KeyVaultApiUrl == null ||
+                ServiceConfig.KeyVaultResourceID == null ||
+                ClientConfig.ClientId == null ||
+                ClientConfig.ClientSecret == null,
+                "Missing valid KeyVault configuration");
         }
 
         /// <summary>The test logger</summary>
