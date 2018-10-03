@@ -21,6 +21,7 @@ using System.Threading.Tasks;
 namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
 {
 
+    /// <inheritdoc/>
     public sealed class KeyVaultCertificateGroup : ICertificateGroup
     {
         private readonly IServicesConfig _servicesConfig;
@@ -28,6 +29,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
         private readonly KeyVaultServiceClient _keyVaultServiceClient;
         private readonly ILogger _log;
         private const string kAuthority = "https://login.microsoftonline.com/";
+
+        /// <inheritdoc/>
         public KeyVaultCertificateGroup(
             IServicesConfig servicesConfig,
             IClientConfig clientConfig,
@@ -50,6 +53,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             _log.Debug("Creating new instance of `KeyVault` service " + servicesConfig.KeyVaultApiUrl, () => { });
         }
 
+        /// <inheritdoc/>
         public KeyVaultCertificateGroup(
             KeyVaultServiceClient keyVaultServiceClient,
             IServicesConfig servicesConfig,
@@ -64,6 +68,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             _log.Debug("Creating new on behalf of instance of `KeyVault` service ", () => { });
         }
 
+        /// <inheritdoc/>
         public async Task Init()
         {
             var certificateGroupCollection = await GetCertificateGroupConfigurationCollection().ConfigureAwait(false);
@@ -98,7 +103,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             }
         }
 
-        public async Task<ICertificateGroup> OnBehalfOfRequest(HttpRequest request)
+        /// <inheritdoc/>
+        public Task<ICertificateGroup> OnBehalfOfRequest(HttpRequest request)
         {
             try
             {
@@ -113,47 +119,53 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                         _clientConfig.AppSecret);
                 var keyVaultServiceClient = new KeyVaultServiceClient(_servicesConfig.KeyVaultApiUrl, _servicesConfig.KeyVaultHSM, _log);
                 keyVaultServiceClient.SetServiceClientCredentials(serviceClientCredentials);
-                return new KeyVaultCertificateGroup(
+                return Task.FromResult<ICertificateGroup>(new KeyVaultCertificateGroup(
                     keyVaultServiceClient,
                     _servicesConfig,
                     _clientConfig,
                     _log
-                    );
+                    ));
             }
             catch (Exception ex)
             {
                 // try default
                 _log.Error("Failed to create on behalf Key Vault client. ", () => new { ex });
             }
-            return this;
+            return Task.FromResult<ICertificateGroup>(this);
         }
 
+        /// <inheritdoc/>
         public async Task<string[]> GetCertificateGroupIds()
         {
             return await KeyVaultCertificateGroupProvider.GetCertificateGroupIds(_keyVaultServiceClient).ConfigureAwait(false); ;
         }
 
+        /// <inheritdoc/>
         public async Task<Opc.Ua.Gds.Server.CertificateGroupConfiguration> GetCertificateGroupConfiguration(string id)
         {
             return await KeyVaultCertificateGroupProvider.GetCertificateGroupConfiguration(_keyVaultServiceClient, id).ConfigureAwait(false);
         }
 
+        /// <inheritdoc/>
         public async Task<Opc.Ua.Gds.Server.CertificateGroupConfiguration> UpdateCertificateGroupConfiguration(string id, Opc.Ua.Gds.Server.CertificateGroupConfiguration config)
         {
             return await KeyVaultCertificateGroupProvider.UpdateCertificateGroupConfiguration(_keyVaultServiceClient, id, config).ConfigureAwait(false);
         }
 
+        /// <inheritdoc/>
         public async Task<Opc.Ua.Gds.Server.CertificateGroupConfiguration> CreateCertificateGroupConfiguration(string id, string subject, string certType)
         {
             return await KeyVaultCertificateGroupProvider.CreateCertificateGroupConfiguration(_keyVaultServiceClient, id, subject, certType).ConfigureAwait(false);
         }
 
+        /// <inheritdoc/>
         public async Task<Opc.Ua.Gds.Server.CertificateGroupConfigurationCollection> GetCertificateGroupConfigurationCollection()
         {
             string json = await _keyVaultServiceClient.GetCertificateConfigurationGroupsAsync().ConfigureAwait(false);
             return JsonConvert.DeserializeObject<Opc.Ua.Gds.Server.CertificateGroupConfigurationCollection>(json);
         }
 
+        /// <inheritdoc/>
         public async Task<Opc.Ua.X509CRL> RevokeCertificateAsync(string id, X509Certificate2 certificate)
         {
             var certificateGroup = await KeyVaultCertificateGroupProvider.Create(_keyVaultServiceClient, id).ConfigureAwait(false);
@@ -161,6 +173,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             return certificateGroup.Crl;
         }
 
+        /// <inheritdoc/>
         public async Task<X509Certificate2> CreateCACertificateAsync(string id)
         {
             var certificateGroup = await KeyVaultCertificateGroupProvider.Create(_keyVaultServiceClient, id).ConfigureAwait(false);
@@ -171,6 +184,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             return null;
         }
 
+        /// <inheritdoc/>
         public async Task<X509Certificate2> SigningRequestAsync(
             string id,
             string applicationUri,
@@ -186,6 +200,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             return await certificateGroup.SigningRequestAsync(app, null, certificateRequest).ConfigureAwait(false);
         }
 
+        /// <inheritdoc/>
         public async Task<Opc.Ua.Gds.Server.X509Certificate2KeyPair> NewKeyPairRequestAsync(
             string id,
             string applicationUri,
@@ -204,6 +219,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             return await certificateGroup.NewKeyPairRequestAsync(app, subjectName, domainNames, privateKeyFormat, privateKeyPassword).ConfigureAwait(false); ;
         }
 
+        /// <inheritdoc/>
         public async Task<X509Certificate2Collection> GetCACertificateChainAsync(string id)
         {
             var certificateGroup = await KeyVaultCertificateGroupProvider.Create(_keyVaultServiceClient, id).ConfigureAwait(false);
@@ -211,6 +227,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             return new X509Certificate2Collection(await certificateGroup.GetCACertificateAsync(id).ConfigureAwait(false));
         }
 
+        /// <inheritdoc/>
         public async Task<IList<Opc.Ua.X509CRL>> GetCACrlChainAsync(string id)
         {
             var certificateGroup = await KeyVaultCertificateGroupProvider.Create(_keyVaultServiceClient, id).ConfigureAwait(false);
@@ -222,6 +239,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             return crlList;
         }
 
+        /// <inheritdoc/>
         public async Task<KeyVaultTrustListModel> GetTrustListAsync(string id)
         {
             return await _keyVaultServiceClient.GetTrustListAsync(id).ConfigureAwait(false);

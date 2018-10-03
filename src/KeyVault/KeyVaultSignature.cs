@@ -112,7 +112,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         }
 
         /// <summary>
-        /// Revoke the certificate. 
+        /// Revoke the certificate.
         /// The CRL number is increased by one and the new CRL is returned.
         /// </summary>
         public static X509CRL RevokeCertificate(
@@ -588,9 +588,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         /// <summary>
         /// Constructor which also specifies a source of randomness to be used if one is required.
         /// </summary>
-        /// <param name="algorithm">The name of the signature algorithm to use.</param>
-        /// <param name="privateKey">The private key to be used in the signing operation.</param>
-        /// <param name="random">The source of randomness to be used in signature calculation.</param>
+        /// <param name="hashAlgorithm">The name of the signature algorithm to use.</param>
+        /// <param name="generator"></param>
         public KeyVaultSignatureFactory(HashAlgorithmName hashAlgorithm, X509SignatureGenerator generator)
         {
             Org.BouncyCastle.Asn1.DerObjectIdentifier sigOid;
@@ -615,6 +614,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
             this.algID = new Org.BouncyCastle.Asn1.X509.AlgorithmIdentifier(sigOid);
         }
 
+        /// <inheritdoc/>
         public Object AlgorithmDetails
         {
             get { return this.algID; }
@@ -651,17 +651,21 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         }
     }
 
+    /// <inheritdoc/>
     public class MemoryBlockResult : Org.BouncyCastle.Crypto.IBlockResult
     {
         private byte[] data;
+        /// <inheritdoc/>
         public MemoryBlockResult(byte[] data)
         {
             this.data = data;
         }
+        /// <inheritdoc/>
         public byte[] Collect()
         {
             return data;
         }
+        /// <inheritdoc/>
         public int Collect(byte[] destination, int offset)
         {
             throw new NotImplementedException();

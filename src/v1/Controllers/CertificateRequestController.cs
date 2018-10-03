@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Controllers
 {
+    /// <inheritdoc/>
     [Route(VersionInfo.PATH + "/request"), TypeFilter(typeof(ExceptionsFilterAttribute))]
     [Produces("application/json")]
     [Authorize(Policy = Policies.CanRead)]
@@ -23,6 +24,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Controllers
     {
         private readonly ICertificateRequest _certificateRequest;
 
+        /// <inheritdoc/>
         public CertificateRequestController(
             ICertificateRequest certificateRequest)
         {
