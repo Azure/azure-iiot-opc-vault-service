@@ -1,17 +1,19 @@
 ﻿@model Microsoft.Azure.IIoT.OpcUa.Services.Vault.Api.Models.ApplicationRecordApiModel
 
 @{
-    ViewBag.Title = "Register";
+    ViewBag.Title = "Certomat";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Register a new Application</h2>
-
+<h2>Register Application</h2>
 
 @using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
+
     <div class="form-horizontal">
+        <h4>Register</h4>
+        <hr />
 
         @for (int i = 0; i < Model.ApplicationNames.Count(); i++)
         {
@@ -43,19 +45,19 @@
             <div class="col-md-10">
                 <div class="checkbox">
                     @Html.DropDownListFor(
-                        model => model.ApplicationType,
-                        new SelectList(
-                            new List<Object>{
+                  model => model.ApplicationType,
+                  new SelectList(
+                      new List<Object>{
                                 new { value = 0 , text = "Server"  },
                                 new { value = 1 , text = "Client" },
                                 new { value = 2 , text = "ClientAndServer" },
                                 new { value = 3 , text = "DiscoveryServer"}
-                            },
-                        "value",
-                        "text",
-                        Model.ApplicationType
-                        ),
-                        "-select-")
+                      },
+                  "value",
+                  "text",
+                  Model.ApplicationType
+                  ),
+                  "-select-")
                     @Html.ValidationMessageFor(model => model.ApplicationType, "", new { @class = "text-danger" })
                 </div>
             </div>
@@ -90,9 +92,18 @@
             </div>
         </div>
 
+        @if (ViewData["Message"] != null)
+        {
+            <hr />
+            <p>
+                <h4>@ViewData["Message"]</h4>
+            </p>
+            <hr />
+        }
+
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Register" class="btn btn-default" />
+                <input type="submit" name="reg" value="Register" class="btn btn-default" />
                 <input type="submit" name="add" value="Add DiscoveryUrl" class="btn btn-default" />
                 <input type="submit" name="update" value="Update" class="btn btn-default" />
             </div>
@@ -100,7 +111,4 @@
     </div>
 }
 
-<div>
-    @Html.ActionLink("Back to List", "Index")
-</div>
 
