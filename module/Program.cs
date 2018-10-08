@@ -209,7 +209,7 @@ namespace Opc.Ua.Gds.Server
             {
                 ApplicationName = Program.Name,
                 ApplicationType = ApplicationType.Server,
-                ConfigSectionName = "Microsoft.Azure.IIoT.OpcUa.Services.Vault.Edge"
+                ConfigSectionName = "Microsoft.Azure.IIoT.OpcUa.Modules.Vault"
             };
 
             // load the application configuration.
@@ -295,8 +295,7 @@ namespace Opc.Ua.Gds.Server
             var appDB = new OpcVaultApplicationsDatabase(opcVaultServiceClient);
 
             requestDB.Initialize();
-            // TODO: disable auto approve once new nuget  is available
-            server = new GlobalDiscoverySampleServer(appDB, requestDB, certGroup/*, false*/);
+            server = new GlobalDiscoverySampleServer(appDB, requestDB, certGroup, false);
 
             // start the server.
             await application.Start(server);

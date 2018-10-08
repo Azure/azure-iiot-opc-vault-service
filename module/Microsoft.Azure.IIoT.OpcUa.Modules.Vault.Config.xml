@@ -148,6 +148,7 @@
           </CertificateGroupConfiguration>
         </CertificateGroups>
         <KnownHostNames/>
+        <DatabaseStorePath>https://iopgds.azurewebsites.net,02279827-17ad-4840-946e-c752508938d9,b70e0c9b-55c3-4d2e-98c2-95595ba6ae86,fG32xNmL8HHxoyVijlkMQU2xm/xtpMAANLpBzOzPE6Y=,72f988bf-86f1-41af-91ab-2d7cd011db47</DatabaseStorePath>
         <ShutdownDelay>5</ShutdownDelay>
       </GlobalDiscoveryServerConfiguration>
     </ua:XmlElement>
