@@ -41,12 +41,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Controllers
             {
                 throw new ArgumentNullException(nameof(signingRequest));
             }
+            string authorityId = User.Identity.Name;
             return await this._certificateRequest.StartSigningRequestAsync(
                 signingRequest.ApplicationId,
                 signingRequest.CertificateGroupId,
                 signingRequest.CertificateTypeId,
                 signingRequest.ToServiceModel(),
-                signingRequest.AuthorityId);
+                authorityId);
         }
 
         /// <summary>
@@ -61,6 +62,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Controllers
             {
                 throw new ArgumentNullException(nameof(newKeyPairRequest));
             }
+            string authorityId = User.Identity.Name;
             return await _certificateRequest.StartNewKeyPairRequestAsync(
                 newKeyPairRequest.ApplicationId,
                 newKeyPairRequest.CertificateGroupId,
@@ -69,7 +71,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Controllers
                 newKeyPairRequest.DomainNames,
                 newKeyPairRequest.PrivateKeyFormat,
                 newKeyPairRequest.PrivateKeyPassword,
-                newKeyPairRequest.AuthorityId);
+                authorityId);
         }
 
         /// <summary>
