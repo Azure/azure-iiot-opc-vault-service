@@ -1,10 +1,10 @@
 ﻿{
-  "Vault": {
+  "OpcVault": {
     //
     // KeyVault service uri from Azure portal
     //
     "KeyVaultResourceId": "https://vault.azure.net"
-    // "KeyVaultApiUrl": "",
+    // "KeyVaultBaseUrl": "",
     // set to true if KeyVault has HSM option
     // "KeyVaultHSM": true
 
@@ -52,12 +52,17 @@
     // The optional tenant id. The tenant ID is an immutable and reliable
     // identifier of the directory.
     //
-    // "TenantId": "",  
+    // "TenantId": "",
+
+    //
+    // The application id
+    //
+    // "AppId": "",
 
     //
     // The application secret for on behalf of authentication
     //
-    // "AppSecret": "",  
+    // "AppSecret": "",
 
     //
     // When validating the token expiration, allows some clock skew

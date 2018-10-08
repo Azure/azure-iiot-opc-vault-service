@@ -110,7 +110,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
                 .AddJsonFile("testsettings.Development.json", optional: true, reloadOnChange: true)
                 .AddEnvironmentVariables();
             Configuration = builder.Build();
-            Configuration.Bind("Vault", ServiceConfig);
+            Configuration.Bind("OpcVault", ServiceConfig);
             Configuration.Bind("Auth", ClientConfig);
         }
 
@@ -403,8 +403,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
         private void SkipOnInvalidConfiguration()
         {
             Skip.If(
-                ServiceConfig.KeyVaultApiUrl == null ||
-                ServiceConfig.KeyVaultResourceID == null ||
+                ServiceConfig.KeyVaultBaseUrl == null ||
+                ServiceConfig.KeyVaultResourceId == null ||
                 ClientConfig.AppId == null ||
                 ClientConfig.AppSecret == null,
                 "Missing valid KeyVault configuration");
