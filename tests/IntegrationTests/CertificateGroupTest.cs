@@ -63,12 +63,12 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
         /// <summary>
         /// The AAD application id for the client.
         /// </summary>
-        public string ClientId { get; set; }
+        public string AppId { get; set; }
 
         /// <summary>
         /// AAD Client / Application secret (optional)
         /// </summary>
-        public string ClientSecret { get; set; }
+        public string AppSecret { get; set; }
 
         /// <summary>
         /// Tenant id if any (optional)
@@ -405,8 +405,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
             Skip.If(
                 ServiceConfig.KeyVaultApiUrl == null ||
                 ServiceConfig.KeyVaultResourceID == null ||
-                ClientConfig.ClientId == null ||
-                ClientConfig.ClientSecret == null,
+                ClientConfig.AppId == null ||
+                ClientConfig.AppSecret == null,
                 "Missing valid KeyVault configuration");
         }
 

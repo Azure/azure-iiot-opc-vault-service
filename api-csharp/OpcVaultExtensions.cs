@@ -8,7 +8,7 @@
 // regenerated.
 // </auto-generated>
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Api
+namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
 {
     using Models;
     using System.Collections;
@@ -786,6 +786,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Api
                 }
             }
 
+            /// <summary>
+            /// returns the status
+            /// </summary>
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
@@ -794,6 +797,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Api
                 return operations.GetStatusAsync().GetAwaiter().GetResult();
             }
 
+            /// <summary>
+            /// returns the status
+            /// </summary>
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>

@@ -8,7 +8,7 @@
 // regenerated.
 // </auto-generated>
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Api
+namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
 {
     using Microsoft.Rest;
     using Microsoft.Rest.Serialization;
@@ -287,7 +287,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Api
         /// </summary>
         private void Initialize()
         {
-            BaseUri = new System.Uri("http://localhost:58801");
+            BaseUri = new System.Uri("http://localhost");
             SerializationSettings = new JsonSerializerSettings
             {
                 Formatting = Newtonsoft.Json.Formatting.Indented,
@@ -3593,6 +3593,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Api
             return _result;
         }
 
+        /// <summary>
+        /// returns the status
+        /// </summary>
         /// <param name='customHeaders'>
         /// Headers that will be added to request.
         /// </param>

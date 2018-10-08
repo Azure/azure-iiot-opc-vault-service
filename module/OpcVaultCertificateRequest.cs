@@ -3,8 +3,8 @@
 //  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------
 
-using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Api;
-using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Api.Models;
+using Microsoft.Azure.IIoT.OpcUa.Api.Vault;
+using Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models;
 using Microsoft.Rest;
 using System;
 using System.Collections.Generic;
@@ -60,7 +60,6 @@ namespace Opc.Ua.Gds.Server.OpcVault
             {
                 var model = new StartSigningRequestApiModel(
                     appId,
-                    authorityId,
                     certTypeId,
                     Convert.ToBase64String(certificateRequest),
                     certificateGroupId.ToString()
@@ -106,13 +105,12 @@ namespace Opc.Ua.Gds.Server.OpcVault
             {
                 var model = new StartNewKeyPairRequestApiModel(
                     appId,
-                    authorityId,
+                    certificateGroupId.ToString(),
                     certTypeId,
                     subjectName,
                     domainNames,
                     privateKeyFormat,
-                    privateKeyPassword,
-                    certificateGroupId.ToString()
+                    privateKeyPassword
                     );
 
                 string requestId = _opcVaultServiceClient.StartNewKeyPairRequest(model);

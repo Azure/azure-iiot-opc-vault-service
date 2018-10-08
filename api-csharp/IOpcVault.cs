@@ -8,7 +8,7 @@
 // regenerated.
 // </auto-generated>
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Api
+namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
 {
     using Microsoft.Rest;
     using Models;
@@ -360,6 +360,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Api
         /// </param>
         Task<HttpOperationResponse<FinishRequestApiModel>> FinishRequestWithHttpMessagesAsync(string requestId, string applicationId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
+        /// <summary>
+        /// returns the status
+        /// </summary>
         /// <param name='customHeaders'>
         /// The headers that will be added to request.
         /// </param>

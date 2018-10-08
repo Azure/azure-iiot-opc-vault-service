@@ -6,6 +6,7 @@
     <WebProject_DirectoryAccessLevelKey>0</WebProject_DirectoryAccessLevelKey>
     <DockerTargetOS>Linux</DockerTargetOS>
     <Configurations>Debug;Release;Develop</Configurations>
+    <HighEntropyVA>true</HighEntropyVA>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\api-csharp\Microsoft.Azure.IIoT.OpcUa.Services.Vault.Api.csproj" />
+    <ProjectReference Include="..\api-csharp\Microsoft.Azure.IIoT.OpcUa.Api.Vault.csproj" />
   </ItemGroup>
 
   <ItemGroup>
