@@ -9,13 +9,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Api.Models
 {
     using Newtonsoft.Json;
 
-    public partial class StartSigningRequestUploadModel
+    public partial class StartSigningRequestUploadApiModel
     {
         /// <summary>
         /// Initializes a new instance of the StartSigningRequestUploadModel
         /// class.
         /// </summary>
-        public StartSigningRequestUploadModel()
+        public StartSigningRequestUploadApiModel()
         {
             CustomInit();
         }
@@ -24,7 +24,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Api.Models
         /// Initializes a new instance of the StartSigningRequestUploadModel
         /// class.
         /// </summary>
-        public StartSigningRequestUploadModel(StartSigningRequestApiModel apiModel)
+        public StartSigningRequestUploadApiModel(StartSigningRequestApiModel apiModel)
         {
             ApiModel = apiModel;
             CustomInit();

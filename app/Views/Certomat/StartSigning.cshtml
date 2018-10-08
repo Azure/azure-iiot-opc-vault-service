@@ -9,7 +9,7 @@
 <h2>Start a signing request for an application</h2>
 
 
-@using (Html.BeginForm("StartSigning", "CertificateRequest", FormMethod.Post, new { enctype = "multipart/form-data" }))
+@using (Html.BeginForm("StartSigning", "Certomat", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     @Html.AntiForgeryToken()
 
@@ -77,7 +77,7 @@
     </div>
 }
 
-<div>
-    @Html.ActionLink("Back to List", "Index")
-</div>
+    <div>
+        @Html.ActionLink("Back to Register", "Register")
+    </div>
 

@@ -50,7 +50,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
         public Task<ActionResult> RegisterAsync()
         {
             var application = new ApplicationRecordApiModel();
-            CleanupApplicationRecord(application);
+            UpdateApiModel(application);
             return Task.FromResult<ActionResult>(View(application));
         }
 
@@ -62,7 +62,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
             string add,
             string update)
         {
-            CleanupApplicationRecord(application);
+            UpdateApiModel(application);
             if (ModelState.IsValid && String.IsNullOrEmpty(add) && String.IsNullOrEmpty(update))
             {
                 AuthorizeClient();
@@ -86,7 +86,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
             string add,
             string update)
         {
-            CleanupApplicationRecord(updatedApplication);
+            UpdateApiModel(updatedApplication);
 
             if (ModelState.IsValid && String.IsNullOrEmpty(add) && String.IsNullOrEmpty(update))
             {
@@ -181,7 +181,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
             }
         }
 
-        private void CleanupApplicationRecord(ApplicationRecordApiModel application)
+        private void UpdateApiModel(ApplicationRecordApiModel application)
         {
             if (application.ApplicationNames != null)
             {
