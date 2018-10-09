@@ -71,7 +71,7 @@ namespace Opc.Ua.Gds.Server
     public class Program
     {
 
-        public static string Name = "Azure Industrial IoT Edge OPC UA Global Discovery Server";
+        public static string Name = "Azure Industrial IoT OPC UA Global Discovery Server";
 
         public static int Main(string[] args)
         {
@@ -80,7 +80,7 @@ namespace Opc.Ua.Gds.Server
             // command line options
             bool showHelp = false;
             var opcVaultOptions = new OpcVaultApiOptions();
-            var azureADOptions = new OpcEdgeAzureADOptions();
+            var azureADOptions = new OpcVaultAzureADOptions();
 
             Mono.Options.OptionSet options = new Mono.Options.OptionSet {
                 { "v|vault=", "OpcVault Url", g => opcVaultOptions.BaseAddress = g },
@@ -109,7 +109,7 @@ namespace Opc.Ua.Gds.Server
 
             if (showHelp)
             {
-                Console.WriteLine("Usage: dotnet Microsoft.Azure.IIoT.OpcUa.Services.Vault.Edge.dll [OPTIONS]");
+                Console.WriteLine("Usage: dotnet Microsoft.Azure.IIoT.OpcUa.Modules.Vault.dll [OPTIONS]");
                 Console.WriteLine();
 
                 Console.WriteLine("Options:");
@@ -117,27 +117,27 @@ namespace Opc.Ua.Gds.Server
                 return (int)ExitCode.ErrorInvalidCommandLine;
             }
 
-            EdgeGlobalDiscoveryServer server = new EdgeGlobalDiscoveryServer();
+            var server = new VaultGlobalDiscoveryServer();
             server.Run(opcVaultOptions, azureADOptions);
 
-            return (int)EdgeGlobalDiscoveryServer.ExitCode;
+            return (int)VaultGlobalDiscoveryServer.ExitCode;
         }
     }
 
-    public class EdgeGlobalDiscoveryServer
+    public class VaultGlobalDiscoveryServer
     {
         GlobalDiscoverySampleServer server;
         Task status;
         DateTime lastEventTime;
         static ExitCode exitCode;
 
-        public EdgeGlobalDiscoveryServer()
+        public VaultGlobalDiscoveryServer()
         {
         }
 
         public void Run(
             OpcVaultApiOptions opcVaultOptions,
-            OpcEdgeAzureADOptions azureADOptions)
+            OpcVaultAzureADOptions azureADOptions)
         {
 
             try
@@ -202,7 +202,7 @@ namespace Opc.Ua.Gds.Server
 
         private async Task ConsoleGlobalDiscoveryServer(
             OpcVaultApiOptions opcVaultOptions, 
-            OpcEdgeAzureADOptions azureADOptions)
+            OpcVaultAzureADOptions azureADOptions)
         {
             ApplicationInstance.MessageDlg = new ApplicationMessageDlg();
             ApplicationInstance application = new ApplicationInstance
