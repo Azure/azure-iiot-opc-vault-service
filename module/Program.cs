@@ -3,13 +3,6 @@
 //  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------
 
-using Microsoft.Azure.IIoT.OpcUa.Api.Vault;
-using Microsoft.Rest;
-using Mono.Options;
-using Opc.Ua.Configuration;
-using Opc.Ua.Gds.Server.Database.OpcVault;
-using Opc.Ua.Gds.Server.OpcVault;
-using Opc.Ua.Server;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +10,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
+using Microsoft.Azure.IIoT.OpcUa.Api.Vault;
+using Mono.Options;
+using Opc.Ua.Configuration;
+using Opc.Ua.Gds.Server.Database.OpcVault;
+using Opc.Ua.Gds.Server.OpcVault;
+using Opc.Ua.Server;
 
 namespace Opc.Ua.Gds.Server
 {
@@ -201,7 +200,7 @@ namespace Opc.Ua.Gds.Server
         }
 
         private async Task ConsoleGlobalDiscoveryServer(
-            OpcVaultApiOptions opcVaultOptions, 
+            OpcVaultApiOptions opcVaultOptions,
             OpcVaultAzureADOptions azureADOptions)
         {
             ApplicationInstance.MessageDlg = new ApplicationMessageDlg();
