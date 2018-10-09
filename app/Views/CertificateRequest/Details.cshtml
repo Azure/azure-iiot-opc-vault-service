@@ -106,8 +106,12 @@
         {
             @Html.ActionLink("PrivateKey", "DownloadPrivateKey", new { requestId = Model.ApiModel.RequestId, applicationId = Model.ApiModel.ApplicationId })
             @Html.Raw("&nbsp;|&nbsp;");
+            @Html.ActionLink("Delete KeyPair", "Accept", new { id = Model.ApiModel.RequestId })
         }
-        @Html.ActionLink("Accept", "Accept", new { id = Model.ApiModel.RequestId })
+        else
+        {
+            @Html.ActionLink("Delete Certificate", "Accept", new { id = Model.ApiModel.RequestId })
+        }
         @Html.Raw("&nbsp;|&nbsp;");
     }
     @Html.ActionLink("Back to List", "Index")

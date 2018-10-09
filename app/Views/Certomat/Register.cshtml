@@ -5,14 +5,13 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Register Application</h2>
+<h2>Register New OPC UA Application</h2>
 
 @using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
 
     <div class="form-horizontal">
-        <h4>Register</h4>
         <hr />
 
         @for (int i = 0; i < Model.ApplicationNames.Count(); i++)

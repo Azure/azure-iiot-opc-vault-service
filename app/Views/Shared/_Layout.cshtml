@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - OpcVault.App</title>
+    <title>@ViewData["Title"] - Microsoft</title>
 
     <environment include="Development">
         <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
@@ -26,54 +26,54 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a asp-area="" asp-controller="Certomat" asp-action="Register" class="navbar-brand">OpcVault.App</a>
+                <!--<a asp-area="" asp-controller="Certomat" asp-action="Register" class="navbar-brand">OpcVault.App</a>-->
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <!--<li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>-->
-                    <li><a asp-area="" asp-controller="Certomat" asp-action="Register">Certomat</a></li>
-                    <li><a asp-area="" asp-controller="Application" asp-action="Index">Application</a></li>
-                    <li><a asp-area="" asp-controller="CertificateRequest" asp-action="Index">CertificateRequest</a></li>
-                    <li><a asp-area="" asp-controller="CertificateGroup" asp-action="Index">CertificateGroup</a></li>
+                    <li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
+                    <li><a asp-area="" asp-controller="Certomat" asp-action="Register">Register New</a></li>
+                    <li><a asp-area="" asp-controller="Application" asp-action="Index">OPC UA Applications</a></li>
+                    <li><a asp-area="" asp-controller="CertificateRequest" asp-action="Index">Certificate Requests</a></li>
+                    <li><a asp-area="" asp-controller="CertificateGroup" asp-action="Index">Certificate Groups</a></li>
                     <!--<li><a asp-area="" asp-controller="Home" asp-action="About">About</a></li>-->
                     <!--<li><a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>-->
-                    </ul>
-                    <partial name="_LoginPartial" />
-                </div>
+                </ul>
+                <partial name="_LoginPartial" />
             </div>
-        </nav>
-
-        <partial name="_CookieConsentPartial" />
-
-        <div class="container body-content">
-            @RenderBody()
-            <hr />
-            <footer>
-                <p>&copy; @DateTime.Now.Year - OpcVault.App</p>
-            </footer>
         </div>
+    </nav>
 
-        <environment include="Development">
-            <script src="~/lib/jquery/dist/jquery.js"></script>
-            <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
-            <script src="~/js/site.js" asp-append-version="true"></script>
-        </environment>
-        <environment exclude="Development">
-            <script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-3.3.1.min.js"
-                    asp-fallback-src="~/lib/jquery/dist/jquery.min.js"
-                    asp-fallback-test="window.jQuery"
-                    crossorigin="anonymous"
-                    integrity="sha384-K+ctZQ+LL8q6tP7I94W+qzQsfRV2a+AfHIi9k8z8l9ggpc8X+Ytst4yBo/hH+8Fk">
-            </script>
-            <script src="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/bootstrap.min.js"
-                    asp-fallback-src="~/lib/bootstrap/dist/js/bootstrap.min.js"
-                    asp-fallback-test="window.jQuery && window.jQuery.fn && window.jQuery.fn.modal"
-                    crossorigin="anonymous"
-                    integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa">
-            </script>
-            <script src="~/js/site.min.js" asp-append-version="true"></script>
-        </environment>
+    <partial name="_CookieConsentPartial" />
 
-        @RenderSection("Scripts", required: false)
-    </body>
-    </html>
+    <div class="container body-content">
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year - Microsoft</p>
+        </footer>
+    </div>
+
+    <environment include="Development">
+        <script src="~/lib/jquery/dist/jquery.js"></script>
+        <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+        <script src="~/js/site.js" asp-append-version="true"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-3.3.1.min.js"
+                asp-fallback-src="~/lib/jquery/dist/jquery.min.js"
+                asp-fallback-test="window.jQuery"
+                crossorigin="anonymous"
+                integrity="sha384-K+ctZQ+LL8q6tP7I94W+qzQsfRV2a+AfHIi9k8z8l9ggpc8X+Ytst4yBo/hH+8Fk">
+        </script>
+        <script src="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/bootstrap.min.js"
+                asp-fallback-src="~/lib/bootstrap/dist/js/bootstrap.min.js"
+                asp-fallback-test="window.jQuery && window.jQuery.fn && window.jQuery.fn.modal"
+                crossorigin="anonymous"
+                integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa">
+        </script>
+        <script src="~/js/site.min.js" asp-append-version="true"></script>
+    </environment>
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>
