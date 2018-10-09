@@ -61,15 +61,15 @@
         @if (ViewData["Message"] != null)
         {
             <hr />
-            <p>
+            <div class="alert alert-warning">
                 <h4>@ViewData["Message"]</h4>
-            </p>
+            </div>
             <hr />
         }
-
-        @Html.ActionLink("Generate new KeyPair and Certificate", "StartNewKeyPair", new { id = Model.ApplicationId }, new { @class = "btn btn-default" })
-        @Html.ActionLink("Generate new Certificate with Signing Request", "StartSigning", new { id = Model.ApplicationId }, new { @class = "btn btn-default" })
-
+        <div class="col-md-offset-2 col-md-10">
+            @Html.ActionLink("Request new KeyPair and Certificate", "StartNewKeyPair", new { id = Model.ApplicationId }, new { @class = "btn btn-default" })
+            @Html.ActionLink("Request new Certificate with Signing Request", "StartSigning", new { id = Model.ApplicationId }, new { @class = "btn btn-default" })
+        </div>
     </div>
 }
 
