@@ -46,12 +46,18 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
             AuthorizeClient();
             if (applicationId != null)
             {
-                var application = await opcVault.GetApplicationAsync(applicationId);
-                apiModel.ApplicationId = application.ApplicationId;
-                apiModel.ApplicationName = application.ApplicationName;
-                apiModel.ApplicationType = application.ApplicationType;
-                apiModel.ApplicationUri = application.ApplicationUri;
-                apiModel.DiscoveryUrls = application.DiscoveryUrls;
+                try
+                {
+                    apiModel = await opcVault.GetApplicationAsync(applicationId);
+                    ViewData["SuccessMessage"] =
+                        "Application with id " + applicationId + " successfully loaded.";
+                }
+                catch (Exception ex)
+                {
+                    ViewData["ErrorMessage"] = 
+                        "An application with id "+ applicationId+" could not be found in the database\n"+
+                        "Message:" + ex.Message;
+                }
             }
             UpdateApiModel(apiModel);
             return View(apiModel);
@@ -62,37 +68,67 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> RegisterAsync(
             ApplicationRecordApiModel apiModel,
+            string find,
             string reg,
             string add,
-            string update)
+            string del)
         {
             UpdateApiModel(apiModel);
-            ViewBag.Message = null;
+
             if (ModelState.IsValid &&
+                String.IsNullOrEmpty(find) &&
                 String.IsNullOrEmpty(add) &&
-                String.IsNullOrEmpty(update) &&
+                String.IsNullOrEmpty(del) &&
+                String.IsNullOrEmpty(reg) &&
+                apiModel.ApplicationId != null)
+            {
+                return RedirectToAction("Request", new { applicationId = apiModel.ApplicationId });
+            }
+
+            if (ModelState.IsValid &&
+                String.IsNullOrEmpty(find) &&
+                String.IsNullOrEmpty(add) &&
+                String.IsNullOrEmpty(del) &&
                 !String.IsNullOrEmpty(reg))
             {
                 AuthorizeClient();
-
-                var applications = await opcVault.FindApplicationAsync(apiModel.ApplicationUri);
-                if (applications == null || applications.Count == 0)
+                try
                 {
-                    try
-                    {
-                        apiModel.ApplicationId = await opcVault.RegisterApplicationAsync(apiModel);
-                    }
-                    catch (Exception ex)
-                    {
-                        ViewData["Message"] = ex.Message;
-                        return View(apiModel);
-                    }
+                    apiModel.ApplicationId = await opcVault.RegisterApplicationAsync(apiModel);
                 }
-                else
+                catch (Exception ex)
                 {
-                    apiModel.ApplicationId = applications[0].ApplicationId;
+                    ViewData["ErrorMessage"] =
+                        "The application registration failed.\n" +
+                        "Message:" + ex.Message;
+                    return View(apiModel);
                 }
                 return RedirectToAction("Request", new { applicationId = apiModel.ApplicationId });
+            }
+
+            if (!String.IsNullOrEmpty(find))
+            {
+                AuthorizeClient();
+                try
+                {
+                    var applications = await opcVault.FindApplicationAsync(apiModel.ApplicationUri);
+                    if (applications == null || applications.Count == 0)
+                    {
+                        ViewData["ErrorMessage"] =
+                            "Couldn't find the application with ApplicationUri " + apiModel.ApplicationUri;
+                    }
+                    else
+                    {
+                        return RedirectToAction("Register", new { applicationId = applications[0].ApplicationId });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ViewData["ErrorMessage"] =
+                        "Failed to find the application with ApplicationUri"+ apiModel.ApplicationUri + "\n" +
+                        "Message:" + ex.Message;
+                    return View(apiModel);
+                }
             }
 
             if (!String.IsNullOrEmpty(add))
@@ -432,10 +468,10 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
             else
             {
                 application.DiscoveryUrls = new List<string>();
-                if (application.DiscoveryUrls.Count == 0)
-                {
-                    application.DiscoveryUrls.Add("");
-                }
+            }
+            if (application.DiscoveryUrls.Count == 0)
+            {
+                application.DiscoveryUrls.Add("");
             }
         }
 
