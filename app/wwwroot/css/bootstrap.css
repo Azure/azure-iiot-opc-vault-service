@@ -120,7 +120,7 @@ input,
 optgroup,
 select,
 textarea {
-  color: inherit;
+  color: black;
   font: inherit;
   margin: 0;
 }

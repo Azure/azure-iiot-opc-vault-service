@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
@@ -12,18 +13,21 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.AzureAD.UI;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.Azure.IIoT.OpcUa.Api.Vault;
 using Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Models;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.TokenStorage;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Utils;
 using Microsoft.Rest;
+using Opc.Ua.Gds.Client;
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
 {
     [Authorize]
     public class CertomatController : Controller
     {
+        const int ApplicationTypeClient = 1;
         private IOpcVault opcVault;
         private readonly OpcVaultApiOptions opcVaultOptions;
         private readonly AzureADOptions azureADOptions;
@@ -54,59 +58,67 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
                 }
                 catch (Exception ex)
                 {
-                    ViewData["ErrorMessage"] = 
-                        "An application with id "+ applicationId+" could not be found in the database\n"+
+                    ViewData["ErrorMessage"] =
+                        "An application with id " + applicationId + " could not be found in the database.<br/>" +
                         "Message:" + ex.Message;
                 }
             }
             UpdateApiModel(apiModel);
-            return View(apiModel);
+            return View(new ApplicationRecordRegisterApiModel(apiModel));
         }
 
         [HttpPost]
         [ActionName("Register")]
         [ValidateAntiForgeryToken]
+        [ApplicationRecordRegisterApiModel]
         public async Task<ActionResult> RegisterAsync(
-            ApplicationRecordApiModel apiModel,
+            ApplicationRecordRegisterApiModel apiModel,
             string find,
             string reg,
             string add,
-            string del)
+            string del,
+            string req)
         {
+            string command = null;
+            if (!String.IsNullOrEmpty(find)) { command = "find"; }
+            if (!String.IsNullOrEmpty(add)) { command = "add"; }
+            if (!String.IsNullOrEmpty(del)) { command = "delete"; }
+            if (!String.IsNullOrEmpty(reg)) { command = "register"; }
+            if (!String.IsNullOrEmpty(req)) { command = "request"; }
+
             UpdateApiModel(apiModel);
 
             if (ModelState.IsValid &&
-                String.IsNullOrEmpty(find) &&
-                String.IsNullOrEmpty(add) &&
-                String.IsNullOrEmpty(del) &&
-                String.IsNullOrEmpty(reg) &&
+                command == "request" &&
                 apiModel.ApplicationId != null)
             {
                 return RedirectToAction("Request", new { applicationId = apiModel.ApplicationId });
             }
 
             if (ModelState.IsValid &&
-                String.IsNullOrEmpty(find) &&
-                String.IsNullOrEmpty(add) &&
-                String.IsNullOrEmpty(del) &&
-                !String.IsNullOrEmpty(reg))
+                command == "register")
             {
                 AuthorizeClient();
                 try
                 {
+                    if (apiModel.ApplicationType == ApplicationTypeClient)
+                    {
+                        apiModel.ServerCapabilities = null;
+                        apiModel.DiscoveryUrls = null;
+                    }
                     apiModel.ApplicationId = await opcVault.RegisterApplicationAsync(apiModel);
                 }
                 catch (Exception ex)
                 {
                     ViewData["ErrorMessage"] =
-                        "The application registration failed.\n" +
-                        "Message:" + ex.Message;
+                        "The application registration failed.<br/>" +
+                        "Message: " + ex.Message;
                     return View(apiModel);
                 }
                 return RedirectToAction("Request", new { applicationId = apiModel.ApplicationId });
             }
 
-            if (!String.IsNullOrEmpty(find))
+            if (command == "find")
             {
                 AuthorizeClient();
                 try
@@ -125,13 +137,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
                 catch (Exception ex)
                 {
                     ViewData["ErrorMessage"] =
-                        "Failed to find the application with ApplicationUri"+ apiModel.ApplicationUri + "\n" +
+                        "Failed to find the application with ApplicationUri" + apiModel.ApplicationUri + "<br/>" +
                         "Message:" + ex.Message;
                     return View(apiModel);
                 }
             }
 
-            if (!String.IsNullOrEmpty(add))
+            if (command == "add")
             {
                 apiModel.DiscoveryUrls.Add("");
             }
@@ -474,6 +486,114 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
                 application.DiscoveryUrls.Add("");
             }
         }
-
     }
+
+    /// <summary>
+    /// helper for model validation in registration form
+    /// </summary>
+    public class ApplicationRecordRegisterApiModelAttribute : ValidationAttribute, IClientModelValidator
+    {
+        ServerCapabilities _serverCaps = new ServerCapabilities();
+        const int ApplicationTypeClient = 1;
+
+        public ApplicationRecordRegisterApiModelAttribute()
+        {
+        }
+
+        public void AddValidation(ClientModelValidationContext context)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+        {
+            ApplicationRecordRegisterApiModel application = (ApplicationRecordRegisterApiModel)validationContext.ObjectInstance;
+            var errorList = new List<string>();
+
+            if (String.IsNullOrWhiteSpace(application.ApplicationUri)) { errorList.Add(nameof(application.ApplicationUri)); }
+            if (String.IsNullOrWhiteSpace(application.ProductUri)) { errorList.Add(nameof(application.ProductUri)); }
+            if (application.ApplicationType == null) { errorList.Add(nameof(application.ApplicationType)); }
+            if (String.IsNullOrWhiteSpace(application.ApplicationName)) { errorList.Add(nameof(application.ApplicationName)); }
+            if (application.ApplicationType != null && application.ApplicationType != ApplicationTypeClient)
+            {
+                if (application.DiscoveryUrls != null)
+                {
+                    for (int i = 0; i < application.DiscoveryUrls.Count; i++)
+                    {
+                        if (String.IsNullOrWhiteSpace(application.DiscoveryUrls[i])) { errorList.Add($"DiscoveryUrls[{i}]"); }
+                    }
+                }
+                else
+                {
+                    errorList.Add($"DiscoveryUrls[0]");
+                }
+            }
+            if (errorList.Count > 0) { return new ValidationResult("Required Field.", errorList); }
+
+            /* entries will be ignored on register
+            if (application.ApplicationType == ApplicationTypeClient)
+            {
+                if (!String.IsNullOrWhiteSpace(application.ServerCapabilities)) { errorList.Add(nameof(application.ServerCapabilities)); }
+                for (int i = 0; i < application.DiscoveryUrls.Count; i++)
+                {
+                    if (!String.IsNullOrWhiteSpace(application.DiscoveryUrls[i])) { errorList.Add($"DiscoveryUrls[{i}]"); }
+                }
+                if (errorList.Count > 0) { return new ValidationResult("Invalid entry for client.", errorList); }
+            }
+            */
+
+            if (!Uri.IsWellFormedUriString(application.ApplicationUri, UriKind.Absolute)) { errorList.Add("ApplicationUri"); }
+            if (!Uri.IsWellFormedUriString(application.ProductUri, UriKind.Absolute)) { errorList.Add("ProductUri"); }
+            if (application.ApplicationType != ApplicationTypeClient)
+            {
+                for (int i = 0; i < application.DiscoveryUrls.Count; i++)
+                {
+                    if (!Uri.IsWellFormedUriString(application.DiscoveryUrls[i], UriKind.Absolute)) { errorList.Add($"DiscoveryUrls[{i}]"); }
+                }
+            }
+            if (errorList.Count > 0) { return new ValidationResult("Not a well formed Uri.", errorList); }
+
+            if (application.ApplicationType != null &&
+                application.ApplicationType != ApplicationTypeClient &&
+                !String.IsNullOrEmpty(application.ServerCapabilities))
+            {
+                string[] serverCapModelArray = application.ServerCapabilities.Split(',');
+                foreach (var cap in serverCapModelArray)
+                {
+                    ServerCapability serverCap = _serverCaps.Find(cap);
+                    if (serverCap == null)
+                    {
+                        errorList.Add(nameof(application.ServerCapabilities));
+                        return new ValidationResult(cap + " is not a valid ServerCapability.", errorList);
+                    }
+                }
+            }
+
+            return ValidationResult.Success;
+        }
+    }
+
+    [ApplicationRecordRegisterApiModelAttribute]
+    public class ApplicationRecordRegisterApiModel : ApplicationRecordApiModel
+    {
+        public ApplicationRecordRegisterApiModel() : base()
+        { }
+
+        public ApplicationRecordRegisterApiModel(ApplicationRecordApiModel apiModel) :
+            base(apiModel.ApplicationId, apiModel.ID)
+        {
+            ApplicationUri = apiModel.ApplicationUri;
+            ApplicationName = apiModel.ApplicationName;
+            ApplicationType = apiModel.ApplicationType;
+            ApplicationNames = apiModel.ApplicationNames;
+            ProductUri = apiModel.ProductUri;
+            DiscoveryUrls = apiModel.DiscoveryUrls;
+            ServerCapabilities = apiModel.ServerCapabilities;
+            GatewayServerUri = apiModel.GatewayServerUri;
+            DiscoveryProfileUri = apiModel.DiscoveryProfileUri;
+        }
+    }
+
 }
+
+
