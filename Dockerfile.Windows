@@ -5,7 +5,6 @@ EXPOSE 80
 FROM microsoft/dotnet:2.1-sdk-nanoserver-1709 AS build
 WORKDIR /src
 COPY src/Microsoft.Azure.IIoT.OpcUa.Services.Vault.csproj src/
-COPY common/Microsoft.Azure.IIoT.OpcUa.Services.Vault.Common.csproj src/
 COPY .nuget .nuget
 RUN dotnet restore --configfile .nuget/NuGet.Config -nowarn:msb3202,nu1503 src/Microsoft.Azure.IIoT.OpcUa.Services.Vault.csproj
 COPY . .
