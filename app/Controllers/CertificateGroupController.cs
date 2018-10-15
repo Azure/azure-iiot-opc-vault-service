@@ -151,7 +151,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
             var byteArray = Convert.FromBase64String(issuer.Chain[0].Certificate);
             return new FileContentResult(byteArray, ContentType.Cert)
             {
-                FileDownloadName = CertFileName(issuer.Chain[0].Certificate) + ".der"
+                FileDownloadName = Utils.Utils.CertFileName(issuer.Chain[0].Certificate) + ".der"
             };
         }
 
@@ -164,22 +164,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
             var byteArray = Convert.FromBase64String(crl.Chain[0].Crl);
             return new FileContentResult(byteArray, ContentType.Crl)
             {
-                FileDownloadName = CertFileName(issuer.Chain[0].Certificate) + ".crl"
+                FileDownloadName = Utils.Utils.CertFileName(issuer.Chain[0].Certificate) + ".crl"
             };
-        }
-
-        private string CertFileName(string signedCertificate)
-        {
-            try
-            {
-                var signedCertByteArray = Convert.FromBase64String(signedCertificate);
-                X509Certificate2 cert = new X509Certificate2(signedCertByteArray);
-                return cert.Subject + "[" + cert.Thumbprint + "]";
-            }
-            catch
-            {
-                return "Certificate";
-            }
         }
 
         private void AuthorizeClient()

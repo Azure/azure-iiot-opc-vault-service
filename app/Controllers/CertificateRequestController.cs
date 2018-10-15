@@ -4,15 +4,11 @@
 //
 
 using System;
-using System.IO;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.AzureAD.UI;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.IIoT.OpcUa.Api.Vault;
-using Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models;
-using Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Models;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.TokenStorage;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Utils;
 using Microsoft.Rest;
@@ -45,6 +41,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
             return View(requests.Requests);
         }
 
+#if DISABLEDPAGES        
         [ActionName("StartNewKeyPair")]
         public async Task<ActionResult> StartNewKeyPairAsync(string id)
         {
@@ -167,15 +164,22 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
 
             return View(request);
         }
-
+#endif
         [ActionName("Details")]
         public async Task<ActionResult> DetailsAsync(string id, string message)
         {
             AuthorizeClient();
             var request = await opcVault.ReadCertificateRequestAsync(id);
-            var model = new CertificateRequestRecordDetailsApiModel(request, message);
             ViewData["Message"] = message;
-            return View(model);
+
+            var application = await opcVault.GetApplicationAsync(request.ApplicationId);
+            if (application == null)
+            {
+                return new NotFoundResult();
+            }
+            ViewData["Application"] = application;
+
+            return View(request);
         }
 
         [ActionName("Approve")]
@@ -185,7 +189,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
             try
             {
                 await opcVault.ApproveCertificateRequestAsync(id, false);
-                return RedirectToAction("Details", new { id , message = "CertificateRequest approved!"});
+                return RedirectToAction("Details", new { id, message = "CertificateRequest approved!" });
             }
             catch (Exception ex)
             {
@@ -225,9 +229,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
                 result.SignedCertificate != null)
             {
                 var byteArray = Convert.FromBase64String(result.SignedCertificate);
-                return new FileContentResult(byteArray, "application/pkix-cert")
+                return new FileContentResult(byteArray, ContentType.Cert)
                 {
-                    FileDownloadName = CertFileName(result.SignedCertificate) + ".der"
+                    FileDownloadName = Utils.Utils.CertFileName(result.SignedCertificate) + ".der"
                 };
             }
             return new NotFoundResult();
@@ -244,7 +248,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
                 var byteArray = Convert.FromBase64String(issuer.Chain[0].Certificate);
                 return new FileContentResult(byteArray, ContentType.Cert)
                 {
-                    FileDownloadName = CertFileName(issuer.Chain[0].Certificate) + ".der"
+                    FileDownloadName = Utils.Utils.CertFileName(issuer.Chain[0].Certificate) + ".der"
                 };
             }
             return new NotFoundResult();
@@ -262,7 +266,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
                 var byteArray = Convert.FromBase64String(crl.Chain[0].Crl);
                 return new FileContentResult(byteArray, ContentType.Crl)
                 {
-                    FileDownloadName = CertFileName(issuer.Chain[0].Certificate) + ".crl"
+                    FileDownloadName = Utils.Utils.CertFileName(issuer.Chain[0].Certificate) + ".crl"
                 };
             }
             return new NotFoundResult();
@@ -281,7 +285,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
                     var byteArray = Convert.FromBase64String(result.PrivateKey);
                     return new FileContentResult(byteArray, ContentType.Pfx)
                     {
-                        FileDownloadName = CertFileName(result.SignedCertificate) + ".pfx"
+                        FileDownloadName = Utils.Utils.CertFileName(result.SignedCertificate) + ".pfx"
                     };
                 }
                 else if (String.Compare(result.PrivateKeyFormat, "PEM", StringComparison.OrdinalIgnoreCase) == 0)
@@ -289,27 +293,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
                     var byteArray = Convert.FromBase64String(result.PrivateKey);
                     return new FileContentResult(byteArray, ContentType.Pem)
                     {
-                        FileDownloadName = CertFileName(result.SignedCertificate) + ".pem"
+                        FileDownloadName = Utils.Utils.CertFileName(result.SignedCertificate) + ".pem"
                     };
                 }
             }
             return new NotFoundResult();
         }
 
-
-        private string CertFileName(string signedCertificate)
-        {
-            try
-            {
-                var signedCertByteArray = Convert.FromBase64String(signedCertificate);
-                X509Certificate2 cert = new X509Certificate2(signedCertByteArray);
-                return cert.Subject + "[" + cert.Thumbprint + "]";
-            }
-            catch
-            {
-                return "Certificate";
-            }
-        }
 
         private void AuthorizeClient()
         {

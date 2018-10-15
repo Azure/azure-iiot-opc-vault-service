@@ -9,9 +9,11 @@
 
 <table class="table">
     <tr>
+        <!--
         <th>
             @Html.DisplayNameFor(model => model.RequestId)
         </th>
+            -->
         <th>
             @Html.DisplayNameFor(model => model.ApplicationId)
         </th>
@@ -27,9 +29,11 @@
     @foreach (var request in Model)
     {
         <tr>
-            <td>
-                @Html.ActionLink(request.RequestId, "Details", new { id = request.RequestId })
-            </td>
+            <!--
+                <td>
+                    @Html.ActionLink(request.RequestId, "Details", new { id = request.RequestId })
+                </td>
+            -->
             <td>
                 @Html.ActionLink(request.ApplicationId, "..\\Application\\Details", new { id = request.ApplicationId })
             </td>
@@ -54,7 +58,6 @@
         </tr>
     }
     <tr>
-        <th />
         <th />
         <th />
         <th />

@@ -44,22 +44,22 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
         }
 
         [ActionName("Register")]
-        public async Task<IActionResult> RegisterAsync(string applicationId)
+        public async Task<IActionResult> RegisterAsync(string id)
         {
             var apiModel = new ApplicationRecordApiModel();
             AuthorizeClient();
-            if (applicationId != null)
+            if (id != null)
             {
                 try
                 {
-                    apiModel = await opcVault.GetApplicationAsync(applicationId);
+                    apiModel = await opcVault.GetApplicationAsync(id);
                     ViewData["SuccessMessage"] =
-                        "Application with id " + applicationId + " successfully loaded.";
+                        "Application with id " + id + " successfully loaded.";
                 }
                 catch (Exception ex)
                 {
                     ViewData["ErrorMessage"] =
-                        "An application with id " + applicationId + " could not be found in the database.<br/>" +
+                        "An application with id " + id + " could not be found in the database.<br/>" +
                         "Message:" + ex.Message;
                 }
             }
@@ -92,7 +92,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
                 command == "request" &&
                 apiModel.ApplicationId != null)
             {
-                return RedirectToAction("Request", new { applicationId = apiModel.ApplicationId });
+                return RedirectToAction("Request", new { id = apiModel.ApplicationId });
             }
 
             if (ModelState.IsValid &&
@@ -115,7 +115,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
                         "Message: " + ex.Message;
                     return View(apiModel);
                 }
-                return RedirectToAction("Request", new { applicationId = apiModel.ApplicationId });
+                return RedirectToAction("Request", new { id = apiModel.ApplicationId });
             }
 
             if (command == "find")
@@ -131,7 +131,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
                     }
                     else
                     {
-                        return RedirectToAction("Register", new { applicationId = applications[0].ApplicationId });
+                        return RedirectToAction("Register", new { id = applications[0].ApplicationId });
                     }
                 }
                 catch (Exception ex)
@@ -143,7 +143,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
                 }
             }
 
-            if (command == "add")
+            if (!String.IsNullOrWhiteSpace(apiModel.DiscoveryUrls.Last()) &&
+                command == "add")
             {
                 apiModel.DiscoveryUrls.Add("");
             }
@@ -152,13 +153,23 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
         }
 
         [ActionName("Request")]
-        public async Task<IActionResult> RequestAsync(string applicationId)
+        public async Task<IActionResult> RequestAsync(string id)
         {
             AuthorizeClient();
-            var application = await opcVault.GetApplicationAsync(applicationId);
-
-            UpdateApiModel(application);
-            return View(application);
+            try
+            {
+                var application = await opcVault.GetApplicationAsync(id);
+                UpdateApiModel(application);
+                return View(application);
+            }
+            catch (Exception ex)
+            {
+                var application = new ApplicationRecordApiModel();
+                ViewData["ErrorMessage"] =
+                    "Failed to find the application with ApplicationId " + id + "<br/>" +
+                    "Message:" + ex.Message;
+                return View(application);
+            }
         }
 
         [ActionName("StartNewKeyPair")]
@@ -191,26 +202,43 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
             ViewData["Application"] = application;
             ViewData["Groups"] = groups;
 
-            var request = new StartNewKeyPairRequestApiModel()
+            var request = new StartNewKeyPairRequestFormApiModel()
             {
                 ApplicationId = id,
                 CertificateGroupId = defaultGroupId,
                 CertificateTypeId = defaultTypeId
             };
-
+            UpdateApiModel(request);
             return View(request);
         }
 
         [HttpPost]
         [ActionName("StartNewKeyPair")]
         [ValidateAntiForgeryToken]
+        [StartNewKeyPairRequestFormApiModel]
         public async Task<ActionResult> StartNewKeyPairAsync(
-            StartNewKeyPairRequestApiModel request)
+            StartNewKeyPairRequestFormApiModel request,
+            string add,
+            string del)
         {
-            if (ModelState.IsValid)
+            AuthorizeClient();
+            UpdateApiModel(request);
+            if (ModelState.IsValid &&
+                String.IsNullOrEmpty(add) &&
+                String.IsNullOrEmpty(del))
             {
-                AuthorizeClient();
-                var id = await opcVault.StartNewKeyPairRequestAsync(request);
+                string id;
+                try
+                {
+                    id = await opcVault.StartNewKeyPairRequestAsync(request);
+                }
+                catch (Exception ex)
+                {
+                    ViewData["ErrorMessage"] =
+                        "Failed to create Certificate Request.<br/>" +
+                        "Message:" + ex.Message;
+                    return View(request);
+                }
                 string message = null;
                 try
                 {
@@ -218,10 +246,28 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
                 }
                 catch (Exception ex)
                 {
-                    message = ex.Message;
+                    message =
+                    "Failed to approve Certificate Request.<br/>" +
+                    "Please contact Administrator for approval." +
+                    ex.Message;
                 }
                 return RedirectToAction("Details", new { id, message });
             }
+
+            if (!String.IsNullOrWhiteSpace(request.DomainNames.Last()) &&
+                !String.IsNullOrEmpty(add))
+            {
+                request.DomainNames.Add("");
+            }
+
+            // reload app info
+            var application = await opcVault.GetApplicationAsync(request.ApplicationId);
+            if (application == null)
+            {
+                return new NotFoundResult();
+            }
+
+            ViewData["Application"] = application;
 
             return View(request);
         }
@@ -307,9 +353,17 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
         {
             AuthorizeClient();
             var request = await opcVault.ReadCertificateRequestAsync(id);
-            var model = new CertificateRequestRecordDetailsApiModel(request, message);
             ViewData["Message"] = message;
-            return View(model);
+
+            var application = await opcVault.GetApplicationAsync(request.ApplicationId);
+            if (application == null)
+            {
+                return new NotFoundResult();
+            }
+
+            ViewData["Application"] = application;
+
+            return View(request);
         }
 
         [ActionName("Approve")]
@@ -359,9 +413,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
                 result.SignedCertificate != null)
             {
                 var byteArray = Convert.FromBase64String(result.SignedCertificate);
-                return new FileContentResult(byteArray, "application/pkix-cert")
+                return new FileContentResult(byteArray, ContentType.Cert)
                 {
-                    FileDownloadName = CertFileName(result.SignedCertificate) + ".der"
+                    FileDownloadName = Utils.Utils.CertFileName(result.SignedCertificate) + ".der"
                 };
             }
             return new NotFoundResult();
@@ -378,7 +432,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
                 var byteArray = Convert.FromBase64String(issuer.Chain[0].Certificate);
                 return new FileContentResult(byteArray, ContentType.Cert)
                 {
-                    FileDownloadName = CertFileName(issuer.Chain[0].Certificate) + ".der"
+                    FileDownloadName = Utils.Utils.CertFileName(issuer.Chain[0].Certificate) + ".der"
                 };
             }
             return new NotFoundResult();
@@ -396,7 +450,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
                 var byteArray = Convert.FromBase64String(crl.Chain[0].Crl);
                 return new FileContentResult(byteArray, ContentType.Crl)
                 {
-                    FileDownloadName = CertFileName(issuer.Chain[0].Certificate) + ".crl"
+                    FileDownloadName = Utils.Utils.CertFileName(issuer.Chain[0].Certificate) + ".crl"
                 };
             }
             return new NotFoundResult();
@@ -415,7 +469,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
                     var byteArray = Convert.FromBase64String(result.PrivateKey);
                     return new FileContentResult(byteArray, ContentType.Pfx)
                     {
-                        FileDownloadName = CertFileName(result.SignedCertificate) + ".pfx"
+                        FileDownloadName = Utils.Utils.CertFileName(result.SignedCertificate) + ".pfx"
                     };
                 }
                 else if (String.Compare(result.PrivateKeyFormat, "PEM", StringComparison.OrdinalIgnoreCase) == 0)
@@ -423,26 +477,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
                     var byteArray = Convert.FromBase64String(result.PrivateKey);
                     return new FileContentResult(byteArray, ContentType.Pem)
                     {
-                        FileDownloadName = CertFileName(result.SignedCertificate) + ".pem"
+                        FileDownloadName = Utils.Utils.CertFileName(result.SignedCertificate) + ".pem"
                     };
                 }
             }
             return new NotFoundResult();
-        }
-
-
-        private string CertFileName(string signedCertificate)
-        {
-            try
-            {
-                var signedCertByteArray = Convert.FromBase64String(signedCertificate);
-                X509Certificate2 cert = new X509Certificate2(signedCertByteArray);
-                return cert.Subject + "[" + cert.Thumbprint + "]";
-            }
-            catch
-            {
-                return "Certificate";
-            }
         }
 
         private void AuthorizeClient()
@@ -486,6 +525,56 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
                 application.DiscoveryUrls.Add("");
             }
         }
+
+        private void UpdateApiModel(StartNewKeyPairRequestFormApiModel request)
+        {
+            if (request.DomainNames != null)
+            {
+                request.DomainNames = request.DomainNames.Where(x => !string.IsNullOrEmpty(x)).ToList();
+            }
+            else
+            {
+                request.DomainNames = new List<string>();
+            }
+            if (request.DomainNames.Count == 0)
+            {
+                request.DomainNames.Add("");
+            }
+        }
+
+    }
+
+    /// <summary>
+    /// helper for model validation in new keypair request form
+    /// </summary>
+    public class StartNewKeyPairRequestFormApiModelAttribute : ValidationAttribute, IClientModelValidator
+    {
+        ServerCapabilities _serverCaps = new ServerCapabilities();
+        const int ApplicationTypeClient = 1;
+
+        public StartNewKeyPairRequestFormApiModelAttribute()
+        {
+        }
+
+        public void AddValidation(ClientModelValidationContext context)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+        {
+            StartNewKeyPairRequestApiModel request = (StartNewKeyPairRequestApiModel)validationContext.ObjectInstance;
+            var errorList = new List<string>();
+
+            if (String.IsNullOrWhiteSpace(request.SubjectName)) { errorList.Add(nameof(request.SubjectName)); }
+            if (String.IsNullOrWhiteSpace(request.PrivateKeyFormat)) { errorList.Add(nameof(request.PrivateKeyFormat)); }
+            if (errorList.Count > 0) { return new ValidationResult("Required Field.", errorList); }
+
+            //if (!Uri.IsWellFormedUriString(request.SubjectName, UriKind.Absolute)) { errorList.Add("ApplicationUri"); }
+            if (errorList.Count > 0) { return new ValidationResult("Not a well formed Certificate Subject.", errorList); }
+
+            return ValidationResult.Success;
+        }
     }
 
     /// <summary>
@@ -516,6 +605,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
             if (String.IsNullOrWhiteSpace(application.ApplicationName)) { errorList.Add(nameof(application.ApplicationName)); }
             if (application.ApplicationType != null && application.ApplicationType != ApplicationTypeClient)
             {
+                if (String.IsNullOrWhiteSpace(application.ServerCapabilities)) { errorList.Add(nameof(application.ServerCapabilities)); }
                 if (application.DiscoveryUrls != null)
                 {
                     for (int i = 0; i < application.DiscoveryUrls.Count; i++)
@@ -573,7 +663,26 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
         }
     }
 
-    [ApplicationRecordRegisterApiModelAttribute]
+    [StartNewKeyPairRequestFormApiModel]
+    public class StartNewKeyPairRequestFormApiModel : StartNewKeyPairRequestApiModel
+    {
+        public StartNewKeyPairRequestFormApiModel() : base()
+        { }
+
+        public StartNewKeyPairRequestFormApiModel(StartNewKeyPairRequestApiModel apiModel) :
+            base()
+        {
+            ApplicationId = apiModel.ApplicationId;
+            CertificateGroupId = apiModel.CertificateGroupId;
+            CertificateTypeId = apiModel.CertificateTypeId;
+            SubjectName = apiModel.SubjectName;
+            DomainNames = apiModel.DomainNames;
+            PrivateKeyFormat = apiModel.PrivateKeyFormat;
+            PrivateKeyPassword = apiModel.PrivateKeyPassword;
+        }
+    }
+
+    [ApplicationRecordRegisterApiModel]
     public class ApplicationRecordRegisterApiModel : ApplicationRecordApiModel
     {
         public ApplicationRecordRegisterApiModel() : base()

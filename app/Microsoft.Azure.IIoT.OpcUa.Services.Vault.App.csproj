@@ -25,7 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Update="Views\CertificateRequest\StartSigning.cshtml">
+    <Content Update="Views\CertificateRequest\_StartSigning.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
     <Content Update="Views\CertificateRequest\Complete.cshtml">

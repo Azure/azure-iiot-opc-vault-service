@@ -46,6 +46,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
             return View(applications.Applications);
         }
 
+#if DISABLEDPAGES
         [ActionName("Register")]
         public Task<ActionResult> RegisterAsync()
         {
@@ -131,6 +132,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
 
             return View(application);
         }
+#endif
 
         [ActionName("Delete")]
         public async Task<ActionResult> DeleteAsync(string id)

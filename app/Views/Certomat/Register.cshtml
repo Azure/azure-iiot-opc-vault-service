@@ -3,11 +3,6 @@
 @{
     ViewBag.Title = "Certomat";
     Layout = "~/Views/Shared/_Layout.cshtml";
-    string ServerDisabled = "";
-    if (Model.ApplicationType != null && Model.ApplicationType == 1)
-    {
-        ServerDisabled = "disabled";
-    }
 }
 <!--
 <script type="text/javascript">
@@ -17,7 +12,14 @@
     });
 </script>
 -->
-<h2>Register New OPC UA Application</h2>
+@if (Model.ApplicationId == null)
+{
+    <h2>Register New OPC UA Application</h2>
+}
+else
+{
+    <h2>Update OPC UA Application</h2>
+}
 
 @using (Html.BeginForm())
 {
@@ -40,7 +42,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.ApplicationUri, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-9">
-                @Html.EditorFor(model => model.ApplicationUri, new { htmlAttributes = new { @class = "form-control", aria_describedby = "appuri-format" } })
+                @Html.EditorFor(model => model.ApplicationUri, new { htmlAttributes = new { @class = "form-control", placeholder = "The Application Uri that identifies the Application", aria_describedby = "appuri-format" } })
                 <label id="ApplicationUri" class="sr-only">Application Uri</label>
                 @Html.ValidationMessageFor(model => model.ApplicationUri, "", new { @class = "text-danger" })
                 <span id="appuri-format">Example: <kbd>urn:myserver:UA:Quickstarts:ReferenceServer</kbd></span>
@@ -50,7 +52,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.ApplicationName, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.ApplicationName, new { htmlAttributes = new { @class = "form-control", @Value = Model.ApplicationName } })
+                @Html.EditorFor(model => model.ApplicationName, new { htmlAttributes = new { @class = "form-control", placeholder = "The friendly Name for the Application", aria_describedby = "appname-format" } })
                 @Html.ValidationMessageFor(model => model.ApplicationName, "", new { @class = "text-danger" })
                 <span id="appname-format">Example: <kbd>Quickstart Reference Server</kbd></span>
             </div>
@@ -77,14 +79,14 @@
                   new { @onchange = "this.form.submit();" })
                     @Html.ValidationMessageFor(model => model.ApplicationType, "", new { @class = "text-danger" })
                 </div>
-                <span id="producturi-format">Choose an application type</span>
+                <span id="apptype-format">Choose an application type</span>
             </div>
         </div>
 
         <div class="form-group">
             @Html.LabelFor(model => model.ProductUri, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.ProductUri, new { htmlAttributes = new { @class = "form-control", aria_describedby = "producturi-format" } })
+                @Html.EditorFor(model => model.ProductUri, new { htmlAttributes = new { @class = "form-control", placeholder = "The Uri for the product associated with the Application", aria_describedby = "producturi-format" } })
                 @Html.ValidationMessageFor(model => model.ProductUri, "", new { @class = "text-danger" })
                 <span id="producturi-format">Example: <kbd>uri:opcfoundation.org:Quickstarts:ReferenceServer</kbd></span>
             </div>
@@ -105,14 +107,13 @@
                         </div>
                     }
                     <div class="col-md-10">
-                        @Html.EditorFor(model => Model.DiscoveryUrls[i], new { htmlAttributes = new { @class = "form-control", aria_describedby = "url-format" } })
+                        @Html.EditorFor(model => Model.DiscoveryUrls[i], new { htmlAttributes = new { @class = "form-control", placeholder = "Discovery Url", aria_describedby = "url-format" } })
                         @Html.ValidationMessageFor(model => Model.DiscoveryUrls[i], "", new { @class = "text-danger" })
                         @if (i + 1 == Model.DiscoveryUrls.Count())
                         {
-                            <span id="url-format">One or more server endpoints: <kbd>opc.tcp://myserver:62541/Quickstarts/ReferenceServer</kbd> or <kbd>https://myserver:44448/Quickstarts/ReferenceServer</kbd></span><br />
-
-                            <input type="submit" name="add" value="Add DiscoveryUrl Row" class="btn btn-default">
-                            <input type="submit" name="del" value="Remove Empty DiscoveryUrl Rows" class="btn btn-default">
+                            <span id="url-format">One or more server endpoints: e.g. <kbd>opc.tcp://myserver:62541/Quickstarts/ReferenceServer</kbd> or <kbd>https://myserver:44448/Quickstarts/ReferenceServer</kbd></span><br />
+                            <input type="submit" name="add" value="Add DiscoveryUrl Field" class="btn btn-default">
+                            <input type="submit" name="del" value="Remove Empty DiscoveryUrl Fields" class="btn btn-default">
                         }
                     </div>
                 </div>
@@ -120,9 +121,9 @@
             <div class="form-group">
                 @Html.LabelFor(model => model.ServerCapabilities, htmlAttributes: new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
-                    @Html.EditorFor(model => model.ServerCapabilities, new { htmlAttributes = new { @class = "form-control", aria_describedby = "caps-format" } })
+                    @Html.EditorFor(model => model.ServerCapabilities, new { htmlAttributes = new { @class = "form-control", placeholder = "Server Capabilities", aria_describedby = "caps-format" } })
                     @Html.ValidationMessageFor(model => model.ServerCapabilities, "", new { @class = "text-danger" })
-                    <span id="caps-format">Zero or more comma separated caps: <kbd>NA,DA,HD,AC,HE,GDS,LDS...</kbd></span>
+                    <span id="caps-format">One or more Server Capabilities: <kbd>NA,DA,HD,AC,HE,GDS,LDS...</kbd></span>
                 </div>
             </div>
         }
@@ -157,15 +158,21 @@
                 @if (Model.ApplicationId != null)
                 {
                     <input type="submit" name="reg" value="Update" class="btn btn-default" />
-                    <input type="submit" name="req" value="Request" class="btn btn-default" />
+                    <input type="submit" name="req" value="Request without Update" class="btn btn-default" />
                 }
                 else
                 {
                     <input type="submit" name="reg" value="Register" class="btn btn-default" />
                 }
+                @Html.ActionLink("Clear Form", "Register", "Certomat", new { id = "" }, new { @class = "btn btn-default" })
             </div>
         </div>
     </div>
 }
+<p>
+<hr/>
+    @Html.ActionLink("Back to Register New", "Register", "Certomat", new { id = "" })
+</p>
+
 
 

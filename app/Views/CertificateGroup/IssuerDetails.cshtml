@@ -63,14 +63,14 @@
         </dl>
     }
 </div>
-<hr/>
+<hr />
 <p>
-    @Html.ActionLink("Back to List", "Index")
-    @Html.Raw("&nbsp;|&nbsp;")
     @Html.ActionLink("Details", "Details", new { id = Model.Name })
     @Html.Raw("&nbsp;|&nbsp;")
-    @Html.ActionLink("Renew", "Renew", new { id = Model.Name },
-            new { onclick = "return confirm('Do you really want to renew the CA certificate for group " + Model.Name + "?')" })
-    @Html.Raw("&nbsp;|&nbsp;")
     @Html.ActionLink("Download Issuer", "DownloadIssuer", new { id = Model.Name })
+    @Html.Raw("&nbsp;|&nbsp;")
+    @Html.ActionLink("Download Crl", "DownloadIssuerCrl", new { id = Model.Name })
+</p>
+<p>
+    @Html.ActionLink("Back to List", "Index")
 </p>
