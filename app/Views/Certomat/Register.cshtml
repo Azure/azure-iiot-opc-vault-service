@@ -111,7 +111,7 @@ else
                         @Html.ValidationMessageFor(model => Model.DiscoveryUrls[i], "", new { @class = "text-danger" })
                         @if (i + 1 == Model.DiscoveryUrls.Count())
                         {
-                            <span id="url-format">One or more server endpoints: e.g. <kbd>opc.tcp://myserver:62541/Quickstarts/ReferenceServer</kbd> or <kbd>https://myserver:44448/Quickstarts/ReferenceServer</kbd></span><br />
+                            <span id="url-format">One or more server endpoints: e.g. <kbd>opc.tcp://myserver:62541/Quickstarts/ReferenceServer</kbd> or <kbd>https://myserver:62540/Quickstarts/ReferenceServer</kbd></span><br />
                             <input type="submit" name="add" value="Add DiscoveryUrl Field" class="btn btn-default">
                             <input type="submit" name="del" value="Remove Empty DiscoveryUrl Fields" class="btn btn-default">
                         }

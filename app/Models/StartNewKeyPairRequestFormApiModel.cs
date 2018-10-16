@@ -36,6 +36,16 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Models
             var errorList = new List<string>();
 
             if (String.IsNullOrWhiteSpace(request.SubjectName)) { errorList.Add(nameof(request.SubjectName)); }
+            if (request.DomainNames != null)
+            {
+                if (request.DomainNames.Count > 0)
+                {
+                    if (String.IsNullOrWhiteSpace(request.DomainNames[0]))
+                    {
+                        errorList.Add("DomainNames[0]");
+                    }
+                }
+            }
             if (String.IsNullOrWhiteSpace(request.PrivateKeyFormat)) { errorList.Add(nameof(request.PrivateKeyFormat)); }
             if (errorList.Count > 0) { return new ValidationResult("Required Field.", errorList); }
 
@@ -47,12 +57,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Models
                 {
                     errorList.Add(nameof(request.SubjectName));
                     return new ValidationResult("Need at least a common name CN=", errorList);
-                }
-                var badprefix = dn.Where(x => !x.Contains("=", StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
-                if (badprefix == null)
-                {
-                    errorList.Add(nameof(request.SubjectName));
-                    return new ValidationResult("The DN entry "+badprefix+" is invalid", errorList);
                 }
             }
             catch
