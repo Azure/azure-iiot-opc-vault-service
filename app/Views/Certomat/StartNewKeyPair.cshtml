@@ -1,4 +1,4 @@
-﻿@model Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers.StartNewKeyPairRequestFormApiModel
+﻿@model Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Models.StartNewKeyPairRequestFormApiModel
 
 @{
     ViewBag.Title = "Start New Key Pair Request";
@@ -79,7 +79,7 @@
                         @Html.ValidationMessageFor(model => Model.DomainNames[i], "", new { @class = "text-danger" })
                         @if (i + 1 == Model.DomainNames.Count())
                         {
-                            <span id="domain-format">One or more domain names, Ipv4 or Ipv6 addresses: <kbd>myserver</kbd> or <kbd>192.168.2.123</kbd> or <kbd>fe80::4120:3a3b:df38</kbd></span><br />
+                            <span id="domain-format">Zero or more domain names, Ipv4 or Ipv6 addresses: <kbd>myserver</kbd> or <kbd>192.168.2.123</kbd> or <kbd>fe80::4120:3a3b:df38</kbd></span><br />
                             <input type="submit" name="add" value="Add Domain Field" class="btn btn-default">
                             <input type="submit" name="del" value="Remove Empty Domain Fields" class="btn btn-default">
                         }

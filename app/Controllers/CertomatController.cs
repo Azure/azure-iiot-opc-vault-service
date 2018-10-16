@@ -59,7 +59,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
                 catch (Exception ex)
                 {
                     ViewData["ErrorMessage"] =
-                        "An application with id " + id + " could not be found in the database.<br/>" +
+                        "An application with id " + id + " could not be found in the database.\r\n" +
                         "Message:" + ex.Message;
                 }
             }
@@ -111,7 +111,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
                 catch (Exception ex)
                 {
                     ViewData["ErrorMessage"] =
-                        "The application registration failed.<br/>" +
+                        "The application registration failed.\r\n" +
                         "Message: " + ex.Message;
                     return View(apiModel);
                 }
@@ -137,7 +137,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
                 catch (Exception ex)
                 {
                     ViewData["ErrorMessage"] =
-                        "Failed to find the application with ApplicationUri" + apiModel.ApplicationUri + "<br/>" +
+                        "Failed to find the application with ApplicationUri" + apiModel.ApplicationUri + "\r\n" +
                         "Message:" + ex.Message;
                     return View(apiModel);
                 }
@@ -166,7 +166,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
             {
                 var application = new ApplicationRecordApiModel();
                 ViewData["ErrorMessage"] =
-                    "Failed to find the application with ApplicationId " + id + "<br/>" +
+                    "Failed to find the application with ApplicationId " + id + "\r\n" +
                     "Message:" + ex.Message;
                 return View(application);
             }
@@ -235,7 +235,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
                 catch (Exception ex)
                 {
                     ViewData["ErrorMessage"] =
-                        "Failed to create Certificate Request.<br/>" +
+                        "Failed to create Certificate Request.\r\n" +
                         "Message:" + ex.Message;
                     return View(request);
                 }
@@ -247,7 +247,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
                 catch (Exception ex)
                 {
                     message =
-                    "Failed to approve Certificate Request.<br/>" +
+                    "Failed to approve Certificate Request.\r\n" +
                     "Please contact Administrator for approval." +
                     ex.Message;
                 }
@@ -541,168 +541,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
                 request.DomainNames.Add("");
             }
         }
-
     }
-
-    /// <summary>
-    /// helper for model validation in new keypair request form
-    /// </summary>
-    public class StartNewKeyPairRequestFormApiModelAttribute : ValidationAttribute, IClientModelValidator
-    {
-        ServerCapabilities _serverCaps = new ServerCapabilities();
-        const int ApplicationTypeClient = 1;
-
-        public StartNewKeyPairRequestFormApiModelAttribute()
-        {
-        }
-
-        public void AddValidation(ClientModelValidationContext context)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override ValidationResult IsValid(object value, ValidationContext validationContext)
-        {
-            StartNewKeyPairRequestApiModel request = (StartNewKeyPairRequestApiModel)validationContext.ObjectInstance;
-            var errorList = new List<string>();
-
-            if (String.IsNullOrWhiteSpace(request.SubjectName)) { errorList.Add(nameof(request.SubjectName)); }
-            if (String.IsNullOrWhiteSpace(request.PrivateKeyFormat)) { errorList.Add(nameof(request.PrivateKeyFormat)); }
-            if (errorList.Count > 0) { return new ValidationResult("Required Field.", errorList); }
-
-            //if (!Uri.IsWellFormedUriString(request.SubjectName, UriKind.Absolute)) { errorList.Add("ApplicationUri"); }
-            if (errorList.Count > 0) { return new ValidationResult("Not a well formed Certificate Subject.", errorList); }
-
-            return ValidationResult.Success;
-        }
-    }
-
-    /// <summary>
-    /// helper for model validation in registration form
-    /// </summary>
-    public class ApplicationRecordRegisterApiModelAttribute : ValidationAttribute, IClientModelValidator
-    {
-        ServerCapabilities _serverCaps = new ServerCapabilities();
-        const int ApplicationTypeClient = 1;
-
-        public ApplicationRecordRegisterApiModelAttribute()
-        {
-        }
-
-        public void AddValidation(ClientModelValidationContext context)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override ValidationResult IsValid(object value, ValidationContext validationContext)
-        {
-            ApplicationRecordRegisterApiModel application = (ApplicationRecordRegisterApiModel)validationContext.ObjectInstance;
-            var errorList = new List<string>();
-
-            if (String.IsNullOrWhiteSpace(application.ApplicationUri)) { errorList.Add(nameof(application.ApplicationUri)); }
-            if (String.IsNullOrWhiteSpace(application.ProductUri)) { errorList.Add(nameof(application.ProductUri)); }
-            if (application.ApplicationType == null) { errorList.Add(nameof(application.ApplicationType)); }
-            if (String.IsNullOrWhiteSpace(application.ApplicationName)) { errorList.Add(nameof(application.ApplicationName)); }
-            if (application.ApplicationType != null && application.ApplicationType != ApplicationTypeClient)
-            {
-                if (String.IsNullOrWhiteSpace(application.ServerCapabilities)) { errorList.Add(nameof(application.ServerCapabilities)); }
-                if (application.DiscoveryUrls != null)
-                {
-                    for (int i = 0; i < application.DiscoveryUrls.Count; i++)
-                    {
-                        if (String.IsNullOrWhiteSpace(application.DiscoveryUrls[i])) { errorList.Add($"DiscoveryUrls[{i}]"); }
-                    }
-                }
-                else
-                {
-                    errorList.Add($"DiscoveryUrls[0]");
-                }
-            }
-            if (errorList.Count > 0) { return new ValidationResult("Required Field.", errorList); }
-
-            /* entries will be ignored on register
-            if (application.ApplicationType == ApplicationTypeClient)
-            {
-                if (!String.IsNullOrWhiteSpace(application.ServerCapabilities)) { errorList.Add(nameof(application.ServerCapabilities)); }
-                for (int i = 0; i < application.DiscoveryUrls.Count; i++)
-                {
-                    if (!String.IsNullOrWhiteSpace(application.DiscoveryUrls[i])) { errorList.Add($"DiscoveryUrls[{i}]"); }
-                }
-                if (errorList.Count > 0) { return new ValidationResult("Invalid entry for client.", errorList); }
-            }
-            */
-
-            if (!Uri.IsWellFormedUriString(application.ApplicationUri, UriKind.Absolute)) { errorList.Add("ApplicationUri"); }
-            if (!Uri.IsWellFormedUriString(application.ProductUri, UriKind.Absolute)) { errorList.Add("ProductUri"); }
-            if (application.ApplicationType != ApplicationTypeClient)
-            {
-                for (int i = 0; i < application.DiscoveryUrls.Count; i++)
-                {
-                    if (!Uri.IsWellFormedUriString(application.DiscoveryUrls[i], UriKind.Absolute)) { errorList.Add($"DiscoveryUrls[{i}]"); }
-                }
-            }
-            if (errorList.Count > 0) { return new ValidationResult("Not a well formed Uri.", errorList); }
-
-            if (application.ApplicationType != null &&
-                application.ApplicationType != ApplicationTypeClient &&
-                !String.IsNullOrEmpty(application.ServerCapabilities))
-            {
-                string[] serverCapModelArray = application.ServerCapabilities.Split(',');
-                foreach (var cap in serverCapModelArray)
-                {
-                    ServerCapability serverCap = _serverCaps.Find(cap);
-                    if (serverCap == null)
-                    {
-                        errorList.Add(nameof(application.ServerCapabilities));
-                        return new ValidationResult(cap + " is not a valid ServerCapability.", errorList);
-                    }
-                }
-            }
-
-            return ValidationResult.Success;
-        }
-    }
-
-    [StartNewKeyPairRequestFormApiModel]
-    public class StartNewKeyPairRequestFormApiModel : StartNewKeyPairRequestApiModel
-    {
-        public StartNewKeyPairRequestFormApiModel() : base()
-        { }
-
-        public StartNewKeyPairRequestFormApiModel(StartNewKeyPairRequestApiModel apiModel) :
-            base()
-        {
-            ApplicationId = apiModel.ApplicationId;
-            CertificateGroupId = apiModel.CertificateGroupId;
-            CertificateTypeId = apiModel.CertificateTypeId;
-            SubjectName = apiModel.SubjectName;
-            DomainNames = apiModel.DomainNames;
-            PrivateKeyFormat = apiModel.PrivateKeyFormat;
-            PrivateKeyPassword = apiModel.PrivateKeyPassword;
-        }
-    }
-
-    [ApplicationRecordRegisterApiModel]
-    public class ApplicationRecordRegisterApiModel : ApplicationRecordApiModel
-    {
-        public ApplicationRecordRegisterApiModel() : base()
-        { }
-
-        public ApplicationRecordRegisterApiModel(ApplicationRecordApiModel apiModel) :
-            base(apiModel.ApplicationId, apiModel.ID)
-        {
-            ApplicationUri = apiModel.ApplicationUri;
-            ApplicationName = apiModel.ApplicationName;
-            ApplicationType = apiModel.ApplicationType;
-            ApplicationNames = apiModel.ApplicationNames;
-            ProductUri = apiModel.ProductUri;
-            DiscoveryUrls = apiModel.DiscoveryUrls;
-            ServerCapabilities = apiModel.ServerCapabilities;
-            GatewayServerUri = apiModel.GatewayServerUri;
-            DiscoveryProfileUri = apiModel.DiscoveryProfileUri;
-        }
-    }
-
 }
 
 
