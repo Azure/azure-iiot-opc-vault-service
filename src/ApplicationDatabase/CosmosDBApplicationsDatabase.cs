@@ -25,7 +25,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
     {
         private readonly ILogger _log;
         private readonly string Endpoint;
-        private SecureString AuthKeyOrResourceToken;
+        private readonly SecureString AuthKeyOrResourceToken;
 
         public CosmosDBApplicationsDatabase(
             IServicesConfig config,

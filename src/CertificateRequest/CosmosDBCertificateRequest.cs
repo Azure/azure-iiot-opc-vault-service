@@ -3,6 +3,14 @@
 //  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Security;
+using System.Security.Cryptography.X509Certificates;
+using System.Text;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.IIoT.Diagnostics;
@@ -12,14 +20,6 @@ using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Models;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Runtime;
 using Opc.Ua;
 using Opc.Ua.Gds.Server;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Security;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
 using CertificateRequest = Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB.Models.CertificateRequest;
 using CertificateRequestState = Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB.Models.CertificateRequestState;
 using StatusCodes = Opc.Ua.StatusCodes;
@@ -167,7 +167,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
 
             CertificateRequest request = null;
             bool isNew = false;
-
             if (request == null)
             {
                 request = new CertificateRequest()
@@ -178,11 +177,60 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                 isNew = true;
             }
 
+            List<string> discoveryUrlDomainNames = new List<string>();
+            if (domainNames != null)
+            {
+                foreach (var domainName in domainNames)
+                {
+                    if (!String.IsNullOrWhiteSpace(domainName))
+                    {
+                        string ipAddress = Opc.Ua.Utils.NormalizedIPAddress(domainName);
+                        if (!String.IsNullOrEmpty(ipAddress))
+                        {
+                            discoveryUrlDomainNames.Add(ipAddress);
+                        }
+                        else
+                        {
+                            discoveryUrlDomainNames.Add(domainName);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                discoveryUrlDomainNames = new List<string>();
+            }
+
+            if (application.DiscoveryUrls != null)
+            {
+                foreach (var discoveryUrl in application.DiscoveryUrls)
+                {
+                    Uri url = Opc.Ua.Utils.ParseUri(discoveryUrl);
+
+                    if (url == null)
+                    {
+                        continue;
+                    }
+
+                    string domainName = url.DnsSafeHost;
+
+                    if (url.HostNameType != UriHostNameType.Dns)
+                    {
+                        domainName = Opc.Ua.Utils.NormalizedIPAddress(domainName);
+                    }
+
+                    if (!Opc.Ua.Utils.FindStringIgnoreCase(discoveryUrlDomainNames, domainName))
+                    {
+                        discoveryUrlDomainNames.Add(domainName);
+                    }
+                }
+            }
+
             request.State = (int)CertificateRequestState.New;
             request.CertificateGroupId = certificateGroupId;
             request.CertificateTypeId = certificateTypeId;
             request.SubjectName = subjectName;
-            request.DomainNames = domainNames;
+            request.DomainNames = discoveryUrlDomainNames.ToArray();
             request.PrivateKeyFormat = privateKeyFormat;
             request.PrivateKeyPassword = privateKeyPassword;
             request.SigningRequest = null;
