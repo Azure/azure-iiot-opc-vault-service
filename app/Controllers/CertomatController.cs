@@ -237,7 +237,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
         [HttpPost]
         [ActionName("StartNewKeyPair")]
         [ValidateAntiForgeryToken]
-        [StartNewKeyPairRequestFormApiModel]
         public async Task<ActionResult> StartNewKeyPairAsync(
             StartNewKeyPairRequestFormApiModel request,
             string add,
@@ -322,8 +321,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
                 return new NotFoundResult();
             }
 
-            ViewData["Application"] = application;
-
             var request = new StartSigningRequestUploadApiModel()
             {
                 ApiModel = new StartSigningRequestApiModel()
@@ -331,7 +328,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
                     ApplicationId = id,
                     CertificateGroupId = defaultGroupId,
                     CertificateTypeId = defaultTypeId
-                }
+                },
+                ApplicationUri = application.ApplicationUri,
+                ApplicationName = application.ApplicationName
             };
 
             return View(request);
