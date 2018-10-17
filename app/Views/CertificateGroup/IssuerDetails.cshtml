@@ -64,13 +64,12 @@
     }
 </div>
 <hr />
-<p>
-    @Html.ActionLink("Details", "Details", new { id = Model.Name })
-    @Html.Raw("&nbsp;|&nbsp;")
-    @Html.ActionLink("Download Issuer", "DownloadIssuer", new { id = Model.Name })
-    @Html.Raw("&nbsp;|&nbsp;")
-    @Html.ActionLink("Download Crl", "DownloadIssuerCrl", new { id = Model.Name })
-</p>
-<p>
+<div>
+    @Html.ActionLink("Details", "Details", new { id = Model.Name }, new { @class = "btn btn-default" })
+    @Html.ActionLink("Download Issuer", "DownloadIssuer", new { id = Model.Name }, new { @class = "btn btn-default" })
+    @Html.ActionLink("Download Crl", "DownloadIssuerCrl", new { id = Model.Name }, new { @class = "btn btn-default" })
+</div>
+<div>
+    <hr />
     @Html.ActionLink("Back to List", "Index")
-</p>
+</div>
