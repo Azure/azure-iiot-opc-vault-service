@@ -66,7 +66,10 @@ else
         @Html.ActionLink("Request new Certificate with Signing Request", "StartSigning", new { id = Model.ApplicationId }, new { @class = "btn btn-default" })
     </div>
 }
+
 <div class="col-md-12">
+    <hr />
+    <img src="~/images/opcvaultflowstep2.svg" alt="OpcVault Request" class="img-responsive" />
     <hr />
     @Html.ActionLink("Back to Register New", "Register", routeValues: new { id = "" })
     <hr />

@@ -4,14 +4,7 @@
     ViewBag.Title = "Certomat";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<!--
-<script type="text/javascript">
-    $(document).ready(function () {
-        $('[data-toggle="tooltip"]').tooltip();
-        $('[rel=tooltip]').tooltip();
-    });
-</script>
--->
+
 @if (Model.ApplicationId == null)
 {
     <h2>Register New OPC UA Application</h2>
@@ -63,20 +56,20 @@ else
             <div class="col-md-10">
                 <div class="checkbox">
                     @Html.DropDownListFor(
-                  model => model.ApplicationType,
-                  new SelectList(
-                      new List<Object>{
+       model => model.ApplicationType,
+       new SelectList(
+           new List<Object>{
                                 new { value = 0 , text = "Server"  },
                                 new { value = 1 , text = "Client" },
                                 new { value = 2 , text = "ClientAndServer" },
                                 new { value = 3 , text = "DiscoveryServer"}
-                      },
-                  "value",
-                  "text",
-                  Model.ApplicationType
-                  ),
-                  "-select-",
-                  new { @onchange = "this.form.submit();" })
+           },
+       "value",
+       "text",
+       Model.ApplicationType
+       ),
+       "-select-",
+       new { @onchange = "this.form.submit();" })
                     @Html.ValidationMessageFor(model => model.ApplicationType, "", new { @class = "text-danger" })
                 </div>
                 <span id="apptype-format">Choose an application type</span>
@@ -169,10 +162,12 @@ else
         </div>
     </div>
 }
-<p>
-<hr/>
-    @Html.ActionLink("Back to Register New", "Register", "Certomat", new { id = "" })
-</p>
 
+<div>
+    <hr />
+    <img src="~/images/opcvaultflowstep1.svg" alt="OpcVault Registration" class="img-responsive" />
+    <hr />
+    @Html.ActionLink("Back to Register New", "Register", "Certomat", new { id = "" })
+</div>
 
 

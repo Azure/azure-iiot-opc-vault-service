@@ -65,7 +65,8 @@
         <div class="form-group">
             @Html.LabelFor(model => model.CertificateRequestFile, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                <input type="file" name="CertificateRequestFile" id="CertificateRequestFile" />
+                @Html.EditorFor(model => model.CertificateRequestFile, new { htmlAttributes = new { @class = "form-control", aria_describedby = "csrfile-format", placeholder = "Upload your local binary CSR file here", type = "file" } })
+                <!--<input type="file" name="CertificateRequestFile" id="CertificateRequestFile" />-->
                 <span id="csrfile-format">Upload binary Certificate Signing Request file.</span>
             </div>
         </div>
@@ -79,6 +80,8 @@
 }
 
 <div>
+    <hr />
+    <img src="~/images/opcvaultflowstep2.svg" alt="OpcVault Request" class="img-responsive" />
     <hr />
     @Html.ActionLink("Back to Register New", "Register", routeValues: new { id = "" })
 </div>
