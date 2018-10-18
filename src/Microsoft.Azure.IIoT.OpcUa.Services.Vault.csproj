@@ -99,4 +99,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup>
+    <Content Update="appsettings.*.json" CopyToPublishDirectory="Never"/>
+  </ItemGroup>
 </Project>
