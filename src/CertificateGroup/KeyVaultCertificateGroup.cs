@@ -38,7 +38,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
         {
             _servicesConfig = servicesConfig;
             _clientConfig = clientConfig;
-            _keyVaultServiceClient = new KeyVaultServiceClient(servicesConfig.KeyVaultBaseUrl, servicesConfig.KeyVaultHSM, logger);
+            _keyVaultServiceClient = new KeyVaultServiceClient(servicesConfig.KeyVaultBaseUrl, true, logger);
             if (clientConfig != null &&
                 clientConfig.AppId != null && clientConfig.AppSecret != null)
             {
@@ -117,7 +117,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                         _servicesConfig.KeyVaultResourceId,
                         _clientConfig.AppId,
                         _clientConfig.AppSecret);
-                var keyVaultServiceClient = new KeyVaultServiceClient(_servicesConfig.KeyVaultBaseUrl, _servicesConfig.KeyVaultHSM, _log);
+                var keyVaultServiceClient = new KeyVaultServiceClient(_servicesConfig.KeyVaultBaseUrl, true, _log);
                 keyVaultServiceClient.SetServiceClientCredentials(serviceClientCredentials);
                 return Task.FromResult<ICertificateGroup>(new KeyVaultCertificateGroup(
                     keyVaultServiceClient,
