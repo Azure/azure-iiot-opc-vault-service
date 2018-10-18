@@ -79,7 +79,7 @@
                         @Html.ValidationMessageFor(model => Model.DomainNames[i], "", new { @class = "text-danger" })
                         @if (i + 1 == Model.DomainNames.Count())
                         {
-                            <span id="domain-format">Zero or more domain names, Ipv4 or Ipv6 addresses: <kbd>myserver</kbd> or <kbd>192.168.2.123</kbd> or <kbd>fe80::4120:3a3b:df38</kbd></span><br />
+                            <span id="domain-format">Domain Names, Ipv4 or Ipv6 addresses: <kbd>myserver</kbd> or <kbd>192.168.2.123</kbd> or <kbd>fe80::4120:3a3b:df38</kbd></span><br />
                             <input type="submit" name="add" value="Add Domain Field" class="btn btn-default">
                             <input type="submit" name="del" value="Remove Empty Domain Fields" class="btn btn-default">
                         }
@@ -117,6 +117,16 @@
                 <span id="pktype-format">Password to protect your private key.</span>
             </div>
         </div>
+
+        @if (ViewData["ErrorMessage"] != null)
+        {
+            <hr />
+            <div class="alert alert-warning">
+                <h4>@ViewData["ErrorMessage"]</h4>
+            </div>
+            <hr />
+        }
+
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
                 <input type="submit" value="Generate New KeyPair" class="btn btn-default" />
@@ -125,9 +135,10 @@
     </div>
 }
 
-<div>
-    <hr />
-    @Html.ActionLink("Back to Register New", "Register", routeValues: new { id = "" })
-    <hr />
-</div>
+    <div>
+        <hr />
+        <img src="~/images/opcvaultflowstep2.svg" alt="OpcVault Request" class="img-responsive" />
+        <hr />
+        @Html.ActionLink("Back to Register New", "Register", routeValues: new { id = "" })
+    </div>
 

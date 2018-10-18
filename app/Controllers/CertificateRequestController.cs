@@ -4,11 +4,14 @@
 //
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.AzureAD.UI;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.IIoT.OpcUa.Api.Vault;
+using Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models;
+using Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Models;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.TokenStorage;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Utils;
 using Microsoft.Rest;
@@ -36,135 +39,30 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
         [ActionName("Index")]
         public async Task<ActionResult> IndexAsync()
         {
+            var appDictionary = new Dictionary<string, ApplicationRecordApiModel>();
             AuthorizeClient();
             var requests = await opcVault.QueryRequestsAsync();
-            return View(requests.Requests);
-        }
-
-#if DISABLEDPAGES        
-        [ActionName("StartNewKeyPair")]
-        public async Task<ActionResult> StartNewKeyPairAsync(string id)
-        {
-            AuthorizeClient();
-            var groups = await opcVault.GetCertificateGroupConfigurationCollectionAsync();
-            if (groups == null)
+            var indexRequests = new List<CertificateRequestIndexApiModel>();
+            foreach (var request in requests.Requests)
             {
-                return new NotFoundResult();
-            }
-
-            string defaultGroupId, defaultTypeId;
-            if (groups.Groups.Count > 0)
-            {
-                defaultGroupId = groups.Groups[0].Name;
-                defaultTypeId = groups.Groups[0].CertificateType;
-            }
-            else
-            {
-                return new NotFoundResult();
-            }
-
-            var application = await opcVault.GetApplicationAsync(id);
-            if (application == null)
-            {
-                return new NotFoundResult();
-            }
-
-            ViewData["Application"] = application;
-            ViewData["Groups"] = groups;
-
-            var request = new StartNewKeyPairRequestApiModel()
-            {
-                ApplicationId = id,
-                CertificateGroupId = defaultGroupId,
-                CertificateTypeId = defaultTypeId
-            };
-
-            return View(request);
-        }
-
-        [HttpPost]
-        [ActionName("StartNewKeyPair")]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> StartNewKeyPairAsync(
-            StartNewKeyPairRequestApiModel request)
-        {
-            if (ModelState.IsValid)
-            {
-                AuthorizeClient();
-                var id = await opcVault.StartNewKeyPairRequestAsync(request);
-                return RedirectToAction("Index");
-            }
-
-            return View(request);
-        }
-
-        [ActionName("StartSigning")]
-        public async Task<ActionResult> StartSigningAsync(string id)
-        {
-            AuthorizeClient();
-            var groups = await opcVault.GetCertificateGroupConfigurationCollectionAsync();
-            if (groups == null)
-            {
-                return new NotFoundResult();
-            }
-
-            string defaultGroupId, defaultTypeId;
-            if (groups.Groups.Count > 0)
-            {
-                defaultGroupId = groups.Groups[0].Name;
-                defaultTypeId = groups.Groups[0].CertificateType;
-            }
-            else
-            {
-                return new NotFoundResult();
-            }
-
-            var application = await opcVault.GetApplicationAsync(id);
-            if (application == null)
-            {
-                return new NotFoundResult();
-            }
-
-            ViewData["Application"] = application;
-
-            var request = new StartSigningRequestUploadApiModel()
-            {
-                ApiModel = new StartSigningRequestApiModel()
+                var indexRequest = new CertificateRequestIndexApiModel(request);
+                ApplicationRecordApiModel application;
+                if (!appDictionary.TryGetValue(request.ApplicationId, out application))
                 {
-                    ApplicationId = id,
-                    CertificateGroupId = defaultGroupId,
-                    CertificateTypeId = defaultTypeId
+                    application = await opcVault.GetApplicationAsync(request.ApplicationId);
                 }
-            };
 
-            return View(request);
-        }
-
-        [HttpPost]
-        [ActionName("StartSigning")]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> StartSigningAsync(
-            StartSigningRequestUploadApiModel request)
-        {
-            if (ModelState.IsValid && (request.CertificateRequestFile != null || request.ApiModel.CertificateRequest != null))
-            {
-                var requestApi = request.ApiModel;
-                if (request.CertificateRequestFile != null)
+                if (application != null)
                 {
-                    using (var memoryStream = new MemoryStream())
-                    {
-                        await request.CertificateRequestFile.CopyToAsync(memoryStream);
-                        requestApi.CertificateRequest = Convert.ToBase64String(memoryStream.ToArray());
-                    }
+                    appDictionary[request.ApplicationId] = application;
+                    indexRequest.ApplicationName = application.ApplicationName;
+                    indexRequest.ApplicationUri = application.ApplicationUri;
                 }
-                AuthorizeClient();
-                var id = await opcVault.StartSigningRequestAsync(requestApi);
-                return RedirectToAction("Index");
+                indexRequests.Add(indexRequest);
             }
-
-            return View(request);
+            return View(indexRequests);
         }
-#endif
+
         [ActionName("Details")]
         public async Task<ActionResult> DetailsAsync(string id, string message)
         {

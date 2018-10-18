@@ -97,6 +97,18 @@
                 @Html.ActionLink("Issuer", "DownloadIssuer", new { requestId = Model.RequestId }, htmlAttributes: new { @class = "btn btn-default" })
                 @Html.ActionLink("Crl", "DownloadIssuerCrl", new { requestId = Model.RequestId }, htmlAttributes: new { @class = "btn btn-default" })
             </dd>
+            <!--
+            <dt>Copy as Base64</dt>
+            <dd>
+                @Html.ActionLink("Certificate", "DownloadCertificate", new { requestId = Model.RequestId, applicationId = Model.ApplicationId }, htmlAttributes: new { @class = "btn btn-default" })
+                @if (!String.IsNullOrEmpty(Model.PrivateKeyFormat))
+                {
+                    @Html.ActionLink("PrivateKey", "DownloadPrivateKey", new { requestId = Model.RequestId, applicationId = Model.ApplicationId }, htmlAttributes: new { @class = "btn btn-default" })
+                }
+                @Html.ActionLink("Issuer", "DownloadIssuer", new { requestId = Model.RequestId }, htmlAttributes: new { @class = "btn btn-default" })
+                @Html.ActionLink("Crl", "DownloadIssuerCrl", new { requestId = Model.RequestId }, htmlAttributes: new { @class = "btn btn-default" })
+            </dd>
+            -->
         }
     </dl>
 
@@ -124,9 +136,10 @@
         <h4>@ViewData["Message"]</h4>
     </div>
 }
-<div class="col-md-12">
+<div>
+    <hr />
+    <img src="~/images/opcvaultflowstep3.svg" alt="OpcVault Request" class="img-responsive" />
     <hr />
     @Html.ActionLink("Back to Register New", "Register", routeValues: new { id = "" })
-    <hr />
 </div>
 

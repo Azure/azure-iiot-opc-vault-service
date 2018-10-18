@@ -81,17 +81,17 @@
 
     </dl>
 </div>
-<p>
-    @Html.ActionLink("Back to List", "Index")
-    @Html.Raw("&nbsp;|&nbsp;")
-    @Html.ActionLink("Edit", "Edit", new { id = Model.Name })
-    @Html.Raw("&nbsp;|&nbsp;")
+<hr />
+<div>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.Name }, new { @class = "btn btn-default" })
     @Html.ActionLink("Renew CA Certificate", "Renew", new { id = Model.Name },
-            new { onclick = "return confirm('Do you really want to renew the CA certificate for group " + Model.Name + "?')" })
-    @Html.Raw("&nbsp;|&nbsp;")
-    @Html.ActionLink("Issuer Details", "IssuerDetails", new { id = Model.Name })
-    @Html.Raw("&nbsp;|&nbsp;")
-    @Html.ActionLink("Download Issuer", "DownloadIssuer", new { id = Model.Name })
-    @Html.Raw("&nbsp;|&nbsp;")
-    @Html.ActionLink("Download Crl", "DownloadIssuerCrl", new { id = Model.Name })
-</p>
+            new { @class = "btn btn-default",
+                onclick = "return confirm('Do you really want to renew the CA certificate for group " + Model.Name + "?')" })
+    @Html.ActionLink("Issuer Details", "IssuerDetails", new { id = Model.Name }, new { @class = "btn btn-default" })
+    @Html.ActionLink("Download Issuer", "DownloadIssuer", new { id = Model.Name }, new { @class = "btn btn-default" })
+    @Html.ActionLink("Download Crl", "DownloadIssuerCrl", new { id = Model.Name }, new { @class = "btn btn-default" })
+</div>
+<div>
+    <hr />
+    @Html.ActionLink("Back to List", "Index")
+</div>

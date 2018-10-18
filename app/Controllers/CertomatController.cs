@@ -5,22 +5,18 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.AzureAD.UI;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.Azure.IIoT.OpcUa.Api.Vault;
 using Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Models;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.TokenStorage;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Utils;
 using Microsoft.Rest;
-using Opc.Ua.Gds.Client;
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
 {
@@ -199,6 +195,31 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
                 return new NotFoundResult();
             }
 
+            // preset Domain names with discovery Urls
+            var domainNames = new List<string>();
+            if (application.DiscoveryUrls != null)
+            {
+                foreach (var discoveryUrl in application.DiscoveryUrls)
+                {
+                    Uri url = Opc.Ua.Utils.ParseUri(discoveryUrl);
+                    if (url == null)
+                    {
+                        continue;
+                    }
+
+                    string domainName = url.DnsSafeHost;
+                    if (url.HostNameType != UriHostNameType.Dns)
+                    {
+                        domainName = Opc.Ua.Utils.NormalizedIPAddress(domainName);
+                    }
+
+                    if (!Opc.Ua.Utils.FindStringIgnoreCase(domainNames, domainName))
+                    {
+                        domainNames.Add(domainName);
+                    }
+                }
+            }
+
             ViewData["Application"] = application;
             ViewData["Groups"] = groups;
 
@@ -206,7 +227,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
             {
                 ApplicationId = id,
                 CertificateGroupId = defaultGroupId,
-                CertificateTypeId = defaultTypeId
+                CertificateTypeId = defaultTypeId,
+                DomainNames = domainNames
             };
             UpdateApiModel(request);
             return View(request);
@@ -215,7 +237,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
         [HttpPost]
         [ActionName("StartNewKeyPair")]
         [ValidateAntiForgeryToken]
-        [StartNewKeyPairRequestFormApiModel]
         public async Task<ActionResult> StartNewKeyPairAsync(
             StartNewKeyPairRequestFormApiModel request,
             string add,
@@ -237,7 +258,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
                     ViewData["ErrorMessage"] =
                         "Failed to create Certificate Request.\r\n" +
                         "Message:" + ex.Message;
-                    return View(request);
+                    goto LoadAppAndView;
                 }
                 string message = null;
                 try
@@ -260,6 +281,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
                 request.DomainNames.Add("");
             }
 
+            LoadAppAndView:
             // reload app info
             var application = await opcVault.GetApplicationAsync(request.ApplicationId);
             if (application == null)
@@ -299,8 +321,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
                 return new NotFoundResult();
             }
 
-            ViewData["Application"] = application;
-
             var request = new StartSigningRequestUploadApiModel()
             {
                 ApiModel = new StartSigningRequestApiModel()
@@ -308,7 +328,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
                     ApplicationId = id,
                     CertificateGroupId = defaultGroupId,
                     CertificateTypeId = defaultTypeId
-                }
+                },
+                ApplicationUri = application.ApplicationUri,
+                ApplicationName = application.ApplicationName
             };
 
             return View(request);
