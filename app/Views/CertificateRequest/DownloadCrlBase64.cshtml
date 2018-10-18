@@ -35,12 +35,14 @@
         </dt>
 
         <dd>
-            @Html.TextAreaFor(model => model.EncodedBase64, 10, 100, htmlAttributes: new { @class = "control-label col-md-10", @readonly = "readonly" })
+            <kbd>
+                @Html.TextAreaFor(model => model.EncodedBase64, 20, 100, htmlAttributes: new { @class = "control-label col-md-10", @readonly = "readonly" })
+            </kbd>
         </dd>
     </dl>
 </div>
 
 <div>
     <hr />
-    @Html.ActionLink("Back to Details", "Index")
+    <a href="javascript:history.go(-1)">Back</a>
 </div>
