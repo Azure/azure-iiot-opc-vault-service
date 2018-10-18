@@ -97,6 +97,16 @@
                 @Html.ActionLink("Issuer", "DownloadIssuer", new { requestId = Model.RequestId }, htmlAttributes: new { @class = "btn btn-default" })
                 @Html.ActionLink("Crl", "DownloadIssuerCrl", new { requestId = Model.RequestId }, htmlAttributes: new { @class = "btn btn-default" })
             </dd>
+            <dt>Download as Base64</dt>
+            <dd>
+                @Html.ActionLink("Certificate", "DownloadCertificateBase64", new { requestId = Model.RequestId, applicationId = Model.ApplicationId }, htmlAttributes: new { @class = "btn btn-default" })
+                @if (!String.IsNullOrEmpty(Model.PrivateKeyFormat))
+                {
+                    @Html.ActionLink("PrivateKey", "DownloadKeyBase64", new { requestId = Model.RequestId, applicationId = Model.ApplicationId }, htmlAttributes: new { @class = "btn btn-default" })
+                }
+                @Html.ActionLink("Issuer", "DownloadIssuerBase64", new { requestId = Model.RequestId }, htmlAttributes: new { @class = "btn btn-default" })
+                @Html.ActionLink("Crl", "DownloadIssuerCrlBase64", new { requestId = Model.RequestId }, htmlAttributes: new { @class = "btn btn-default" })
+            </dd>
         }
     </dl>
 

@@ -28,6 +28,15 @@
     <Content Update="Views\CertificateRequest\Complete.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
+    <Content Update="Views\CertificateRequest\DownloadKeyBase64.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\CertificateRequest\DownloadCrlBase64.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\CertificateRequest\DownloadCertBase64.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
     <Content Update="Views\Certomat\Details.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
@@ -39,6 +48,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Content Update="appsettings.*.json" CopyToPublishDirectory="Never"/>
+    <Content Update="appsettings.*.json" CopyToPublishDirectory="Never" />
   </ItemGroup>
 </Project>
