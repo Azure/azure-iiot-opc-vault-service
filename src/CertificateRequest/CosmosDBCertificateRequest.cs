@@ -398,9 +398,49 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                     }
                 }
             } while (retryUpdate);
-
-
         }
+
+        public async Task DeleteAsync(string requestId)
+        {
+            Guid reqId = GetIdFromString(requestId);
+
+            bool retryUpdate;
+            do
+            {
+                retryUpdate = false;
+
+                CertificateRequest request = await CertificateRequests.GetAsync(reqId);
+                if (request == null)
+                {
+                    throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
+                }
+
+                if (request.State != CertificateRequestState.Approved)
+                {
+                    throw new ServiceResultException(StatusCodes.BadInvalidState);
+                }
+
+                request.State = CertificateRequestState.Deleted;
+
+                // erase information which is not required anymore
+                request.SigningRequest = null;
+                request.PrivateKeyFormat = null;
+                request.PrivateKeyPassword = null;
+                request.DeleteTime = DateTime.UtcNow;
+                try
+                {
+                    await CertificateRequests.UpdateAsync(request.RequestId, request, request.ETag);
+                }
+                catch (DocumentClientException dce)
+                {
+                    if (dce.StatusCode == HttpStatusCode.PreconditionFailed)
+                    {
+                        retryUpdate = true;
+                    }
+                }
+            } while (retryUpdate);
+        }
+
 
         public async Task<FinishRequestResultModel> FinishRequestAsync(
             string requestId,
@@ -467,6 +507,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                 case CertificateRequestState.Rejected:
                 case CertificateRequestState.Accepted:
                 case CertificateRequestState.Approved:
+                case CertificateRequestState.Deleted:
+                case CertificateRequestState.Revoked:
                     break;
                 default:
                     throw new ServiceResultException(StatusCodes.BadInvalidArgument);
@@ -481,8 +523,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                 request.SigningRequest,
                 request.SubjectName,
                 request.DomainNames,
-                request.PrivateKeyFormat,
-                request.PrivateKeyPassword);
+                request.PrivateKeyFormat);
 
         }
 
@@ -493,7 +534,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             IEnumerable<CertificateRequest> requests;
             if (appId == null && state == null)
             {
-                requests = await CertificateRequests.GetAsync(x => true);
+                requests = await CertificateRequests.GetAsync(x => x.State < CertificateRequestState.Deleted);
             }
             else if (appId != null && state != null)
             {

@@ -10,6 +10,7 @@ using System.Net;
 using System.Security;
 using System.Text;
 using System.Threading.Tasks;
+using Autofac;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.IIoT.Diagnostics;
 using Microsoft.Azure.IIoT.Exceptions;
@@ -26,11 +27,14 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
         private readonly ILogger _log;
         private readonly string Endpoint;
         private readonly SecureString AuthKeyOrResourceToken;
+        private readonly ILifetimeScope Scope = null;
 
         public CosmosDBApplicationsDatabase(
+            ILifetimeScope scope,
             IServicesConfig config,
             ILogger logger)
         {
+            this.Scope = scope;
             this.Endpoint = config.CosmosDBEndpoint;
             this.AuthKeyOrResourceToken = new SecureString();
             foreach (char ch in config.CosmosDBToken)
@@ -140,10 +144,12 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                 throw new ResourceNotFoundException("A record with the specified application id does not exist.");
             }
 
-            var certificateRequests = await CertificateRequests.GetAsync(ii => ii.ApplicationId == appId.ToString());
-            foreach (var entry in new List<CertificateRequest>(certificateRequests))
+            ICertificateRequest certificateRequestsService = Scope.Resolve<ICertificateRequest>();
+            // mark all requests as deleted
+            var certificateRequests = await certificateRequestsService.QueryAsync(appId.ToString(), null);
+            foreach (var request in certificateRequests)
             {
-                await CertificateRequests.DeleteAsync(entry.RequestId);
+                await certificateRequestsService.DeleteAsync(request.RequestId);
             }
 
             await Applications.DeleteAsync(appId);
@@ -282,7 +288,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
         {
             db = new DocumentDBRepository(Endpoint, AuthKeyOrResourceToken);
             Applications = new DocumentDBCollection<Application>(db);
-            CertificateRequests = new DocumentDBCollection<CertificateRequest>(db);
         }
 
         private string CreateServerQuery(uint startingRecordId, uint maxRecordsToQuery)
@@ -428,7 +433,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
         private DateTime queryCounterResetTime = DateTime.UtcNow;
         private DocumentDBRepository db;
         private IDocumentDBCollection<Application> Applications;
-        private IDocumentDBCollection<CertificateRequest> CertificateRequests;
         #endregion
     }
 }
