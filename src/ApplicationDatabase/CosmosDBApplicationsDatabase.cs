@@ -3,6 +3,13 @@
 //  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Security;
+using System.Text;
+using System.Threading.Tasks;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.IIoT.Diagnostics;
 using Microsoft.Azure.IIoT.Exceptions;
@@ -11,13 +18,6 @@ using Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB.Models;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Models;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Runtime;
 using Opc.Ua.Gds.Server.Database;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Security;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
 {
@@ -45,55 +45,17 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
         #region IApplicationsDatabase
         public async Task<string> RegisterApplicationAsync(Application application)
         {
-            bool isNew = false;
             Guid applicationId = VerifyRegisterApplication(application);
-            if (Guid.Empty == applicationId)
+            if (Guid.Empty != applicationId)
             {
-                isNew = true;
+                return await UpdateApplicationAsync(application.ApplicationId.ToString(), application);
             }
 
-            string capabilities = ServerCapabilities(application);
-
-            bool retryUpdate;
-            do
-            {
-                retryUpdate = false;
-                Application record = null;
-                if (applicationId != Guid.Empty)
-                {
-                    record = await Applications.GetAsync(applicationId);
-                    if (record == null)
-                    {
-                        application.ApplicationId = Guid.NewGuid();
-                        isNew = true;
-                    }
-                }
-
-                if (isNew)
-                {
-                    // find new ID for QueryServers
-                    var maxAppIDEnum = await Applications.GetAsync("SELECT TOP 1 * FROM Applications a ORDER BY a.ID DESC");
-                    var maxAppID = maxAppIDEnum.SingleOrDefault();
-                    application.ID = (maxAppID != null) ? maxAppID.ID + 1 : 1;
-                    application.ApplicationId = Guid.NewGuid();
-                    var result = await Applications.CreateAsync(application);
-                    applicationId = new Guid(result.Id);
-                }
-                else
-                {
-                    try
-                    {
-                        await Applications.UpdateAsync(applicationId, application, record.ETag);
-                    }
-                    catch (DocumentClientException dce)
-                    {
-                        if (dce.StatusCode == HttpStatusCode.PreconditionFailed)
-                        {
-                            retryUpdate = true;
-                        }
-                    }
-                }
-            } while (retryUpdate);
+            application.ID = await GetMaxAppIDAsync();
+            application.CreateTime = application.UpdateTime = DateTime.UtcNow;
+            application.ApplicationId = Guid.NewGuid();
+            var result = await Applications.CreateAsync(application);
+            applicationId = new Guid(result.Id);
 
             return applicationId.ToString();
         }
@@ -112,10 +74,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
 
             Guid recordId = VerifyRegisterApplication(application);
             Guid applicationId = new Guid(id);
-
-            if (recordId == Guid.Empty)
+            if (applicationId == Guid.Empty)
             {
-                application.ApplicationId = applicationId;
+                throw new ArgumentException("The applicationId is invalid", nameof(id));
             }
 
             string capabilities = ServerCapabilities(application);
@@ -132,6 +93,12 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                     {
                         throw new ArgumentException("A record with the specified application id does not exist.", nameof(id));
                     }
+
+                    if (record.ID == 0)
+                    {
+                        record.ID = await GetMaxAppIDAsync();
+                    }
+                    record.UpdateTime = DateTime.UtcNow;
 
                     record.ApplicationUri = application.ApplicationUri;
                     record.ApplicationName = application.ApplicationName;
@@ -449,6 +416,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             return capabilities.ToString();
         }
 
+        private async Task<int> GetMaxAppIDAsync()
+        {
+            // find new ID for QueryServers
+            var maxAppIDEnum = await Applications.GetAsync("SELECT TOP 1 * FROM Applications a ORDER BY a.ID DESC");
+            var maxAppID = maxAppIDEnum.SingleOrDefault();
+            return (maxAppID != null) ? maxAppID.ID + 1 : 1;
+        }
         #endregion
         #region Private Fields
         private DateTime queryCounterResetTime = DateTime.UtcNow;
