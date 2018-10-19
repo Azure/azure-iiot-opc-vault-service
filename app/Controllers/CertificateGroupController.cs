@@ -61,6 +61,14 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
             return RedirectToAction("IssuerDetails", new { id });
         }
 
+        [ActionName("Revoke")]
+        public async Task<ActionResult> Revoke(string id)
+        {
+            AuthorizeClient();
+            await opcVault.RevokeGroupAsync(id);
+            return RedirectToAction("IssuerDetails", new { id });
+        }
+
         [HttpPost]
         [ActionName("Edit")]
         [ValidateAntiForgeryToken]
