@@ -157,28 +157,46 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
         }
 
         [ActionName("DownloadIssuerBase64")]
-        public async Task<ActionResult> DownloadIssuerBase64Async(string requestId)
+        public async Task<ActionResult> DownloadIssuerBase64Async(string groupId, string requestId)
         {
             AuthorizeClient();
-            var request = await opcVault.ReadCertificateRequestAsync(requestId);
-            if (request != null)
+            if (groupId == null)
             {
-                var issuer = await opcVault.GetCACertificateChainAsync(request.CertificateGroupId);
+                var request = await opcVault.ReadCertificateRequestAsync(requestId);
+                if (request != null)
+                {
+                    groupId = request.CertificateGroupId;
+                }
+            }
+
+            if (groupId != null)
+            {
+                var issuer = await opcVault.GetCACertificateChainAsync(groupId);
                 return RedirectToAction("DownloadCertBase64", new { cert = issuer.Chain[0].Certificate });
             }
+
             return new NotFoundResult();
         }
 
         [ActionName("DownloadIssuerCrlBase64")]
-        public async Task<ActionResult> DownloadIssuerCrlBase64Async(string requestId)
+        public async Task<ActionResult> DownloadIssuerCrlBase64Async(string groupId, string requestId)
         {
             AuthorizeClient();
-            var request = await opcVault.ReadCertificateRequestAsync(requestId);
-            if (request != null)
+            if (groupId == null)
             {
-                var crl = await opcVault.GetCACrlChainAsync(request.CertificateGroupId);
+                var request = await opcVault.ReadCertificateRequestAsync(requestId);
+                if (request != null)
+                {
+                    groupId = request.CertificateGroupId;
+                }
+            }
+
+            if (groupId != null)
+            {
+                var crl = await opcVault.GetCACrlChainAsync(groupId);
                 return RedirectToAction("DownloadCrlBase64", new { crl = crl.Chain[0].Crl });
             }
+
             return new NotFoundResult();
         }
 
