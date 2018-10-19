@@ -1,12 +1,12 @@
 ﻿@model Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models.ApplicationRecordApiModel
 
 @{
-    ViewBag.Title = "Delete";
+    ViewBag.Title = "Unregister";
     Layout = "~/Views/Shared/_Layout.cshtml";
     IList<string> AppTypes = new List<string>() { "Server", "Client", "ClientAndServer", "DiscoveryServer" };
 }
 
-<h2>Delete an Application</h2>
+<h2>Unregister an Application</h2>
 
 <div>
     <hr />
@@ -119,13 +119,13 @@
 
         <hr />
         <div class="alert alert-warning">
-            <h3>Are you sure you want to delete this OPC UA Application?</h3>
-            <h4>All certificate requests of this Application will be deleted.</h4>
+            <h3>Are you sure you want to unregister this OPC UA Application?</h3>
+            <h4>All certificate requests of this Application will be deleted and revoked.</h4>
         </div>
         <hr />
 
         <div class="form-actions no-color">
-            <input type="submit" value="Delete" class="btn btn-danger" />
+            <input type="submit" value="Unregister" class="btn btn-danger" />
         </div>
     }
     <hr />

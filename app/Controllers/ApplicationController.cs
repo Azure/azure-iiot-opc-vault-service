@@ -46,7 +46,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
             return View(applications.Applications);
         }
 
-        [ActionName("Delete")]
+        [ActionName("Unregister")]
         public async Task<ActionResult> DeleteAsync(string id)
         {
             if (String.IsNullOrEmpty(id))
@@ -64,9 +64,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
         }
 
         [HttpPost]
-        [ActionName("Delete")]
+        [ActionName("Unregister")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> DeleteConfirmedAsync([Bind("Id")] string id)
+        public async Task<ActionResult> UnregisterConfirmedAsync([Bind("Id")] string id)
         {
             AuthorizeClient();
             await opcVault.UnregisterApplicationAsync(id);
