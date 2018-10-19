@@ -41,6 +41,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
         Task AcceptAsync(
             string requestId);
 
+        Task DeleteAsync(
+            string requestId);
+
         Task<FinishRequestResultModel> FinishRequestAsync(
             string requestId,
             string applicationId
