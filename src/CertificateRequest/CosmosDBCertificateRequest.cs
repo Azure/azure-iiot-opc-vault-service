@@ -415,11 +415,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                     throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
                 }
 
-                if (request.State != CertificateRequestState.Approved)
-                {
-                    throw new ServiceResultException(StatusCodes.BadInvalidState);
-                }
-
                 request.State = CertificateRequestState.Deleted;
 
                 // erase information which is not required anymore
