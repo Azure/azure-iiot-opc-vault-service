@@ -436,6 +436,93 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             } while (retryUpdate);
         }
 
+        public async Task RevokeAsync(string requestId)
+        {
+            Guid reqId = GetIdFromString(requestId);
+
+            bool retryUpdate;
+            do
+            {
+                retryUpdate = false;
+                CertificateRequest request = await CertificateRequests.GetAsync(reqId);
+
+                if (request == null)
+                {
+                    throw new ServiceResultException(StatusCodes.BadNodeIdUnknown, "Unknown request id");
+                }
+
+                if (request.State != CertificateRequestState.Deleted)
+                {
+                    throw new ServiceResultException(StatusCodes.BadInvalidState);
+                }
+
+                if (request.Certificate == null)
+                {
+                    throw new ServiceResultException(StatusCodes.BadInvalidState);
+                }
+
+                request.State = CertificateRequestState.Revoked;
+                // erase information which is not required anymore
+                request.PrivateKeyFormat = null;
+                request.SigningRequest = null;
+                request.PrivateKeyPassword = null;
+                request.PrivateKey = null;
+
+                try
+                {
+                    var cert = new X509Certificate2(request.Certificate);
+                    var crl = await CertificateGroup.RevokeCertificateAsync(request.CertificateGroupId, cert);
+                }
+                catch (Exception e)
+                {
+                    StringBuilder error = new StringBuilder();
+
+                    error.Append("Error Revoking Certificate=" + e.Message);
+                    error.Append("\r\nGroupId=" + request.CertificateGroupId);
+                    throw new ServiceResultException(StatusCodes.BadConfigurationError, error.ToString());
+                }
+
+                request.RevokeTime = DateTime.UtcNow;
+
+                try
+                {
+                    await CertificateRequests.UpdateAsync(reqId, request, request.ETag);
+                }
+                catch (DocumentClientException dce)
+                {
+                    if (dce.StatusCode == HttpStatusCode.PreconditionFailed)
+                    {
+                        retryUpdate = true;
+                    }
+                }
+            } while (retryUpdate);
+
+        }
+
+        public async Task PurgeAsync(string requestId)
+        {
+            Guid reqId = GetIdFromString(requestId);
+
+            CertificateRequest request = await CertificateRequests.GetAsync(reqId);
+            if (request == null)
+            {
+                throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
+            }
+            if (request.State != CertificateRequestState.Revoked &&
+                request.State != CertificateRequestState.Rejected &&
+                request.State != CertificateRequestState.New)
+            {
+                throw new ServiceResultException(StatusCodes.BadInvalidState);
+            }
+
+            await CertificateRequests.DeleteAsync(request.RequestId);
+        }
+
+        public Task RevokeGroupAsync(string groupId)
+        {
+            throw new NotImplementedException();
+        }
+
 
         public async Task<FinishRequestResultModel> FinishRequestAsync(
             string requestId,
