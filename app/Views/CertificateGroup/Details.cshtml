@@ -104,6 +104,8 @@
     @Html.ActionLink("Renew CA Certificate", "Renew", new { id = Model.Name },
             new { @class = "btn btn-warning",
                 onclick = "return confirm('Do you really want to renew the CA certificate for group " + Model.Name + "?')" })
+    @Html.ActionLink("Update Cert Revocation List (CRL)", "Revoke", new { id = Model.Name },
+            new { @class = "btn btn-warning" })
 </div>
 <div>
     <hr />
