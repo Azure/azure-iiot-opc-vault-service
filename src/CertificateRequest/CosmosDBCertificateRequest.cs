@@ -496,7 +496,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                     }
                 }
             } while (retryUpdate);
-
         }
 
         public async Task PurgeAsync(string requestId)
@@ -518,9 +517,83 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             await CertificateRequests.DeleteAsync(request.RequestId);
         }
 
-        public Task RevokeGroupAsync(string groupId)
+        public async Task RevokeGroupAsync(string groupId)
         {
-            throw new NotImplementedException();
+            var deletedRequests = await CertificateRequests.GetAsync(x => x.State == CertificateRequestState.Deleted);
+
+            if (deletedRequests == null ||
+                deletedRequests.Count() == 0)
+            {
+                return;
+            }
+
+            var revokedId = new List<Guid>();
+            var certCollection = new X509Certificate2Collection();
+            foreach (var request in deletedRequests)
+            {
+                if (String.Compare(request.CertificateGroupId, groupId, StringComparison.OrdinalIgnoreCase) == 0)
+                {
+                    try
+                    {
+                        var cert = new X509Certificate2(request.Certificate);
+                        certCollection.Add(cert);
+                        revokedId.Add(request.RequestId);
+                    }
+                    catch
+                    {
+                        // skip 
+                    }
+                    
+                }
+            }
+
+            await CertificateGroup.RevokeCertificatesAsync(groupId, certCollection);
+
+            foreach (var reqId in deletedRequests)
+            {
+                bool retryUpdate;
+                do
+                {
+                    retryUpdate = false;
+                    CertificateRequest request = await CertificateRequests.GetAsync(reqId.RequestId);
+
+                    if (request == null)
+                    {
+                        throw new ServiceResultException(StatusCodes.BadNodeIdUnknown, "Unknown request id");
+                    }
+
+                    if (request.State != CertificateRequestState.Deleted)
+                    {
+                        throw new ServiceResultException(StatusCodes.BadInvalidState);
+                    }
+
+                    if (request.Certificate == null)
+                    {
+                        throw new ServiceResultException(StatusCodes.BadInvalidState);
+                    }
+
+                    request.State = CertificateRequestState.Revoked;
+                    request.RevokeTime = DateTime.UtcNow;
+                    // erase information which is not required anymore
+                    request.Certificate = null;
+                    request.PrivateKeyFormat = null;
+                    request.SigningRequest = null;
+                    request.PrivateKeyPassword = null;
+                    request.PrivateKey = null;
+
+                    try
+                    {
+                        await CertificateRequests.UpdateAsync(reqId.RequestId, request, request.ETag);
+                    }
+                    catch (DocumentClientException dce)
+                    {
+                        if (dce.StatusCode == HttpStatusCode.PreconditionFailed)
+                        {
+                            retryUpdate = true;
+                        }
+                    }
+                } while (retryUpdate);
+            }
         }
 
 
