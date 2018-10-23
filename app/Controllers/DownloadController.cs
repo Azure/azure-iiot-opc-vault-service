@@ -244,8 +244,16 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
                 }
                 else if (String.Compare(result.PrivateKeyFormat, "PEM", StringComparison.OrdinalIgnoreCase) == 0)
                 {
-                    var byteArray = Convert.FromBase64String(result.PrivateKey);
-                    model.EncodedBase64 = System.Text.Encoding.UTF8.GetString(byteArray, 0, byteArray.Length);
+                    if (false)
+                    {
+                        //to display PEM as text
+                        var byteArray = Convert.FromBase64String(result.PrivateKey);
+                        model.EncodedBase64 = System.Text.Encoding.UTF8.GetString(byteArray, 0, byteArray.Length);
+                    }
+                    else
+                    {
+                        model.EncodedBase64 = result.PrivateKey;
+                    }
                     return View(model);
                 }
             }

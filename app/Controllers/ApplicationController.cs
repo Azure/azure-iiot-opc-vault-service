@@ -3,18 +3,19 @@
 // license information.
 //
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.AzureAD.UI;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.IIoT.OpcUa.Api.Vault;
 using Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models;
+using Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Models;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.TokenStorage;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Utils;
 using Microsoft.Rest;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
 {
@@ -43,7 +44,12 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
             AuthorizeClient();
             var applicationQuery = new QueryApplicationsApiModel();
             var applications = await opcVault.QueryApplicationsAsync(applicationQuery);
-            return View(applications.Applications);
+            var applicationsTrimmed = new List<ApplicationRecordTrimmedApiModel>();
+            foreach (var app in applications.Applications)
+            {
+                applicationsTrimmed.Add(new ApplicationRecordTrimmedApiModel(app));
+            }
+            return View(applicationsTrimmed);
         }
 
         [ActionName("Unregister")]

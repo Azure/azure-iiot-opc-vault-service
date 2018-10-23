@@ -19,12 +19,14 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Models
             RequestId = apiModel.RequestId;
             ApplicationId = apiModel.ApplicationId;
             State = apiModel.State;
-            CertificateGroupId = apiModel.CertificateGroupId;
-            CertificateTypeId = apiModel.CertificateTypeId;
-            SigningRequest = apiModel.SigningRequest;
+            // reduce view size, add as approbriate
+            //CertificateGroupId = apiModel.CertificateGroupId;
+            //CertificateTypeId = apiModel.CertificateTypeId;
+            //SigningRequest = apiModel.SigningRequest;
             SubjectName = apiModel.SubjectName;
-            DomainNames = apiModel.DomainNames;
-            PrivateKeyFormat = apiModel.PrivateKeyFormat;
+            //DomainNames = apiModel.DomainNames;
+            //PrivateKeyFormat = apiModel.PrivateKeyFormat;
+            TrimLength = 40;
         }
 
         /// <summary>
@@ -36,6 +38,19 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Models
         /// </summary>
         [JsonProperty(PropertyName = "ApplicationName")]
         public string ApplicationName { get; set; }
+
+        public int TrimLength { get; set; }
+        public string ApplicationUriTrimmed { get => Trimmed(ApplicationUri); }
+        public string ApplicationNameTrimmed { get => Trimmed(ApplicationName); }
+        public string SubjectNameTrimmed { get => Trimmed(SubjectName); }
+
+        private string Trimmed(string value)
+        {
+            if (value?.Length > TrimLength)
+                return value.Substring(0, TrimLength - 3) + "...";
+            return value;
+        }
+
 
     }
 }
