@@ -25,6 +25,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Models
             SubjectName = apiModel.SubjectName;
             DomainNames = apiModel.DomainNames;
             PrivateKeyFormat = apiModel.PrivateKeyFormat;
+            TrimLength = 40;
         }
 
         /// <summary>
@@ -36,6 +37,19 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Models
         /// </summary>
         [JsonProperty(PropertyName = "ApplicationName")]
         public string ApplicationName { get; set; }
+
+        public int TrimLength { get; set; }
+        public string ApplicationUriTrimmed { get => Trimmed(ApplicationUri); }
+        public string ApplicationNameTrimmed { get => Trimmed(ApplicationName); }
+        public string SubjectNameTrimmed { get => Trimmed(SubjectName); }
+
+        private string Trimmed(string value)
+        {
+            if (value?.Length > TrimLength)
+                return value.Substring(0, TrimLength - 3) + "...";
+            return value;
+        }
+
 
     }
 }
