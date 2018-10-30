@@ -233,12 +233,19 @@ namespace Opc.Ua.Gds.Server
         /// </summary>
         protected virtual void SessionManager_ImpersonateUser(Session session, ImpersonateEventArgs args)
         {
-            // only use the test users for unit testing, otherwise keep disabled!
-#if UNITTEST
+            // check for a user name token
+            AnonymousIdentityToken anonymousToken = args.NewIdentity as AnonymousIdentityToken;
+            if (anonymousToken != null)
+            {
+                args.Identity = new RoleBasedIdentity(new UserIdentity(), GdsRole.ApplicationUser);
+                return;
+            }
+
             // check for a user name token
             UserNameIdentityToken userNameToken = args.NewIdentity as UserNameIdentityToken;
             if (userNameToken != null)
             {
+#if UNITTESTONLY
                 if (VerifyPassword(userNameToken))
                 {
                     switch (userNameToken.UserName)
@@ -268,22 +275,22 @@ namespace Opc.Ua.Gds.Server
                             }
                     }
                 }
-            }
 #endif
+            }
+
             // check for x509 user token.
             X509IdentityToken x509Token = args.NewIdentity as X509IdentityToken;
             if (x509Token != null)
             {
-                GdsRole role = GdsRole.ApplicationUser;
+                GdsRole role = GdsRole.ApplicationAdmin;
                 VerifyUserTokenCertificate(x509Token.Certificate);
-
-                // todo: is cert listed in admin list? then 
-                // role = GdsRole.ApplicationAdmin;
 
                 Utils.Trace("X509 Token Accepted: {0} as {1}", args.Identity.DisplayName, role.ToString());
                 args.Identity = new RoleBasedIdentity(new UserIdentity(x509Token), role);
                 return;
             }
+
+            throw new ServiceResultException(new ServiceResult(StatusCodes.BadUserAccessDenied));
         }
 
         /// <summary>
@@ -329,16 +336,16 @@ namespace Opc.Ua.Gds.Server
             }
         }
 
-#if UNITTEST
+#if UNITTESTONLY
         private bool VerifyPassword(UserNameIdentityToken userNameToken)
         {
             // TODO: check username/password permissions
             return userNameToken.DecryptedPassword == "demo";
         }
 #endif
-        #endregion
+#endregion
 
-        #region Private Fields
+#region Private Fields
         private object m_lock = new object();
         private Dictionary<uint, ImpersonationContext> m_contexts = new Dictionary<uint, ImpersonationContext>();
         private IApplicationsDatabase m_database = null;
@@ -346,6 +353,6 @@ namespace Opc.Ua.Gds.Server
         private ICertificateGroup m_certificateGroup = null;
         private bool m_autoApprove;
         private X509CertificateValidator m_userCertificateValidator;
-        #endregion
+#endregion
     }
 }
