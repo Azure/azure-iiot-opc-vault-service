@@ -113,8 +113,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
             Configuration = builder.Build();
             Configuration.Bind("OpcVault", ServiceConfig);
             Configuration.Bind("Auth", ClientConfig);
-            //KeyVaultPurgeCACertificateAsync().Wait();
-            //FirstKeyVaultCreateCACertificateAsync().Wait();
         }
 
         [SkippableFact, Trait(Constants.Type, Constants.UnitTest), TestPriority(100)]

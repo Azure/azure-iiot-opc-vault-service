@@ -388,8 +388,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
                 do
                 {
                     await Task.Delay(1000);
-                    operation = await _keyVaultClient.GetCertificateOperationAsync(_vaultBaseUrl, id);
-                } while (operation.Status == "inProgress");
+                    operation = await _keyVaultClient.GetCertificateOperationAsync(_vaultBaseUrl, id, ct);
+                } while (operation.Status == "inProgress" && !ct.IsCancellationRequested);
                 if (operation.Status != "completed")
                 {
                     throw new ServiceResultException(StatusCodes.BadUnexpectedError, "Failed to create new key pair.");
@@ -446,7 +446,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
                     true);
 
                 // merge Root CA cert with 
-                var result3 = await _keyVaultClient.MergeCertificateAsync(
+                var mergeResult = await _keyVaultClient.MergeCertificateAsync(
                     _vaultBaseUrl,
                     id,
                     new X509Certificate2Collection(signedcert)

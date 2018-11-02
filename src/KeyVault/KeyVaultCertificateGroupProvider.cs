@@ -21,6 +21,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
 {
     public sealed class KeyVaultCertificateGroupProvider : Opc.Ua.Gds.Server.CertificateGroup
     {
+        public TimeSpan CrlUpdateTime = TimeSpan.FromDays(30);
         public X509CRL Crl;
         public X509SignatureGenerator x509SignatureGenerator;
 
@@ -253,6 +254,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
 
                 // create default revocation list, sign with KeyVault
                 Crl = RevokeCertificate(Certificate, null, null,
+                    notBefore, notBefore + CrlUpdateTime,
                     new KeyVaultSignatureGenerator(_keyVaultServiceClient, _caCertKeyIdentifier, Certificate),
                     this.Configuration.CACertificateHashSize);
 
@@ -277,6 +279,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
             var certificates = new X509Certificate2Collection() { certificate };
             var caCertKeyInfoCollection = await _keyVaultServiceClient.GetCertificateVersionsKeyInfoAsync(Configuration.Id);
             var authorityKeyIdentifier = FindAuthorityKeyIdentifier(certificate);
+            DateTime now = DateTime.UtcNow;
             foreach (var caCertKeyInfo in caCertKeyInfoCollection)
             {
                 var subjectKeyId = FindSubjectKeyIdentifierExtension(caCertKeyInfo.Certificate);
@@ -288,6 +291,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
                     var crl = await _keyVaultServiceClient.LoadCACrl(Configuration.Id, caCertKeyInfo.Certificate);
                     var crls = new List<X509CRL>() { crl };
                     var newCrl = RevokeCertificate(caCertKeyInfo.Certificate, crls, certificates,
+                        now, now + CrlUpdateTime,
                         new KeyVaultSignatureGenerator(_keyVaultServiceClient, caCertKeyInfo.KeyIdentifier, caCertKeyInfo.Certificate),
                         this.Configuration.CACertificateHashSize);
                     await _keyVaultServiceClient.ImportCACrl(Configuration.Id, caCertKeyInfo.Certificate, newCrl).ConfigureAwait(false);
@@ -308,6 +312,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
             var remainingCertificates = new X509Certificate2Collection(certificates);
             await LoadPublicAssets().ConfigureAwait(false);
             var caCertKeyInfoCollection = await _keyVaultServiceClient.GetCertificateVersionsKeyInfoAsync(Configuration.Id);
+            DateTime now = DateTime.UtcNow;
             foreach (var caCertKeyInfo in caCertKeyInfoCollection)
             {
                 if (remainingCertificates.Count == 0)
@@ -336,6 +341,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
                 var crl = await _keyVaultServiceClient.LoadCACrl(Configuration.Id, caCertKeyInfo.Certificate);
                 var crls = new List<X509CRL>() { crl };
                 var newCrl = RevokeCertificate(caCertKeyInfo.Certificate, crls, caRevokeCollection,
+                    now, now + CrlUpdateTime,
                     new KeyVaultSignatureGenerator(_keyVaultServiceClient, caCertKeyInfo.KeyIdentifier, caCertKeyInfo.Certificate),
                     this.Configuration.CACertificateHashSize);
                 await _keyVaultServiceClient.ImportCACrl(Configuration.Id, caCertKeyInfo.Certificate, newCrl).ConfigureAwait(false);
@@ -510,7 +516,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
             if (Certificate == null ||
                 _caCertSecretIdentifier == null ||
                 _caCertKeyIdentifier == null ||
-                TimeSpan.FromHours(1) > (DateTime.UtcNow - _lastUpdate))
+                TimeSpan.FromHours(1) < (DateTime.UtcNow - _lastUpdate))
             {
                 await Init();
                 _lastUpdate = DateTime.UtcNow;

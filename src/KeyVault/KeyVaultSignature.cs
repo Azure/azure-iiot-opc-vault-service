@@ -19,6 +19,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
 {
     public class KeyVaultCertFactory
     {
+        const int SerialNumberLength = 20;
+
         /// <summary>
         /// Creates a KeyVault signed certificate.
         /// </summary>
@@ -49,7 +51,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
             }
 
             // new serial number
-            byte[] serialNumber = new byte[10];
+            byte[] serialNumber = new byte[SerialNumberLength];
             RandomNumberGenerator.Fill(serialNumber);
             serialNumber[0] &= 0x7F;
 
@@ -150,6 +152,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
             X509Certificate2 issuerCertificate,
             List<X509CRL> issuerCrls,
             X509Certificate2Collection revokedCertificates,
+            DateTime thisUpdate,
+            DateTime nextUpdate,
             X509SignatureGenerator generator,
             uint hashSize
             )
@@ -163,15 +167,17 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
             var crlGen = new Org.BouncyCastle.X509.X509V2CrlGenerator();
             crlGen.SetIssuerDN(bcCertCA.IssuerDN);
 
-            DateTime now = DateTime.UtcNow;
-            DateTime nextUpdate = now.AddMonths(12);
-            if (nextUpdate > bcCertCA.NotAfter)
+            if (thisUpdate == DateTime.MinValue)
+            {
+                thisUpdate = DateTime.UtcNow;
+            }
+            crlGen.SetThisUpdate(thisUpdate);
+
+            if (nextUpdate <= thisUpdate)
             {
                 nextUpdate = bcCertCA.NotAfter;
             }
-            crlGen.SetThisUpdate(now);
             crlGen.SetNextUpdate(nextUpdate);
-
             // merge all existing revocation list
             if (issuerCrls != null)
             {
@@ -191,14 +197,14 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
             if (revokedCertificates == null || revokedCertificates.Count == 0)
             {
                 // add a dummy revoked cert
-                crlGen.AddCrlEntry(Org.BouncyCastle.Math.BigInteger.One, now, Org.BouncyCastle.Asn1.X509.CrlReason.Unspecified);
+                crlGen.AddCrlEntry(Org.BouncyCastle.Math.BigInteger.One, thisUpdate, Org.BouncyCastle.Asn1.X509.CrlReason.Unspecified);
             }
             else
             {
                 // add the revoked cert
                 foreach (var revokedCertificate in revokedCertificates)
                 {
-                    crlGen.AddCrlEntry(GetSerialNumber(revokedCertificate), now, Org.BouncyCastle.Asn1.X509.CrlReason.PrivilegeWithdrawn);
+                    crlGen.AddCrlEntry(GetSerialNumber(revokedCertificate), thisUpdate, Org.BouncyCastle.Asn1.X509.CrlReason.PrivilegeWithdrawn);
                 }
             }
 
