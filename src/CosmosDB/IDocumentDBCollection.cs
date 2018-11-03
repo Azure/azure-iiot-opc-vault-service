@@ -19,7 +19,17 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB
         Task DeleteAsync(Guid id);
         Task<T> GetAsync(Guid id);
         Task<IEnumerable<T>> GetAsync(Expression<Func<T, bool>> predicate);
+        Task<KeyValuePair<string, IEnumerable<T>>> GetAsync(
+            Expression<Func<T, bool>> predicate,
+            string continuationToken,
+            int? maxItemCount
+            );
         Task<IEnumerable<T>> GetAsync(string predicate);
+        Task<KeyValuePair<string, IEnumerable<T>>> GetAsync(
+            string predicate,
+            string continuationToken,
+            int? maxItemCount
+            );
         Task<Document> UpdateAsync(Guid id, T item, string eTag);
     }
 }
