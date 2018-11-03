@@ -444,9 +444,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             /// </param>
             /// <param name='groupId'>
             /// </param>
-            public static TrustListApiModel GetTrustList(this IOpcVault operations, string groupId)
+            /// <param name='maxResults'>
+            /// </param>
+            public static TrustListApiModel GetTrustList(this IOpcVault operations, string groupId, int? maxResults = default(int?))
             {
-                return operations.GetTrustListAsync(groupId).GetAwaiter().GetResult();
+                return operations.GetTrustListAsync(groupId, maxResults).GetAwaiter().GetResult();
             }
 
             /// <summary>
@@ -457,12 +459,54 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             /// </param>
             /// <param name='groupId'>
             /// </param>
+            /// <param name='maxResults'>
+            /// </param>
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<TrustListApiModel> GetTrustListAsync(this IOpcVault operations, string groupId, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<TrustListApiModel> GetTrustListAsync(this IOpcVault operations, string groupId, int? maxResults = default(int?), CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.GetTrustListWithHttpMessagesAsync(groupId, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.GetTrustListWithHttpMessagesAsync(groupId, maxResults, null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <summary>
+            /// Get trust list
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='groupId'>
+            /// </param>
+            /// <param name='maxResults'>
+            /// </param>
+            /// <param name='nextPageLink'>
+            /// </param>
+            public static TrustListApiModel GetTrustListNext(this IOpcVault operations, string groupId, int? maxResults = default(int?), string nextPageLink = default(string))
+            {
+                return operations.GetTrustListNextAsync(groupId, maxResults, nextPageLink).GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Get trust list
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='groupId'>
+            /// </param>
+            /// <param name='maxResults'>
+            /// </param>
+            /// <param name='nextPageLink'>
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<TrustListApiModel> GetTrustListNextAsync(this IOpcVault operations, string groupId, int? maxResults = default(int?), string nextPageLink = default(string), CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.GetTrustListNextWithHttpMessagesAsync(groupId, maxResults, nextPageLink, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }

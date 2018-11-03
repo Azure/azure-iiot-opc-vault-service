@@ -103,9 +103,17 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Controllers
         /// <summary>Get trust list</summary>
         [HttpGet("{groupId}/trustlist")]
         [SwaggerOperation(OperationId = "GetTrustList")]
-        public async Task<TrustListApiModel> GetTrustListAsync(string groupId)
+        public async Task<TrustListApiModel> GetTrustListAsync(string groupId, int? maxResults)
         {
-            return new TrustListApiModel(await this.certificateGroups.GetTrustListAsync(groupId));
+            return new TrustListApiModel(await this.certificateGroups.GetTrustListAsync(groupId, maxResults, null));
+        }
+
+        /// <summary>Get trust list</summary>
+        [HttpGet("{groupId}/trustlistnext")]
+        [SwaggerOperation(OperationId = "GetTrustListNext")]
+        public async Task<TrustListApiModel> GetTrustListNextAsync(string groupId, int? maxResults, [FromBody] string nextPageLink)
+        {
+            return new TrustListApiModel(await this.certificateGroups.GetTrustListAsync(groupId, maxResults, nextPageLink));
         }
 
         /// <summary>Create new CA Certificate</summary>
