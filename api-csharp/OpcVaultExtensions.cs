@@ -214,6 +214,38 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
                 }
             }
 
+            /// <summary>
+            /// Query applications
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='query'>
+            /// </param>
+            public static QueryApplicationsPageResponseApiModel QueryApplicationsPage(this IOpcVault operations, QueryApplicationsPageApiModel query = default(QueryApplicationsPageApiModel))
+            {
+                return operations.QueryApplicationsPageAsync(query).GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Query applications
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='query'>
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<QueryApplicationsPageResponseApiModel> QueryApplicationsPageAsync(this IOpcVault operations, QueryApplicationsPageApiModel query = default(QueryApplicationsPageApiModel), CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.QueryApplicationsPageWithHttpMessagesAsync(query, null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
