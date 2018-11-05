@@ -92,7 +92,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB
 
 
         /// <inheritdoc/>
-        public async Task<KeyValuePair<string, IEnumerable<T>>> GetAsync(
+        public async Task<(string, IEnumerable<T>)> GetPageAsync(
             Expression<Func<T, bool>> predicate,
             string continuationToken,
             int? maxItemCount
@@ -121,11 +121,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB
                 }
             }
 
-            return new KeyValuePair<string, IEnumerable<T>>(queryResult.ResponseContinuation, results);
+            return (queryResult.ResponseContinuation, results);
         }
 
         /// <inheritdoc/>
-        public async Task<KeyValuePair<string, IEnumerable<T>>> GetAsync(
+        public async Task<(string, IEnumerable<T>)> GetPageAsync(
             string predicate,
             string continuationToken,
             int? maxItemCount
@@ -154,7 +154,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB
                 }
             }
 
-            return new KeyValuePair<string, IEnumerable<T>>(queryResult.ResponseContinuation, results);
+            return (queryResult.ResponseContinuation, results);
         }
 
         /// <inheritdoc/>

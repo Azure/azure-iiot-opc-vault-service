@@ -147,11 +147,16 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
 
             ICertificateRequest certificateRequestsService = Scope.Resolve<ICertificateRequest>();
             // mark all requests as deleted
-            var certificateRequests = await certificateRequestsService.QueryAsync(appId.ToString(), null);
-            foreach (var request in certificateRequests)
+            ReadRequestResultModel[] certificateRequests;
+            string nextPageLink = null;
+            do
             {
-                await certificateRequestsService.DeleteAsync(request.RequestId);
-            }
+                (nextPageLink, certificateRequests) = await certificateRequestsService.QueryPageAsync(appId.ToString(), null, nextPageLink);
+                foreach (var request in certificateRequests)
+                {
+                    await certificateRequestsService.DeleteAsync(request.RequestId);
+                }
+            } while (nextPageLink != null);
 
             await Applications.DeleteAsync(appId);
         }
@@ -315,9 +320,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             string query = CreateServerQuery(0, 0);
             do
             {
-                var page = await Applications.GetAsync(query, nextPageLink, maxRecordsToReturn - records.Count);
-                nextPageLink = page.Key;
-                var applications = page.Value;
+                IEnumerable<Application> applications;
+                (nextPageLink, applications) = await Applications.GetPageAsync(query, nextPageLink, maxRecordsToReturn - records.Count);
 
                 foreach (var application in applications)
                 {

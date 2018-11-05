@@ -384,42 +384,26 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         /// </summary>
         /// <param name='groupId'>
         /// </param>
+        /// <param name='allVersions'>
+        /// </param>
         /// <param name='customHeaders'>
         /// The headers that will be added to request.
         /// </param>
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse> RevokeGroupWithHttpMessagesAsync(string groupId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse> RevokeGroupWithHttpMessagesAsync(string groupId, bool? allVersions = default(bool?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Query certificate requests
         /// </summary>
-        /// <param name='customHeaders'>
-        /// The headers that will be added to request.
+        /// <param name='nextPageLink'>
         /// </param>
-        /// <param name='cancellationToken'>
-        /// The cancellation token.
-        /// </param>
-        Task<HttpOperationResponse<CertificateRequestRecordQueryResponseApiModel>> QueryRequestsWithHttpMessagesAsync(Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
-
-        /// <summary>
-        /// Query certificate requests by appId
-        /// </summary>
         /// <param name='appId'>
         /// </param>
-        /// <param name='customHeaders'>
-        /// The headers that will be added to request.
+        /// <param name='requestState'>
         /// </param>
-        /// <param name='cancellationToken'>
-        /// The cancellation token.
-        /// </param>
-        Task<HttpOperationResponse<CertificateRequestRecordQueryResponseApiModel>> QueryAppRequestsWithHttpMessagesAsync(string appId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
-
-        /// <summary>
-        /// Query certificate requests by state
-        /// </summary>
-        /// <param name='state'>
+        /// <param name='maxResults'>
         /// </param>
         /// <param name='customHeaders'>
         /// The headers that will be added to request.
@@ -427,7 +411,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse<CertificateRequestRecordQueryResponseApiModel>> QueryAppRequests1WithHttpMessagesAsync(string state, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse<CertificateRequestRecordQueryResponseApiModel>> QueryRequestsPageWithHttpMessagesAsync(string nextPageLink = default(string), string appId = default(string), string requestState = default(string), int? maxResults = default(int?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Complete certificate request
