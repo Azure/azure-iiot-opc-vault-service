@@ -139,7 +139,7 @@ namespace Opc.Ua.Gds.Server.OpcVault
                 result.AddTrustedCrls(trustList.TrustedCrls);
                 if (!String.IsNullOrEmpty(trustList.NextPageLink))
                 {
-                    trustList = await _opcServiceClient.GetTrustListNextAsync(id, MaxResults, trustList.NextPageLink).ConfigureAwait(false);
+                    trustList = await _opcServiceClient.GetTrustListNextAsync(trustList.NextPageLink, id, MaxResults).ConfigureAwait(false);
                 }
                 else
                 {
