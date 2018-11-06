@@ -412,9 +412,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             /// </param>
             /// <param name='groupId'>
             /// </param>
-            public static X509Certificate2CollectionApiModel GetCACertificateChain(this IOpcVault operations, string groupId)
+            /// <param name='maxResults'>
+            /// </param>
+            public static X509Certificate2CollectionApiModel GetCACertificateChain(this IOpcVault operations, string groupId, int? maxResults = default(int?))
             {
-                return operations.GetCACertificateChainAsync(groupId).GetAwaiter().GetResult();
+                return operations.GetCACertificateChainAsync(groupId, maxResults).GetAwaiter().GetResult();
             }
 
             /// <summary>
@@ -425,12 +427,54 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             /// </param>
             /// <param name='groupId'>
             /// </param>
+            /// <param name='maxResults'>
+            /// </param>
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<X509Certificate2CollectionApiModel> GetCACertificateChainAsync(this IOpcVault operations, string groupId, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<X509Certificate2CollectionApiModel> GetCACertificateChainAsync(this IOpcVault operations, string groupId, int? maxResults = default(int?), CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.GetCACertificateChainWithHttpMessagesAsync(groupId, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.GetCACertificateChainWithHttpMessagesAsync(groupId, maxResults, null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <summary>
+            /// Get CA Certificate chain
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='groupId'>
+            /// </param>
+            /// <param name='nextPageLink'>
+            /// </param>
+            /// <param name='maxResults'>
+            /// </param>
+            public static X509Certificate2CollectionApiModel GetCACertificateChainNext(this IOpcVault operations, string groupId, string nextPageLink = default(string), int? maxResults = default(int?))
+            {
+                return operations.GetCACertificateChainNextAsync(groupId, nextPageLink, maxResults).GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Get CA Certificate chain
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='groupId'>
+            /// </param>
+            /// <param name='nextPageLink'>
+            /// </param>
+            /// <param name='maxResults'>
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<X509Certificate2CollectionApiModel> GetCACertificateChainNextAsync(this IOpcVault operations, string groupId, string nextPageLink = default(string), int? maxResults = default(int?), CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.GetCACertificateChainNextWithHttpMessagesAsync(groupId, nextPageLink, maxResults, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }
@@ -444,9 +488,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             /// </param>
             /// <param name='groupId'>
             /// </param>
-            public static X509CrlCollectionApiModel GetCACrlChain(this IOpcVault operations, string groupId)
+            /// <param name='maxResults'>
+            /// </param>
+            public static X509CrlCollectionApiModel GetCACrlChain(this IOpcVault operations, string groupId, int? maxResults = default(int?))
             {
-                return operations.GetCACrlChainAsync(groupId).GetAwaiter().GetResult();
+                return operations.GetCACrlChainAsync(groupId, maxResults).GetAwaiter().GetResult();
             }
 
             /// <summary>
@@ -457,12 +503,54 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             /// </param>
             /// <param name='groupId'>
             /// </param>
+            /// <param name='maxResults'>
+            /// </param>
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<X509CrlCollectionApiModel> GetCACrlChainAsync(this IOpcVault operations, string groupId, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<X509CrlCollectionApiModel> GetCACrlChainAsync(this IOpcVault operations, string groupId, int? maxResults = default(int?), CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.GetCACrlChainWithHttpMessagesAsync(groupId, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.GetCACrlChainWithHttpMessagesAsync(groupId, maxResults, null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <summary>
+            /// Get CA CRL chain
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='groupId'>
+            /// </param>
+            /// <param name='nextPageLink'>
+            /// </param>
+            /// <param name='maxResults'>
+            /// </param>
+            public static X509CrlCollectionApiModel GetCACrlChainNext(this IOpcVault operations, string groupId, string nextPageLink = default(string), int? maxResults = default(int?))
+            {
+                return operations.GetCACrlChainNextAsync(groupId, nextPageLink, maxResults).GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Get CA CRL chain
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='groupId'>
+            /// </param>
+            /// <param name='nextPageLink'>
+            /// </param>
+            /// <param name='maxResults'>
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<X509CrlCollectionApiModel> GetCACrlChainNextAsync(this IOpcVault operations, string groupId, string nextPageLink = default(string), int? maxResults = default(int?), CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.GetCACrlChainNextWithHttpMessagesAsync(groupId, nextPageLink, maxResults, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }
