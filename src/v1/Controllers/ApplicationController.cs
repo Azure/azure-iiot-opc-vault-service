@@ -97,7 +97,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Controllers
         }
 
         /// <summary>Query applications</summary>
-        [HttpPost("query")]
+        [HttpGet("query")]
         [SwaggerOperation(OperationId = "QueryApplications")]
         public async Task<QueryApplicationsResponseApiModel> QueryApplicationsAsync([FromBody] QueryApplicationsApiModel query)
         {
@@ -119,7 +119,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Controllers
         }
 
         /// <summary>Query applications</summary>
-        [HttpPost("querypage")]
+        [HttpGet("querypage")]
         [SwaggerOperation(OperationId = "QueryApplicationsPage")]
         public async Task<QueryApplicationsPageResponseApiModel> QueryApplicationsPageAsync([FromBody] QueryApplicationsPageApiModel query)
         {

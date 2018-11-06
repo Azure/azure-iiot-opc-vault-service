@@ -160,9 +160,25 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Controllers
         }
 
         /// <summary>Query certificate requests</summary>
-        [HttpGet]
-        [SwaggerOperation(OperationId = "QueryRequestsPage")]
-        public async Task<CertificateRequestRecordQueryResponseApiModel> QueryRequestsPageNextAsync([FromBody] string nextPageLink, string appId, string requestState, int? maxResults)
+        [HttpGet("query")]
+        [SwaggerOperation(OperationId = "QueryRequests")]
+        public async Task<CertificateRequestRecordQueryResponseApiModel> QueryRequestsPageAsync(string appId, string requestState, int? maxResults)
+        {
+            CertificateRequestState? parsedState = null;
+            if (requestState != null)
+            {
+                parsedState = (CertificateRequestState)Enum.Parse(typeof(CertificateRequestState), requestState);
+            }
+            ReadRequestResultModel[] results;
+            string nextPageLink;
+            (nextPageLink, results) = await _certificateRequest.QueryPageAsync(appId, parsedState, null, maxResults);
+            return new CertificateRequestRecordQueryResponseApiModel(results, nextPageLink);
+        }
+
+        /// <summary>Query certificate requests</summary>
+        [HttpGet("querynext")]
+        [SwaggerOperation(OperationId = "QueryRequestsNext")]
+        public async Task<CertificateRequestRecordQueryResponseApiModel> QueryRequestsNextAsync([FromBody] string nextPageLink, string appId, string requestState, int? maxResults)
         {
             CertificateRequestState? parsedState = null;
             if (requestState != null)
