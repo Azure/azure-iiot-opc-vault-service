@@ -176,7 +176,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Controllers
         }
 
         /// <summary>Query certificate requests</summary>
-        [HttpGet("querynext")]
+        [HttpPost("querynext")]
         [SwaggerOperation(OperationId = "QueryRequestsNext")]
         public async Task<CertificateRequestRecordQueryResponseApiModel> QueryRequestsNextAsync([FromBody] string nextPageLink, string appId, string requestState, int? maxResults)
         {

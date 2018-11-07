@@ -51,7 +51,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Controllers
         [HttpPut("{groupId}")]
         [SwaggerOperation(OperationId = "UpdateCertificateGroupConfiguration")]
         [Authorize(Policy = Policies.CanManage)]
-
         public async Task<CertificateGroupConfigurationApiModel> PutAsync(string groupId, [FromBody] CertificateGroupConfigurationApiModel config)
         {
             var onBehalfOfCertificateGroups = await this.certificateGroups.OnBehalfOfRequest(Request);
@@ -92,7 +91,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Controllers
         }
 
         /// <summary>Get CA Certificate chain</summary>
-        [HttpGet("{groupId}/cacertnext")]
+        [HttpPost("{groupId}/cacertnext")]
         [SwaggerOperation(OperationId = "GetCACertificateChainNext")]
         public async Task<X509Certificate2CollectionApiModel> GetCACertificateChainNextAsync(string groupId, [FromBody] string nextPageLink, int? maxResults)
         {
@@ -110,7 +109,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Controllers
         }
 
         /// <summary>Get CA CRL chain</summary>
-        [HttpGet("{groupId}/cacrlnext")]
+        [HttpPost("{groupId}/cacrlnext")]
         [SwaggerOperation(OperationId = "GetCACrlChainNext")]
         public async Task<X509CrlCollectionApiModel> GetCACrlChainNextAsync(string groupId, [FromBody] string nextPageLink, int? maxResults)
         {
@@ -127,7 +126,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Controllers
         }
 
         /// <summary>Get trust list</summary>
-        [HttpGet("{groupId}/trustlistnext")]
+        [HttpPost("{groupId}/trustlistnext")]
         [SwaggerOperation(OperationId = "GetTrustListNext")]
         public async Task<TrustListApiModel> GetTrustListNextAsync(string groupId, [FromBody] string nextPageLink, int? maxResults)
         {
