@@ -10,7 +10,7 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Microsoft.Azure.IIoT.Auth.Azure;
+using Microsoft.Azure.IIoT.Auth.Clients;
 using Microsoft.Azure.IIoT.Diagnostics;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Models;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Runtime;

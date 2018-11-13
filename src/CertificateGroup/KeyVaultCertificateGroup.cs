@@ -10,7 +10,7 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Azure.IIoT.Auth.Azure;
+using Microsoft.Azure.IIoT.Auth.Clients;
 using Microsoft.Azure.IIoT.Diagnostics;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Models;

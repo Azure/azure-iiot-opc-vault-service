@@ -5,7 +5,7 @@
 
 
 using System;
-using Microsoft.Azure.IIoT.Auth.Azure;
+using Microsoft.Azure.IIoT.Auth.Clients;
 using Microsoft.Azure.IIoT.Diagnostics;
 using Microsoft.Azure.IIoT.Auth.Server;
 using Microsoft.Azure.IIoT.Auth.Runtime;
@@ -61,8 +61,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Runtime
         public string AppSecret => _auth.AppSecret;
         /// <inheritdoc/>
         public string TenantId => _auth.TenantId;
-        /// <inheritdoc/>
-        public string Instance => _auth.Instance;
         /// <inheritdoc/>
         public string Authority => _auth.Authority;
         /// <inheritdoc/>
