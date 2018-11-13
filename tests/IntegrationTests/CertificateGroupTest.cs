@@ -81,11 +81,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
         /// <summary>
         /// Instance or authority (optional)
         /// </summary>
-        public string Instance { get; set; }
-
-        /// <summary>
-        /// Instance or authority (optional)
-        /// </summary>
         public string Authority { get; set; }
     }
 
