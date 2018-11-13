@@ -81,7 +81,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
         /// <summary>
         /// Instance or authority (optional)
         /// </summary>
-        public string Authority { get; set; }
+        public string InstanceUrl { get; set; }
     }
 
     public class LogConfig : ILogConfig
