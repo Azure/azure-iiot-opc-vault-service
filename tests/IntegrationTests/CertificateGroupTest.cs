@@ -62,7 +62,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
 
     public class ClientConfig : IClientConfig
     {
-
         /// <summary>
         /// The AAD application id for the client.
         /// </summary>
@@ -82,6 +81,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
         /// Instance or authority (optional)
         /// </summary>
         public string InstanceUrl { get; set; }
+
+        /// <summary>
+        /// Audience to talk to.
+        /// </summary>
+        public string Audience { get; set; }
     }
 
     public class LogConfig : ILogConfig
