@@ -5,8 +5,8 @@ EXPOSE 44342
 
 FROM microsoft/dotnet:2.1-sdk AS build
 WORKDIR /src
-COPY opc-gds-app/Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.csproj Vault.App/
-RUN dotnet restore Gds.App/Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.csproj
+COPY Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.csproj Vault.App/
+RUN dotnet restore Vault.App/Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.csproj
 COPY . .
 WORKDIR /src/Vault.App
 RUN dotnet build Microsoft.Azure.IIoT.OpcUa.Services.Gds.Vault.csproj -c Release -o /app
