@@ -461,7 +461,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
 
                 return signedcert;
             }
-            catch
+            catch 
             {
                 throw new ServiceResultException(StatusCodes.BadInternalError, "Failed to create new Root CA certificate");
             }
