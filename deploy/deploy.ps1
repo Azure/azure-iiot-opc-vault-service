@@ -461,22 +461,26 @@ Function GetRequiredPermissions() {
     Param(
         [string] $applicationDisplayName,
         [string] $requiredDelegatedPermissions, 
-        [string] $requiredApplicationPermissions, 
+        [string] $requiredApplicationPermissions,
+        [string] $appId,
         $servicePrincipal
     )
 
     # If we are passed the service principal we use it directly, otherwise we find it from 
     # the display name (which might not be unique)
-    if ($servicePrincipal) {
-        $sp = $servicePrincipal
-    }
-    else {
-        $sp = Get-AzureADServicePrincipal -Filter "DisplayName eq '$applicationDisplayName'"
+    if (!$appId)
+    {
+        if ($servicePrincipal) {
+            $sp = $servicePrincipal
+        }
+        else {
+            $sp = Get-AzureADServicePrincipal -Filter "DisplayName eq '$applicationDisplayName'"
+        }
+        $appId = $sp.AppId
     }
 
-    $appid = $sp.AppId
     $requiredAccess = New-Object Microsoft.Open.AzureAD.Model.RequiredResourceAccess
-    $requiredAccess.ResourceAppId = $appid 
+    $requiredAccess.ResourceAppId = $appId 
     $requiredAccess.ResourceAccess =  
         New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.ResourceAccess]
 
@@ -540,9 +544,9 @@ Function GetAzureADApplicationConfig() {
             -Filter "identifierUris/any(uri:uri eq 'https://$tenantName/$serviceDisplayName')"  
         if (!$serviceAadApplication) {
             $serviceAadApplication = New-AzureADApplication -DisplayName $serviceDisplayName `
-                -PublicClient $False -HomePage "https://localhost" `
+                -PublicClient $False -HomePage "https://$serviceDisplayName.azurewebsites.net" `
                 -IdentifierUris "https://$tenantName/$serviceDisplayName"
-            Write-Host "Created new AAD service application."+$serviceDisplayName
+            Write-Host "Created new AAD service application '$($serviceDisplayName)'."
         }
         $serviceServicePrincipal=Get-AzureADServicePrincipal `
              -Filter "AppId eq '$($serviceAadApplication.AppId)'"
@@ -556,16 +560,18 @@ Function GetAzureADApplicationConfig() {
             -Filter "DisplayName eq '$clientDisplayName'"
         if (!$clientAadApplication) {
             $clientAadApplication = New-AzureADApplication -DisplayName $clientDisplayName `
-                -PublicClient $True
-            Write-Host "Created new AAD client application."+$clientDisplayName
+                -PublicClient $False -HomePage "https://$clientDisplayName.azurewebsites.net" `
+                -IdentifierUris "https://$tenantName/$clientDisplayName"
+            Write-Host "Created new AAD client application '$($clientDisplayName)'."
         }
 
         $moduleAadApplication=Get-AzureADApplication `
             -Filter "DisplayName eq '$moduleDisplayName'"
         if (!$moduleAadApplication) {
             $moduleAadApplication = New-AzureADApplication -DisplayName $moduleDisplayName `
-                -PublicClient $True
-            Write-Host "Created new AAD Module application. "+$moduleDisplayName
+                -PublicClient $False -HomePage "http://localhost" `
+                -IdentifierUris "https://$tenantName/$moduleDisplayName"
+            Write-Host "Created new AAD Module application '$($moduleDisplayName)'."
         }
 
         # Find client principal
@@ -612,34 +618,40 @@ Function GetAzureADApplicationConfig() {
         $appRoles.Add($adminRole)
         $knownApplications = New-Object System.Collections.Generic.List[System.String]
         $knownApplications.Add($clientAadApplication.AppId)
+        $knownApplications.Add($moduleAadApplication.AppId)
         $requiredResourcesAccess = `
             New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.RequiredResourceAccess]
         $requiredPermissions = GetRequiredPermissions -applicationDisplayName "Azure Key Vault" `
             -requiredDelegatedPermissions "user_impersonation" 
         $requiredResourcesAccess.Add($requiredPermissions)
-        $requiredPermissions = GetRequiredPermissions -applicationDisplayName "Microsoft Graph" `
+        $requiredPermissions = GetRequiredPermissions -applicationDisplayName "Microsoft.Azure.ActiveDirectory" `
             -requiredDelegatedPermissions "User.Read" 
         $requiredResourcesAccess.Add($requiredPermissions)
         Set-AzureADApplication -ObjectId $serviceAadApplication.ObjectId `
-            -RequiredResourceAccess $requiredResourcesAccess `
-            -KnownClientApplications $knownApplications -AppRoles $appRoles
+            -KnownClientApplications $knownApplications -AppRoles $appRoles `
+            -RequiredResourceAccess $requiredResourcesAccess
+        Write-Host "'$($serviceDisplayName)' updated with required resource access, app roles and known applications."  
 
         # 
         # Update client application to add reply urls required permissions.
         #
         $replyUrls = New-Object System.Collections.Generic.List[System.String]
-        $replyUrls.Add("urn:ietf:wg:oauth:2.0:oob")
+        $replyUrls.Add("https://localhost:44342/signin-oidc")
+        $replyUrls.Add("http://localhost:44342/signin-oidc")
+        $replyUrls.Add("https://localhost:58801/oauth2-redirect.html")
+        $replyUrls.Add("http://localhost:58801/oauth2-redirect.html")
         $requiredResourcesAccess = `
             New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.RequiredResourceAccess]
         $requiredPermissions = GetRequiredPermissions -applicationDisplayName $serviceDisplayName `
             -requiredDelegatedPermissions "user_impersonation" # "Directory.Read.All|User.Read"
         $requiredResourcesAccess.Add($requiredPermissions)
-        $requiredPermissions = GetRequiredPermissions -applicationDisplayName "Microsoft Graph" `
+        $requiredPermissions = GetRequiredPermissions -applicationDisplayName "Microsoft.Azure.ActiveDirectory" `
             -requiredDelegatedPermissions "User.Read" 
         $requiredResourcesAccess.Add($requiredPermissions)
         Set-AzureADApplication -ObjectId $clientAadApplication.ObjectId `
             -RequiredResourceAccess $requiredResourcesAccess -ReplyUrls $replyUrls `
             -Oauth2AllowImplicitFlow $True -Oauth2AllowUrlPathMatching $True
+        Write-Host "'$($clientDisplayName)' updated with required resource access, reply url and implicit flow."  
 
         # 
         # Update module application to add reply urls required permissions.
@@ -651,22 +663,34 @@ Function GetAzureADApplicationConfig() {
         $requiredPermissions = GetRequiredPermissions -applicationDisplayName $serviceDisplayName `
             -requiredDelegatedPermissions "user_impersonation" # "Directory.Read.All|User.Read"
         $requiredResourcesAccess.Add($requiredPermissions)
-        $requiredPermissions = GetRequiredPermissions -applicationDisplayName "Microsoft Graph" `
+        $requiredPermissions = GetRequiredPermissions -applicationDisplayName "Microsoft.Azure.ActiveDirectory" `
             -requiredDelegatedPermissions "User.Read" 
         $requiredResourcesAccess.Add($requiredPermissions)
         Set-AzureADApplication -ObjectId $moduleAadApplication.ObjectId `
             -RequiredResourceAccess $requiredResourcesAccess -ReplyUrls $replyUrls `
-            -Oauth2AllowImplicitFlow $True -Oauth2AllowUrlPathMatching $True
+            -Oauth2AllowImplicitFlow $False -Oauth2AllowUrlPathMatching $False
+        Write-Host "'$($moduleDisplayName)' updated with required resource access, reply url and implicit flow."  
+
+        $serviceSecret = New-AzureADApplicationPasswordCredential -ObjectId $serviceAadApplication.ObjectId -CustomKeyIdentifier "Service Key" -EndDate (get-date).AddYears(1)
+        $clientSecret = New-AzureADApplicationPasswordCredential -ObjectId $clientAadApplication.ObjectId -CustomKeyIdentifier "Client Key" -EndDate (get-date).AddYears(1)
+        $moduleSecret = New-AzureADApplicationPasswordCredential -ObjectId $moduleAadApplication.ObjectId -CustomKeyIdentifier "Module Key" -EndDate (get-date).AddYears(1)
+
+        #Write-Host $serviceSecret
+        #Write-Host $clientSecret
+        #Write-Host $moduleSecret
 
         return [pscustomobject] @{ 
             TenantId = $tenantId
             Instance = $script:environment.ActiveDirectoryAuthority
             Audience = $serviceAadApplication.IdentifierUris[0].ToString()
-            AppId = $serviceAadApplication.AppId
-            AppObjectId = $serviceAadApplication.ObjectId
+            ServiceId = $serviceAadApplication.AppId
+            ServiceSecret = $serviceSecret.Value
+            ServiceObjectId = $serviceAadApplication.ObjectId
             ClientId = $clientAadApplication.AppId
+            ClientSecret = $clientSecret.Value
             ClientObjectId = $clientAadApplication.ObjectId
             ModuleId = $moduleAadApplication.AppId
+            ModuleSecret = $moduleSecret.Value
             ModuleObjectId = $moduleAadApplication.ObjectId
         }
     }
@@ -681,10 +705,10 @@ Function GetAzureADApplicationConfig() {
         Write-Host "2) in the PowerShell window, type: Install-Module AzureAD" 
         Write-Host
 
-        $reply = Read-Host -Prompt "Continue without authentication? [y/n]"
-        if ($reply -match "[yY]") { 
-            return $null
-        }
+        #$reply = Read-Host -Prompt "Continue without authentication? [y/n]"
+        #if ($reply -match "[yY]") { 
+        #    return $null
+        #}
         throw $ex
     }
 }
@@ -749,17 +773,30 @@ $aadConfig = GetAzureADApplicationConfig
 try {
     Write-Host "Almost done..."
     & ($deploymentScript) -resourceGroupName $script:resourceGroupName `
-        -interactive $script:interactive -aadConfig $aadConfig
+        -interactive $script:interactive -aadConfig $aadConfig -webAppName $script:resourceGroupName
     Write-Host "Deployment succeeded."
 }
 catch {
-    Write-Host "Deployment failed."
     $ex = $_.Exception
+    Write-Host $_.Exception.Message
+    Write-Host "Deployment failed."
     if ($deleteOnErrorPrompt) {
         $reply = Read-Host -Prompt "Delete resource group? [y/n]"
         if ($reply -match "[yY]") { 
             try {
+                Write-Host "Remove resource group "$script:resourceGroupName
                 Remove-AzureRmResourceGroup -Name $script:resourceGroupName -Force
+            }
+            catch {
+                Write-Host $_.Exception.Message
+            }
+            try {
+                Write-Host "Remove AD App "$aadConfig.ServiceObjectId
+                Remove-AzureADApplication -ObjectId $aadConfig.ServiceObjectId
+                Write-Host "Remove AD App "$aadConfig.ClientObjectId
+                Remove-AzureADApplication -ObjectId $aadConfig.ClientObjectId
+                Write-Host "Remove AD App "$aadConfig.ModuleObjectId
+                Remove-AzureADApplication -ObjectId $aadConfig.ModuleObjectId
             }
             catch {
                 Write-Host $_.Exception.Message
