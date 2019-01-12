@@ -183,8 +183,8 @@
                         "AZUREAD__INSTANCE": "[parameters('aadInstance')]",
                         "AZUREAD__TENANTID": "[parameters('aadTenantId')]",
                         "OPCVAULT__BASEADDRESS": "[concat('https://', reference(resourceId('Microsoft.Web/sites', variables('webAppServiceName'))).hostNames[0])]",
-                        "OPCVAULT__RESOURCEID": "[parameters('aadServiceId')]"//,
-                        //"WEBSITE_RUN_FROM_PACKAGE": "1"
+                        "OPCVAULT__RESOURCEID": "[parameters('aadServiceId')]",
+                        "WEBSITE_RUN_FROM_PACKAGE": "1"
                     }
                 }
             ]
@@ -228,8 +228,8 @@
                         "AUTH__TRUSTEDISSUER": "[concat('https://sts.windows.net/', parameters('aadTenantId'))]",
                         "SWAGGER__ENABLED": "true",
                         "SWAGGER__APPID": "[parameters('aadClientId')]",
-                        "SWAGGER__APPSECRET": "[parameters('aadClientSecret')]" //,
-                        //"WEBSITE_RUN_FROM_PACKAGE": "1"
+                        "SWAGGER__APPSECRET": "[parameters('aadClientSecret')]",
+                        "WEBSITE_RUN_FROM_PACKAGE": "1"
                     }
                 }
             ]

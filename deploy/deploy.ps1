@@ -828,7 +828,6 @@ $profileService = Get-AzureRmWebAppSlotPublishingProfile `
     @slotParameters
 $publishProfilePath = Join-Path -Path ".\" -ChildPath "$($webServiceName).publishsettings"
 Write-Output $profileService | Out-File -FilePath $publishProfilePath 
-Write-Host $profileService
 $profileServiceXml = [xml]$profileService
 $profileService = $profileServiceXml.publishData.publishProfile[0]
 
@@ -836,6 +835,7 @@ $profileService = $profileServiceXml.publishData.publishProfile[0]
 $publishFolder = Join-Path -Path $deploydir -ChildPath "\service"
 if(Test-path $publishFolder) {Remove-Item -Recurse -Force $publishFolder}
 
+Write-Host -Message 'Publish service'
 dotnet publish -c Debug -o $publishFolder ..\src\Microsoft.Azure.IIoT.OpcUa.Services.Vault.csproj
 
 $destination = Join-Path -Path $deploydir -ChildPath "\service.zip"
@@ -843,7 +843,9 @@ if(Test-path $destination) {Remove-item $destination}
 Add-Type -assembly "system.io.compression.filesystem"
 [io.compression.zipfile]::CreateFromDirectory($publishFolder, $destination)
 
-#PowerShell
+if(Test-path $publishFolder) {Remove-Item -Recurse -Force $publishFolder}
+
+# Upload zip to web app
 $username = $profileService.UserName
 $password = $profileService.userPWD
 $filePath = $destination
@@ -855,12 +857,15 @@ Invoke-RestMethod -Uri $apiUrl -Headers @{Authorization=("Basic {0}" -f $base64A
 $publishFolder = Join-Path -Path $deploydir -ChildPath "\app"
 if(Test-path $publishFolder) {Remove-Item -Recurse -Force $publishFolder}
 
+Write-Host -Message 'Publish application'
 dotnet publish -c Debug -o $publishFolder ..\app\Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.csproj
 
 $destination = Join-Path -Path $deploydir -ChildPath "\app.zip"
 if(Test-path $destination) {Remove-item $destination}
 Add-Type -assembly "system.io.compression.filesystem"
 [io.compression.zipfile]::CreateFromDirectory($publishFolder, $destination)
+
+if(Test-path $publishFolder) {Remove-Item -Recurse -Force $publishFolder}
 
 $profileClient = Get-AzureRmWebAppSlotPublishingProfile `
     -Format WebDeploy `
@@ -869,7 +874,6 @@ $profileClient = Get-AzureRmWebAppSlotPublishingProfile `
     @slotParameters
 $publishProfilePath = Join-Path -Path ".\" -ChildPath "$($webAppName).publishsettings"
 Write-Output $profileClient | Out-File -FilePath $publishProfilePath 
-Write-Host $profileClient
 $profileClientXml = [xml]$profileClient
 $profileClient = $profileClientXml.publishData.publishProfile[0]
 
