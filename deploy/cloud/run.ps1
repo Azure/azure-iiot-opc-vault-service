@@ -11,6 +11,9 @@
  .PARAMETER webAppName
     The host name prefix of the web application. 
 
+ .PARAMETER webServiceName
+    The host name prefix of the web application. 
+
  .PARAMETER aadConfig
     The AAD configuration the template will be configured with.
 
@@ -21,7 +24,8 @@
 
 param(
     [Parameter(Mandatory=$True)] [string] $resourceGroupName,
-    [string] $webAppName = "",
+    [string] $webAppName = $null,
+    [string] $webServiceName = $null,
     $aadConfig = $null,
     $interactive = $true
 )
@@ -109,14 +113,24 @@ if ($aadConfig) {
 }
 
 
-# Set website name
+# Set web app site name
 if ($interactive -and [string]::IsNullOrEmpty($webAppName)) {
-    $webAppName = Read-Host "Please specify a website name"
+    $webAppName = Read-Host "Please specify a web applications site name"
 }
 
 if (![string]::IsNullOrEmpty($webAppName)) { 
     $templateParameters.Add("webAppName", $webAppName)
 }
+
+# Set web service site name
+if ($interactive -and [string]::IsNullOrEmpty($webServiceName)) {
+    $webServiceName = Read-Host "Please specify a web service site name"
+}
+
+if (![string]::IsNullOrEmpty($webServiceName)) { 
+    $templateParameters.Add("webServiceName", $webServiceName)
+}
+
 
 # Start the deployment
 $templateFilePath = Join-Path $ScriptDir "template.json"
@@ -142,18 +156,15 @@ if ($aadConfig -and $aadConfig.ClientObjectId) {
     $replyUrls.Add($webAppServiceUrl + "/oauth2-redirect.html")
     Write-Host $webAppPortalUrl"/signin-oidc"
     Write-Host $webAppServiceUrl"/oauth2-redirect.html"
-    # still connected
     Set-AzureADApplication -ObjectId $aadConfig.ClientObjectId -ReplyUrls $replyUrls -HomePage $webAppPortalUrl
 }
 
-$profileService = Get-AzureRMWebAppPublishingProfile -ResourceGroupName $resourceGroupName -Name $webAppServiceName
-Write-Host $profileService
-
-$profileClient = Get-AzureRMWebAppPublishingProfile -ResourceGroupName $resourceGroupName -Name $webAppPortalName
-Write-Host $profileClient
+if ($aadConfig -and $aadConfig.ClientObjectId) {
+    Set-AzureADApplication -ObjectId $aadConfig.ServiceObjectId -HomePage $webServicePortalUrl
+}
 
 Write-Host
-Write-Host "To access the web portal go to:"
+Write-Host "To access the web client go to:"
 Write-Host $webAppPortalUrl
 Write-Host
 Write-Host "To access the web service go to:"

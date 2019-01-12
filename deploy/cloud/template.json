@@ -68,14 +68,21 @@
         "webAppName": {
             "type": "string",
             "metadata": {
-                "description": "Base name of the resource such as web app name and app service plan "
+                "description": "Web app base name."
+            },
+            "minLength": 2
+        },
+        "webServiceName": {
+            "type": "string",
+            "metadata": {
+                "description": "Web service base name."
             },
             "minLength": 2
         }
     },
     "variables": {
         "tenantId": "[subscription().tenantId]",
-        "randomSuffix": "[take(uniqueString(subscription().subscriptionId, resourceGroup().id, parameters('webAppName')), 5)]",
+        "randomSuffix": "[take(uniqueString(subscription().subscriptionId, resourceGroup().id, resourceGroup().name), 5)]",
         "applocation": "[resourceGroup().location]",
         "keyVaultName": "[concat('vault-', variables('randomSuffix'))]",
         "vaultSku": "Premium",
@@ -83,9 +90,9 @@
         "enabledForTemplateDeployment": false,
         "enableVaultForVolumeEncryption": false,
         "webAppSku": "S1",
-        "webAppPortalName": "[concat(parameters('webAppName'), '-app')]",
-        "webAppServiceName": "[concat(parameters('webAppName'), '-service')]",
-        "appServicePlanName": "[concat('AppServicePlan-', parameters('webAppName'))]",
+        "webAppPortalName": "[parameters('webAppName')]",
+        "webAppServiceName": "[parameters('webServiceName')]",
+        "appServicePlanName": "[concat('AppServicePlan-', resourceGroup().name)]",
         "documentDBName": "[concat('cosmosdb-', variables('randomSuffix'))]",
         "documentDBApiVersion": "2016-03-19",
         "documentDBResourceId": "[resourceId('Microsoft.DocumentDb/databaseAccounts', variables('documentDBName'))]",
@@ -176,7 +183,8 @@
                         "AZUREAD__INSTANCE": "[parameters('aadInstance')]",
                         "AZUREAD__TENANTID": "[parameters('aadTenantId')]",
                         "OPCVAULT__BASEADDRESS": "[concat('https://', reference(resourceId('Microsoft.Web/sites', variables('webAppServiceName'))).hostNames[0])]",
-                        "OPCVAULT__RESOURCEID": "[parameters('aadServiceId')]"
+                        "OPCVAULT__RESOURCEID": "[parameters('aadServiceId')]"//,
+                        //"WEBSITE_RUN_FROM_PACKAGE": "1"
                     }
                 }
             ]
@@ -211,15 +219,17 @@
                         "ASPNETCORE_ENVIRONMENT": "Development",
                         "OPCVAULT__KEYVAULTBASEURL": "[reference(resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))).vaultUri]",
                         "OPCVAULT__COSMOSDBENDPOINT": "[reference(resourceId('Microsoft.DocumentDb/databaseAccounts', variables('documentDBName'))).documentEndpoint]",
-                        "OPCVAULT__COSMOSDBTOKEN": "", //"[reference(concat('Microsoft.DocumentDb/databaseAccounts', variables('documentDBName')).Secret)]",
+                        "OPCVAULT__COSMOSDBTOKEN": "abc", //"[reference(concat('Microsoft.DocumentDb/databaseAccounts', variables('documentDBName')).Secret)]",
                         "OPCVAULT__AUTOAPPROVE": "false",
                         "AUTH__APPID": "[parameters('aadServiceId')]",
                         "AUTH__APPSECRET": "[parameters('aadServiceSecret')]",
-                        "AUTH__AUTHORITY": "[parameters('aadInstance')]",
+                        "AUTH__AUDIENCE": "[parameters('aadServiceId')]",
                         "AUTH__TENANTID": "[parameters('aadTenantId')]",
+                        "AUTH__TRUSTEDISSUER": "[concat('https://sts.windows.net/', parameters('aadTenantId'))]",
                         "SWAGGER__ENABLED": "true",
                         "SWAGGER__APPID": "[parameters('aadClientId')]",
-                        "SWAGGER__APPSECRET": "[parameters('aadClientSecret')]"
+                        "SWAGGER__APPSECRET": "[parameters('aadClientSecret')]" //,
+                        //"WEBSITE_RUN_FROM_PACKAGE": "1"
                     }
                 }
             ]

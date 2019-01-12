@@ -671,9 +671,12 @@ Function GetAzureADApplicationConfig() {
             -Oauth2AllowImplicitFlow $False -Oauth2AllowUrlPathMatching $False
         Write-Host "'$($moduleDisplayName)' updated with required resource access, reply url and implicit flow."  
 
-        $serviceSecret = New-AzureADApplicationPasswordCredential -ObjectId $serviceAadApplication.ObjectId -CustomKeyIdentifier "Service Key" -EndDate (get-date).AddYears(1)
-        $clientSecret = New-AzureADApplicationPasswordCredential -ObjectId $clientAadApplication.ObjectId -CustomKeyIdentifier "Client Key" -EndDate (get-date).AddYears(1)
-        $moduleSecret = New-AzureADApplicationPasswordCredential -ObjectId $moduleAadApplication.ObjectId -CustomKeyIdentifier "Module Key" -EndDate (get-date).AddYears(1)
+        $serviceSecret = New-AzureADApplicationPasswordCredential -ObjectId $serviceAadApplication.ObjectId `
+            -CustomKeyIdentifier "Service Key" -EndDate (get-date).AddYears(1)
+        $clientSecret = New-AzureADApplicationPasswordCredential -ObjectId $clientAadApplication.ObjectId `
+            -CustomKeyIdentifier "Client Key" -EndDate (get-date).AddYears(1)
+        $moduleSecret = New-AzureADApplicationPasswordCredential -ObjectId $moduleAadApplication.ObjectId `
+            -CustomKeyIdentifier "Module Key" -EndDate (get-date).AddYears(1)
 
         #Write-Host $serviceSecret
         #Write-Host $clientSecret
@@ -686,12 +689,15 @@ Function GetAzureADApplicationConfig() {
             ServiceId = $serviceAadApplication.AppId
             ServiceSecret = $serviceSecret.Value
             ServiceObjectId = $serviceAadApplication.ObjectId
+            ServiceDisplayName = $serviceDisplayName
             ClientId = $clientAadApplication.AppId
             ClientSecret = $clientSecret.Value
             ClientObjectId = $clientAadApplication.ObjectId
+            ClientDisplayName = $clientDisplayName
             ModuleId = $moduleAadApplication.AppId
             ModuleSecret = $moduleSecret.Value
             ModuleObjectId = $moduleAadApplication.ObjectId
+            ModuleDisplayName = $moduleDisplayName
         }
     }
     catch {
@@ -769,11 +775,15 @@ SelectSubscription
 
 $deleteOnErrorPrompt = GetOrCreateResourceGroup
 $aadConfig = GetAzureADApplicationConfig
+$webAppName = $script:resourceGroupName + "-app"
+$webServiceName = $script:resourceGroupName + "-service"
+
 
 try {
-    Write-Host "Almost done..."
+    Write-Host "Start deployment..."
     & ($deploymentScript) -resourceGroupName $script:resourceGroupName `
-        -interactive $script:interactive -aadConfig $aadConfig -webAppName $script:resourceGroupName
+        -interactive $script:interactive -aadConfig $aadConfig `
+        -webAppName $webAppName -webServiceName $webServiceName
     Write-Host "Deployment succeeded."
 }
 catch {
@@ -791,11 +801,11 @@ catch {
                 Write-Host $_.Exception.Message
             }
             try {
-                Write-Host "Remove AD App "$aadConfig.ServiceObjectId
+                Write-Host "Remove AD App "$aadConfig.ServiceDisplayName
                 Remove-AzureADApplication -ObjectId $aadConfig.ServiceObjectId
-                Write-Host "Remove AD App "$aadConfig.ClientObjectId
+                Write-Host "Remove AD App "$aadConfig.ClientDisplayName
                 Remove-AzureADApplication -ObjectId $aadConfig.ClientObjectId
-                Write-Host "Remove AD App "$aadConfig.ModuleObjectId
+                Write-Host "Remove AD App "$aadConfig.ModuleDisplayName
                 Remove-AzureADApplication -ObjectId $aadConfig.ModuleObjectId
             }
             catch {
@@ -805,3 +815,69 @@ catch {
     }
     throw $ex
 }
+
+$deploydir = pwd
+
+Write-Host -Message 'Get publishing profile for web service'
+$slotParameters = @{ Slot = "Production" }
+
+$profileService = Get-AzureRmWebAppSlotPublishingProfile `
+    -Format WebDeploy `
+    -ResourceGroupName $resourceGroupName `
+    -Name $webServiceName `
+    @slotParameters
+$publishProfilePath = Join-Path -Path ".\" -ChildPath "$($webServiceName).publishsettings"
+Write-Output $profileService | Out-File -FilePath $publishProfilePath 
+Write-Host $profileService
+$profileServiceXml = [xml]$profileService
+$profileService = $profileServiceXml.publishData.publishProfile[0]
+
+# delete any previous publish
+$publishFolder = Join-Path -Path $deploydir -ChildPath "\service"
+if(Test-path $publishFolder) {Remove-Item -Recurse -Force $publishFolder}
+
+dotnet publish -c Debug -o $publishFolder ..\src\Microsoft.Azure.IIoT.OpcUa.Services.Vault.csproj
+
+$destination = Join-Path -Path $deploydir -ChildPath "\service.zip"
+if(Test-path $destination) {Remove-item $destination}
+Add-Type -assembly "system.io.compression.filesystem"
+[io.compression.zipfile]::CreateFromDirectory($publishFolder, $destination)
+
+#PowerShell
+$username = $profileService.UserName
+$password = $profileService.userPWD
+$filePath = $destination
+$apiUrl = "https://" +  $profileService.publishUrl +"/api/zipdeploy"
+$base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:{1}" -f $username, $password)))
+$userAgent = "powershell/1.0"
+Invoke-RestMethod -Uri $apiUrl -Headers @{Authorization=("Basic {0}" -f $base64AuthInfo)} -UserAgent $userAgent -Method POST -InFile $filePath -ContentType "multipart/form-data"
+
+$publishFolder = Join-Path -Path $deploydir -ChildPath "\app"
+if(Test-path $publishFolder) {Remove-Item -Recurse -Force $publishFolder}
+
+dotnet publish -c Debug -o $publishFolder ..\app\Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.csproj
+
+$destination = Join-Path -Path $deploydir -ChildPath "\app.zip"
+if(Test-path $destination) {Remove-item $destination}
+Add-Type -assembly "system.io.compression.filesystem"
+[io.compression.zipfile]::CreateFromDirectory($publishFolder, $destination)
+
+$profileClient = Get-AzureRmWebAppSlotPublishingProfile `
+    -Format WebDeploy `
+    -ResourceGroupName $resourceGroupName `
+    -Name $webAppName `
+    @slotParameters
+$publishProfilePath = Join-Path -Path ".\" -ChildPath "$($webAppName).publishsettings"
+Write-Output $profileClient | Out-File -FilePath $publishProfilePath 
+Write-Host $profileClient
+$profileClientXml = [xml]$profileClient
+$profileClient = $profileClientXml.publishData.publishProfile[0]
+
+$username = $profileClient.UserName
+$password = $profileClient.userPWD
+$filePath = $destination
+$apiUrl = "https://" +  $profileClient.publishUrl +"/api/zipdeploy"
+$base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:{1}" -f $username, $password)))
+$userAgent = "powershell/1.0"
+Invoke-RestMethod -Uri $apiUrl -Headers @{Authorization=("Basic {0}" -f $base64AuthInfo)} -UserAgent $userAgent -Method POST -InFile $filePath -ContentType "multipart/form-data"
+
