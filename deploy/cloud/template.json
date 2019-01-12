@@ -4,7 +4,6 @@
     "parameters": {
         "aadTenantId": {
             "type": "string",
-            "defaultValue": "",
             "metadata": {
                 "description": "The AAD tenant identifier (GUID)"
             }
@@ -18,49 +17,50 @@
         },
         "aadServiceId": {
             "type": "string",
-            "defaultValue": "",
             "metadata": {
                 "description": "AAD service app identifier (GUID)"
             }
         },
         "aadServiceSecret": {
             "type": "securestring",
-            "defaultValue": "",
             "metadata": {
                 "description": "AAD service application secret."
             }
         },
         "aadClientId": {
             "type": "string",
-            "defaultValue": "",
             "metadata": {
                 "description": "AAD client application identifier (GUID)"
             }
         },
         "aadClientSecret": {
             "type": "securestring",
-            "defaultValue": "",
             "metadata": {
                 "description": "AAD client application secret."
             }
         },
         "aadModuleId": {
             "type": "string",
-            "defaultValue": "",
             "metadata": {
                 "description": "AAD module application identifier (GUID)"
             }
         },
         "aadModuleSecret": {
             "type": "securestring",
-            "defaultValue": "",
             "metadata": {
                 "description": "AAD module application secret."
             }
         },
         "aadAudience": {
             "type": "string",
-            "defaultValue": "",
+            "defaultValue": "[parameters('aadServiceId')]",
+            "metadata": {
+                "description": "Audience to validate token audience against."
+            }
+        },
+        "aadTrustedIssuer": {
+            "type": "string",
+            "defaultValue": "[concat('https://sts.windows.net/', parameters('aadTenantId'))]",
             "metadata": {
                 "description": "Audience to validate token audience against."
             }
@@ -219,13 +219,13 @@
                         "ASPNETCORE_ENVIRONMENT": "Development",
                         "OPCVAULT__KEYVAULTBASEURL": "[reference(resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))).vaultUri]",
                         "OPCVAULT__COSMOSDBENDPOINT": "[reference(resourceId('Microsoft.DocumentDb/databaseAccounts', variables('documentDBName'))).documentEndpoint]",
-                        "OPCVAULT__COSMOSDBTOKEN": "abc", //"[reference(concat('Microsoft.DocumentDb/databaseAccounts', variables('documentDBName')).Secret)]",
+                        "OPCVAULT__COSMOSDBTOKEN": "[listKeys(resourceId('Microsoft.DocumentDb/databaseAccounts', variables('documentDBName')), variables('documentDBApiVersion')).primaryMasterKey]",
                         "OPCVAULT__AUTOAPPROVE": "false",
                         "AUTH__APPID": "[parameters('aadServiceId')]",
                         "AUTH__APPSECRET": "[parameters('aadServiceSecret')]",
-                        "AUTH__AUDIENCE": "[parameters('aadServiceId')]",
+                        "AUTH__AUDIENCE": "[parameters('aadAudience')]",
                         "AUTH__TENANTID": "[parameters('aadTenantId')]",
-                        "AUTH__TRUSTEDISSUER": "[concat('https://sts.windows.net/', parameters('aadTenantId'))]",
+                        "AUTH__TRUSTEDISSUER": "[parameters('aadTrustedIssuer')]",
                         "SWAGGER__ENABLED": "true",
                         "SWAGGER__APPID": "[parameters('aadClientId')]",
                         "SWAGGER__APPSECRET": "[parameters('aadClientSecret')]",
@@ -260,13 +260,17 @@
             "type": "string",
             "value": "[variables('tenantId')]"
         },
-        "KeyVault": {
-            "type": "object",
-            "value": "[reference(resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName')))]"
+        "KeyVaultBaseUrl": {
+            "type": "string",
+            "value": "[reference(resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))).vaultUri]"
         },
-        "CosmosDB": {
-            "type": "object",
-            "value": "[reference(resourceId('Microsoft.DocumentDb/databaseAccounts', variables('documentDBName')))]"
+        "CosmosDBEndpoint": {
+            "type": "string",
+            "value": "[reference(resourceId('Microsoft.DocumentDb/databaseAccounts', variables('documentDBName'))).documentEndpoint]"
+        },
+        "CosmosDBToken": {
+            "type": "string",
+            "value": "[listKeys(resourceId('Microsoft.DocumentDb/databaseAccounts', variables('documentDBName')), variables('documentDBApiVersion')).primaryMasterKey]"
         }
     }
 }

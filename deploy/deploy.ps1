@@ -685,7 +685,7 @@ Function GetAzureADApplicationConfig() {
         return [pscustomobject] @{ 
             TenantId = $tenantId
             Instance = $script:environment.ActiveDirectoryAuthority
-            Audience = $serviceAadApplication.IdentifierUris[0].ToString()
+            Audience = $serviceAadApplication.AppId
             ServiceId = $serviceAadApplication.AppId
             ServiceSecret = $serviceSecret.Value
             ServiceObjectId = $serviceAadApplication.ObjectId
