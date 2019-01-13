@@ -678,11 +678,7 @@ Function GetAzureADApplicationConfig() {
         $moduleSecret = New-AzureADApplicationPasswordCredential -ObjectId $moduleAadApplication.ObjectId `
             -CustomKeyIdentifier "Module Key" -EndDate (get-date).AddYears(1)
 
-        #Write-Host $serviceSecret
-        #Write-Host $clientSecret
-        #Write-Host $moduleSecret
-
-        return [pscustomobject] @{ 
+        return [pscustomobject] @{
             TenantId = $tenantId
             Instance = $script:environment.ActiveDirectoryAuthority
             Audience = $serviceAadApplication.AppId
@@ -698,6 +694,7 @@ Function GetAzureADApplicationConfig() {
             ModuleSecret = $moduleSecret.Value
             ModuleObjectId = $moduleAadApplication.ObjectId
             ModuleDisplayName = $moduleDisplayName
+            UserPrincipalId = $user.ObjectId
         }
     }
     catch {

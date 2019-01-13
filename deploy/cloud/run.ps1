@@ -89,6 +89,9 @@ if ($aadConfig) {
     if (![string]::IsNullOrEmpty($aadConfig.ServiceId)) { 
         $templateParameters.Add("aadServiceId", $aadConfig.ServiceId)
     }
+    if (![string]::IsNullOrEmpty($aadConfig.ServiceObjectId)) { 
+        $templateParameters.Add("aadServiceObjectId", $aadConfig.ServiceObjectId)
+    }
     if (![string]::IsNullOrEmpty($aadConfig.ServiceSecret)) { 
         $templateParameters.Add("aadServiceSecret", $aadConfig.ServiceSecret)
     }
@@ -109,6 +112,9 @@ if ($aadConfig) {
     }
     if (![string]::IsNullOrEmpty($aadConfig.Instance)) { 
         $templateParameters.Add("aadInstance", $aadConfig.Instance)
+    }
+    if (![string]::IsNullOrEmpty($aadConfig.UserPrincipalId)) { 
+        $templateParameters.Add("aadUserPrincipalId", $aadConfig.UserPrincipalId)
     }
 }
 

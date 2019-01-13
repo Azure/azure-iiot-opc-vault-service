@@ -18,7 +18,13 @@
         "aadServiceId": {
             "type": "string",
             "metadata": {
-                "description": "AAD service app identifier (GUID)"
+                "description": "AAD service application identifier (GUID)"
+            }
+        },
+        "aadServiceObjectId": {
+            "type": "string",
+            "metadata": {
+                "description": "AAD service application object id (GUID)"
             }
         },
         "aadServiceSecret": {
@@ -65,6 +71,12 @@
                 "description": "Audience to validate token audience against."
             }
         },
+        "aadUserPrincipalId": {
+            "type": "string",
+            "metadata": {
+                "description": "The user principal id managing the vault. (GUID)"
+            }
+        },
         "webAppName": {
             "type": "string",
             "metadata": {
@@ -78,6 +90,20 @@
                 "description": "Web service base name."
             },
             "minLength": 2
+        },
+        "groupsObject": {
+            "type": "object",
+            "defaultValue": {
+                "secrets": [
+                    {
+                        "secretName": "groups",
+                        "secretValue": "TestContent"
+                    }
+                ]
+            },
+            "metadata": {
+                "description": "all secrets {\"secretName\":\"\",\"secretValue\":\"\"} wrapped in a secure object"
+            }
         }
     },
     "variables": {
@@ -97,7 +123,11 @@
         "documentDBApiVersion": "2016-03-19",
         "documentDBResourceId": "[resourceId('Microsoft.DocumentDb/databaseAccounts', variables('documentDBName'))]",
         "apiType": "SQL",
-        "offerType": "Standard"
+        "offerType": "Standard",
+        "readPermissions": [ "Get", "List" ],
+        "writePermissions": [ "Get", "List", "Set" ],
+        "signPermissions": [ "Get", "List", "Sign" ],
+        "createPermissions": [ "Get", "List", "Update", "Create", "Import" ]
     },
     "resources": [
         {
@@ -149,7 +179,65 @@
                     "family": "A"
                 },
                 "accessPolicies": []
+            },
+            "resources": [
+                {
+                    "type": "accessPolicies",
+                    "name": "add",
+                    "apiVersion": "2018-02-14",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]"
+                    ],
+                    "properties": {
+                        "accessPolicies": [
+                            {
+                                "tenantId": "[parameters('aadTenantId')]",
+                                "objectId": "[parameters('aadServiceObjectId')]",
+                                "permissions": {
+                                    "secrets": "[variables('readPermissions')]",
+                                    "certificates": "[variables('readPermissions')]"
+                                }
+                            },
+                            {
+                                "tenantId": "[parameters('aadTenantId')]",
+                                "objectId": "[parameters('aadUserPrincipalId')]",
+                                "permissions": {
+                                    "keys": "[variables('signPermissions')]",
+                                    "secrets": "[variables('writePermissions')]",
+                                    "certificates": "[variables('createPermissions')]"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "type": "Microsoft.KeyVault/vaults/secrets",
+            "name": "[concat(variables('keyVaultName'), '/', parameters('groupsObject').secrets[copyIndex()].secretName)]",
+            "apiVersion": "2015-06-01",
+            "properties": {
+                "value": "[parameters('groupsObject').secrets[copyIndex()].secretValue]"
+            },
+            "dependsOn": [
+                "[concat('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
+            ],
+            "copy": {
+                "name": "secretsCopy",
+                "count": "[length(parameters('groupsObject').secrets)]"
             }
+        },
+        {
+            "type": "Microsoft.KeyVault/vaults/secrets",
+            "name": "[concat(variables('keyVaultName'), '/cosmosdbtoken')]",
+            "apiVersion": "2015-06-01",
+            "properties": {
+                "value": "[listKeys(resourceId('Microsoft.DocumentDb/databaseAccounts', variables('documentDBName')), variables('documentDBApiVersion')).primaryMasterKey]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDb/databaseAccounts', variables('documentDBName'))]",
+                "[concat('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
+            ]
         },
         {
             "apiVersion": "2016-08-01",
@@ -269,7 +357,7 @@
             "value": "[reference(resourceId('Microsoft.DocumentDb/databaseAccounts', variables('documentDBName'))).documentEndpoint]"
         },
         "CosmosDBToken": {
-            "type": "string",
+            "type": "securestring",
             "value": "[listKeys(resourceId('Microsoft.DocumentDb/databaseAccounts', variables('documentDBName')), variables('documentDBApiVersion')).primaryMasterKey]"
         }
     }
