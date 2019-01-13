@@ -90,7 +90,7 @@ if ($aadConfig) {
         $templateParameters.Add("aadServiceId", $aadConfig.ServiceId)
     }
     if (![string]::IsNullOrEmpty($aadConfig.ServiceObjectId)) { 
-        $templateParameters.Add("aadServiceObjectId", $aadConfig.ServiceObjectId)
+        $templateParameters.Add("aadServicePrincipalId", $aadConfig.ServicePrincipalId)
     }
     if (![string]::IsNullOrEmpty($aadConfig.ServiceSecret)) { 
         $templateParameters.Add("aadServiceSecret", $aadConfig.ServiceSecret)

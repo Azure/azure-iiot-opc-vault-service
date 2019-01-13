@@ -632,6 +632,29 @@ Function GetAzureADApplicationConfig() {
             -RequiredResourceAccess $requiredResourcesAccess
         Write-Host "'$($serviceDisplayName)' updated with required resource access, app roles and known applications."  
 
+        #
+        # Add current user as Writer, Approver and Administrator
+        #
+        #$serviceAadApplicationServicePrincipal = Get-AzureADServicePrincipal -ObjectId $serviceAadApplication.ObjectId
+
+        try {
+            $app_role_name = "Writer"
+            $app_role = $serviceServicePrincipal.AppRoles | Where-Object { $_.DisplayName -eq $app_role_name }
+            New-AzureADUserAppRoleAssignment -ObjectId $user.ObjectId -PrincipalId $user.ObjectId -ResourceId $serviceServicePrincipal.ObjectId -Id $app_role.Id
+
+            $app_role_name = "Approver"
+            $app_role = $serviceServicePrincipal.AppRoles | Where-Object { $_.DisplayName -eq $app_role_name }
+            New-AzureADUserAppRoleAssignment -ObjectId $user.ObjectId -PrincipalId $user.ObjectId -ResourceId $serviceServicePrincipal.ObjectId -Id $app_role.Id
+
+            $app_role_name = "Administrator"
+            $app_role = $serviceServicePrincipal.AppRoles | Where-Object { $_.DisplayName -eq $app_role_name }
+            New-AzureADUserAppRoleAssignment -ObjectId $user.ObjectId -PrincipalId $user.ObjectId -ResourceId $serviceServicePrincipal.ObjectId -Id $app_role.Id
+        }
+        catch ()
+        {
+            Write-Host "User has already app roles assigned."
+        }
+
         # 
         # Update client application to add reply urls required permissions.
         #
@@ -685,6 +708,7 @@ Function GetAzureADApplicationConfig() {
             ServiceId = $serviceAadApplication.AppId
             ServiceSecret = $serviceSecret.Value
             ServiceObjectId = $serviceAadApplication.ObjectId
+            ServicePrincipalId = $serviceServicePrincipal.ObjectId
             ServiceDisplayName = $serviceDisplayName
             ClientId = $clientAadApplication.AppId
             ClientSecret = $clientSecret.Value
