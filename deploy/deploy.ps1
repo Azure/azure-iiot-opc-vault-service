@@ -635,8 +635,6 @@ Function GetAzureADApplicationConfig() {
         #
         # Add current user as Writer, Approver and Administrator
         #
-        #$serviceAadApplicationServicePrincipal = Get-AzureADServicePrincipal -ObjectId $serviceAadApplication.ObjectId
-
         try {
             $app_role_name = "Writer"
             $app_role = $serviceServicePrincipal.AppRoles | Where-Object { $_.DisplayName -eq $app_role_name }
@@ -650,7 +648,7 @@ Function GetAzureADApplicationConfig() {
             $app_role = $serviceServicePrincipal.AppRoles | Where-Object { $_.DisplayName -eq $app_role_name }
             New-AzureADUserAppRoleAssignment -ObjectId $user.ObjectId -PrincipalId $user.ObjectId -ResourceId $serviceServicePrincipal.ObjectId -Id $app_role.Id
         }
-        catch ()
+        catch
         {
             Write-Host "User has already app roles assigned."
         }
@@ -798,13 +796,14 @@ $deleteOnErrorPrompt = GetOrCreateResourceGroup
 $aadConfig = GetAzureADApplicationConfig
 $webAppName = $script:resourceGroupName + "-app"
 $webServiceName = $script:resourceGroupName + "-service"
-
+$groupsConfig = Get-Content .\KeyVault.Secret.Groups.json -Raw 
 
 try {
     Write-Host "Start deployment..."
     & ($deploymentScript) -resourceGroupName $script:resourceGroupName `
         -interactive $script:interactive -aadConfig $aadConfig `
-        -webAppName $webAppName -webServiceName $webServiceName
+        -webAppName $webAppName -webServiceName $webServiceName `
+        -groupsConfig $groupsConfig
     Write-Host "Deployment succeeded."
 }
 catch {

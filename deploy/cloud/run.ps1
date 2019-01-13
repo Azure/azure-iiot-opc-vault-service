@@ -17,6 +17,9 @@
  .PARAMETER aadConfig
     The AAD configuration the template will be configured with.
 
+ .PARAMETER groupsConfig
+    The certificate groups configuration.
+
  .PARAMETER interactive
     Whether to run in interactive mode
 
@@ -27,6 +30,7 @@ param(
     [string] $webAppName = $null,
     [string] $webServiceName = $null,
     $aadConfig = $null,
+    [string] $groupsConfig = $null,
     $interactive = $true
 )
 
@@ -118,6 +122,10 @@ if ($aadConfig) {
     }
 }
 
+# Configure groups
+if (![string]::IsNullOrEmpty($groupsConfig)) { 
+    $templateParameters.Add("groupsConfig", $groupsConfig)
+}
 
 # Set web app site name
 if ($interactive -and [string]::IsNullOrEmpty($webAppName)) {

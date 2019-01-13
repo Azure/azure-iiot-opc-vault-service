@@ -91,18 +91,11 @@
             },
             "minLength": 2
         },
-        "groupsObject": {
-            "type": "object",
-            "defaultValue": {
-                "secrets": [
-                    {
-                        "secretName": "groups",
-                        "secretValue": "TestContent"
-                    }
-                ]
-            },
+        "groupsConfig": {
+            "type": "string",
+            "defaultValue": "",
             "metadata": {
-                "description": "all secrets {\"secretName\":\"\",\"secretValue\":\"\"} wrapped in a secure object"
+                "description": "Certificate group configuration."
             }
         }
     },
@@ -129,7 +122,15 @@
         "readPermissions": [ "Get", "List" ],
         "writePermissions": [ "Get", "List", "Set" ],
         "signPermissions": [ "Get", "List", "Sign" ],
-        "createPermissions": [ "Get", "List", "Update", "Create", "Import" ]
+        "createPermissions": [ "Get", "List", "Update", "Create", "Import" ],
+        "groupsObject": {
+            "secrets": [
+                {
+                    "secretName": "groups",
+                    "secretValue": "[parameters('groupsConfig')]"
+                }
+            ]
+        }
     },
     "resources": [
         {
@@ -215,18 +216,19 @@
             ]
         },
         {
+            "condition": "[not(empty(parameters('groupsConfig')))]",
             "type": "Microsoft.KeyVault/vaults/secrets",
-            "name": "[concat(variables('keyVaultName'), '/', parameters('groupsObject').secrets[copyIndex()].secretName)]",
+            "name": "[concat(variables('keyVaultName'), '/', variables('groupsObject').secrets[copyIndex()].secretName)]",
             "apiVersion": "2015-06-01",
             "properties": {
-                "value": "[parameters('groupsObject').secrets[copyIndex()].secretValue]"
+                "value": "[variables('groupsObject').secrets[copyIndex()].secretValue]"
             },
             "dependsOn": [
                 "[concat('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
             ],
             "copy": {
                 "name": "secretsCopy",
-                "count": "[length(parameters('groupsObject').secrets)]"
+                "count": "[length(variables('groupsObject').secrets)]"
             }
         },
         {
