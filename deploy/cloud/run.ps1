@@ -177,15 +177,10 @@ if ($aadConfig -and $aadConfig.ClientObjectId) {
     Set-AzureADApplication -ObjectId $aadConfig.ServiceObjectId -HomePage $webServicePortalUrl
 }
 
-Write-Host
-Write-Host "To access the web client go to:"
-Write-Host $webAppPortalUrl
-Write-Host
-Write-Host "To access the web service go to:"
-Write-Host $webAppServiceUrl
-Write-Host
 #Write-Host "Use the following User and Password to log onto your VM:"
 #Write-Host 
 #Write-Host $adminUser
 #Write-Host $adminPassword
-#Write-Host 
+#Write-Host
+
+Return $webAppPortalUrl, $webAppServiceUrl

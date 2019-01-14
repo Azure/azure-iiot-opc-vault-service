@@ -66,7 +66,7 @@ Function SelectEnvironment() {
                     -ResourceManagerUrl https://management.azure.com/ `
                     -ManagementPortalUrl http://go.microsoft.com/fwlink/?LinkId=254433
             }
-            $script:locations = @("West US", "North Europe", "West Europe")
+            $script:locations = @("East US", "West US", "North Europe", "West Europe")
         }
         default {
             throw ("'{0}' is not a supported Azure Cloud environment" -f $script:environmentName)
@@ -74,6 +74,43 @@ Function SelectEnvironment() {
     }
     $script:environment = Get-AzureRmEnvironment $script:environmentName
     $script:environmentName = $script:environment.Name
+}
+
+#*******************************************************************************************************
+# Deploy a zip to web app
+#*******************************************************************************************************
+Function ZipDeploy()
+{
+    Param (
+        [string] $resourceGroupName,
+        [string] $webAppName,
+        [string] $folderPath,
+        $slotParameters
+    ) 
+
+    $filePath = $folderPath + ".zip"
+    if(Test-path $filePath) {Remove-item $filePath}
+    Add-Type -assembly "system.io.compression.filesystem"
+    [io.compression.zipfile]::CreateFromDirectory($folderPath, $filePath)
+    if(Test-path $publishFolder) {Remove-Item -Recurse -Force $publishFolder}
+
+    $profileClient = Get-AzureRmWebAppSlotPublishingProfile `
+        -Format WebDeploy `
+        -ResourceGroupName $resourceGroupName `
+        -Name $webAppName `
+        @slotParameters
+    $publishProfilePath = Join-Path -Path ".\" -ChildPath "$($webAppName).$($slotParameters.Slot).publishsettings"
+    Write-Output $profileClient | Out-File -FilePath $publishProfilePath 
+    $profileClientXml = [xml]$profileClient
+    $profileClient = $profileClientXml.publishData.publishProfile[0]
+
+    $username = $profileClient.UserName
+    $password = $profileClient.userPWD
+    $apiUrl = "https://" +  $profileClient.publishUrl + "/api/zipdeploy"
+    $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:{1}" -f $username, $password)))
+    $userAgent = "powershell/1.0"
+    Invoke-RestMethod -Uri $apiUrl -Headers @{Authorization=("Basic {0}" -f $base64AuthInfo)} -UserAgent $userAgent -Method POST -InFile $filePath -ContentType "multipart/form-data"
+
 }
 
 #*******************************************************************************************************
@@ -802,7 +839,7 @@ $groupsConfig = Get-Content .\KeyVault.Secret.Groups.json -Raw
 
 try {
     Write-Host "Start deployment..."
-    & ($deploymentScript) -resourceGroupName $script:resourceGroupName `
+    $serviceUrls = & ($deploymentScript) -resourceGroupName $script:resourceGroupName `
         -interactive $script:interactive -aadConfig $aadConfig `
         -webAppName $webAppName -webServiceName $webServiceName `
         -groupsConfig $groupsConfig
@@ -843,38 +880,14 @@ $deploydir = pwd
 Write-Host -Message 'Get publishing profile for web service'
 $slotParameters = @{ Slot = "Production" }
 
-$profileService = Get-AzureRmWebAppSlotPublishingProfile `
-    -Format WebDeploy `
-    -ResourceGroupName $resourceGroupName `
-    -Name $webServiceName `
-    @slotParameters
-$publishProfilePath = Join-Path -Path ".\" -ChildPath "$($webServiceName).publishsettings"
-Write-Output $profileService | Out-File -FilePath $publishProfilePath 
-$profileServiceXml = [xml]$profileService
-$profileService = $profileServiceXml.publishData.publishProfile[0]
-
 # delete any previous publish
 $publishFolder = Join-Path -Path $deploydir -ChildPath "\service"
 if(Test-path $publishFolder) {Remove-Item -Recurse -Force $publishFolder}
 
-Write-Host -Message 'Publish service'
 dotnet publish -c Debug -o $publishFolder ..\src\Microsoft.Azure.IIoT.OpcUa.Services.Vault.csproj
 
-$destination = Join-Path -Path $deploydir -ChildPath "\service.zip"
-if(Test-path $destination) {Remove-item $destination}
-Add-Type -assembly "system.io.compression.filesystem"
-[io.compression.zipfile]::CreateFromDirectory($publishFolder, $destination)
-
-if(Test-path $publishFolder) {Remove-Item -Recurse -Force $publishFolder}
-
-# Upload zip to web app
-$username = $profileService.UserName
-$password = $profileService.userPWD
-$filePath = $destination
-$apiUrl = "https://" +  $profileService.publishUrl +"/api/zipdeploy"
-$base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:{1}" -f $username, $password)))
-$userAgent = "powershell/1.0"
-Invoke-RestMethod -Uri $apiUrl -Headers @{Authorization=("Basic {0}" -f $base64AuthInfo)} -UserAgent $userAgent -Method POST -InFile $filePath -ContentType "multipart/form-data"
+Write-Host -Message 'Publish service'
+ZipDeploy $resourceGroupName $webServiceName $publishFolder $slotParameters
 
 $publishFolder = Join-Path -Path $deploydir -ChildPath "\app"
 if(Test-path $publishFolder) {Remove-Item -Recurse -Force $publishFolder}
@@ -882,28 +895,51 @@ if(Test-path $publishFolder) {Remove-Item -Recurse -Force $publishFolder}
 Write-Host -Message 'Publish application'
 dotnet publish -c Debug -o $publishFolder ..\app\Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.csproj
 
-$destination = Join-Path -Path $deploydir -ChildPath "\app.zip"
-if(Test-path $destination) {Remove-item $destination}
-Add-Type -assembly "system.io.compression.filesystem"
-[io.compression.zipfile]::CreateFromDirectory($publishFolder, $destination)
+ZipDeploy $resourceGroupName $webAppName $publishFolder $slotParameters
 
-if(Test-path $publishFolder) {Remove-Item -Recurse -Force $publishFolder}
+$moduleConfiguration = '--vault="'+$serviceUrls[1]+'"'
+$moduleConfiguration += ' --resource="'+$($aadConfig.ServiceId)+'"'
+$moduleConfiguration += ' --clientid="'+$($aadConfig.ModuleId)+'"'
+$moduleConfiguration += ' --secret="'+$($aadConfig.ModuleSecret)+'"'
+$moduleConfiguration += ' --tenantid="'+$($aadConfig.TenantId)+'"'
 
-$profileClient = Get-AzureRmWebAppSlotPublishingProfile `
-    -Format WebDeploy `
-    -ResourceGroupName $resourceGroupName `
-    -Name $webAppName `
-    @slotParameters
-$publishProfilePath = Join-Path -Path ".\" -ChildPath "$($webAppName).publishsettings"
-Write-Output $profileClient | Out-File -FilePath $publishProfilePath 
-$profileClientXml = [xml]$profileClient
-$profileClient = $profileClientXml.publishData.publishProfile[0]
+Write-Host $moduleConfiguration 
+$moduleConfigPath = Join-Path -Path ".\" -ChildPath "$($webServiceName).config"
+Write-Output $moduleConfiguration | Out-File -FilePath $moduleConfigPath -Encoding ascii
 
-$username = $profileClient.UserName
-$password = $profileClient.userPWD
-$filePath = $destination
-$apiUrl = "https://" +  $profileClient.publishUrl +"/api/zipdeploy"
-$base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:{1}" -f $username, $password)))
-$userAgent = "powershell/1.0"
-Invoke-RestMethod -Uri $apiUrl -Headers @{Authorization=("Basic {0}" -f $base64AuthInfo)} -UserAgent $userAgent -Method POST -InFile $filePath -ContentType "multipart/form-data"
+Write-Host "GDS module configuration:"
+Write-Host "--vault="$serviceUrls[1]
+Write-Host "--resource="$aadConfig.ServiceId
+Write-Host "--clientid="$aadConfig.ModuleId
+Write-Host "--secret="$aadConfig.ModuleSecret
+Write-Host "--tenantid="$aadConfig.TenantId
+
+cd ..\module\docker\linux
+.\dockerbuild.bat
+cd ..\..\..\deploy
+
+$dockerrun = 'docker run -it -p 58850-58852:58850-58852 -e 58850-58852 -h %COMPUTERNAME% -v "/c/GDS:/root/.local/share/Microsoft/GDS" edgeopcvault:latest '
+$dockerrun += $moduleConfiguration
+$dockerrunfilename = ".\"+$resourceGroupName+"-dockergds.cmd"
+Write-Output $dockerrun | Out-File -FilePath $dockerrunfilename -Encoding ascii
+
+$apprun = "cd ..\module `r`n"
+$apprun += 'dotnet run --project ..\module\Microsoft.Azure.IIoT.OpcUa.Modules.Vault.csproj '
+$apprun += $moduleConfiguration
+$apprunfilename = ".\"+$resourceGroupName+"-gds.cmd"
+Write-Output $apprun | Out-File -FilePath $apprunfilename -Encoding ascii
+
+Write-Host
+Write-Host "To access the web client go to:"
+Write-Host $serviceUrls[0]
+Write-Host
+Write-Host "To access the web service go to:"
+Write-Host $serviceUrls[1]
+Write-Host
+Write-Host "To start the local docker GDS server:"
+Write-Host $dockerrunfilename
+Write-Host 
+Write-Host "To start the local dotnet GDS server:"
+Write-Host $apprunfilename
+Write-Host 
 
