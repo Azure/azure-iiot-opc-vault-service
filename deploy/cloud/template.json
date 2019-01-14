@@ -167,7 +167,7 @@
         {
             "type": "Microsoft.KeyVault/vaults",
             "name": "[variables('keyVaultName')]",
-            "apiVersion": "2015-06-01",
+            "apiVersion": "2018-02-14",
             "location": "[variables('applocation')]",
             "tags": {
                 "displayName": "KeyVault"
@@ -219,12 +219,12 @@
             "condition": "[not(empty(parameters('groupsConfig')))]",
             "type": "Microsoft.KeyVault/vaults/secrets",
             "name": "[concat(variables('keyVaultName'), '/', variables('groupsObject').secrets[copyIndex()].secretName)]",
-            "apiVersion": "2015-06-01",
+            "apiVersion": "2018-02-14",
             "properties": {
                 "value": "[variables('groupsObject').secrets[copyIndex()].secretValue]"
             },
             "dependsOn": [
-                "[concat('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
+                "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]"
             ],
             "copy": {
                 "name": "secretsCopy",
@@ -233,14 +233,14 @@
         },
         {
             "type": "Microsoft.KeyVault/vaults/secrets",
-            "name": "[concat(variables('keyVaultName'), '/cosmosdbtoken')]",
-            "apiVersion": "2015-06-01",
+            "name": "[concat(variables('keyVaultName'), '/', 'Service-OpcVault--CosmosDBToken')]",
+            "apiVersion": "2018-02-14",
             "properties": {
                 "value": "[listKeys(resourceId('Microsoft.DocumentDb/databaseAccounts', variables('documentDBName')), variables('documentDBApiVersion')).primaryMasterKey]"
             },
             "dependsOn": [
                 "[resourceId('Microsoft.DocumentDb/databaseAccounts', variables('documentDBName'))]",
-                "[concat('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
+                "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]"
             ]
         },
         {
@@ -328,9 +328,10 @@
                     "properties": {
                         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(concat('microsoft.insights/components/', variables('appInsightsName'))).InstrumentationKey]",
                         "ASPNETCORE_ENVIRONMENT": "Development",
+                        "KEYVAULT": "[reference(resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))).vaultUri]",
                         "OPCVAULT__KEYVAULTBASEURL": "[reference(resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))).vaultUri]",
                         "OPCVAULT__COSMOSDBENDPOINT": "[reference(resourceId('Microsoft.DocumentDb/databaseAccounts', variables('documentDBName'))).documentEndpoint]",
-                        "OPCVAULT__COSMOSDBTOKEN": "[listKeys(resourceId('Microsoft.DocumentDb/databaseAccounts', variables('documentDBName')), variables('documentDBApiVersion')).primaryMasterKey]",
+                        //"OPCVAULT__COSMOSDBTOKEN": "[listKeys(resourceId('Microsoft.DocumentDb/databaseAccounts', variables('documentDBName')), variables('documentDBApiVersion')).primaryMasterKey]",
                         "OPCVAULT__AUTOAPPROVE": "false",
                         "AUTH__APPID": "[parameters('aadServiceId')]",
                         "AUTH__APPSECRET": "[parameters('aadServiceSecret')]",
@@ -360,10 +361,6 @@
             "name": "[variables('appInsightsName')]",
             "type": "Microsoft.Insights/components",
             "location": "[resourceGroup().location]",
-            "tags": {
-                "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', variables('appInsightsName'))]": "Resource",
-                "displayName": "AppInsightsComponent"
-            },
             "properties": {
                 "applicationId": "[variables('appInsightsName')]"
             }
@@ -402,10 +399,6 @@
         "CosmosDBEndpoint": {
             "type": "string",
             "value": "[reference(resourceId('Microsoft.DocumentDb/databaseAccounts', variables('documentDBName'))).documentEndpoint]"
-        },
-        "CosmosDBToken": {
-            "type": "securestring",
-            "value": "[listKeys(resourceId('Microsoft.DocumentDb/databaseAccounts', variables('documentDBName')), variables('documentDBApiVersion')).primaryMasterKey]"
         }
     }
 }
