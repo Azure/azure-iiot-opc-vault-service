@@ -886,13 +886,13 @@ if(Test-path $publishFolder) {Remove-Item -Recurse -Force $publishFolder}
 
 dotnet publish -c Debug -o $publishFolder ..\src\Microsoft.Azure.IIoT.OpcUa.Services.Vault.csproj
 
-Write-Host -Message 'Publish service'
+Write-Host 'Publish service'
 ZipDeploy $resourceGroupName $webServiceName $publishFolder $slotParameters
 
 $publishFolder = Join-Path -Path $deploydir -ChildPath "\app"
 if(Test-path $publishFolder) {Remove-Item -Recurse -Force $publishFolder}
 
-Write-Host -Message 'Publish application'
+Write-Host 'Publish application'
 dotnet publish -c Debug -o $publishFolder ..\app\Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.csproj
 
 ZipDeploy $resourceGroupName $webAppName $publishFolder $slotParameters
@@ -903,7 +903,7 @@ $moduleConfiguration += ' --clientid="'+$($aadConfig.ModuleId)+'"'
 $moduleConfiguration += ' --secret="'+$($aadConfig.ModuleSecret)+'"'
 $moduleConfiguration += ' --tenantid="'+$($aadConfig.TenantId)+'"'
 
-Write-Host $moduleConfiguration 
+#Write-Host $moduleConfiguration 
 $moduleConfigPath = Join-Path -Path ".\" -ChildPath "$($webServiceName).config"
 Write-Output $moduleConfiguration | Out-File -FilePath $moduleConfigPath -Encoding ascii
 
