@@ -1,9 +1,9 @@
 <#
  .SYNOPSIS
-    Deploys Industrial IoT services to Azure
+    Deploys the OpcVault service to Azure
 
  .DESCRIPTION
-    Deploys the Industrial IoT services dependencies and optionally micro services and UI to Azure.
+    Deploys the OpcVault services and UI to Azure.
 
  .PARAMETER type
     The type of deployment (cloud, vm, local)
@@ -20,8 +20,8 @@
  .PARAMETER resourceGroupLocation
     Optional, a resource group location. If specified, will try to create a new resource group in this location.
 
- .PARAMETER withAuthentication
-    Whether to enable authentication - defaults to $true.
+ .PARAMETER withAutoApprove
+    Whether to enable auto approval - defaults to $false.
 
  .PARAMETER tenantId
     AD tenant to use. 
@@ -39,7 +39,7 @@ param(
     [string] $accountName,
     $credentials,
     [string] $tenantId,
-    [bool] $withAuthentication = $true,
+    [bool] $withAutoApprove = $false,
     [ValidateSet("AzureCloud")] [string] $environmentName = "AzureCloud"
 )
 
@@ -389,10 +389,10 @@ Function ConnectToAzureADTenant() {
     if ($script:interactive) {
         # Interactive
         if (!$script:tenantId) {
-            if (!$script:withAuthentication) {
+            if (!$script:withAutoApprove) {
                 $reply = Read-Host -Prompt "Enable authentication? [y/n]"
-                if ( $reply -notmatch "[yY]" ) { 
-                    return $null
+                if ( $reply -match "[yY]" ) { 
+                    $script:withAutoApprove = $true
                 }
             }
             $script:tenantId = SelectAzureADTenantId
@@ -588,8 +588,6 @@ Function GetAzureADApplicationConfig() {
         #
         try {
             $user = Get-AzureADUser -ObjectId $creds.Account.Id -ErrorAction Stop
-            # TODO: Check whether already owner...
-
             Add-AzureADApplicationOwner -ObjectId $serviceAadApplication.ObjectId `
                 -RefObjectId $user.ObjectId
             Add-AzureADApplicationOwner -ObjectId $clientAadApplication.ObjectId `
@@ -631,6 +629,10 @@ Function GetAzureADApplicationConfig() {
             -KnownClientApplications $knownApplications -AppRoles $appRoles `
             -RequiredResourceAccess $requiredResourcesAccess
         Write-Host "'$($serviceDisplayName)' updated with required resource access, app roles and known applications."  
+
+        # read updated app roles for service principal
+        $serviceServicePrincipal=Get-AzureADServicePrincipal `
+            -Filter "AppId eq '$($serviceAadApplication.AppId)'"
 
         #
         # Add current user as Writer, Approver and Administrator
