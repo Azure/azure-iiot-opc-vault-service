@@ -20,6 +20,12 @@
  .PARAMETER groupsConfig
     The certificate groups configuration.
 
+ .PARAMETER autoApprove
+    Set the web app auto approval configuration.
+
+ .PARAMETER environment
+    Set the web app environment configuration. (Production,Development)
+
  .PARAMETER interactive
     Whether to run in interactive mode
 
@@ -31,6 +37,8 @@ param(
     [string] $webServiceName = $null,
     $aadConfig = $null,
     [string] $groupsConfig = $null,
+    [string] $autoApprove = "false",
+    [string] $environment = "Production",
     $interactive = $true
 )
 
@@ -66,13 +74,8 @@ $ScriptDir = Split-Path $script:MyInvocation.MyCommand.Path
 
 # Register RPs
 Register-AzureRmResourceProvider -ProviderNamespace "microsoft.web" | Out-Null
-#Register-AzureRmResourceProvider -ProviderNamespace "microsoft.compute" | Out-Null
 
-# Set admin password
-$adminPassword = CreateRandomPassword
-$templateParameters = @{ 
-    # adminPassword = $adminPassword
-}
+$templateParameters = @{ }
 
 try {
     # Try set branch name as current branch
@@ -145,6 +148,15 @@ if (![string]::IsNullOrEmpty($webServiceName)) {
     $templateParameters.Add("webServiceName", $webServiceName)
 }
 
+# Configure web app auto approve
+if (![string]::IsNullOrEmpty($autoApprove)) { 
+    $templateParameters.Add("autoApprove", $autoApprove)
+}
+
+# Configure web app environment
+if (![string]::IsNullOrEmpty($environment)) { 
+    $templateParameters.Add("environment", $environment)
+}
 
 # Start the deployment
 $templateFilePath = Join-Path $ScriptDir "template.json"
@@ -156,17 +168,17 @@ $webAppPortalUrl = $deployment.Outputs["webAppPortalUrl"].Value
 $webAppServiceUrl = $deployment.Outputs["webAppServiceUrl"].Value
 $webAppPortalName = $deployment.Outputs["webAppPortalName"].Value
 $webAppServiceName = $deployment.Outputs["webAppServiceName"].Value
-#$adminUser = $deployment.Outputs["adminUsername"].Value
 
 if ($aadConfig -and $aadConfig.ClientObjectId) {
     # 
-    # Update client application to add reply urls required permissions.
+    # Update client application to add reply urls to required permissions.
     #
     $adClient = Get-AzureADApplication -ObjectId $aadConfig.ClientObjectId 
     Write-Host "Adding ReplyUrls:"
-    #$replyUrls = New-Object System.Collections.Generic.List[System.String]
     $replyUrls = $adClient.ReplyUrls
+    # web app
     $replyUrls.Add($webAppPortalUrl + "/signin-oidc")
+    # swagger
     $replyUrls.Add($webAppServiceUrl + "/oauth2-redirect.html")
     Write-Host $webAppPortalUrl"/signin-oidc"
     Write-Host $webAppServiceUrl"/oauth2-redirect.html"
@@ -176,11 +188,5 @@ if ($aadConfig -and $aadConfig.ClientObjectId) {
 if ($aadConfig -and $aadConfig.ClientObjectId) {
     Set-AzureADApplication -ObjectId $aadConfig.ServiceObjectId -HomePage $webServicePortalUrl
 }
-
-#Write-Host "Use the following User and Password to log onto your VM:"
-#Write-Host 
-#Write-Host $adminUser
-#Write-Host $adminPassword
-#Write-Host
 
 Return $webAppPortalUrl, $webAppServiceUrl

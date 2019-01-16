@@ -95,9 +95,24 @@
             "type": "string",
             "defaultValue": "",
             "metadata": {
-                "description": "Certificate group configuration."
+                "description": "Default certificate group configuration. (JSON)"
+            }
+        },
+        "autoApprove": {
+            "type": "string",
+            "defaultValue": "false",
+            "metadata": {
+                "description": "Preset service for certificate auto approval."
+            }
+        },
+        "environment": {
+            "type": "string",
+            "defaultValue": "Production",
+            "metadata": {
+                "description": "Preset web app environment."
             }
         }
+
     },
     "variables": {
         "tenantId": "[subscription().tenantId]",
@@ -122,7 +137,7 @@
         "readPermissions": [ "Get", "List" ],
         "writePermissions": [ "Get", "List", "Set" ],
         "signPermissions": [ "Get", "List", "Sign" ],
-        "createPermissions": [ "Get", "List", "Update", "Create", "Import" ],
+        "createPermissions": [ "Get", "List", "Update", "Create", "Import", "Delete"],
         "groupsObject": {
             "secrets": [
                 {
@@ -273,13 +288,14 @@
                     },
                     "properties": {
                         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(concat('microsoft.insights/components/', variables('appInsightsName'))).InstrumentationKey]",
-                        "ASPNETCORE_ENVIRONMENT": "Development",
+                        "ASPNETCORE_ENVIRONMENT": "[parameters('environment')]",
                         "AZUREAD__CLIENTID": "[parameters('aadClientId')]",
                         "AZUREAD__CLIENTSECRET": "[parameters('aadClientSecret')]",
                         "AZUREAD__INSTANCE": "[parameters('aadInstance')]",
                         "AZUREAD__TENANTID": "[parameters('aadTenantId')]",
                         "OPCVAULT__BASEADDRESS": "[concat('https://', reference(resourceId('Microsoft.Web/sites', variables('webAppServiceName'))).hostNames[0])]",
                         "OPCVAULT__RESOURCEID": "[parameters('aadServiceId')]",
+                        "OPCVAULT__AUTOAPPROVE": "[parameters('autoApprove')]",
                         "WEBSITE_RUN_FROM_PACKAGE": "1"
                     }
                 },
@@ -327,12 +343,12 @@
                     },
                     "properties": {
                         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(concat('microsoft.insights/components/', variables('appInsightsName'))).InstrumentationKey]",
-                        "ASPNETCORE_ENVIRONMENT": "Development",
+                        "ASPNETCORE_ENVIRONMENT": "[parameters('environment')]",
                         "KEYVAULT": "[reference(resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))).vaultUri]",
                         "OPCVAULT__KEYVAULTBASEURL": "[reference(resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))).vaultUri]",
                         "OPCVAULT__COSMOSDBENDPOINT": "[reference(resourceId('Microsoft.DocumentDb/databaseAccounts', variables('documentDBName'))).documentEndpoint]",
                         //"OPCVAULT__COSMOSDBTOKEN": "[listKeys(resourceId('Microsoft.DocumentDb/databaseAccounts', variables('documentDBName')), variables('documentDBApiVersion')).primaryMasterKey]",
-                        "OPCVAULT__AUTOAPPROVE": "false",
+                        "OPCVAULT__AUTOAPPROVE": "[parameters('autoApprove')]",
                         "AUTH__APPID": "[parameters('aadServiceId')]",
                         "AUTH__APPSECRET": "[parameters('aadServiceSecret')]",
                         "AUTH__AUDIENCE": "[parameters('aadAudience')]",
