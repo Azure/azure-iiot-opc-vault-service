@@ -1,4 +1,4 @@
-# Azure Industrial IoT Services
+## Azure Industrial IoT Services
 
 ### OPC Unified Architecture (OPC UA) Certificate Management Service
 
@@ -14,109 +14,49 @@ A web management application front end and a local OPC UA GDS server allow for e
 * **ASP.Net Core Sample Application** as user interface for the Certificate Management Service.
 * **OPC UA .Net Standard GDS Server** for local OPC UA device connectivity to the cloud Certificate Management Service.
 
-## Prerequisites
+### Microservice Features
+1. Production ready certificate microservice based on C# with ASP.Net Core 2.1.
+2. Uses Azure Key Vault as CA certificate store, key pair generator and certificate signer backed by FIPS 140-2 Level 2 validated HSMs.
+3. Uses Cosmos DB as application and certificate request database. Open database interface to integrate with other database services.
+2. Secured by AzureAD role based access with separation of Reader, Writer, Approver and Administrator roles.
+2. Exposes Rest API (with Swagger UI) to easily integrate certificate microservice in other cloud services.
+7. Support for RSA certificates with a SHA256 signature and keys with a length of 2048, 3072 or 4096 bits.
+8. Support to sign certificates created with new key pairs from Azure Key Vault or by using Certificate Signing Requests (CSR).
+4. Key Pairs and signed certificates with extensions follow requirements and guidelines as specified in the OPC UA GDS Certificate Management Services, Part 12.
+9. The CA has full CRL support with revocation of unregistered OPC UA applications.
+5. Uses on behalf tokens to access Azure Key Vault to validate user permissions at KeyVault level in addition to the validation at the microservice Rest API.
+9. Follows Microsoft SDL guidelines for public-key infrastructure.
+5. Leverages OPC UA .NetStandard GDS Server Common libraries.
+13. Uses Azure Key Vault versioning and auditing to track CA certificate access and CRL history.
 
-### Build and Deploy the Azure service on Windows
+### Web Certificate Management Sample Features
+5. Sample code is based on the certificate management microservice Rest API using C# with ASP.Net Core 2.1.
+8. Workflow to secure a OPC UA application with a CA signed certificate: Register an OPC UA application, request a certificate or key pair, generate the signed certificate and download it.
+5. Forms to manage OPC UA applications and certificate requests.
+8. CA certificate management for the Administrator role to configure CA cert lifetime and subject name.
+9. Binary and base64 download of certificates and keys as PFX, PEM and DER.
+9. Renewal of a CA certificates.
+11. Upload CSR for signing requests as file or base64.
+8. Create key pairs and sign certificates with a CSR based on application information.
+7. Sample workflow to unregister and revoke a OPC UA application by updating CRLs.
+10. Issues consolidated CRL updates for multiple unregistered applications in one step.
+11. Accesses the microservice on behalf of the user to be able to allow access to protected functions in Azure Key Vault (e.g. to be able to access signing rights for Approver).
 
-This Powershell script provides an easy way to deploy the OPC UA Vault service and the application.<br>
+### Local Global Discovery Server (GDS) with cloud integration
+5. Based on the GDS server common library of the OPC UA .NetStandard SDK.
+6. Implements OPC UA Discovery and Certificate management services by connecting to the microservice.
+7. Executes in a docker container or as a .Net Core 2.0 application on Windows or Linux.
+8. Implements namespace of OPC UA GDS Discovery and Certificate Management Services V1.04, Part 12.
+6. **Note:** At this time the server can only act in a reader role with limited functionality due to lack of user OAUTH2 authentication support in the .NetStandard SDK. For development purposes and testing the AzureAD registration can be enabled for a 'Writer' role for a limited functionality to create certificate requests and to update applications, but this configuration is not recommended in production deployments.
 
-1. Sign up for an [Azure Subscription][azure-free].
-1. [Install .NET Core 2.1+][dotnet-install].
-2. [Install Docker][docker-url].
-4. Install the [Azure Command Line tools for PowerShell][powershell-install].
-1. Open a Powershell window at the repo root. 
-3. Go to the deploy folder `cd deploy`
-5. Start the deployment with `.\deploy.ps1` for interactive installation<br>
-or enter a full command line:  
-`.\deploy.ps1  -subscriptionName "MySubscriptionName" -resourceGroupLocation "East US" -tenantId <myTenantId> -resourceGroupName <myResourceGroup>`
-6. Follow the instructions in the script to login to your subscription and to provide additional information
-9. After a successful build and deploy you should see the following message:
+## [Build and Deploy](docs/howto-deploy-services.md) the service to Azure
 
-```
-To access the web client go to:
-https://myResourceGroup-app.azurewebsites.net
+The documentation how to build and deploy the service is [here](docs/howto-deploy-services.md).
 
-To access the web service go to:
-https://myResourceGroup-service.azurewebsites.net
+## [Build and Run](docs/howto-run-services-locally.md) the services locally
 
-To start the local docker GDS server:
-.\myResourceGroup-dockergds.cmd
+The documentation how to build and run the service is [here](docs/howto-run-services-locally.md).
 
-To start the local dotnet GDS server:
-.\myResourceGroup-gds.cmd
-```
-
-10. Give the web app and the web service a few minutes to start up for the first time.
-10. Open your favorite browser and open the application page: `https://myResourceGroup-app.azurewebsites.net`
-11. To take a look at the Swagger Api open: `https://myResourceGroup-service.azurewebsites.net`
-13. To start a local GDS server with dotnet start `.\myResourceGroup-gds.cmd` or with docker start `.\myResourceGroup-dockergds.cmd`.
-
-### Issue the first CA certificate
-
-1. Open your certificate service at `https://myResourceGroup-app.azurewebsites.net` and login.
-2. Navigate to the `Certificate Groups` page.
-3. There is one `Default` Certificate Group listed. Click on `Edit`.
-4. In `Edit Certificate Group Details` you can modify the Subject Name and Lifetime of your CA and application certificates.
-5. Enter a valid Subject in the valid, e.g. `CN=My CA Root, O=MyCompany, OU=MyDepartment`.
-6. Click on the `Save` button.
-7. Click on the `Details` button. The `View Certificate Group Details` should display the updated information.
-8. Click on the `Renew CA Certificate` button to issue your first CA certificate. Press `Ok` to proceed.
-9. After a few seconds the the `Certificate Details` are shown. Press `Issuer` or `Crl` to download the latest CA certificate and CRL.
-10. Now the OPC UA Certificate Management Service is ready to issue certificates for OPC UA applications.
-
-## Build and Run(TODO)
-
-### Building and running the service with Visual Studio or VS Code(TODO)
-
-1. Make sure the [Prerequisites](#Prerequisites) are set up.
-1. [Install .NET Core 2.1+][dotnet-install]
-1. Install any recent edition of Visual Studio (Windows/MacOS) or Visual Studio Code (Windows/MacOS/Linux).
-   * If you already have Visual Studio installed, then ensure you have [.NET Core Tools for Visual Studio 2017][dotnetcore-tools-url] installed (Windows only).
-   * If you already have VS Code installed, then ensure you have the [C# for Visual Studio Code (powered by OmniSharp)][omnisharp-url] extension installed.
-1. Open the solution in Visual Studio or VS Code
-1. Start the `Microsoft.Azure.IIoT.OpcUa.Services.Twin` project (e.g. press F5).
-1. Open a browser to `http://localhost:9041/` and test the service using the services' Swagger UI or the [OPC Twin CLI](https://github.com/Azure/azure-iiot-opc-twin-api).
-
-### Building and running the service on the command line(TODO)
-
-1. Make sure the [Prerequisites](#Prerequisites) are set up.
-1. [Install .NET Core 2.1+][dotnet-install]
-1. Open a terminal window or command line window at the repo root. 
-1. Set the [required environment variables](#Setup-Environment-variables) as explained [here](#Configuration-And-Environment-Variables)
-1. Run the following command:
-    ```bash
-    cd src
-    dotnet run
-    ```
-1. Open a browser to `http://localhost:9041/` and test the service using the services' Swagger UI or the [OPC Twin CLI](https://github.com/Azure/azure-iiot-opc-twin-api).
-
-### Building and running the service using Docker(TODO)
-
-1. Make sure [Docker][docker-url] is installed.
-1. Make sure the [Prerequisites](#prerequisites) are set up.
-1. Set the [required environment variables](#Setup-Environment-variables) as explained [here](#Configuration-And-Environment-Variables)
-1. Change into the repo root and build the docker image using `docker build -t azure-iiot-opc-twin-service .`
-1. To run the image run `docker run -p 9041:9041 -e _HUB_CS=$PCS_IOTHUB_CONNSTRING -it azure-iiot-opc-twin-service` (or `docker run -p 9041:9041 -e _HUB_CS=%PCS_IOTHUB_CONNSTRING% -it azure-iiot-opc-twin-service` on Windows).
-1. Open a browser to `http://localhost:9041/` and test the service using the services' Swagger UI or the [OPC Twin CLI](https://github.com/Azure/azure-iiot-opc-twin-api).
-
-### Configuration and Environment variables(TODO)
-
-The service can be configured in its [appsettings.json](src/appsettings.json) file.  Alternatively, all configuration can be overridden on the command line, or through environment variables.  If you have deployed the dependent services using the [pcs local][deploy-local] command, make sure the environment variables shown at the end of deployment are all set in your environment.
-
-* [This page][windows-envvars-howto-url] describes how to setup env vars in Windows.
-* For Linux and MacOS, we suggest to create a shell script to set up the environment variables each time before starting the service host (e.g. VS Code or docker). Depending on OS and terminal, there are ways to persist values globally, for more information [this](https://stackoverflow.com/questions/13046624/how-to-permanently-export-a-variable-in-linux), [this](https://help.ubuntu.com/community/EnvironmentVariables), or [this](https://stackoverflow.com/questions/135688/setting-environment-variables-in-os-x) page should help.
-
-> Make sure to restart your editor or IDE after setting your environment variables to ensure they are picked up.
-
-## Other Industrial IoT Solution Accelerator components(TODO)
-
-* OPC GDS Vault service (Coming soon)
-* [OPC Twin Registry service](https://github.com/Azure/azure-iiot-opc-twin-registry)
-* [OPC Twin Onboarding service](https://github.com/Azure/azure-iiot-opc-twin-onboarding)
-* OPC Twin common business logic (Coming soon)
-* [OPC Twin IoT Edge module](https://github.com/Azure/azure-iiot-opc-twin-module)
-* [OPC Publisher IoT Edge module](https://github.com/Azure/iot-edge-opc-publisher)
-* [OPC Twin API](https://github.com/Azure/azure-iiot-opc-twin-api)
 
 # Contributing
 
@@ -154,16 +94,9 @@ Licensed under the [MIT](LICENSE) License.
 [rm-arch-url]: https://docs.microsoft.com/azure/iot-suite/iot-suite-remote-monitoring-sample-walkthrough
 [postman-url]: https://www.getpostman.com
 [iotedge-url]: https://github.com/Azure/iotedge
-[iothub-docs-url]: https://docs.microsoft.com/azure/iot-hub/
 [docker-url]: https://www.docker.com/
 [dotnet-install]: https://www.microsoft.com/net/learn/get-started
 [vs-install-url]: https://www.visualstudio.com/downloads
 [dotnetcore-tools-url]: https://www.microsoft.com/net/core#windowsvs2017
-[omnisharp-url]: https://github.com/OmniSharp/omnisharp-vscode
-[windows-envvars-howto-url]: https://superuser.com/questions/949560/how-do-i-set-system-environment-variables-in-windows-10
-[iothub-connstring-blog]: https://blogs.msdn.microsoft.com/iotdev/2017/05/09/understand-different-connection-strings-in-azure-iot-hub/
-[deploy-rm]: https://docs.microsoft.com/azure/iot-suite/iot-suite-remote-monitoring-deploy
-[deploy-local]: https://docs.microsoft.com/azure/iot-suite/iot-suite-remote-monitoring-deploy-local#deploy-the-azure-services
-[disable-auth]: https://github.com/Azure/azure-iot-pcs-remote-monitoring-dotnet/wiki/Developer-Reference-Guide#disable-authentication
 
 
