@@ -64,7 +64,9 @@ Function SelectEnvironment() {
                     -ResourceManagerUrl https://management.azure.com/ `
                     -ManagementPortalUrl http://go.microsoft.com/fwlink/?LinkId=254433
             }
-            $script:locations = @("East US", "West US", "North Europe", "West Europe")
+            # locations currently limited by Application Insights
+            # TODO: test "Canada Central", "Central India", "Southeast Asia")
+            $script:locations = @("East US", "West US 2", "North Europe", "West Europe")
         }
         default {
             throw ("'{0}' is not a supported Azure Cloud environment" -f $script:environmentName)
