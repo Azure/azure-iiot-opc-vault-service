@@ -34,7 +34,6 @@ param(
     [string] $resourceGroupLocation,
     [string] $subscriptionName,
     [string] $subscriptionId,
-    [string] $accountName,
     [string] $tenantId,
     [bool] $withAutoApprove = $false,
     [ValidateSet("AzureCloud")] [string] $environmentName = "AzureCloud"
