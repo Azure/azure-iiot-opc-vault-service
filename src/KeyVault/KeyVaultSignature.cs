@@ -68,7 +68,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
 
             // Basic constraints
             request.CertificateExtensions.Add(
-                new X509BasicConstraintsExtension(caCert, false, 0, true));
+                new X509BasicConstraintsExtension(caCert, caCert, 0, true));
 
             // Subject Key Identifier
             var ski = new X509SubjectKeyIdentifierExtension(
