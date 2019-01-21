@@ -21,7 +21,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
 {
     public sealed class KeyVaultCertificateGroupProvider : Opc.Ua.Gds.Server.CertificateGroup
     {
-        public TimeSpan CrlUpdateTime = TimeSpan.FromDays(30);
         public X509CRL Crl;
         public X509SignatureGenerator x509SignatureGenerator;
 
@@ -254,7 +253,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
 
                 // create default revocation list, sign with KeyVault
                 Crl = RevokeCertificate(Certificate, null, null,
-                    notBefore, notBefore + CrlUpdateTime,
+                    notBefore, DateTime.MinValue,
                     new KeyVaultSignatureGenerator(_keyVaultServiceClient, _caCertKeyIdentifier, Certificate),
                     this.Configuration.CACertificateHashSize);
 
@@ -291,7 +290,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
                     var crl = await _keyVaultServiceClient.LoadCACrl(Configuration.Id, caCertKeyInfo.Certificate);
                     var crls = new List<X509CRL>() { crl };
                     var newCrl = RevokeCertificate(caCertKeyInfo.Certificate, crls, certificates,
-                        now, now + CrlUpdateTime,
+                        now, DateTime.MinValue,
                         new KeyVaultSignatureGenerator(_keyVaultServiceClient, caCertKeyInfo.KeyIdentifier, caCertKeyInfo.Certificate),
                         this.Configuration.CACertificateHashSize);
                     await _keyVaultServiceClient.ImportCACrl(Configuration.Id, caCertKeyInfo.Certificate, newCrl).ConfigureAwait(false);
@@ -341,7 +340,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
                 var crl = await _keyVaultServiceClient.LoadCACrl(Configuration.Id, caCertKeyInfo.Certificate);
                 var crls = new List<X509CRL>() { crl };
                 var newCrl = RevokeCertificate(caCertKeyInfo.Certificate, crls, caRevokeCollection,
-                    now, now + CrlUpdateTime,
+                    now, DateTime.MinValue,
                     new KeyVaultSignatureGenerator(_keyVaultServiceClient, caCertKeyInfo.KeyIdentifier, caCertKeyInfo.Certificate),
                     this.Configuration.CACertificateHashSize);
                 await _keyVaultServiceClient.ImportCACrl(Configuration.Id, caCertKeyInfo.Certificate, newCrl).ConfigureAwait(false);

@@ -360,6 +360,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
             int keySize,
             int hashSize,
             bool trusted,
+            string crlDistributionPoint = null,
             CancellationToken ct = default)
         {
             try
@@ -443,7 +444,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
                     null,
                     publicKey,
                     new KeyVaultSignatureGenerator(this, caCertKeyIdentifier, null),
-                    true);
+                    true,
+                    crlDistributionPoint);
 
                 // merge Root CA cert with
                 var mergeResult = await _keyVaultClient.MergeCertificateAsync(
@@ -530,8 +532,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
                     (ushort)hashSize,
                     issuerCert,
                     publicKey,
-                    generator,
-                    true);
+                    generator);
 
                 // merge signed cert with keystore
                 var mergeResult = await _keyVaultClient.MergeCertificateAsync(
