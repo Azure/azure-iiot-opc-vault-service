@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------
+// ------------------------------------------------------------
 //  Copyright (c) Microsoft Corporation.  All rights reserved.
 //  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------
@@ -218,8 +218,10 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
             foreach (string group in groups)
             {
                 ApplicationTestData randomApp = RandomApplicationTestData();
+                Guid requestId = Guid.NewGuid();
                 Opc.Ua.Gds.Server.X509Certificate2KeyPair newKeyPair = await keyVault.NewKeyPairRequestAsync(
                     group,
+                    requestId.ToString(),
                     randomApp.ApplicationRecord.ApplicationUri,
                     randomApp.Subject,
                     randomApp.DomainNames.ToArray(),
@@ -304,8 +306,10 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
             foreach (string group in groups)
             {
                 ApplicationTestData randomApp = RandomApplicationTestData();
+                Guid requestId = Guid.NewGuid();
                 Opc.Ua.Gds.Server.X509Certificate2KeyPair newCert = await keyVault.NewKeyPairRequestAsync(
                     group,
+                    requestId.ToString(),
                     randomApp.ApplicationRecord.ApplicationUri,
                     randomApp.Subject,
                     randomApp.DomainNames.ToArray(),

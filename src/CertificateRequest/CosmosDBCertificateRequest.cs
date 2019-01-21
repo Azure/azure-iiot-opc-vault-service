@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------
+// ------------------------------------------------------------
 //  Copyright (c) Microsoft Corporation.  All rights reserved.
 //  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------
@@ -298,7 +298,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                                 );
 
                             request.Certificate = certificate.RawData;
-                            request.PrivateKey = null;
                         }
                         catch (Exception e)
                         {
@@ -319,6 +318,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                         {
                             newKeyPair = await CertificateGroup.NewKeyPairRequestAsync(
                                 request.CertificateGroupId,
+                                requestId,
                                 application.ApplicationUri,
                                 request.SubjectName,
                                 request.DomainNames,
@@ -337,8 +337,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                         }
 
                         request.Certificate = newKeyPair.Certificate.RawData;
-                        request.PrivateKey = newKeyPair.PrivateKey;
-
+                        // ignore private key, it is stored in KeyVault
                     }
                 }
 
@@ -466,7 +465,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                 request.PrivateKeyFormat = null;
                 request.SigningRequest = null;
                 request.PrivateKeyPassword = null;
-                request.PrivateKey = null;
 
                 try
                 {
@@ -579,7 +577,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                     request.PrivateKeyFormat = null;
                     request.SigningRequest = null;
                     request.PrivateKeyPassword = null;
-                    request.PrivateKey = null;
 
                     try
                     {
@@ -632,6 +629,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                 throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
             }
 
+            // get private key
+            byte[] privateKey = await CertificateGroup.LoadPrivateKeyAsync(request.CertificateGroupId, requestId, request.PrivateKeyFormat);
+
             return new FinishRequestResultModel(
                 request.State,
                 applicationId,
@@ -640,7 +640,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                 request.CertificateTypeId,
                 request.Certificate,
                 request.PrivateKeyFormat,
-                request.PrivateKey,
+                privateKey,
                 request.AuthorityId);
         }
 

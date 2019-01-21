@@ -463,7 +463,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
 
                 return signedcert;
             }
-            catch 
+            catch
             {
                 throw new ServiceResultException(StatusCodes.BadInternalError, "Failed to create new Root CA certificate");
             }
@@ -624,6 +624,53 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         }
 
         /// <summary>
+        /// Imports a Private Key for group id and certificate.
+        /// </summary>
+        public async Task ImportCertKey(string id, string requestId, byte[] privateKey, string privateKeyFormat, CancellationToken ct = default(CancellationToken))
+        {
+            var contentType = PrivateKeyFormatToContentType(privateKeyFormat);
+            string secretIdentifier = KeySecretName(id, requestId);
+            DateTime now = DateTime.UtcNow;
+            SecretAttributes secretAttributes = new SecretAttributes()
+            {
+                Enabled = true,
+                NotBefore = now - TimeSpan.FromDays(-1),
+                Expires = now + TimeSpan.FromDays(30),
+            };
+            var result = await _keyVaultClient.SetSecretAsync(
+                _vaultBaseUrl,
+                secretIdentifier,
+                (contentType == ContentTypePfx) ? Convert.ToBase64String(privateKey) : Encoding.ASCII.GetString(privateKey),
+                null,
+                contentType,
+                secretAttributes,
+                ct)
+                .ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Load Private Key for certificate in group.
+        /// </summary>
+        public async Task<byte[]> LoadCertKey(string id, string requestId, string privateKeyFormat, CancellationToken ct = default(CancellationToken))
+        {
+            var contentType = PrivateKeyFormatToContentType(privateKeyFormat);
+            string secretIdentifier = KeySecretName(id, requestId);
+            var secret = await _keyVaultClient.GetSecretAsync(_vaultBaseUrl, secretIdentifier, ct).ConfigureAwait(false);
+            if (secret.ContentType == contentType)
+            {
+                if (secret.ContentType == ContentTypePfx)
+                {
+                    return Convert.FromBase64String(secret.Value);
+                }
+                else if (secret.ContentType == ContentTypePem)
+                {
+                    return Encoding.ASCII.GetBytes(secret.Value);
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
         /// Creates a trust list with all certs and crls in issuer and trusted list.
         /// i) First load all certs and crls tagged with id==Issuer or id==Trusted.
         /// ii) Then walk all CA cert versions and load all certs tagged with id==Issuer or id==Trusted.
@@ -763,7 +810,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
             var secretItems = await _keyVaultClient.GetSecretsAsync(_vaultBaseUrl, MaxResults, ct).ConfigureAwait(false);
             while (secretItems != null)
             {
-                foreach (var secretItem in secretItems.Where(s => s.ContentType == ContentTypeCrl))
+                foreach (var secretItem in secretItems.Where(s =>
+                    (s.ContentType == ContentTypeCrl || s.ContentType == ContentTypePem || s.ContentType == ContentTypePfx)
+                    ))
                 {
                     try
                     {
@@ -892,7 +941,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
 
         private string KeyStoreName(string id, string requestId)
         {
-            return id + "Keys" + requestId;
+            return id + "Key" + requestId;
+        }
+        private string KeySecretName(string id, string requestId)
+        {
+            return id + "Key" + requestId;
         }
         private string CrlSecretName(string id, X509Certificate2 certificate)
         {
@@ -919,6 +972,19 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
                 return new X509Certificate2(certBlob);
             }
             return null;
+        }
+
+        private string PrivateKeyFormatToContentType(string privateKeyFormat)
+        {
+            if (privateKeyFormat == "PFX")
+            {
+                return ContentTypePfx;
+            }
+            else if (privateKeyFormat == "PEM")
+            {
+                return ContentTypePem;
+            }
+            throw new Exception("Unknown Private Key format.");
         }
 
         private string _vaultBaseUrl;

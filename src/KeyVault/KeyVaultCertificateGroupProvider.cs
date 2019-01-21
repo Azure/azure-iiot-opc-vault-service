@@ -355,9 +355,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         }
 
         /// <summary>
-        /// Creates a new key pair with certificate offline and signs it with KeyVault.
+        /// Creates a new key pair with KeyVault and signs it with KeyVault.
         /// </summary>
-        public override async Task<X509Certificate2KeyPair> NewKeyPairRequestAsync(
+        public async Task<X509Certificate2KeyPair> NewKeyPairRequestKeyVaultAsync(
             ApplicationRecordDataType application,
             string subjectName,
             string[] domainNames,
@@ -368,7 +368,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
 
             DateTime notBefore = TrimmedNotBeforeDate();
             DateTime notAfter = notBefore.AddMonths(Configuration.DefaultCertificateLifetime);
-            // create new cert in HSM storage
+            // create new cert with KeyVault
             using (var signedCertWithPrivateKey = await _keyVaultServiceClient.CreateSignedKeyPairAsync(
                 Configuration.Id,
                 Certificate,
@@ -403,7 +403,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         /// <summary>
         /// Creates a new key pair with certificate offline and signs it with KeyVault.
         /// </summary>
-        public async Task<X509Certificate2KeyPair> NewKeyPairRequestOfflineAsync(
+        public override async Task<X509Certificate2KeyPair> NewKeyPairRequestAsync(
             ApplicationRecordDataType application,
             string subjectName,
             string[] domainNames,
@@ -457,9 +457,26 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
                     {
                         throw new ServiceResultException(StatusCodes.BadInvalidArgument, "Invalid private key format");
                     }
+
                     return new X509Certificate2KeyPair(new X509Certificate2(signedCertWithPrivateKey.RawData), privateKeyFormat, privateKey);
                 }
             }
+        }
+
+        /// <summary>
+        /// Stores the private key of a cert request in a Key Vault secret.
+        /// </summary>
+        public async Task ImportCertKeySecret(string id, string requestId, byte[] privateKey, string privateKeyFormat, CancellationToken ct = default(CancellationToken))
+        {
+            await _keyVaultServiceClient.ImportCertKey(id, requestId, privateKey, privateKeyFormat, ct);
+        }
+
+        /// <summary>
+        /// Load the private key of a cert request from Key Vault secret.
+        /// </summary>
+        public async Task<byte[]> LoadCertKeySecret(string id, string requestId, string privateKeyFormat, CancellationToken ct = default(CancellationToken))
+        {
+            return await _keyVaultServiceClient.LoadCertKey(id, requestId, privateKeyFormat, ct);
         }
 
         /// <summary>

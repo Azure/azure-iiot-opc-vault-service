@@ -216,6 +216,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
         /// <inheritdoc/>
         public async Task<Opc.Ua.Gds.Server.X509Certificate2KeyPair> NewKeyPairRequestAsync(
             string id,
+            string requestId,
             string applicationUri,
             string subjectName,
             string[] domainNames,
@@ -229,7 +230,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                 ApplicationNames = new Opc.Ua.LocalizedTextCollection(),
                 ApplicationUri = applicationUri
             };
-            return await certificateGroup.NewKeyPairRequestAsync(app, subjectName, domainNames, privateKeyFormat, privateKeyPassword).ConfigureAwait(false);
+            var keyPair = await certificateGroup.NewKeyPairRequestAsync(app, subjectName, domainNames, privateKeyFormat, privateKeyPassword).ConfigureAwait(false);
+            await certificateGroup.ImportCertKeySecret(id, requestId, keyPair.PrivateKey, keyPair.PrivateKeyFormat);
+            return keyPair;
         }
 
         /// <inheritdoc/>
@@ -250,6 +253,12 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                 await certificateGroup.GetCACrlAsync(id).ConfigureAwait(false)
             };
             return crlList;
+        }
+
+        public async Task<byte[]> LoadPrivateKeyAsync(string id, string requestId, string privateKeyFormat)
+        {
+            var certificateGroup = await KeyVaultCertificateGroupProvider.Create(_keyVaultServiceClient, id).ConfigureAwait(false);
+            return await certificateGroup.LoadCertKeySecret(id, requestId, privateKeyFormat);
         }
 
         /// <inheritdoc/>
