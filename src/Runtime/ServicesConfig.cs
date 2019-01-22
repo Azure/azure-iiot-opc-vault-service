@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------
+// ------------------------------------------------------------
 //  Copyright (c) Microsoft Corporation.  All rights reserved.
 //  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------
@@ -13,6 +13,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Runtime
         string KeyVaultBaseUrl { get; set; }
         string KeyVaultResourceId { get; set; }
         string CosmosDBEndpoint { get; set; }
+        string CosmosDBCollection { get; set; }
         string CosmosDBToken { get; set; }
         bool AutoApprove { get; set; }
     }
@@ -23,6 +24,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Runtime
         public ServicesConfig()
         {
             KeyVaultResourceId = "https://vault.azure.net";
+            CosmosDBCollection = "AppsAndCertRequests";
             AutoApprove = false;
         }
 
@@ -32,6 +34,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Runtime
         public string KeyVaultResourceId { get; set; }
         /// <inheritdoc/>
         public string CosmosDBEndpoint { get; set; }
+        /// <inheritdoc/>
+        public string CosmosDBCollection { get; set; }
         /// <inheritdoc/>
         public string CosmosDBToken { get; set; }
         /// <inheritdoc/>

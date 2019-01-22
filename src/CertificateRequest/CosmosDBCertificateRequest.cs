@@ -32,10 +32,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
         public readonly ExpandedNodeId DefaultHttpsGroupId;
         public readonly ExpandedNodeId DefaultUserTokenGroupId;
 
-        private readonly ILogger _log;
         internal IApplicationsDatabase ApplicationsDatabase;
         internal ICertificateGroup CertificateGroup;
         private readonly string _endpoint;
+        private readonly string _collectionId;
+        private readonly ILogger _log;
         private SecureString _authKeyOrResourceToken;
 
         public CosmosDBCertificateRequest(
@@ -47,6 +48,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             ApplicationsDatabase = database;
             CertificateGroup = certificateGroup;
             _endpoint = config.CosmosDBEndpoint;
+            _collectionId = config.CosmosDBCollection;
             _authKeyOrResourceToken = new SecureString();
             foreach (char ch in config.CosmosDBToken)
             {
@@ -67,7 +69,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
         public Task Initialize()
         {
             var db = new DocumentDBRepository(_endpoint, _authKeyOrResourceToken);
-            CertificateRequests = new DocumentDBCollection<CosmosDB.Models.CertificateRequest>(db);
+            CertificateRequests = new DocumentDBCollection<CosmosDB.Models.CertificateRequest>(db, _collectionId);
             return Task.CompletedTask;
         }
 

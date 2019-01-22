@@ -27,6 +27,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
         const int _defaultRecordsPerQuery = 10;
         private readonly ILogger _log;
         private readonly string _endpoint;
+        private readonly string _collectionId;
         private readonly SecureString _authKeyOrResourceToken;
         private readonly ILifetimeScope _scope = null;
 
@@ -37,6 +38,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
         {
             _scope = scope;
             _endpoint = config.CosmosDBEndpoint;
+            _collectionId = config.CosmosDBCollection;
             _authKeyOrResourceToken = new SecureString();
             foreach (char ch in config.CosmosDBToken)
             {
@@ -390,7 +392,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
         private void Initialize()
         {
             _db = new DocumentDBRepository(_endpoint, _authKeyOrResourceToken);
-            _applications = new DocumentDBCollection<Application>(_db);
+            _applications = new DocumentDBCollection<Application>(_db, _collectionId);
         }
 
         private string CreateServerQuery(uint startingRecordId, uint maxRecordsToQuery)
