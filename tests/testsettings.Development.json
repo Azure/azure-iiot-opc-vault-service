@@ -1,0 +1,71 @@
+﻿{
+  "OpcVault": {
+    //
+    // KeyVault service uri from Azure portal
+    //
+    "KeyVaultResourceId": "https://vault.azure.net",
+    "KeyVaultBaseUrl": "https://gdsvault-test.vault.azure.net",
+    // set to true if KeyVault has HSM option
+    "KeyVaultHSM": true
+    //
+    // CosmosDB service uri and token from Azure portal
+    //
+    //"CosmosDBEndpoint": "https://gdsvault.documents.azure.com:443/",
+    //"CosmosDBToken": "4V4KeQjLC6texZNM4odgaFDsZsGkgxOJBgfa3utK0HzZG0yvjI5YpSjYzuoQaq7SSKTbGGvC5ssqgmGHaioung=="
+  },
+
+  //
+  // Auth configuration
+  //
+  "Auth": {
+    //
+    // This can be changed to false, for example during development, to allow
+    // invalid/missing authorizations.
+    //
+    "Required": true,
+
+    //
+    // Identifies the security token service (STS) that constructs and
+    // returns the token. In the tokens that Azure AD returns, the
+    // issuer is sts.windows.net. The GUID in the Issuer claim value is
+    // the tenant ID of the Azure AD directory. The tenant ID is an
+    // immutable and reliable identifier of the directory. Used to verify
+    // that tokens are issued by Azure AD.
+    //
+    // When using Azure Active Directory, the format of the Issuer is:
+    // https://sts.windows.net/<tenant_Id>/
+    // example: issuer:
+    // https://sts.windows.net/fa01ade2-2365-4dd1-a084-a6ef027090fc/
+    //
+    // "TrustedIssuer": "https://sts.windows.net/72f988bf-86f1-41af-91ab-2d7cd011db47/",
+
+    //
+    // The authority to use to issue tokens, by default this is
+    // https://login.microsoftonline.com/.  Use to override for special
+    // setups.
+    //
+    "Authority": "https://login.microsoftonline.com/6e660ce4-d51a-4585-80c6-58035e212354",
+
+    //
+    // The optional tenant id. The tenant ID is an immutable and reliable
+    // identifier of the directory.
+    //
+    "TenantId": "6e660ce4-d51a-4585-80c6-58035e212354",
+
+    //
+    // The application id
+    //
+    "AppId": "f70b169e-8d98-40df-8581-f61fa48faa8f",
+
+    //
+    // The application secret for client credentials
+    //
+    "AppSecret": "ifhuwDuz+Wy4zgwvVG7xVqMsMnNQYtBLGEQrA+1DVvc=",
+
+    //
+    // When validating the token expiration, allows some clock skew
+    // Default: 2 minutes
+    //
+    "AllowedClockSkewSeconds": 300
+  }
+}
