@@ -139,7 +139,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         #region ICertificateGroupProvider
         public override async Task Init()
         {
-            await semaphoreSlim.WaitAsync();
+            await _semaphoreSlim.WaitAsync();
             try
             {
                 Opc.Ua.Utils.Trace(Opc.Ua.Utils.TraceMasks.Information, "InitializeCertificateGroup: {0}", m_subjectName);
@@ -166,7 +166,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
             }
             finally
             {
-                semaphoreSlim.Release();
+                _semaphoreSlim.Release();
             }
         }
 
@@ -176,7 +176,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         /// </summary>
         public async Task<bool> CreateImportedCACertificateAsync()
         {
-            await semaphoreSlim.WaitAsync();
+            await _semaphoreSlim.WaitAsync();
             try
             {
 
@@ -216,7 +216,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
             }
             finally
             {
-                semaphoreSlim.Release();
+                _semaphoreSlim.Release();
             }
         }
 
@@ -225,7 +225,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         /// </summary>
         public async Task<bool> CreateCACertificateAsync()
         {
-            await semaphoreSlim.WaitAsync();
+            await _semaphoreSlim.WaitAsync();
             try
             {
                 DateTime notBefore = TrimmedNotBeforeDate();
@@ -264,7 +264,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
             }
             finally
             {
-                semaphoreSlim.Release();
+                _semaphoreSlim.Release();
             }
         }
 
@@ -466,7 +466,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         /// <summary>
         /// Stores the private key of a cert request in a Key Vault secret.
         /// </summary>
-        public async Task ImportCertKeySecret(string id, string requestId, byte[] privateKey, string privateKeyFormat, CancellationToken ct = default(CancellationToken))
+        public async Task ImportCertKeySecret(string id, string requestId, byte[] privateKey, string privateKeyFormat, CancellationToken ct = default)
         {
             await _keyVaultServiceClient.ImportCertKey(id, requestId, privateKey, privateKeyFormat, ct);
         }
@@ -474,7 +474,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         /// <summary>
         /// Load the private key of a cert request from Key Vault secret.
         /// </summary>
-        public async Task<byte[]> LoadCertKeySecret(string id, string requestId, string privateKeyFormat, CancellationToken ct = default(CancellationToken))
+        public async Task<byte[]> LoadCertKeySecret(string id, string requestId, string privateKeyFormat, CancellationToken ct = default)
         {
             return await _keyVaultServiceClient.LoadCertKey(id, requestId, privateKeyFormat, ct);
         }
@@ -728,6 +728,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         private string _caCertSecretIdentifier;
         private string _caCertKeyIdentifier;
         private DateTime _lastUpdate;
-        private SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1, 1);
+        private SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
     }
 }

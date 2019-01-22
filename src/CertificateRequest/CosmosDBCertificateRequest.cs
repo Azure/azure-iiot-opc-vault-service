@@ -32,8 +32,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
         public readonly ExpandedNodeId DefaultHttpsGroupId;
         public readonly ExpandedNodeId DefaultUserTokenGroupId;
 
-        internal IApplicationsDatabase ApplicationsDatabase;
-        internal ICertificateGroup CertificateGroup;
+        internal IApplicationsDatabase _applicationsDatabase;
+        internal ICertificateGroup _certificateGroup;
         private readonly string _endpoint;
         private readonly string _dataBaseId;
         private readonly string _collectionId;
@@ -46,8 +46,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             IServicesConfig config,
             ILogger logger)
         {
-            ApplicationsDatabase = database;
-            CertificateGroup = certificateGroup;
+            _applicationsDatabase = database;
+            _certificateGroup = certificateGroup;
             _dataBaseId = config.CosmosDBDatabase;
             _endpoint = config.CosmosDBEndpoint;
             _collectionId = config.CosmosDBCollection;
@@ -71,7 +71,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
         public Task Initialize()
         {
             var db = new DocumentDBRepository(_endpoint, _dataBaseId, _authKeyOrResourceToken);
-            CertificateRequests = new DocumentDBCollection<CosmosDB.Models.CertificateRequest>(db, _collectionId);
+            _certificateRequests = new DocumentDBCollection<CosmosDB.Models.CertificateRequest>(db, _collectionId);
             return Task.CompletedTask;
         }
 
@@ -79,9 +79,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
         {
             try
             {
-                var onBehalfOfCertificateGroup = await CertificateGroup.OnBehalfOfRequest(request);
+                var onBehalfOfCertificateGroup = await _certificateGroup.OnBehalfOfRequest(request);
                 var certRequest = (CosmosDBCertificateRequest)this.MemberwiseClone();
-                certRequest.CertificateGroup = onBehalfOfCertificateGroup;
+                certRequest._certificateGroup = onBehalfOfCertificateGroup;
                 return certRequest;
             }
             catch (Exception ex)
@@ -99,7 +99,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             byte[] certificateSigningRequest,
             string authorityId)
         {
-            Application application = await ApplicationsDatabase.GetApplicationAsync(applicationId);
+            Application application = await _applicationsDatabase.GetApplicationAsync(applicationId);
             if (application == null)
             {
                 throw new ServiceResultException(StatusCodes.BadNotFound, "The ApplicationId does not refer to a valid application.");
@@ -137,7 +137,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
 
             if (isNew)
             {
-                await CertificateRequests.CreateAsync(request);
+                await _certificateRequests.CreateAsync(request);
             }
 
             return request.RequestId.ToString();
@@ -153,7 +153,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             string privateKeyPassword,
             string authorityId)
         {
-            Application application = await ApplicationsDatabase.GetApplicationAsync(applicationId);
+            Application application = await _applicationsDatabase.GetApplicationAsync(applicationId);
             if (application == null)
             {
                 throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
@@ -243,7 +243,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
 
             if (isNew)
             {
-                await CertificateRequests.CreateAsync(request);
+                await _certificateRequests.CreateAsync(request);
             }
 
             return request.RequestId.ToString();
@@ -260,7 +260,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             do
             {
                 retryUpdate = false;
-                CertificateRequest request = await CertificateRequests.GetAsync(reqId);
+                CertificateRequest request = await _certificateRequests.GetAsync(reqId);
 
                 if (request == null)
                 {
@@ -272,7 +272,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                     throw new ServiceResultException(StatusCodes.BadInvalidState);
                 }
 
-                Application application = await ApplicationsDatabase.GetApplicationAsync(request.ApplicationId);
+                Application application = await _applicationsDatabase.GetApplicationAsync(request.ApplicationId);
                 if (application == null)
                 {
                     throw new ServiceResultException(StatusCodes.BadNodeIdUnknown, "Unknown application id");
@@ -295,7 +295,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                     {
                         try
                         {
-                            certificate = await CertificateGroup.SigningRequestAsync(
+                            certificate = await _certificateGroup.SigningRequestAsync(
                                 request.CertificateGroupId,
                                 application.ApplicationUri,
                                 request.SigningRequest
@@ -320,7 +320,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                         X509Certificate2KeyPair newKeyPair = null;
                         try
                         {
-                            newKeyPair = await CertificateGroup.NewKeyPairRequestAsync(
+                            newKeyPair = await _certificateGroup.NewKeyPairRequestAsync(
                                 request.CertificateGroupId,
                                 requestId,
                                 application.ApplicationUri,
@@ -348,7 +348,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                 request.ApproveRejectTime = DateTime.UtcNow;
                 try
                 {
-                    await CertificateRequests.UpdateAsync(reqId, request, request.ETag);
+                    await _certificateRequests.UpdateAsync(reqId, request, request.ETag);
                 }
                 catch (DocumentClientException dce)
                 {
@@ -371,7 +371,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             {
                 retryUpdate = false;
 
-                CertificateRequest request = await CertificateRequests.GetAsync(reqId);
+                CertificateRequest request = await _certificateRequests.GetAsync(reqId);
                 if (request == null)
                 {
                     throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
@@ -391,7 +391,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                 request.AcceptTime = DateTime.UtcNow;
                 try
                 {
-                    await CertificateRequests.UpdateAsync(request.RequestId, request, request.ETag);
+                    await _certificateRequests.UpdateAsync(request.RequestId, request, request.ETag);
                 }
                 catch (DocumentClientException dce)
                 {
@@ -412,7 +412,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             {
                 retryUpdate = false;
 
-                CertificateRequest request = await CertificateRequests.GetAsync(reqId);
+                CertificateRequest request = await _certificateRequests.GetAsync(reqId);
                 if (request == null)
                 {
                     throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
@@ -427,7 +427,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                 request.DeleteTime = DateTime.UtcNow;
                 try
                 {
-                    await CertificateRequests.UpdateAsync(request.RequestId, request, request.ETag);
+                    await _certificateRequests.UpdateAsync(request.RequestId, request, request.ETag);
                 }
                 catch (DocumentClientException dce)
                 {
@@ -447,7 +447,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             do
             {
                 retryUpdate = false;
-                CertificateRequest request = await CertificateRequests.GetAsync(reqId);
+                CertificateRequest request = await _certificateRequests.GetAsync(reqId);
 
                 if (request == null)
                 {
@@ -473,7 +473,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                 try
                 {
                     var cert = new X509Certificate2(request.Certificate);
-                    var crl = await CertificateGroup.RevokeCertificateAsync(request.CertificateGroupId, cert);
+                    var crl = await _certificateGroup.RevokeCertificateAsync(request.CertificateGroupId, cert);
                 }
                 catch (Exception e)
                 {
@@ -488,7 +488,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
 
                 try
                 {
-                    await CertificateRequests.UpdateAsync(reqId, request, request.ETag);
+                    await _certificateRequests.UpdateAsync(reqId, request, request.ETag);
                 }
                 catch (DocumentClientException dce)
                 {
@@ -504,7 +504,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
         {
             Guid reqId = GetIdFromString(requestId);
 
-            CertificateRequest request = await CertificateRequests.GetAsync(reqId);
+            CertificateRequest request = await _certificateRequests.GetAsync(reqId);
             if (request == null)
             {
                 throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
@@ -516,13 +516,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                 throw new ServiceResultException(StatusCodes.BadInvalidState);
             }
 
-            await CertificateRequests.DeleteAsync(request.RequestId);
+            await _certificateRequests.DeleteAsync(request.RequestId);
         }
 
         public async Task RevokeGroupAsync(string groupId, bool? allVersions)
         {
             // TODO: implement all versions to renew all CSR for all CA versions
-            var deletedRequests = await CertificateRequests.GetAsync(x => x.State == CertificateRequestState.Deleted);
+            var deletedRequests = await _certificateRequests.GetAsync(x => x.State == CertificateRequestState.Deleted);
             if (deletedRequests == null ||
                 deletedRequests.Count() == 0)
             {
@@ -549,7 +549,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                 }
             }
 
-            await CertificateGroup.RevokeCertificatesAsync(groupId, certCollection);
+            await _certificateGroup.RevokeCertificatesAsync(groupId, certCollection);
 
             foreach (var reqId in deletedRequests)
             {
@@ -557,7 +557,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                 do
                 {
                     retryUpdate = false;
-                    CertificateRequest request = await CertificateRequests.GetAsync(reqId.RequestId);
+                    CertificateRequest request = await _certificateRequests.GetAsync(reqId.RequestId);
 
                     if (request == null)
                     {
@@ -584,7 +584,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
 
                     try
                     {
-                        await CertificateRequests.UpdateAsync(reqId.RequestId, request, request.ETag);
+                        await _certificateRequests.UpdateAsync(reqId.RequestId, request, request.ETag);
                     }
                     catch (DocumentClientException dce)
                     {
@@ -604,13 +604,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
         {
             Guid reqId = GetIdFromString(requestId);
 
-            Application application = await ApplicationsDatabase.GetApplicationAsync(applicationId);
+            Application application = await _applicationsDatabase.GetApplicationAsync(applicationId);
             if (application == null)
             {
                 throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
             }
 
-            CertificateRequest request = await CertificateRequests.GetAsync(reqId);
+            CertificateRequest request = await _certificateRequests.GetAsync(reqId);
             if (request == null)
             {
                 throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
@@ -634,7 +634,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             }
 
             // get private key
-            byte[] privateKey = await CertificateGroup.LoadPrivateKeyAsync(request.CertificateGroupId, requestId, request.PrivateKeyFormat);
+            byte[] privateKey = await _certificateGroup.LoadPrivateKeyAsync(request.CertificateGroupId, requestId, request.PrivateKeyFormat);
 
             return new FinishRequestResultModel(
                 request.State,
@@ -654,7 +654,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
         {
             Guid reqId = GetIdFromString(requestId);
 
-            CertificateRequest request = await CertificateRequests.GetAsync(reqId);
+            CertificateRequest request = await _certificateRequests.GetAsync(reqId);
             if (request == null)
             {
                 throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
@@ -695,19 +695,19 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             IEnumerable<CertificateRequest> requests;
             if (appId == null && state == null)
             {
-                (nextPageLink, requests) = await CertificateRequests.GetPageAsync(x => x.State < CertificateRequestState.Deleted, nextPageLink, maxResults);
+                (nextPageLink, requests) = await _certificateRequests.GetPageAsync(x => x.State < CertificateRequestState.Deleted, nextPageLink, maxResults);
             }
             else if (appId != null && state != null)
             {
-                (nextPageLink, requests) = await CertificateRequests.GetPageAsync(x => x.ApplicationId == appId && x.State == state, nextPageLink, maxResults);
+                (nextPageLink, requests) = await _certificateRequests.GetPageAsync(x => x.ApplicationId == appId && x.State == state, nextPageLink, maxResults);
             }
             else if (appId != null)
             {
-                (nextPageLink, requests) = await CertificateRequests.GetPageAsync(x => x.ApplicationId == appId, nextPageLink, maxResults);
+                (nextPageLink, requests) = await _certificateRequests.GetPageAsync(x => x.ApplicationId == appId, nextPageLink, maxResults);
             }
             else
             {
-                (nextPageLink, requests) = await CertificateRequests.GetPageAsync(x => x.State == state, nextPageLink, maxResults);
+                (nextPageLink, requests) = await _certificateRequests.GetPageAsync(x => x.State == state, nextPageLink, maxResults);
             }
             List<ReadRequestResultModel> result = new List<ReadRequestResultModel>();
             foreach (CertificateRequest request in requests)
@@ -875,8 +875,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
         #endregion
 
         #region Private Fields
-        private DateTime queryCounterResetTime = DateTime.UtcNow;
-        private IDocumentDBCollection<CertificateRequest> CertificateRequests;
+        private DateTime _queryCounterResetTime = DateTime.UtcNow;
+        private IDocumentDBCollection<CertificateRequest> _certificateRequests;
         #endregion
     }
 }
