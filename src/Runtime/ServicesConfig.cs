@@ -4,7 +4,6 @@
 // ------------------------------------------------------------
 
 
-using Microsoft.Azure.IIoT.Utils;
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Runtime
 {
@@ -13,6 +12,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Runtime
         string KeyVaultBaseUrl { get; set; }
         string KeyVaultResourceId { get; set; }
         string CosmosDBEndpoint { get; set; }
+        string CosmosDBDatabase { get; set; }
         string CosmosDBCollection { get; set; }
         string CosmosDBToken { get; set; }
         bool AutoApprove { get; set; }
@@ -24,6 +24,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Runtime
         public ServicesConfig()
         {
             KeyVaultResourceId = "https://vault.azure.net";
+            CosmosDBDatabase = "OpcVault";
             CosmosDBCollection = "AppsAndCertRequests";
             AutoApprove = false;
         }
@@ -34,6 +35,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Runtime
         public string KeyVaultResourceId { get; set; }
         /// <inheritdoc/>
         public string CosmosDBEndpoint { get; set; }
+        /// <inheritdoc/>
+        public string CosmosDBDatabase { get; set; }
         /// <inheritdoc/>
         public string CosmosDBCollection { get; set; }
         /// <inheritdoc/>

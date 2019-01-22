@@ -35,6 +35,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
         internal IApplicationsDatabase ApplicationsDatabase;
         internal ICertificateGroup CertificateGroup;
         private readonly string _endpoint;
+        private readonly string _dataBaseId;
         private readonly string _collectionId;
         private readonly ILogger _log;
         private SecureString _authKeyOrResourceToken;
@@ -47,6 +48,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
         {
             ApplicationsDatabase = database;
             CertificateGroup = certificateGroup;
+            _dataBaseId = config.CosmosDBDatabase;
             _endpoint = config.CosmosDBEndpoint;
             _collectionId = config.CosmosDBCollection;
             _authKeyOrResourceToken = new SecureString();
@@ -68,7 +70,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
         #region ICertificateRequest
         public Task Initialize()
         {
-            var db = new DocumentDBRepository(_endpoint, _authKeyOrResourceToken);
+            var db = new DocumentDBRepository(_endpoint, _dataBaseId, _authKeyOrResourceToken);
             CertificateRequests = new DocumentDBCollection<CosmosDB.Models.CertificateRequest>(db, _collectionId);
             return Task.CompletedTask;
         }
