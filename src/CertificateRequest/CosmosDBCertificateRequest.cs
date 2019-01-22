@@ -365,7 +365,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                 string requestId)
         {
             Guid reqId = GetIdFromString(requestId);
-
             bool retryUpdate;
             do
             {
@@ -381,6 +380,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                 {
                     throw new ServiceResultException(StatusCodes.BadInvalidState);
                 }
+
+                await _certificateGroup.AcceptPrivateKeyAsync(request.CertificateGroupId, requestId);
 
                 request.State = CertificateRequestState.Accepted;
 
@@ -401,6 +402,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                     }
                 }
             } while (retryUpdate);
+
         }
 
         public async Task DeleteAsync(string requestId)
@@ -420,6 +422,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
 
                 request.State = CertificateRequestState.Deleted;
 
+                await _certificateGroup.DeletePrivateKeyAsync(request.CertificateGroupId, requestId);
+
                 // erase information which is not required anymore
                 request.SigningRequest = null;
                 request.PrivateKeyFormat = null;
@@ -437,6 +441,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                     }
                 }
             } while (retryUpdate);
+
         }
 
         public async Task RevokeAsync(string requestId)
@@ -545,7 +550,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                     {
                         // skip 
                     }
-                    
+
                 }
             }
 
@@ -686,7 +691,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
 
         }
 
-        public async Task<(string,ReadRequestResultModel[])> QueryPageAsync(
+        public async Task<(string, ReadRequestResultModel[])> QueryPageAsync(
             string appId,
             CertificateRequestState? state,
             string nextPageLink,

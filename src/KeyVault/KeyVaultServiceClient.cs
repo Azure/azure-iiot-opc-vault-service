@@ -671,6 +671,28 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         }
 
         /// <summary>
+        /// Accept Private Key for certificate in group.
+        /// </summary>
+        public async Task AcceptCertKey(string id, string requestId, CancellationToken ct = default)
+        {
+            string secretIdentifier = KeySecretName(id, requestId);
+            var secretAttributes = new SecretAttributes
+            {
+                Enabled = false
+            };
+            await _keyVaultClient.UpdateSecretAsync(_vaultBaseUrl, secretIdentifier, secretAttributes, null, ct).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Delete Private Key for certificate in group.
+        /// </summary>
+        public async Task DeleteCertKey(string id, string requestId, CancellationToken ct = default)
+        {
+            string secretIdentifier = KeySecretName(id, requestId);
+            await _keyVaultClient.DeleteSecretAsync(_vaultBaseUrl, secretIdentifier, ct).ConfigureAwait(false);
+        }
+
+        /// <summary>
         /// Creates a trust list with all certs and crls in issuer and trusted list.
         /// i) First load all certs and crls tagged with id==Issuer or id==Trusted.
         /// ii) Then walk all CA cert versions and load all certs tagged with id==Issuer or id==Trusted.
@@ -976,11 +998,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
 
         private string PrivateKeyFormatToContentType(string privateKeyFormat)
         {
-            if (privateKeyFormat == "PFX")
+            if (privateKeyFormat.Equals("PFX", StringComparison.OrdinalIgnoreCase))
             {
                 return ContentTypePfx;
             }
-            else if (privateKeyFormat == "PEM")
+            else if (privateKeyFormat.Equals("PEM", StringComparison.OrdinalIgnoreCase))
             {
                 return ContentTypePem;
             }

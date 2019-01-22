@@ -480,6 +480,22 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         }
 
         /// <summary>
+        /// Accept the private key of a cert request from Key Vault secret.
+        /// </summary>
+        public async Task AcceptCertKeySecret(string id, string requestId, CancellationToken ct = default)
+        {
+            await _keyVaultServiceClient.AcceptCertKey(id, requestId, ct);
+        }
+
+        /// <summary>
+        /// Delete the private key of a cert request from Key Vault secret.
+        /// </summary>
+        public async Task DeleteCertKeySecret(string id, string requestId, CancellationToken ct = default)
+        {
+            await _keyVaultServiceClient.DeleteCertKey(id, requestId, ct);
+        }
+
+        /// <summary>
         /// Creates a KeyVault signed certficate from signing request.
         /// </summary>
         public override async Task<X509Certificate2> SigningRequestAsync(

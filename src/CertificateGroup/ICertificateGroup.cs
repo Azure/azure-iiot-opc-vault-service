@@ -51,5 +51,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             );
 
         Task<byte[]> LoadPrivateKeyAsync(string id, string requestId, string privateKeyFormat);
+        Task AcceptPrivateKeyAsync(string id, string requestId);
+        Task DeletePrivateKeyAsync(string id, string requestId);
     }
 }

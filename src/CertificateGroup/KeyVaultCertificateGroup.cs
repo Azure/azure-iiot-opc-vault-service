@@ -255,10 +255,25 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             return crlList;
         }
 
+        /// <inheritdoc/>
         public async Task<byte[]> LoadPrivateKeyAsync(string id, string requestId, string privateKeyFormat)
         {
             var certificateGroup = await KeyVaultCertificateGroupProvider.Create(_keyVaultServiceClient, id).ConfigureAwait(false);
             return await certificateGroup.LoadCertKeySecret(id, requestId, privateKeyFormat);
+        }
+
+        /// <inheritdoc/>
+        public async Task AcceptPrivateKeyAsync(string id, string requestId)
+        {
+            var certificateGroup = await KeyVaultCertificateGroupProvider.Create(_keyVaultServiceClient, id).ConfigureAwait(false);
+            await certificateGroup.AcceptCertKeySecret(id, requestId);
+        }
+
+        /// <inheritdoc/>
+        public async Task DeletePrivateKeyAsync(string id, string requestId)
+        {
+            var certificateGroup = await KeyVaultCertificateGroupProvider.Create(_keyVaultServiceClient, id).ConfigureAwait(false);
+            await certificateGroup.DeleteCertKeySecret(id, requestId);
         }
 
         /// <inheritdoc/>
