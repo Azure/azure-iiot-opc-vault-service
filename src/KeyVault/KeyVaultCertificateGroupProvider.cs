@@ -677,13 +677,15 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
 
         private static Dictionary<NodeId, string> CertTypeMap()
         {
-            var certTypeMap = new Dictionary<NodeId, string>();
-            // FUTURE: support more cert types
-            //CertTypeMap.Add(Opc.Ua.ObjectTypeIds.HttpsCertificateType, "HttpsCertificateType");
-            //CertTypeMap.Add(Opc.Ua.ObjectTypeIds.UserCredentialCertificateType, "UserCredentialCertificateType");
-            certTypeMap.Add(Opc.Ua.ObjectTypeIds.ApplicationCertificateType, "ApplicationCertificateType");
-            //CertTypeMap.Add(Opc.Ua.ObjectTypeIds.RsaMinApplicationCertificateType, "RsaMinApplicationCertificateType");
-            certTypeMap.Add(Opc.Ua.ObjectTypeIds.RsaSha256ApplicationCertificateType, "RsaSha256ApplicationCertificateType");
+            var certTypeMap = new Dictionary<NodeId, string>
+            {
+                // FUTURE: support more cert types
+                //{ Opc.Ua.ObjectTypeIds.HttpsCertificateType, "HttpsCertificateType" },
+                //{ Opc.Ua.ObjectTypeIds.UserCredentialCertificateType, "UserCredentialCertificateType" },
+                { Opc.Ua.ObjectTypeIds.ApplicationCertificateType, "ApplicationCertificateType" },
+                //{ Opc.Ua.ObjectTypeIds.RsaMinApplicationCertificateType, "RsaMinApplicationCertificateType" },
+                { Opc.Ua.ObjectTypeIds.RsaSha256ApplicationCertificateType, "RsaSha256ApplicationCertificateType" }
+            };
             return certTypeMap;
         }
 
