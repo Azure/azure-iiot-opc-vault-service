@@ -62,7 +62,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "module", "module", "{0B0B4C
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "app", "app", "{5B2AE5F1-67F0-409B-96D1-B0D64D9313A9}"
 	ProjectSection(SolutionItems) = preProject
-		app\Dockerfile = app\Dockerfile
+		Dockerfile = Dockerfile
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "windows", "windows", "{26707714-63D1-4D26-A47A-6A2B276A9878}"
