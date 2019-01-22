@@ -20,3 +20,4 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app .
 ENTRYPOINT ["dotnet", "Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.dll"]
+
