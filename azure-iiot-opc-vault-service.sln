@@ -59,17 +59,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "service", "service", "{F8F0
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "module", "module", "{0B0B4CD4-C53B-4988-9EC4-1BF510DD6978}"
+	ProjectSection(SolutionItems) = preProject
+		Dockerfile.module = Dockerfile.module
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "app", "app", "{5B2AE5F1-67F0-409B-96D1-B0D64D9313A9}"
 	ProjectSection(SolutionItems) = preProject
-		Dockerfile = Dockerfile
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "windows", "windows", "{26707714-63D1-4D26-A47A-6A2B276A9878}"
-	ProjectSection(SolutionItems) = preProject
-		module\docker\windows\dockerbuild.bat = module\docker\windows\dockerbuild.bat
-		module\docker\windows\Dockerfile = module\docker\windows\Dockerfile
-		module\docker\windows\dockerrun.bat = module\docker\windows\dockerrun.bat
+		Dockerfile.app = Dockerfile.app
 	EndProjectSection
 EndProject
 Global
@@ -107,7 +103,6 @@ Global
 		{F8F0B5F3-1075-4727-A0D1-5BA05E7218A7} = {1724C572-75C3-4A4C-A710-3D8C3A3223BF}
 		{0B0B4CD4-C53B-4988-9EC4-1BF510DD6978} = {1724C572-75C3-4A4C-A710-3D8C3A3223BF}
 		{5B2AE5F1-67F0-409B-96D1-B0D64D9313A9} = {1724C572-75C3-4A4C-A710-3D8C3A3223BF}
-		{26707714-63D1-4D26-A47A-6A2B276A9878} = {0B0B4CD4-C53B-4988-9EC4-1BF510DD6978}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F947AAE7-2D6B-43C0-B5E6-824B8E4D7992}

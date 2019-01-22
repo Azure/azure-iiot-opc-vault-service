@@ -936,8 +936,8 @@ Write-Host "--secret="$aadConfig.ModuleSecret
 Write-Host "--tenantid="$aadConfig.TenantId
 
 # prepare the GDS module docker image
-cd ..\module\docker\windows
-.\dockerbuild.bat
+cd ..
+docker build --file .\Dockerfile.module -t edgeopcvault .
 cd $deploydir
 
 # create batch file for user to start GDS docker container
