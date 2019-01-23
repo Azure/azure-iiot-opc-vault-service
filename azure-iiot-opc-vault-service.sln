@@ -9,9 +9,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
 		common.props = common.props
-		CONTRIBUTING.md = CONTRIBUTING.md
-		DEVELOPMENT.md = DEVELOPMENT.md
+		Directory.Build.props = Directory.Build.props
 		license.txt = license.txt
+		NuGet.Config = NuGet.Config
 		project.props = project.props
 		version.props = version.props
 	EndProjectSection
@@ -28,6 +28,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.IIoT.OpcUa.
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{E9C6A792-1D70-4DE9-B5FB-8D8BCAA223EE}"
 	ProjectSection(SolutionItems) = preProject
+		CONTRIBUTING.md = CONTRIBUTING.md
+		DEVELOPMENT.md = DEVELOPMENT.md
 		docs\howto-deploy-services.md = docs\howto-deploy-services.md
 		docs\howto-run-services-locally.md = docs\howto-run-services-locally.md
 		README.md = README.md
@@ -49,23 +51,11 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docker", "docker", "{1724C572-75C3-4A4C-A710-3D8C3A3223BF}"
 	ProjectSection(SolutionItems) = preProject
 		.dockerignore = .dockerignore
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "service", "service", "{F8F0B5F3-1075-4727-A0D1-5BA05E7218A7}"
-	ProjectSection(SolutionItems) = preProject
-		src\Dockerfile = src\Dockerfile
-		src\Dockerfile.Windows = src\Dockerfile.Windows
-		src\Dockerfile.Windows-Server2016 = src\Dockerfile.Windows-Server2016
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "module", "module", "{0B0B4CD4-C53B-4988-9EC4-1BF510DD6978}"
-	ProjectSection(SolutionItems) = preProject
-		Dockerfile.module = Dockerfile.module
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "app", "app", "{5B2AE5F1-67F0-409B-96D1-B0D64D9313A9}"
-	ProjectSection(SolutionItems) = preProject
+		Dockerfile = Dockerfile
 		Dockerfile.app = Dockerfile.app
+		Dockerfile.module = Dockerfile.module
+		Dockerfile.Windows = Dockerfile.Windows
+		Dockerfile.Windows-Server2016 = Dockerfile.Windows-Server2016
 	EndProjectSection
 EndProject
 Global
@@ -100,9 +90,6 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{ECDA661E-A357-4472-B98F-3E0D807965A9} = {A3FF1EEF-11DA-470B-9C98-B043B3CB4DE7}
-		{F8F0B5F3-1075-4727-A0D1-5BA05E7218A7} = {1724C572-75C3-4A4C-A710-3D8C3A3223BF}
-		{0B0B4CD4-C53B-4988-9EC4-1BF510DD6978} = {1724C572-75C3-4A4C-A710-3D8C3A3223BF}
-		{5B2AE5F1-67F0-409B-96D1-B0D64D9313A9} = {1724C572-75C3-4A4C-A710-3D8C3A3223BF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F947AAE7-2D6B-43C0-B5E6-824B8E4D7992}

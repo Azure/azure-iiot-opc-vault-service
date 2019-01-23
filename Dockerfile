@@ -1,12 +1,13 @@
-FROM microsoft/dotnet:2.1-aspnetcore-runtime-nanoserver-sac2016 AS base
+FROM microsoft/dotnet:2.1-aspnetcore-runtime AS base
 WORKDIR /app
 EXPOSE 80
 
-FROM microsoft/dotnet:2.1-sdk-nanoserver-sac2016 AS build
+FROM microsoft/dotnet:2.1-sdk AS build
 WORKDIR /src
-COPY Microsoft.Azure.IIoT.OpcUa.Services.Vault.csproj src/
-RUN dotnet restore -nowarn:msb3202,nu1503 src/Microsoft.Azure.IIoT.OpcUa.Services.Vault.csproj
-COPY . src/
+COPY src/Microsoft.Azure.IIoT.OpcUa.Services.Vault.csproj src/
+COPY NuGet.Config NuGet.Config
+RUN dotnet restore --configfile NuGet.Config -nowarn:msb3202,nu1503 src/Microsoft.Azure.IIoT.OpcUa.Services.Vault.csproj
+COPY src/ src/
 WORKDIR /src/src
 RUN dotnet build Microsoft.Azure.IIoT.OpcUa.Services.Vault.csproj -c Release -o /app
 
