@@ -59,9 +59,9 @@ In case you run into issues please follow the steps [below](#Troubleshooting-dep
 
 As a sidenote, it is possible to redeploy a build with exactly the same settings. Be aware that such an operation renews all application secrets and may reset some settings in the AAD application registrations.
 
-## [How to use the Certificate Management Service](howto-use-cert-services.md)
+## How to use the Certificate Management Service
 
-Please find an article about how to use the Certificate Management Service [here](howto-use-cert-services.md).
+Please find an article describing how to use the Certificate Management Service [here](howto-use-cert-services.md).
 
 ## Troubleshooting deployment failures
 

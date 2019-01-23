@@ -4,10 +4,10 @@ This article explains how to manage the OPC UA Certificate Management Service in
 
 ## Prerequisites
 
-### [How to deploy the Certificate Management Service](howto-deploy-services.md)
+### How to deploy the Certificate Management Service
 
 First of all, the service needs to be deployed to the Azure cloud.
-Please find an article about how to deploy the Certificate Management Service [here](howto-deploy-services.md).
+Please find an article describing how to deploy the Certificate Management Service [here](howto-deploy-services.md).
 
 ### Create the root CA certificate
 
