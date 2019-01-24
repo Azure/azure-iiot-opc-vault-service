@@ -464,7 +464,7 @@
                         "AUTH__AUDIENCE": "[parameters('aadAudience')]",
                         "AUTH__TENANTID": "[parameters('aadTenantId')]",
                         "AUTH__TRUSTEDISSUER": "[parameters('aadTrustedIssuer')]",
-                        "SWAGGER__ENABLED": "[if (equals(parameters('environment'),'Development'),'True','False')]",
+                        "SWAGGER__ENABLED": "True",
                         "SWAGGER__APPID": "[parameters('aadClientId')]",
                         //"SWAGGER__APPSECRET": "[parameters('aadClientSecret')]",
                         "WEBSITE_RUN_FROM_PACKAGE": "[if (equals(parameters('environment'),'Development'),'0','1')]"
