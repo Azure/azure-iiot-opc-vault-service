@@ -23,6 +23,9 @@
  .PARAMETER withAutoApprove
     Whether to enable auto approval - defaults to $false.
 
+ .PARAMETER development
+    Whether to deploy for development or production - defaults to $false (production).
+
  .PARAMETER tenantId
     AD tenant to use. 
 
@@ -36,6 +39,7 @@ param(
     [string] $subscriptionId,
     [string] $tenantId,
     [bool] $withAutoApprove = $false,
+    [bool] $development = $false,
     [ValidateSet("AzureCloud")] [string] $environmentName = "AzureCloud"
 )
 
@@ -64,8 +68,7 @@ Function SelectEnvironment() {
                     -ManagementPortalUrl http://go.microsoft.com/fwlink/?LinkId=254433
             }
             # locations currently limited by Application Insights
-            # TODO: test "Canada Central", "Central India", "Southeast Asia")
-            $script:locations = @("East US", "West US 2", "North Europe", "West Europe")
+            $script:locations = @("East US", "West US 2", "North Europe", "West Europe", "Canada Central", "Central India", "Southeast Asia")
         }
         default {
             throw ("'{0}' is not a supported Azure Cloud environment" -f $script:environmentName)
@@ -696,10 +699,13 @@ Function GetAzureADApplicationConfig() {
         # Update client application to add reply urls required permissions.
         #
         $replyUrls = New-Object System.Collections.Generic.List[System.String]
-        $replyUrls.Add("https://localhost:44342/signin-oidc")
-        $replyUrls.Add("http://localhost:44342/signin-oidc")
-        $replyUrls.Add("https://localhost:58801/oauth2-redirect.html")
-        $replyUrls.Add("http://localhost:58801/oauth2-redirect.html")
+        #if ($development)
+        {
+            $replyUrls.Add("https://localhost:44342/signin-oidc")
+            $replyUrls.Add("http://localhost:44342/signin-oidc")
+            $replyUrls.Add("https://localhost:58801/oauth2-redirect.html")
+            $replyUrls.Add("http://localhost:58801/oauth2-redirect.html")
+        }
         $requiredResourcesAccess = `
             New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.RequiredResourceAccess]
         $requiredPermissions = GetRequiredPermissions -servicePrincipal $serviceServicePrincipal `
@@ -851,6 +857,12 @@ $deleteOnErrorPrompt = GetOrCreateResourceGroup
 $aadConfig = GetAzureADApplicationConfig 
 $webAppName = $script:resourceGroupName + "-app"
 $webServiceName = $script:resourceGroupName + "-service"
+$aspenvironment = "Production"
+
+if ($development)
+{
+    $aspenvironment = "Development"
+}
 
 # the initial group configuration is only set once
 if ($deleteOnErrorPrompt)
@@ -865,7 +877,7 @@ try {
         -interactive $script:interactive -aadConfig $aadConfig `
         -webAppName $webAppName -webServiceName $webServiceName `
         -groupsConfig $groupsConfig -autoApprove $withAutoApprove `
-        -environment "Development"
+        -environment $aspenvironment
     Write-Host "Deployment succeeded."
 }
 catch {
@@ -901,19 +913,24 @@ catch {
 # publishing slot
 $slotParameters = @{ Slot = "Production" }
 $deploydir = pwd
+$buildConfig = "Release"
+if ($development)
+{
+    $buildConfig = "Debug"
+}
 
 # build and publish the service webapp
 Write-Host 'Publish service'
 $publishFolder = Join-Path -Path $deploydir -ChildPath "\service"
 if(Test-path $publishFolder) {Remove-Item -Recurse -Force $publishFolder}
-dotnet publish -c Debug -o $publishFolder ..\src\Microsoft.Azure.IIoT.OpcUa.Services.Vault.csproj
+dotnet publish -c $buildConfig -o $publishFolder ..\src\Microsoft.Azure.IIoT.OpcUa.Services.Vault.csproj
 ZipDeploy $resourceGroupName $webServiceName $publishFolder $slotParameters
 
 # build and publish the client webapp
 Write-Host 'Publish application'
 $publishFolder = Join-Path -Path $deploydir -ChildPath "\app"
 if(Test-path $publishFolder) {Remove-Item -Recurse -Force $publishFolder}
-dotnet publish -c Debug -o $publishFolder ..\app\Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.csproj
+dotnet publish -c $buildConfig -o $publishFolder ..\app\Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.csproj
 ZipDeploy $resourceGroupName $webAppName $publishFolder $slotParameters
 
 # build configuration options for module
@@ -927,13 +944,16 @@ $moduleConfiguration += ' --tenantid="'+$($aadConfig.TenantId)+'"'
 $moduleConfigPath = Join-Path -Path $deploydir -ChildPath "$($resourceGroupName).module.config"
 Write-Output $moduleConfiguration | Out-File -FilePath $moduleConfigPath -Encoding ascii
 
-# output information
-Write-Host "GDS module configuration:"
-Write-Host "--vault="$serviceUrls[1]
-Write-Host "--resource="$aadConfig.ServiceId
-Write-Host "--clientid="$aadConfig.ModuleId
-Write-Host "--secret="$aadConfig.ModuleSecret
-Write-Host "--tenantid="$aadConfig.TenantId
+if ($development)
+{
+    # output information
+    Write-Host "GDS module configuration:"
+    Write-Host "--vault="$serviceUrls[1]
+    Write-Host "--resource="$aadConfig.ServiceId
+    Write-Host "--clientid="$aadConfig.ModuleId
+    Write-Host "--secret="$aadConfig.ModuleSecret
+    Write-Host "--tenantid="$aadConfig.TenantId
+}
 
 # prepare the GDS module docker image
 cd ..
@@ -941,7 +961,12 @@ docker build --file .\Dockerfile.module -t edgeopcvault .
 cd $deploydir
 
 # create batch file for user to start GDS docker container
-$dockerrun = 'docker run -it -p 58850-58852:58850-58852 -e 58850-58852 -h %COMPUTERNAME% -v "/c/GDS:/root/.local/share/Microsoft/GDS" edgeopcvault:latest '
+$dockerrun = 'docker run -it -p 58850-58852:58850-58852 -e 58850-58852 -h %COMPUTERNAME%'
+if ($development)
+{
+    $dockerrun += ' -v "/c/GDS:/root/.local/share/Microsoft/GDS"'
+}
+$dockerrun += ' edgeopcvault:latest '
 $dockerrun += $moduleConfiguration
 $dockerrunfilename = ".\"+$resourceGroupName+"-dockergds.cmd"
 Write-Output $dockerrun | Out-File -FilePath $dockerrunfilename -Encoding ascii

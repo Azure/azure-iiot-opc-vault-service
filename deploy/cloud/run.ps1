@@ -168,6 +168,9 @@ $webAppPortalUrl = $deployment.Outputs["webAppPortalUrl"].Value
 $webAppServiceUrl = $deployment.Outputs["webAppServiceUrl"].Value
 $webAppPortalName = $deployment.Outputs["webAppPortalName"].Value
 $webAppServiceName = $deployment.Outputs["webAppServiceName"].Value
+$keyVaultBaseUrl = $deployment.Outputs["keyVaultBaseUrl"].Value
+$opcVaultBaseUrl = $deployment.Outputs["opcVaultBaseUrl"].Value
+$cosmosDBEndpoint = $deployment.Outputs["cosmosDBEndpoint"].Value
 
 if ($aadConfig -and $aadConfig.ClientObjectId) {
     # 
