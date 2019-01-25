@@ -119,13 +119,6 @@
                 "description": "Default certificate group configuration. (JSON)"
             }
         },
-        "autoApprove": {
-            "type": "string",
-            "defaultValue": "false",
-            "metadata": {
-                "description": "Preset service for certificate auto approval."
-            }
-        },
         "environment": {
             "type": "string",
             "defaultValue": "Production",
@@ -401,7 +394,6 @@
                         "AZUREAD__TENANTID": "[parameters('aadTenantId')]",
                         "OPCVAULT__BASEADDRESS": "[concat('https://', reference(resourceId('Microsoft.Web/sites', variables('webAppServiceName'))).hostNames[0])]",
                         "OPCVAULT__RESOURCEID": "[parameters('aadServiceId')]",
-                        "OPCVAULT__AUTOAPPROVE": "[parameters('autoApprove')]",
                         "WEBSITE_RUN_FROM_PACKAGE": "[if (equals(parameters('environment'),'Development'),'0','1')]"
                     }
                 },
@@ -458,13 +450,12 @@
                         "OPCVAULT__COSMOSDBENDPOINT": "[reference(resourceId('Microsoft.DocumentDb/databaseAccounts', variables('documentDBName'))).documentEndpoint]",
                         //"OPCVAULT__COSMOSDBTOKEN": "[listKeys(resourceId('Microsoft.DocumentDb/databaseAccounts', variables('documentDBName')), variables('documentDBApiVersion')).primaryMasterKey]",
                         //"OPCVAULT__COSMOSDBREADONLYTOKEN": "[listKeys(resourceId('Microsoft.DocumentDb/databaseAccounts', variables('documentDBName')), variables('documentDBApiVersion')).primaryReadonlyMasterKey]",
-                        "OPCVAULT__AUTOAPPROVE": "[parameters('autoApprove')]",
                         "AUTH__APPID": "[parameters('aadServiceId')]",
                         //"AUTH__APPSECRET": "[parameters('aadServiceSecret')]",
                         "AUTH__AUDIENCE": "[parameters('aadAudience')]",
                         "AUTH__TENANTID": "[parameters('aadTenantId')]",
                         "AUTH__TRUSTEDISSUER": "[parameters('aadTrustedIssuer')]",
-                        "SWAGGER__ENABLED": "True",
+                        "SWAGGER__ENABLED": "[if (equals(parameters('environment'),'Development'),'True','False')]",
                         "SWAGGER__APPID": "[parameters('aadClientId')]",
                         //"SWAGGER__APPSECRET": "[parameters('aadClientSecret')]",
                         "WEBSITE_RUN_FROM_PACKAGE": "[if (equals(parameters('environment'),'Development'),'0','1')]"

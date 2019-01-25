@@ -121,6 +121,12 @@ Optional, a resource group location. If specified, will try to create a new reso
 
 AAD tenant to use. 
 
+```
+-development
+```
+
+
+Optional, to deploy for development. Use debug build and set the ASP.Net Environment to Development. Create .publishsettings for import in Visual Studio 2017 to allow to deploy the app and the service directly.
 
 [azure-free]:https://azure.microsoft.com/en-us/free/
 [powershell-install]:https://azure.microsoft.com/en-us/downloads/#PowerShell
