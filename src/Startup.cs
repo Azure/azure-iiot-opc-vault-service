@@ -184,6 +184,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                 Description = ServiceInfo.DESCRIPTION,
             });
 
+            // add custom header tagged as security issue
+            app.Use(async (context, next) =>
+            {
+                context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
+                await next();
+            });
+
             app.UseMvc();
 
             // If you want to dispose of resources that have been resolved in the
