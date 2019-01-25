@@ -126,6 +126,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Controllers
         [Authorize(Policy = Policies.CanManage)]
         public async Task PurgeCertificateRequestAsync(string requestId)
         {
+            // may require elevated rights to delete pk
             await _certificateRequest.PurgeAsync(requestId);
         }
 
