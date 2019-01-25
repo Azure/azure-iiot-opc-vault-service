@@ -403,14 +403,14 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             var queryParameters = new SqlParameterCollection();
             if (maxRecordsToQuery != 0)
             {
-                query = String.Format("SELECT TOP @maxRecordsToQuery", maxRecordsToQuery);
+                query = "SELECT TOP @maxRecordsToQuery";
                 queryParameters.Add(new SqlParameter("@maxRecordsToQuery", maxRecordsToQuery));
             }
             else
             {
                 query = String.Format("SELECT");
             }
-            query += String.Format(" * FROM Applications a WHERE a.ID >= @startingRecord ORDER BY a.ID", startingRecordId);
+            query += " * FROM Applications a WHERE a.ID >= @startingRecord ORDER BY a.ID";
             queryParameters.Add(new SqlParameter( "@startingRecord", startingRecordId));
             SqlQuerySpec sqlQuerySpec = new SqlQuerySpec {
                 QueryText = query,
