@@ -20,9 +20,6 @@
  .PARAMETER resourceGroupLocation
     Optional, a resource group location. If specified, will try to create a new resource group in this location.
 
- .PARAMETER withAutoApprove
-    Whether to enable auto approval - defaults to $false.
-
  .PARAMETER development
     Whether to deploy for development or production - defaults to $false (production).
 
@@ -38,7 +35,6 @@ param(
     [string] $subscriptionName,
     [string] $subscriptionId,
     [string] $tenantId,
-    [bool] $withAutoApprove = $false,
     [bool] $development = $false,
     [ValidateSet("AzureCloud")] [string] $environmentName = "AzureCloud"
 )
@@ -876,8 +872,7 @@ try {
     $serviceUrls = & ($deploymentScript) -resourceGroupName $script:resourceGroupName `
         -interactive $script:interactive -aadConfig $aadConfig `
         -webAppName $webAppName -webServiceName $webServiceName `
-        -groupsConfig $groupsConfig -autoApprove $withAutoApprove `
-        -environment $aspenvironment
+        -groupsConfig $groupsConfig -environment $aspenvironment
     Write-Host "Deployment succeeded."
 }
 catch {

@@ -20,9 +20,6 @@
  .PARAMETER groupsConfig
     The certificate groups configuration.
 
- .PARAMETER autoApprove
-    Set the web app auto approval configuration.
-
  .PARAMETER environment
     Set the web app environment configuration. (Production,Development)
 
@@ -37,7 +34,6 @@ param(
     [string] $webServiceName = $null,
     $aadConfig = $null,
     [string] $groupsConfig = $null,
-    [string] $autoApprove = "false",
     [string] $environment = "Production",
     $interactive = $true
 )
@@ -146,11 +142,6 @@ if ($interactive -and [string]::IsNullOrEmpty($webServiceName)) {
 
 if (![string]::IsNullOrEmpty($webServiceName)) { 
     $templateParameters.Add("webServiceName", $webServiceName)
-}
-
-# Configure web app auto approve
-if (![string]::IsNullOrEmpty($autoApprove)) { 
-    $templateParameters.Add("autoApprove", $autoApprove)
 }
 
 # Configure web app environment
