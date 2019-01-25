@@ -639,6 +639,13 @@ Function GetAzureADApplicationConfig() {
         #
         # Update service application to add roles, known applications and required permissions
         #
+        $replyUrls = New-Object System.Collections.Generic.List[System.String]
+        if ($development)
+        {
+            # localhost reply Urls should be turned off in production
+            $replyUrls.Add("https://localhost:58801/signin-oidc")
+            $replyUrls.Add("http://localhost:58801/signin-oidc")
+        }
         $approverRole = CreateAppRole -current $serviceAadApplication.AppRoles -name "Approver" `
             -value "Sign" -description "Approvers have the ability to issue certificates."
         $writerRole = CreateAppRole -current $serviceAadApplication.AppRoles -name "Writer" `
@@ -663,7 +670,7 @@ Function GetAzureADApplicationConfig() {
         $requiredResourcesAccess.Add($requiredPermissions)
         Set-AzureADApplication -ObjectId $serviceAadApplication.ObjectId `
             -KnownClientApplications $knownApplications -AppRoles $appRoles `
-            -RequiredResourceAccess $requiredResourcesAccess
+            -RequiredResourceAccess $requiredResourcesAccess -ReplyUrls $replyUrls
         Write-Host "'$($serviceDisplayName)' updated with required resource access, app roles and known applications."  
 
         # read updated app roles for service principal
@@ -695,8 +702,9 @@ Function GetAzureADApplicationConfig() {
         # Update client application to add reply urls required permissions.
         #
         $replyUrls = New-Object System.Collections.Generic.List[System.String]
-        #if ($development)
+        if ($development)
         {
+            # localhost reply Urls should be turned off in production
             $replyUrls.Add("https://localhost:44342/signin-oidc")
             $replyUrls.Add("http://localhost:44342/signin-oidc")
             $replyUrls.Add("https://localhost:58801/oauth2-redirect.html")

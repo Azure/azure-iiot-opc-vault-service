@@ -168,7 +168,7 @@ if ($aadConfig -and $aadConfig.ClientObjectId) {
     # Update client application to add reply urls to required permissions.
     #
     $adClient = Get-AzureADApplication -ObjectId $aadConfig.ClientObjectId 
-    Write-Host "Adding ReplyUrls:"
+    Write-Host "Adding ReplyUrls to client AD:"
     $replyUrls = $adClient.ReplyUrls
     # web app
     $replyUrls.Add($webAppPortalUrl + "/signin-oidc")
@@ -179,7 +179,16 @@ if ($aadConfig -and $aadConfig.ClientObjectId) {
     Set-AzureADApplication -ObjectId $aadConfig.ClientObjectId -ReplyUrls $replyUrls -HomePage $webAppPortalUrl
 }
 
-if ($aadConfig -and $aadConfig.ClientObjectId) {
+if ($aadConfig -and $aadConfig.ServiceObjectId) {
+    # 
+    # Update client application to add reply urls to required permissions.
+    #
+    $adService = Get-AzureADApplication -ObjectId $aadConfig.ServiceObjectId 
+    Write-Host "Adding ReplyUrls to service AD:"
+    $replyUrls = $adService.ReplyUrls
+    # service
+    $replyUrls.Add($webAppServiceUrl + "/signin-oidc")
+    Write-Host $webAppServiceUrl"/signin-oidc"
     Set-AzureADApplication -ObjectId $aadConfig.ServiceObjectId -HomePage $webServicePortalUrl
 }
 
