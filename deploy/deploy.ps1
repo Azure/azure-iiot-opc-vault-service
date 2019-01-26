@@ -871,7 +871,7 @@ SelectSubscription
 
 $deleteOnErrorPrompt = GetOrCreateResourceGroup
 $aadConfig = GetAzureADApplicationConfig 
-$webAppName = $script:resourceGroupName + "-app"
+$webAppName = $script:resourceGroupName 
 $webServiceName = $script:resourceGroupName + "-service"
 $aspenvironment = "Production"
 

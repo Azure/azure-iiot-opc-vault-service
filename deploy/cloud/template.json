@@ -149,7 +149,7 @@
         "webAppPortalName": "[parameters('webAppName')]",
         "webAppServiceName": "[parameters('webServiceName')]",
         "appInsightsName": "[concat(variables('groupPrefix'), '-', variables('randomSuffix'))]",
-        "appServicePlanName": "[concat('AppServicePlan-', resourceGroup().name)]",
+        "appServicePlanName": "[concat(variables('groupPrefix'), '-', variables('randomSuffix'))]",
         "servicePlanApiVersion": "2017-08-01",
         "documentDBName": "[concat(variables('groupPrefix'), '-', variables('randomSuffix'))]",
         "documentDBApiVersion": "2016-03-19",
