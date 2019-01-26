@@ -7,7 +7,7 @@
     <Product>Microsoft Azure Industrial IoT OPC UA Vault Service</Product>
     <Authors>Azure Industrial IoT</Authors>
     <Company>Microsoft</Company>
-    <PackageLicenseUrl>https://github.com/Azure/azure-iiot-opc-vault-service/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageLicenseUrl>https://github.com/Azure/azure-iiot-opc-vault-service/blob/master/license.txt</PackageLicenseUrl>
     <Copyright>Microsoft Corp. All rights reserved.</Copyright>
     <Description>Azure Industrial IoT OPC UA Vault service component</Description>
     <UserSecretsId>71f9c347-48d7-4f74-8f1b-c3df149c26c8</UserSecretsId>
@@ -100,6 +100,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="web.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

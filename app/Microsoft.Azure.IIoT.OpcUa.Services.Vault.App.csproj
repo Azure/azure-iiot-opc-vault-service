@@ -47,6 +47,9 @@
     <Content Update="Views\Certomat\StartSigning.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
+    <Content Update="web.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Content Update="appsettings.*.json" CopyToPublishDirectory="Never" />
