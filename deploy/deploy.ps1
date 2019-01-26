@@ -20,11 +20,14 @@
  .PARAMETER resourceGroupLocation
     Optional, a resource group location. If specified, will try to create a new resource group in this location.
 
+ .PARAMETER tenantId
+    AD tenant to use. 
+
  .PARAMETER development
     Whether to deploy for development or production - defaults to $false (production).
 
- .PARAMETER tenantId
-    AD tenant to use. 
+ .PARAMETER onlyBuild
+    Only build and zipdeploy the app and service, rebuild the docker image, skip ARM template and AD app registration. 
 
 #>
 
@@ -36,6 +39,7 @@ param(
     [string] $subscriptionId,
     [string] $tenantId,
     [bool] $development = $false,
+    [bool] $onlyBuild = $false,
     [ValidateSet("AzureCloud")] [string] $environmentName = "AzureCloud"
 )
 
@@ -108,7 +112,6 @@ Function ZipDeploy()
     $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:{1}" -f $username, $password)))
     $userAgent = "powershell/1.0"
     Invoke-RestMethod -Uri $apiUrl -Headers @{Authorization=("Basic {0}" -f $base64AuthInfo)} -UserAgent $userAgent -Method POST -InFile $filePath -ContentType "multipart/form-data"
-
 }
 
 #*******************************************************************************************************
@@ -619,6 +622,11 @@ Function GetAzureADApplicationConfig() {
                 -Tags {WindowsAzureActiveDirectoryIntegratedApp}
         }
 
+        if ($onlyBuild)
+        {
+            return $null
+        }
+
         #
         # Try to add current user as app owner 
         #
@@ -826,6 +834,10 @@ Function GetOrCreateResourceGroup() {
         -ErrorAction SilentlyContinue
     if(!$resourceGroup) {
         Write-Host "Resource group '$script:resourceGroupName' does not exist."
+        if ($onlyBuild)
+        {
+            throw "Can only build on existing deployments."
+        }
         if(!(ValidateLocation $script:resourceGroupLocation)) {
             SelectLocation
         }
@@ -874,43 +886,46 @@ if ($deleteOnErrorPrompt)
     $groupsConfig = Get-Content .\KeyVault.Secret.Groups.json -Raw
 }
 
-# start the ARM deployment script
-try {
-    Write-Host "Start deployment..."
-    $serviceUrls = & ($deploymentScript) -resourceGroupName $script:resourceGroupName `
-        -interactive $script:interactive -aadConfig $aadConfig `
-        -webAppName $webAppName -webServiceName $webServiceName `
-        -groupsConfig $groupsConfig -environment $aspenvironment
-    Write-Host "Deployment succeeded."
-}
-catch {
-    $ex = $_.Exception
-    Write-Host $_.Exception.Message
-    Write-Host "Deployment failed."
-    if ($deleteOnErrorPrompt) {
-        $reply = Read-Host -Prompt "Delete resource group? [y/n]"
-        if ($reply -match "[yY]") { 
-            try {
-                Write-Host "Remove resource group "$script:resourceGroupName
-                Remove-AzureRmResourceGroup -Name $script:resourceGroupName -Force
-            }
-            catch {
-                Write-Host $_.Exception.Message
-            }
-            try {
-                Write-Host "Delete AD App "$aadConfig.ServiceDisplayName
-                Remove-AzureADApplication -ObjectId $aadConfig.ServiceObjectId
-                Write-Host "Delete AD App "$aadConfig.ClientDisplayName
-                Remove-AzureADApplication -ObjectId $aadConfig.ClientObjectId
-                Write-Host "Delete AD App "$aadConfig.ModuleDisplayName
-                Remove-AzureADApplication -ObjectId $aadConfig.ModuleObjectId
-            }
-            catch {
-                Write-Host $_.Exception.Message
+if (-Not $onlyBuild)
+{
+    # start the ARM deployment script
+    try {
+        Write-Host "Start deployment..."
+        $serviceUrls = & ($deploymentScript) -resourceGroupName $script:resourceGroupName `
+            -interactive $script:interactive -aadConfig $aadConfig `
+            -webAppName $webAppName -webServiceName $webServiceName `
+            -groupsConfig $groupsConfig -environment $aspenvironment
+        Write-Host "Deployment succeeded."
+    }
+    catch {
+        $ex = $_.Exception
+        Write-Host $_.Exception.Message
+        Write-Host "Deployment failed."
+        if ($deleteOnErrorPrompt) {
+            $reply = Read-Host -Prompt "Delete resource group? [y/n]"
+            if ($reply -match "[yY]") { 
+                try {
+                    Write-Host "Remove resource group "$script:resourceGroupName
+                    Remove-AzureRmResourceGroup -Name $script:resourceGroupName -Force
+                }
+                catch {
+                    Write-Host $_.Exception.Message
+                }
+                try {
+                    Write-Host "Delete AD App "$aadConfig.ServiceDisplayName
+                    Remove-AzureADApplication -ObjectId $aadConfig.ServiceObjectId
+                    Write-Host "Delete AD App "$aadConfig.ClientDisplayName
+                    Remove-AzureADApplication -ObjectId $aadConfig.ClientObjectId
+                    Write-Host "Delete AD App "$aadConfig.ModuleDisplayName
+                    Remove-AzureADApplication -ObjectId $aadConfig.ModuleObjectId
+                }
+                catch {
+                    Write-Host $_.Exception.Message
+                }
             }
         }
+        throw $ex
     }
-    throw $ex
 }
 
 # publishing slot
@@ -936,63 +951,69 @@ if(Test-path $publishFolder) {Remove-Item -Recurse -Force $publishFolder}
 dotnet publish -c $buildConfig -o $publishFolder ..\app\Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.csproj
 ZipDeploy $resourceGroupName $webAppName $publishFolder $slotParameters
 
-# build configuration options for module
-$moduleConfiguration = '--vault="'+$serviceUrls[1]+'"'
-$moduleConfiguration += ' --resource="'+$($aadConfig.ServiceId)+'"'
-$moduleConfiguration += ' --clientid="'+$($aadConfig.ModuleId)+'"'
-$moduleConfiguration += ' --secret="'+$($aadConfig.ModuleSecret)+'"'
-$moduleConfiguration += ' --tenantid="'+$($aadConfig.TenantId)+'"'
-
-# save config for user, e.g. for VS debugging of the module
-$moduleConfigPath = Join-Path -Path $deploydir -ChildPath "$($resourceGroupName).module.config"
-Write-Output $moduleConfiguration | Out-File -FilePath $moduleConfigPath -Encoding ascii
-
-if ($development)
-{
-    # output information
-    Write-Host "GDS module configuration:"
-    Write-Host "--vault="$serviceUrls[1]
-    Write-Host "--resource="$aadConfig.ServiceId
-    Write-Host "--clientid="$aadConfig.ModuleId
-    Write-Host "--secret="$aadConfig.ModuleSecret
-    Write-Host "--tenantid="$aadConfig.TenantId
-}
-
 # prepare the GDS module docker image
 cd ..
 docker build --file .\Dockerfile.module -t edgeopcvault .
 cd $deploydir
 
-# create batch file for user to start GDS docker container
-$dockerrun = 'docker run -it -p 58850-58852:58850-58852 -e 58850-58852 -h %COMPUTERNAME%'
-if ($development)
+if (-Not $onlyBuild)
 {
-    $dockerrun += ' -v "/c/GDS:/root/.local/share/Microsoft/GDS"'
+    # build configuration options for module
+    $moduleConfiguration = '--vault="'+$serviceUrls[1]+'"'
+    $moduleConfiguration += ' --resource="'+$($aadConfig.ServiceId)+'"'
+    $moduleConfiguration += ' --clientid="'+$($aadConfig.ModuleId)+'"'
+    $moduleConfiguration += ' --secret="'+$($aadConfig.ModuleSecret)+'"'
+    $moduleConfiguration += ' --tenantid="'+$($aadConfig.TenantId)+'"'
+
+    # save config for user, e.g. for VS debugging of the module
+    $moduleConfigPath = Join-Path -Path $deploydir -ChildPath "$($resourceGroupName).module.config"
+    Write-Output $moduleConfiguration | Out-File -FilePath $moduleConfigPath -Encoding ascii
+
+    if ($development)
+    {
+        # output information
+        Write-Host "GDS module configuration:"
+        Write-Host "--vault="$serviceUrls[1]
+        Write-Host "--resource="$aadConfig.ServiceId
+        Write-Host "--clientid="$aadConfig.ModuleId
+        Write-Host "--secret="$aadConfig.ModuleSecret
+        Write-Host "--tenantid="$aadConfig.TenantId
+    }
+
+    # create batch file for user to start GDS docker container
+    $dockerrun = 'docker run -it -p 58850-58852:58850-58852 -e 58850-58852 -h %COMPUTERNAME%'
+    if ($development)
+    {
+        $dockerrun += ' -v "/c/GDS:/root/.local/share/Microsoft/GDS"'
+    }
+    $dockerrun += ' edgeopcvault:latest '
+    $dockerrun += $moduleConfiguration
+    $dockerrunfilename = ".\"+$resourceGroupName+"-dockergds.cmd"
+    Write-Output $dockerrun | Out-File -FilePath $dockerrunfilename -Encoding ascii
+
+    # create batch file for user to start GDS as dotnet app
+    $apprun = "cd ..\module `r`n"
+    $apprun += 'dotnet run --project ..\module\Microsoft.Azure.IIoT.OpcUa.Modules.Vault.csproj '
+    $apprun += $moduleConfiguration
+    $apprunfilename = ".\"+$resourceGroupName+"-gds.cmd"
+    Write-Output $apprun | Out-File -FilePath $apprunfilename -Encoding ascii
+
+    # deployment info
+    Write-Host
+    Write-Host "To access the web client go to:"
+    Write-Host $serviceUrls[0]
+    Write-Host
+    Write-Host "To access the web service go to:"
+    Write-Host $serviceUrls[1]
+    Write-Host
+    Write-Host "To start the local docker GDS server:"
+    Write-Host $dockerrunfilename
+    Write-Host 
+    Write-Host "To start the local dotnet GDS server:"
+    Write-Host $apprunfilename
+    Write-Host 
 }
-$dockerrun += ' edgeopcvault:latest '
-$dockerrun += $moduleConfiguration
-$dockerrunfilename = ".\"+$resourceGroupName+"-dockergds.cmd"
-Write-Output $dockerrun | Out-File -FilePath $dockerrunfilename -Encoding ascii
-
-# create batch file for user to start GDS as dotnet app
-$apprun = "cd ..\module `r`n"
-$apprun += 'dotnet run --project ..\module\Microsoft.Azure.IIoT.OpcUa.Modules.Vault.csproj '
-$apprun += $moduleConfiguration
-$apprunfilename = ".\"+$resourceGroupName+"-gds.cmd"
-Write-Output $apprun | Out-File -FilePath $apprunfilename -Encoding ascii
-
-# deployment info
-Write-Host
-Write-Host "To access the web client go to:"
-Write-Host $serviceUrls[0]
-Write-Host
-Write-Host "To access the web service go to:"
-Write-Host $serviceUrls[1]
-Write-Host
-Write-Host "To start the local docker GDS server:"
-Write-Host $dockerrunfilename
-Write-Host 
-Write-Host "To start the local dotnet GDS server:"
-Write-Host $apprunfilename
-Write-Host 
-
+else
+{
+    Write-Host "Only Build and deploy finished successfully."
+}

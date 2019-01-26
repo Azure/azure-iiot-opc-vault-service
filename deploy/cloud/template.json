@@ -237,6 +237,13 @@
                         "permissions": {
                             "secrets": "[variables('readPermissions')]"
                         }
+                    },
+                    {
+                        "tenantId": "[parameters('aadTenantId')]",
+                        "objectId": "[parameters('aadUserPrincipalId')]",
+                        "permissions": {
+                            "secrets": "[variables('readPermissions')]"
+                        }
                     }
                 ]
             }
@@ -266,13 +273,12 @@
         },
         {
             "type": "Microsoft.KeyVault/vaults/secrets",
-            "name": "[concat(variables('keyVaultName'), '/', 'Service-OpcVault--CosmosDBReadOnlyToken')]",
+            "name": "[concat(variables('keyVaultName'), '/', 'App-AzureAd--ClientSecret')]",
             "apiVersion": "[variables('keyVaultApiVersion')]",
             "properties": {
-                "value": "[listKeys(resourceId('Microsoft.DocumentDb/databaseAccounts', variables('documentDBName')), variables('documentDBApiVersion')).primaryReadonlyMasterKey]"
+                "value": "[parameters('aadClientSecret')]"
             },
             "dependsOn": [
-                "[resourceId('Microsoft.DocumentDb/databaseAccounts', variables('documentDBName'))]",
                 "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]"
             ]
         },
@@ -449,7 +455,6 @@
                         "OPCVAULT__KEYVAULTBASEURL": "[reference(resourceId('Microsoft.KeyVault/vaults', variables('opcVaultName'))).vaultUri]",
                         "OPCVAULT__COSMOSDBENDPOINT": "[reference(resourceId('Microsoft.DocumentDb/databaseAccounts', variables('documentDBName'))).documentEndpoint]",
                         //"OPCVAULT__COSMOSDBTOKEN": "[listKeys(resourceId('Microsoft.DocumentDb/databaseAccounts', variables('documentDBName')), variables('documentDBApiVersion')).primaryMasterKey]",
-                        //"OPCVAULT__COSMOSDBREADONLYTOKEN": "[listKeys(resourceId('Microsoft.DocumentDb/databaseAccounts', variables('documentDBName')), variables('documentDBApiVersion')).primaryReadonlyMasterKey]",
                         "AUTH__APPID": "[parameters('aadServiceId')]",
                         //"AUTH__APPSECRET": "[parameters('aadServiceSecret')]",
                         "AUTH__AUDIENCE": "[parameters('aadAudience')]",
