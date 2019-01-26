@@ -136,7 +136,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                     options.SerializerSettings.MaxDepth = 10;
                 });
 
-            services.AddApplicationInsightsTelemetry();
+            services.AddApplicationInsightsTelemetry(Config.Configuration);
 
             services.AddSwagger(Config, new Info
             {

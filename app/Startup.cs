@@ -57,9 +57,10 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
-            services.AddApplicationInsightsTelemetry();
             services.AddAuthentication(AzureADDefaults.AuthenticationScheme)
                 .AddAzureAD(options => Configuration.Bind("AzureAd", options))
+                // hack for iOS12, fix an endless loop during login
+                .AddCookie(options => options.Cookie.SameSite = SameSiteMode.None)
             ;
             services.Configure<OpenIdConnectOptions>(AzureADDefaults.OpenIdScheme, options =>
             {
@@ -124,6 +125,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App
             })
             .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddSession();
+
+            services.AddApplicationInsightsTelemetry(Configuration);
 
             // This will register IDistributedCache based token cache which ADAL will use for caching access tokens.
             services.AddScoped<ITokenCacheService, DistributedTokenCacheService>();
