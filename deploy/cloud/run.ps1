@@ -189,7 +189,7 @@ if ($aadConfig -and $aadConfig.ServiceObjectId) {
     # service
     $replyUrls.Add($webAppServiceUrl + "/signin-oidc")
     Write-Host $webAppServiceUrl"/signin-oidc"
-    Set-AzureADApplication -ObjectId $aadConfig.ServiceObjectId -HomePage $webServicePortalUrl
+    Set-AzureADApplication -ObjectId $aadConfig.ServiceObjectId -ReplyUrls $replyUrls -HomePage $webServicePortalUrl
 }
 
 Return $webAppPortalUrl, $webAppServiceUrl
