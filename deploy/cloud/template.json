@@ -168,11 +168,13 @@
                 }
             ]
         },
-        "serviceIdentityResourceId": "[concat(resourceId('Microsoft.Web/sites', variables('webAppServiceName')),'/providers/Microsoft.ManagedIdentity/Identities/default')]"
+        "identityApiVersion": "2018-11-30",
+        "serviceIdentityResourceId": "[concat(resourceId('Microsoft.Web/sites', variables('webAppServiceName')),'/providers/Microsoft.ManagedIdentity/Identities/default')]",
+        "appIdentityResourceId": "[concat(resourceId('Microsoft.Web/sites', variables('webAppPortalName')),'/providers/Microsoft.ManagedIdentity/Identities/default')]"
     },
     "resources": [
         {
-            "comments": "This service plan is used for the app, the service and slots.",
+            "comments": "This service plan is used for the app, the service and the slots.",
             "apiVersion": "[variables('servicePlanApiVersion')]",
             "type": "Microsoft.Web/serverfarms",
             "kind": "app",
@@ -203,7 +205,7 @@
             "dependsOn": []
         },
         {
-            "comments": "This is the KeyVault for the service app.",
+            "comments": "This is the KeyVault for the service and the app.",
             "type": "Microsoft.KeyVault/vaults",
             "name": "[variables('keyVaultName')]",
             "apiVersion": "[variables('keyVaultApiVersion')]",
@@ -217,16 +219,24 @@
                     "family": "A"
                 },
                 "dependsOn": [
-                    "[resourceId('Microsoft.Web/sites', variables('webAppServiceName'))]"
+                    "[resourceId('Microsoft.Web/sites', variables('webAppServiceName'))]",
+                    "[resourceId('Microsoft.Web/sites', variables('webAppPortalName'))]"
                 ],
                 "enabledForDeployment": "[variables('enabledForDeployment')]",
                 "enabledForTemplateDeployment": "[variables('enabledForTemplateDeployment')]",
                 "enabledForVolumeEncryption": "[variables('enableVaultForVolumeEncryption')]",
-                "tenantId": "[reference(variables('serviceIdentityResourceId'), '2015-08-31-PREVIEW').tenantId]",
+                "tenantId": "[reference(variables('serviceIdentityResourceId'), variables('identityApiVersion')).tenantId]",
                 "accessPolicies": [
                     {
-                        "tenantId": "[reference(variables('serviceIdentityResourceId'), '2015-08-31-PREVIEW').tenantId]",
-                        "objectId": "[reference(variables('serviceIdentityResourceId'), '2015-08-31-PREVIEW').principalId]",
+                        "tenantId": "[reference(variables('serviceIdentityResourceId'), variables('identityApiVersion')).tenantId]",
+                        "objectId": "[reference(variables('serviceIdentityResourceId'), variables('identityApiVersion')).principalId]",
+                        "permissions": {
+                            "secrets": "[variables('readPermissions')]"
+                        }
+                    },
+                    {
+                        "tenantId": "[reference(variables('appIdentityResourceId'), variables('identityApiVersion')).tenantId]",
+                        "objectId": "[reference(variables('appIdentityResourceId'), variables('identityApiVersion')).principalId]",
                         "permissions": {
                             "secrets": "[variables('readPermissions')]"
                         }
@@ -370,6 +380,9 @@
             "kind": "app",
             "name": "[variables('webAppPortalName')]",
             "location": "[variables('applocation')]",
+            "identity": {
+                "type": "SystemAssigned"
+            },
             "properties": {
                 "name": "[variables('webAppPortalName')]",
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]",
@@ -386,6 +399,7 @@
                     "dependsOn": [
                         "[resourceId('Microsoft.Web/sites', variables('webAppPortalName'))]",
                         "[resourceId('Microsoft.Web/sites', variables('webAppServiceName'))]",
+                        "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]",
                         "Microsoft.ApplicationInsights.AzureWebSites"
                     ],
                     "tags": {
@@ -395,11 +409,12 @@
                         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(concat('microsoft.insights/components/', variables('appInsightsName'))).InstrumentationKey]",
                         "ASPNETCORE_ENVIRONMENT": "[parameters('environment')]",
                         "AZUREAD__CLIENTID": "[parameters('aadClientId')]",
-                        "AZUREAD__CLIENTSECRET": "[parameters('aadClientSecret')]",
+                        //"AZUREAD__CLIENTSECRET": "[parameters('aadClientSecret')]",
                         "AZUREAD__INSTANCE": "[parameters('aadInstance')]",
                         "AZUREAD__TENANTID": "[parameters('aadTenantId')]",
                         "OPCVAULT__BASEADDRESS": "[concat('https://', reference(resourceId('Microsoft.Web/sites', variables('webAppServiceName'))).hostNames[0])]",
                         "OPCVAULT__RESOURCEID": "[parameters('aadServiceId')]",
+                        "KEYVAULT": "[reference(resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))).vaultUri]",
                         "WEBSITE_RUN_FROM_PACKAGE": "[if (equals(parameters('environment'),'Development'),'0','1')]"
                     }
                 },
@@ -442,6 +457,7 @@
                     "dependsOn": [
                         "[resourceId('Microsoft.DocumentDb/databaseAccounts', variables('documentDBName'))]",
                         "[resourceId('Microsoft.KeyVault/vaults', variables('opcVaultName'))]",
+                        "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]",
                         "[resourceId('Microsoft.Web/sites', variables('webAppServiceName'))]",
                         "Microsoft.ApplicationInsights.AzureWebSites"
                     ],
