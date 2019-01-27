@@ -15,9 +15,13 @@ A web management application front end and a local OPC UA GDS server allow for e
 
 ### This repository contains the following:
 
+This repo contains all components required to run a CA in the Azure cloud for your OPC UA environment:
+
 * **ASP.Net Core Certificate Management Microservice** to manage certificates with Azure Key Vault and CosmosDB.
 * **ASP.Net Core Sample Application** as user interface for the Certificate Management Service.
 * **OPC UA .Net Standard GDS Server** for local OPC UA device connectivity to the cloud Certificate Management Service.
+
+A Powershell deployment script automatically builds and deploys the services to your subscription. By default, security is configured for a production system. 
 
 ### Certificate Management Microservice Features
 1. Production ready certificate microservice based on C# with ASP.Net Core 2.1.
@@ -72,7 +76,7 @@ The documentation how to manage certificates with the Web sample application is 
 The documentation how to build and run the service is [here](docs/howto-run-services-locally.md).
 -->
 
-# [Contributing](CONTRIBUTING)
+# [Contributing](CONTRIBUTING.md)
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
 Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
