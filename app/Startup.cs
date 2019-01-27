@@ -3,6 +3,8 @@
 // license information.
 //
 
+using System;
+using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Authentication;
@@ -20,8 +22,6 @@ using Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.TokenStorage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
-using System;
-using System.Threading.Tasks;
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App
 {
@@ -59,8 +59,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App
             });
             services.AddAuthentication(AzureADDefaults.AuthenticationScheme)
                 .AddAzureAD(options => Configuration.Bind("AzureAd", options))
-                // hack for iOS12, fix an endless loop during login
-                .AddCookie(options => options.Cookie.SameSite = SameSiteMode.None)
             ;
             services.Configure<OpenIdConnectOptions>(AzureADDefaults.OpenIdScheme, options =>
             {
@@ -161,6 +159,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App
             app.UseStaticFiles();
             app.UseCookiePolicy();
 
+            // fix iOS12 login issue
+            FixWebkitOpenIDLoginLoop(app);
+
             app.UseAuthentication();
             app.UseMvc(routes =>
             {
@@ -192,6 +193,28 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App
             // Register configuration interfaces
 
             return builder.Build();
+        }
+
+        /// <summary>
+        /// Fix for webkit strict same site cookie implementation
+        /// Credits go to:
+        /// https://brockallen.com/2019/01/11/same-site-cookies-asp-net-core-and-external-authentication-providers/
+        /// </summary>
+        /// <param name="app"></param>
+        private void FixWebkitOpenIDLoginLoop(IApplicationBuilder app)
+        {
+            app.Use(async (ctx, next) =>
+            {
+                await next();
+                if (ctx.Request.Path == "/signin-oidc" &&
+                    ctx.Response.StatusCode == 302)
+                {
+                    var location = ctx.Response.Headers["location"];
+                    ctx.Response.StatusCode = 200;
+                    var html = $@"<html><head><meta http-equiv='refresh' content='0;url={location}' /></head></html>";
+                    await ctx.Response.WriteAsync(html);
+                }
+            });
         }
 
     }
