@@ -15,32 +15,30 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models
     using System.Collections.Generic;
     using System.Linq;
 
-    public partial class CertificateRequestRecordApiModel
+    public partial class CreateNewKeyPairRequestApiModel
     {
         /// <summary>
-        /// Initializes a new instance of the CertificateRequestRecordApiModel
+        /// Initializes a new instance of the CreateNewKeyPairRequestApiModel
         /// class.
         /// </summary>
-        public CertificateRequestRecordApiModel()
+        public CreateNewKeyPairRequestApiModel()
         {
             CustomInit();
         }
 
         /// <summary>
-        /// Initializes a new instance of the CertificateRequestRecordApiModel
+        /// Initializes a new instance of the CreateNewKeyPairRequestApiModel
         /// class.
         /// </summary>
-        public CertificateRequestRecordApiModel(string requestId = default(string), string applicationId = default(string), string state = default(string), string certificateGroupId = default(string), string certificateTypeId = default(string), bool? signingRequest = default(bool?), string subjectName = default(string), IList<string> domainNames = default(IList<string>), string privateKeyFormat = default(string))
+        public CreateNewKeyPairRequestApiModel(string applicationId = default(string), string certificateGroupId = default(string), string certificateTypeId = default(string), string subjectName = default(string), IList<string> domainNames = default(IList<string>), string privateKeyFormat = default(string), string privateKeyPassword = default(string))
         {
-            RequestId = requestId;
             ApplicationId = applicationId;
-            State = state;
             CertificateGroupId = certificateGroupId;
             CertificateTypeId = certificateTypeId;
-            SigningRequest = signingRequest;
             SubjectName = subjectName;
             DomainNames = domainNames;
             PrivateKeyFormat = privateKeyFormat;
+            PrivateKeyPassword = privateKeyPassword;
             CustomInit();
         }
 
@@ -51,18 +49,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models
 
         /// <summary>
         /// </summary>
-        [JsonProperty(PropertyName = "requestId")]
-        public string RequestId { get; set; }
-
-        /// <summary>
-        /// </summary>
         [JsonProperty(PropertyName = "applicationId")]
         public string ApplicationId { get; set; }
-
-        /// <summary>
-        /// </summary>
-        [JsonProperty(PropertyName = "state")]
-        public string State { get; set; }
 
         /// <summary>
         /// </summary>
@@ -73,11 +61,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models
         /// </summary>
         [JsonProperty(PropertyName = "certificateTypeId")]
         public string CertificateTypeId { get; set; }
-
-        /// <summary>
-        /// </summary>
-        [JsonProperty(PropertyName = "signingRequest")]
-        public bool? SigningRequest { get; set; }
 
         /// <summary>
         /// </summary>
@@ -93,6 +76,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models
         /// </summary>
         [JsonProperty(PropertyName = "privateKeyFormat")]
         public string PrivateKeyFormat { get; set; }
+
+        /// <summary>
+        /// </summary>
+        [JsonProperty(PropertyName = "privateKeyPassword")]
+        public string PrivateKeyPassword { get; set; }
 
     }
 }

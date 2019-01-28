@@ -11,36 +11,32 @@
 namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models
 {
     using Newtonsoft.Json;
-    using System.Collections;
-    using System.Collections.Generic;
     using System.Linq;
 
-    public partial class CertificateRequestRecordApiModel
+    public partial class FetchRequestResultApiModel
     {
         /// <summary>
-        /// Initializes a new instance of the CertificateRequestRecordApiModel
-        /// class.
+        /// Initializes a new instance of the FetchRequestResultApiModel class.
         /// </summary>
-        public CertificateRequestRecordApiModel()
+        public FetchRequestResultApiModel()
         {
             CustomInit();
         }
 
         /// <summary>
-        /// Initializes a new instance of the CertificateRequestRecordApiModel
-        /// class.
+        /// Initializes a new instance of the FetchRequestResultApiModel class.
         /// </summary>
-        public CertificateRequestRecordApiModel(string requestId = default(string), string applicationId = default(string), string state = default(string), string certificateGroupId = default(string), string certificateTypeId = default(string), bool? signingRequest = default(bool?), string subjectName = default(string), IList<string> domainNames = default(IList<string>), string privateKeyFormat = default(string))
+        public FetchRequestResultApiModel(string requestId = default(string), string applicationId = default(string), string state = default(string), string certificateGroupId = default(string), string certificateTypeId = default(string), string signedCertificate = default(string), string privateKeyFormat = default(string), string privateKey = default(string), string authorityId = default(string))
         {
             RequestId = requestId;
             ApplicationId = applicationId;
             State = state;
             CertificateGroupId = certificateGroupId;
             CertificateTypeId = certificateTypeId;
-            SigningRequest = signingRequest;
-            SubjectName = subjectName;
-            DomainNames = domainNames;
+            SignedCertificate = signedCertificate;
             PrivateKeyFormat = privateKeyFormat;
+            PrivateKey = privateKey;
+            AuthorityId = authorityId;
             CustomInit();
         }
 
@@ -76,23 +72,23 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models
 
         /// <summary>
         /// </summary>
-        [JsonProperty(PropertyName = "signingRequest")]
-        public bool? SigningRequest { get; set; }
-
-        /// <summary>
-        /// </summary>
-        [JsonProperty(PropertyName = "subjectName")]
-        public string SubjectName { get; set; }
-
-        /// <summary>
-        /// </summary>
-        [JsonProperty(PropertyName = "domainNames")]
-        public IList<string> DomainNames { get; set; }
+        [JsonProperty(PropertyName = "signedCertificate")]
+        public string SignedCertificate { get; set; }
 
         /// <summary>
         /// </summary>
         [JsonProperty(PropertyName = "privateKeyFormat")]
         public string PrivateKeyFormat { get; set; }
+
+        /// <summary>
+        /// </summary>
+        [JsonProperty(PropertyName = "privateKey")]
+        public string PrivateKey { get; set; }
+
+        /// <summary>
+        /// </summary>
+        [JsonProperty(PropertyName = "authorityId")]
+        public string AuthorityId { get; set; }
 
     }
 }
