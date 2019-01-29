@@ -12,6 +12,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Azure.IIoT.Diagnostics;
     using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Runtime;
+    using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Swagger;
     using Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1;
     using Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Auth;
     using Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Filters;
@@ -138,7 +139,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
 
             services.AddApplicationInsightsTelemetry(Config.Configuration);
 
-            services.AddSwagger(Config, new Info
+            services.AddSwaggerEx(Config, new Info
             {
                 Title = ServiceInfo.NAME,
                 Version = VersionInfo.PATH,
@@ -177,7 +178,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
 
             app.EnableCors();
 
-            app.UseSwagger(Config, new Info
+            app.UseSwaggerEx(Config, new Info
             {
                 Title = ServiceInfo.NAME,
                 Version = VersionInfo.PATH,
