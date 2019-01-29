@@ -28,9 +28,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models
         /// Initializes a new instance of the
         /// CertificateGroupConfigurationApiModel class.
         /// </summary>
-        public CertificateGroupConfigurationApiModel(string id = default(string), string certificateType = default(string), string subjectName = default(string), int? defaultCertificateLifetime = default(int?), int? defaultCertificateKeySize = default(int?), int? defaultCertificateHashSize = default(int?), int? issuerCACertificateLifetime = default(int?), int? issuerCACertificateKeySize = default(int?), int? issuerCACertificateHashSize = default(int?))
+        public CertificateGroupConfigurationApiModel(string name = default(string), string certificateType = default(string), string subjectName = default(string), int? defaultCertificateLifetime = default(int?), int? defaultCertificateKeySize = default(int?), int? defaultCertificateHashSize = default(int?), int? issuerCACertificateLifetime = default(int?), int? issuerCACertificateKeySize = default(int?), int? issuerCACertificateHashSize = default(int?))
         {
-            Id = id;
+            Name = name;
             CertificateType = certificateType;
             SubjectName = subjectName;
             DefaultCertificateLifetime = defaultCertificateLifetime;
@@ -49,8 +49,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models
 
         /// <summary>
         /// </summary>
-        [JsonProperty(PropertyName = "id")]
-        public string Id { get; set; }
+        [JsonProperty(PropertyName = "name")]
+        public string Name { get; set; }
 
         /// <summary>
         /// </summary>
