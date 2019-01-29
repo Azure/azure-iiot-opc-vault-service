@@ -8,7 +8,6 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.Azure.IIoT.Auth.Clients;
 using Microsoft.Azure.IIoT.Diagnostics;
@@ -17,83 +16,12 @@ using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Runtime;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test.Helpers;
 using Microsoft.Extensions.Configuration;
 using Opc.Ua;
-using Opc.Ua.Gds;
-using Opc.Ua.Test;
 using TestCaseOrdering;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
 {
-    public class ApplicationTestData
-    {
-        public ApplicationTestData()
-        {
-            Initialize();
-        }
-
-        private void Initialize()
-        {
-            ApplicationRecord = new ApplicationRecordDataType();
-            CertificateGroupId = null;
-            CertificateTypeId = null;
-            CertificateRequestId = null;
-            DomainNames = new StringCollection();
-            Subject = null;
-            PrivateKeyFormat = "PFX";
-            PrivateKeyPassword = "";
-            Certificate = null;
-            PrivateKey = null;
-            IssuerCertificates = null;
-        }
-
-        public ApplicationRecordDataType ApplicationRecord;
-        public NodeId CertificateGroupId;
-        public NodeId CertificateTypeId;
-        public NodeId CertificateRequestId;
-        public StringCollection DomainNames;
-        public string Subject;
-        public string PrivateKeyFormat;
-        public string PrivateKeyPassword;
-        public byte[] Certificate;
-        public byte[] PrivateKey;
-        public byte[][] IssuerCertificates;
-    }
-
-    public class ClientConfig : IClientConfig
-    {
-        /// <summary>
-        /// The AAD application id for the client.
-        /// </summary>
-        public string AppId { get; set; }
-
-        /// <summary>
-        /// AAD Client / Application secret (optional)
-        /// </summary>
-        public string AppSecret { get; set; }
-
-        /// <summary>
-        /// Tenant id if any (optional)
-        /// </summary>
-        public string TenantId { get; set; }
-
-        /// <summary>
-        /// Instance or authority (optional)
-        /// </summary>
-        public string InstanceUrl { get; set; }
-
-        /// <summary>
-        /// Audience to talk to.
-        /// </summary>
-        public string Audience { get; set; }
-    }
-
-    public class LogConfig : ILogConfig
-    {
-        public LogLevel LogLevel => LogLevel.Debug;
-
-        public string ProcessId => "Vault.Test";
-    }
 
     [TestCaseOrderer("TestCaseOrdering.PriorityOrderer", "Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test")]
     public class CertificateGroupTest
@@ -107,8 +35,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
         public CertificateGroupTest(ITestOutputHelper log)
         {
             _log = log;
-            _randomSource = new RandomSource(_randomStart);
-            _dataGenerator = new DataGenerator(_randomSource);
+            _randomGenerator = new ApplicationTestDataGenerator();
             var builder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("testsettings.json", optional: false, reloadOnChange: true)
@@ -217,7 +144,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
             string[] groups = await keyVault.GetCertificateGroupIds();
             foreach (string group in groups)
             {
-                ApplicationTestData randomApp = RandomApplicationTestData();
+                ApplicationTestData randomApp = _randomGenerator.RandomApplicationTestData();
                 Guid requestId = Guid.NewGuid();
                 Opc.Ua.Gds.Server.X509Certificate2KeyPair newKeyPair = await keyVault.NewKeyPairRequestAsync(
                     group,
@@ -257,7 +184,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
             foreach (string group in groups)
             {
                 var certificateGroupConfiguration = await keyVault.GetCertificateGroupConfiguration(group);
-                ApplicationTestData randomApp = RandomApplicationTestData();
+                ApplicationTestData randomApp = _randomGenerator.RandomApplicationTestData();
                 X509Certificate2 csrCertificate = CertificateFactory.CreateCertificate(
                     null, null, null,
                     randomApp.ApplicationRecord.ApplicationUri,
@@ -305,7 +232,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
             string[] groups = await keyVault.GetCertificateGroupIds();
             foreach (string group in groups)
             {
-                ApplicationTestData randomApp = RandomApplicationTestData();
+                ApplicationTestData randomApp = _randomGenerator.RandomApplicationTestData();
                 Guid requestId = Guid.NewGuid();
                 Opc.Ua.Gds.Server.X509Certificate2KeyPair newCert = await keyVault.NewKeyPairRequestAsync(
                     group,
@@ -390,7 +317,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
                 }
             }
 
-            // now revoke all
+            // now revoke all certifcates
             var revokeCertificates = new X509Certificate2Collection(certCollection);
             foreach (string group in groups)
             {
@@ -399,6 +326,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
                 revokeCertificates = unrevokedCertificates;
             }
             Assert.Empty(revokeCertificates);
+
+            // reload updated trust list from KeyVault
             var trustListAllGroups = new KeyVaultTrustListModel("all");
             foreach (string group in groups)
             {
@@ -412,6 +341,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
                 }
                 trustListAllGroups.AddRange(trustList);
             }
+
+            // verify certificates are revoked
             {
                 var validator = await X509TestUtils.CreateValidatorAsync(trustListAllGroups);
                 foreach (var cert in certCollection)
@@ -422,96 +353,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
                     });
                 }
             }
-
-        }
-
-        private ApplicationTestData RandomApplicationTestData()
-        {
-            ApplicationType appType = (ApplicationType)_randomSource.NextInt32((int)ApplicationType.ClientAndServer);
-            string pureAppName = _dataGenerator.GetRandomString("en");
-            pureAppName = Regex.Replace(pureAppName, @"[^\w\d\s]", "");
-            string pureAppUri = Regex.Replace(pureAppName, @"[^\w\d]", "");
-            string appName = "UA " + pureAppName;
-            StringCollection domainNames = RandomDomainNames();
-            string localhost = domainNames[0];
-            string privateKeyFormat = _randomSource.NextInt32(1) == 0 ? "PEM" : "PFX";
-            string appUri = ("urn:localhost:opcfoundation.org:" + pureAppUri.ToLower()).Replace("localhost", localhost);
-            string prodUri = "http://opcfoundation.org/UA/" + pureAppUri;
-            StringCollection discoveryUrls = new StringCollection();
-            StringCollection serverCapabilities = new StringCollection();
-            switch (appType)
-            {
-                case ApplicationType.Client:
-                    appName += " Client";
-                    break;
-                case ApplicationType.ClientAndServer:
-                    appName += " Client and";
-                    goto case ApplicationType.Server;
-                case ApplicationType.Server:
-                    appName += " Server";
-                    int port = (_dataGenerator.GetRandomInt16() & 0x1fff) + 50000;
-                    discoveryUrls = RandomDiscoveryUrl(domainNames, port, pureAppUri);
-                    break;
-            }
-            ApplicationTestData testData = new ApplicationTestData
-            {
-                ApplicationRecord = new ApplicationRecordDataType
-                {
-                    ApplicationNames = new LocalizedTextCollection { new LocalizedText("en-us", appName) },
-                    ApplicationUri = appUri,
-                    ApplicationType = appType,
-                    ProductUri = prodUri,
-                    DiscoveryUrls = discoveryUrls,
-                    ServerCapabilities = serverCapabilities
-                },
-                DomainNames = domainNames,
-                Subject = string.Format("CN={0},DC={1},O=OPC Foundation", appName, localhost),
-                PrivateKeyFormat = privateKeyFormat
-            };
-            return testData;
-        }
-
-        private string RandomLocalHost()
-        {
-            string localhost = Regex.Replace(_dataGenerator.GetRandomSymbol("en").Trim().ToLower(), @"[^\w\d]", "");
-            if (localhost.Length >= 12)
-            {
-                localhost = localhost.Substring(0, 12);
-            }
-            return localhost;
-        }
-
-        private string[] RandomDomainNames()
-        {
-            int count = _randomSource.NextInt32(8) + 1;
-            string[] result = new string[count];
-            for (int i = 0; i < count; i++)
-            {
-                result[i] = RandomLocalHost();
-            }
-            return result;
-        }
-
-        private StringCollection RandomDiscoveryUrl(StringCollection domainNames, int port, string appUri)
-        {
-            StringCollection result = new StringCollection();
-            foreach (string name in domainNames)
-            {
-                int random = _randomSource.NextInt32(7);
-                if ((result.Count == 0) || (random & 1) == 0)
-                {
-                    result.Add(string.Format("opc.tcp://{0}:{1}/{2}", name, (port++).ToString(), appUri));
-                }
-                if ((random & 2) == 0)
-                {
-                    result.Add(string.Format("http://{0}:{1}/{2}", name, (port++).ToString(), appUri));
-                }
-                if ((random & 4) == 0)
-                {
-                    result.Add(string.Format("https://{0}:{1}/{2}", name, (port++).ToString(), appUri));
-                }
-            }
-            return result;
         }
 
         private void SkipOnInvalidConfiguration()
@@ -524,13 +365,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
                 "Missing valid KeyVault configuration");
         }
 
-
         /// <summary>The test logger</summary>
         private readonly ITestOutputHelper _log;
-        private const int _randomStart = 1;
-        private RandomSource _randomSource;
-        private DataGenerator _dataGenerator;
-
+        private ApplicationTestDataGenerator _randomGenerator;
     }
 
 
