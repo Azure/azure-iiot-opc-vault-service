@@ -26,7 +26,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB.Models
         [JsonProperty(PropertyName = "_etag")]
         public string ETag { get; set; }
         public string ApplicationId { get; set; }
-        public CertificateRequestState State { get; set; }
+        public CertificateRequestState CertificateRequestState { get; set; }
         public string CertificateGroupId { get; set; }
         public string CertificateTypeId { get; set; }
         public byte[] SigningRequest { get; set; }

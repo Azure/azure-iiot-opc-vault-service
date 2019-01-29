@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------
+// ------------------------------------------------------------
 //  Copyright (c) Microsoft Corporation.  All rights reserved.
 //  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------
@@ -8,42 +8,46 @@ using Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Models
 {
     public sealed class ApplicationRecordApiModel
     {
-        [JsonProperty(PropertyName = "ApplicationId", Order = 10)]
+        [JsonProperty(PropertyName = "applicationId")]
         public string ApplicationId { get; set; }
 
-        [JsonProperty(PropertyName = "ID", Order = 15)]
+        [JsonProperty(PropertyName = "id")]
         public int? ID { get; }
 
-        [JsonProperty(PropertyName = "ApplicationUri", Order = 20)]
+        [JsonProperty(PropertyName = "state")]
+        public string State { get; set; }
+
+        [JsonProperty(PropertyName = "applicationUri")]
         public string ApplicationUri { get; set; }
 
-        [JsonProperty(PropertyName = "ApplicationName", Order = 30)]
+        [JsonProperty(PropertyName = "applicationName")]
         public string ApplicationName { get; set; }
 
-        [JsonProperty(PropertyName = "ApplicationType", Order = 40)]
+        [JsonProperty(PropertyName = "applicationType")]
         public int ApplicationType { get; set; }
 
-        [JsonProperty(PropertyName = "ApplicationNames", Order = 50)]
-        public ApplicationNameApiModel[] ApplicationNames { get; set; }
+        [JsonProperty(PropertyName = "applicationNames")]
+        public IList<ApplicationNameApiModel> ApplicationNames { get; set; }
 
-        [JsonProperty(PropertyName = "ProductUri", Order = 60)]
+        [JsonProperty(PropertyName = "productUri")]
         public string ProductUri { get; set; }
 
-        [JsonProperty(PropertyName = "DiscoveryUrls", Order = 70)]
-        public string[] DiscoveryUrls { get; set; }
+        [JsonProperty(PropertyName = "discoveryUrls")]
+        public IList<string> DiscoveryUrls { get; set; }
 
-        [JsonProperty(PropertyName = "ServerCapabilities", Order = 80)]
+        [JsonProperty(PropertyName = "serverCapabilities")]
         public string ServerCapabilities { get; set; }
 
-        [JsonProperty(PropertyName = "GatewayServerUri", Order = 90)]
+        [JsonProperty(PropertyName = "gatewayServerUri")]
         public string GatewayServerUri { get; set; }
 
-        [JsonProperty(PropertyName = "DiscoveryProfileUri", Order = 100)]
+        [JsonProperty(PropertyName = "discoveryProfileUri")]
         public string DiscoveryProfileUri { get; set; }
 
 
@@ -55,6 +59,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Models
         {
             this.ApplicationId = application.ApplicationId != Guid.Empty ? application.ApplicationId.ToString() : null;
             this.ID = application.ID;
+            this.State = application.ApplicationState.ToString();
             this.ApplicationUri = application.ApplicationUri;
             this.ApplicationName = application.ApplicationName;
             this.ApplicationType = application.ApplicationType;
@@ -64,7 +69,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Models
                 var applicationNameModel = new ApplicationNameApiModel(applicationName);
                 applicationNames.Add(applicationNameModel);
             }
-            this.ApplicationNames = applicationNames.ToArray();
+            this.ApplicationNames = applicationNames;
             this.ProductUri = application.ProductUri;
             this.DiscoveryUrls = application.DiscoveryUrls;
             this.ServerCapabilities = application.ServerCapabilities;
@@ -75,6 +80,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Models
         public Application ToServiceModel()
         {
             var application = new Application();
+            // ID and State are ignored, readonly
             application.ApplicationId = this.ApplicationId != null ? new Guid(this.ApplicationId) : Guid.Empty;
             application.ApplicationUri = this.ApplicationUri;
             application.ApplicationName = this.ApplicationName;
@@ -89,7 +95,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Models
                 application.ApplicationNames = applicationNames.ToArray();
             }
             application.ProductUri = this.ProductUri;
-            application.DiscoveryUrls = this.DiscoveryUrls;
+            application.DiscoveryUrls = this.DiscoveryUrls.ToArray();
             application.ServerCapabilities = this.ServerCapabilities;
             application.GatewayServerUri = this.GatewayServerUri;
             application.DiscoveryProfileUri = this.DiscoveryProfileUri;

@@ -1,5 +1,6 @@
-﻿// Copyright (c) Microsoft. All rights reserved.
+// Copyright (c) Microsoft. All rights reserved.
 
+using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Models;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test.Helpers;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Controllers;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Models;
@@ -47,7 +48,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test.v1.Controllers
             // *Act*:     execute an action in the system under test (SUT)
             // *Assert*:  verify that the test succeeded
             var id = "Default";
-            var configuration = new Opc.Ua.Gds.Server.CertificateGroupConfiguration()
+            var configuration = new CertificateGroupConfigurationModel()
             {
                 Id = id
             };
@@ -61,7 +62,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test.v1.Controllers
             // method is returning an object of the expected type. We test only
             // public methods, i.e. to test code inside private methods, we
             // write a test that starts from a public method.
-            CertificateGroupConfigurationApiModel result = this.target.GetAsync(id).Result;
+            CertificateGroupConfigurationApiModel result = this.target.GetCertificateGroupConfigurationAsync(id).Result;
 
             // Verify that Devices.GetAsync() has been called, exactly once
             // with the correct parameters

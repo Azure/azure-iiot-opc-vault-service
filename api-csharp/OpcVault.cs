@@ -2414,7 +2414,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         }
 
         /// <summary>
-        /// Get CA Certificate chain
+        /// Get Issuer CA Certificate chain
         /// </summary>
         /// <param name='group'>
         /// </param>
@@ -2441,7 +2441,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         /// <return>
         /// A response object containing the response body and response headers.
         /// </return>
-        public async Task<HttpOperationResponse<X509Certificate2CollectionApiModel>> GetCertificateGroupCAChainWithHttpMessagesAsync(string group, int? maxResults = default(int?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<HttpOperationResponse<X509Certificate2CollectionApiModel>> GetCertificateGroupIssuerCAChainWithHttpMessagesAsync(string group, int? maxResults = default(int?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (group == null)
             {
@@ -2457,11 +2457,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
                 tracingParameters.Add("group", group);
                 tracingParameters.Add("maxResults", maxResults);
                 tracingParameters.Add("cancellationToken", cancellationToken);
-                ServiceClientTracing.Enter(_invocationId, this, "GetCertificateGroupCAChain", tracingParameters);
+                ServiceClientTracing.Enter(_invocationId, this, "GetCertificateGroupIssuerCAChain", tracingParameters);
             }
             // Construct URL
             var _baseUrl = BaseUri.AbsoluteUri;
-            var _url = new System.Uri(new System.Uri(_baseUrl + (_baseUrl.EndsWith("/") ? "" : "/")), "v1/group/{group}/cacert").ToString();
+            var _url = new System.Uri(new System.Uri(_baseUrl + (_baseUrl.EndsWith("/") ? "" : "/")), "v1/group/{group}/issuerca").ToString();
             _url = _url.Replace("{group}", System.Uri.EscapeDataString(group));
             List<string> _queryParameters = new List<string>();
             if (maxResults != null)
@@ -2566,7 +2566,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         }
 
         /// <summary>
-        /// Get CA Certificate chain
+        /// Get Issuer CA Certificate chain
         /// </summary>
         /// <param name='group'>
         /// </param>
@@ -2595,7 +2595,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         /// <return>
         /// A response object containing the response body and response headers.
         /// </return>
-        public async Task<HttpOperationResponse<X509Certificate2CollectionApiModel>> GetCertificateGroupCAChainNextWithHttpMessagesAsync(string group, string nextPageLink = default(string), int? maxResults = default(int?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<HttpOperationResponse<X509Certificate2CollectionApiModel>> GetCertificateGroupIssuerCAChainNextWithHttpMessagesAsync(string group, string nextPageLink = default(string), int? maxResults = default(int?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (group == null)
             {
@@ -2612,11 +2612,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
                 tracingParameters.Add("nextPageLink", nextPageLink);
                 tracingParameters.Add("maxResults", maxResults);
                 tracingParameters.Add("cancellationToken", cancellationToken);
-                ServiceClientTracing.Enter(_invocationId, this, "GetCertificateGroupCAChainNext", tracingParameters);
+                ServiceClientTracing.Enter(_invocationId, this, "GetCertificateGroupIssuerCAChainNext", tracingParameters);
             }
             // Construct URL
             var _baseUrl = BaseUri.AbsoluteUri;
-            var _url = new System.Uri(new System.Uri(_baseUrl + (_baseUrl.EndsWith("/") ? "" : "/")), "v1/group/{group}/cacert/next").ToString();
+            var _url = new System.Uri(new System.Uri(_baseUrl + (_baseUrl.EndsWith("/") ? "" : "/")), "v1/group/{group}/issuerca/next").ToString();
             _url = _url.Replace("{group}", System.Uri.EscapeDataString(group));
             List<string> _queryParameters = new List<string>();
             if (maxResults != null)
@@ -2727,7 +2727,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         }
 
         /// <summary>
-        /// Get CA CRL chain
+        /// Get Issuer CA CRL chain
         /// </summary>
         /// <param name='group'>
         /// </param>
@@ -2754,7 +2754,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         /// <return>
         /// A response object containing the response body and response headers.
         /// </return>
-        public async Task<HttpOperationResponse<X509CrlCollectionApiModel>> GetCertificateGroupCACrlChainWithHttpMessagesAsync(string group, int? maxResults = default(int?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<HttpOperationResponse<X509CrlCollectionApiModel>> GetCertificateGroupIssuerCACrlChainWithHttpMessagesAsync(string group, int? maxResults = default(int?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (group == null)
             {
@@ -2770,11 +2770,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
                 tracingParameters.Add("group", group);
                 tracingParameters.Add("maxResults", maxResults);
                 tracingParameters.Add("cancellationToken", cancellationToken);
-                ServiceClientTracing.Enter(_invocationId, this, "GetCertificateGroupCACrlChain", tracingParameters);
+                ServiceClientTracing.Enter(_invocationId, this, "GetCertificateGroupIssuerCACrlChain", tracingParameters);
             }
             // Construct URL
             var _baseUrl = BaseUri.AbsoluteUri;
-            var _url = new System.Uri(new System.Uri(_baseUrl + (_baseUrl.EndsWith("/") ? "" : "/")), "v1/group/{group}/cacrl").ToString();
+            var _url = new System.Uri(new System.Uri(_baseUrl + (_baseUrl.EndsWith("/") ? "" : "/")), "v1/group/{group}/issuercacrl").ToString();
             _url = _url.Replace("{group}", System.Uri.EscapeDataString(group));
             List<string> _queryParameters = new List<string>();
             if (maxResults != null)
@@ -2879,7 +2879,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         }
 
         /// <summary>
-        /// Get CA CRL chain
+        /// Get Issuer CA CRL chain
         /// </summary>
         /// <param name='group'>
         /// </param>
@@ -2908,7 +2908,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         /// <return>
         /// A response object containing the response body and response headers.
         /// </return>
-        public async Task<HttpOperationResponse<X509CrlCollectionApiModel>> GetCertificateGroupCACrlChainNextWithHttpMessagesAsync(string group, string nextPageLink = default(string), int? maxResults = default(int?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<HttpOperationResponse<X509CrlCollectionApiModel>> GetCertificateGroupIssuerCACrlChainNextWithHttpMessagesAsync(string group, string nextPageLink = default(string), int? maxResults = default(int?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (group == null)
             {
@@ -2925,11 +2925,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
                 tracingParameters.Add("nextPageLink", nextPageLink);
                 tracingParameters.Add("maxResults", maxResults);
                 tracingParameters.Add("cancellationToken", cancellationToken);
-                ServiceClientTracing.Enter(_invocationId, this, "GetCertificateGroupCACrlChainNext", tracingParameters);
+                ServiceClientTracing.Enter(_invocationId, this, "GetCertificateGroupIssuerCACrlChainNext", tracingParameters);
             }
             // Construct URL
             var _baseUrl = BaseUri.AbsoluteUri;
-            var _url = new System.Uri(new System.Uri(_baseUrl + (_baseUrl.EndsWith("/") ? "" : "/")), "v1/group/{group}/cacrl/next").ToString();
+            var _url = new System.Uri(new System.Uri(_baseUrl + (_baseUrl.EndsWith("/") ? "" : "/")), "v1/group/{group}/issuercacrl/next").ToString();
             _url = _url.Replace("{group}", System.Uri.EscapeDataString(group));
             List<string> _queryParameters = new List<string>();
             if (maxResults != null)
@@ -3242,7 +3242,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             }
             // Construct URL
             var _baseUrl = BaseUri.AbsoluteUri;
-            var _url = new System.Uri(new System.Uri(_baseUrl + (_baseUrl.EndsWith("/") ? "" : "/")), "v1/group/{group}/trustlistnext").ToString();
+            var _url = new System.Uri(new System.Uri(_baseUrl + (_baseUrl.EndsWith("/") ? "" : "/")), "v1/group/{group}/trustlist/next").ToString();
             _url = _url.Replace("{group}", System.Uri.EscapeDataString(group));
             List<string> _queryParameters = new List<string>();
             if (maxResults != null)
@@ -3378,7 +3378,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         /// <return>
         /// A response object containing the response body and response headers.
         /// </return>
-        public async Task<HttpOperationResponse<X509Certificate2ApiModel>> CreateCertificateGroupCACertWithHttpMessagesAsync(string group, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<HttpOperationResponse<X509Certificate2ApiModel>> CreateCertificateGroupIssuerCACertWithHttpMessagesAsync(string group, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (group == null)
             {
@@ -3393,11 +3393,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
                 Dictionary<string, object> tracingParameters = new Dictionary<string, object>();
                 tracingParameters.Add("group", group);
                 tracingParameters.Add("cancellationToken", cancellationToken);
-                ServiceClientTracing.Enter(_invocationId, this, "CreateCertificateGroupCACert", tracingParameters);
+                ServiceClientTracing.Enter(_invocationId, this, "CreateCertificateGroupIssuerCACert", tracingParameters);
             }
             // Construct URL
             var _baseUrl = BaseUri.AbsoluteUri;
-            var _url = new System.Uri(new System.Uri(_baseUrl + (_baseUrl.EndsWith("/") ? "" : "/")), "v1/group/{group}/create").ToString();
+            var _url = new System.Uri(new System.Uri(_baseUrl + (_baseUrl.EndsWith("/") ? "" : "/")), "v1/group/{group}/issuerca/create").ToString();
             _url = _url.Replace("{group}", System.Uri.EscapeDataString(group));
             // Create HTTP transport objects
             var _httpRequest = new HttpRequestMessage();

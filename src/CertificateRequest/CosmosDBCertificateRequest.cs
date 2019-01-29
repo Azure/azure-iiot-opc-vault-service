@@ -124,7 +124,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                 isNew = true;
             }
 
-            request.State = (int)CertificateRequestState.New;
+            request.CertificateRequestState = (int)CertificateRequestState.New;
             request.CertificateGroupId = certificateGroupId;
             request.CertificateTypeId = certificateTypeId;
             request.SubjectName = null;
@@ -148,7 +148,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             string certificateGroupId,
             string certificateTypeId,
             string subjectName,
-            string[] domainNames,
+            IList<string> domainNames,
             string privateKeyFormat,
             string privateKeyPassword,
             string authorityId)
@@ -230,7 +230,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                 }
             }
 
-            request.State = (int)CertificateRequestState.New;
+            request.CertificateRequestState = (int)CertificateRequestState.New;
             request.CertificateGroupId = certificateGroupId;
             request.CertificateTypeId = certificateTypeId;
             request.SubjectName = subjectName;
@@ -267,7 +267,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                     throw new ServiceResultException(StatusCodes.BadNodeIdUnknown, "Unknown request id");
                 }
 
-                if (request.State != CertificateRequestState.New)
+                if (request.CertificateRequestState != CertificateRequestState.New)
                 {
                     throw new ServiceResultException(StatusCodes.BadInvalidState);
                 }
@@ -280,7 +280,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
 
                 if (isRejected)
                 {
-                    request.State = CertificateRequestState.Rejected;
+                    request.CertificateRequestState = CertificateRequestState.Rejected;
                     // erase information which is not required anymore
                     request.PrivateKeyFormat = null;
                     request.SigningRequest = null;
@@ -288,7 +288,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                 }
                 else
                 {
-                    request.State = CertificateRequestState.Approved;
+                    request.CertificateRequestState = CertificateRequestState.Approved;
 
                     X509Certificate2 certificate;
                     if (request.SigningRequest != null)
@@ -366,6 +366,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
         {
             Guid reqId = GetIdFromString(requestId);
             bool retryUpdate;
+            bool first = true;
             do
             {
                 retryUpdate = false;
@@ -376,14 +377,18 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                     throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
                 }
 
-                if (request.State != CertificateRequestState.Approved)
+                if (request.CertificateRequestState != CertificateRequestState.Approved)
                 {
                     throw new ServiceResultException(StatusCodes.BadInvalidState);
                 }
 
-                await _certificateGroup.AcceptPrivateKeyAsync(request.CertificateGroupId, requestId);
+                if (request.PrivateKeyFormat != null && first)
+                {
+                    await _certificateGroup.DeletePrivateKeyAsync(request.CertificateGroupId, requestId);
+                }
 
-                request.State = CertificateRequestState.Accepted;
+                first = false;
+                request.CertificateRequestState = CertificateRequestState.Accepted;
 
                 // erase information which is not required anymore
                 request.SigningRequest = null;
@@ -410,6 +415,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             Guid reqId = GetIdFromString(requestId);
 
             bool retryUpdate;
+            bool first = true;
             do
             {
                 retryUpdate = false;
@@ -420,9 +426,20 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                     throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
                 }
 
-                request.State = CertificateRequestState.Deleted;
+                request.CertificateRequestState = CertificateRequestState.Deleted;
 
-                await _certificateGroup.DeletePrivateKeyAsync(request.CertificateGroupId, requestId);
+                if (request.PrivateKeyFormat != null && first)
+                {
+                    try
+                    {
+                        await _certificateGroup.DeletePrivateKeyAsync(request.CertificateGroupId, requestId);
+                    }
+                    catch (Exception ex)
+                    {
+                        var s = ex.Message;
+                    }
+                }
+                first = false;
 
                 // erase information which is not required anymore
                 request.SigningRequest = null;
@@ -459,7 +476,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                     throw new ServiceResultException(StatusCodes.BadNodeIdUnknown, "Unknown request id");
                 }
 
-                if (request.State != CertificateRequestState.Deleted)
+                if (request.CertificateRequestState != CertificateRequestState.Deleted)
                 {
                     throw new ServiceResultException(StatusCodes.BadInvalidState);
                 }
@@ -469,7 +486,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                     throw new ServiceResultException(StatusCodes.BadInvalidState);
                 }
 
-                request.State = CertificateRequestState.Revoked;
+                request.CertificateRequestState = CertificateRequestState.Revoked;
                 // erase information which is not required anymore
                 request.PrivateKeyFormat = null;
                 request.SigningRequest = null;
@@ -514,9 +531,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             {
                 throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
             }
-            if (request.State != CertificateRequestState.Revoked &&
-                request.State != CertificateRequestState.Rejected &&
-                request.State != CertificateRequestState.New)
+            if (request.CertificateRequestState != CertificateRequestState.Revoked &&
+                request.CertificateRequestState != CertificateRequestState.Rejected &&
+                request.CertificateRequestState != CertificateRequestState.New)
             {
                 throw new ServiceResultException(StatusCodes.BadInvalidState);
             }
@@ -527,7 +544,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
         public async Task RevokeGroupAsync(string groupId, bool? allVersions)
         {
             // TODO: implement all versions to renew all CSR for all CA versions
-            var deletedRequests = await _certificateRequests.GetAsync(x => x.State == CertificateRequestState.Deleted);
+            var deletedRequests = await _certificateRequests.GetAsync(x => x.CertificateRequestState == CertificateRequestState.Deleted);
             if (deletedRequests == null ||
                 deletedRequests.Count() == 0)
             {
@@ -538,19 +555,21 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             var certCollection = new X509Certificate2Collection();
             foreach (var request in deletedRequests)
             {
-                if (String.Compare(request.CertificateGroupId, groupId, StringComparison.OrdinalIgnoreCase) == 0)
+                if (request.Certificate != null)
                 {
-                    try
+                    if (String.Compare(request.CertificateGroupId, groupId, StringComparison.OrdinalIgnoreCase) == 0)
                     {
-                        var cert = new X509Certificate2(request.Certificate);
-                        certCollection.Add(cert);
-                        revokedId.Add(request.RequestId);
+                        try
+                        {
+                            var cert = new X509Certificate2(request.Certificate);
+                            certCollection.Add(cert);
+                            revokedId.Add(request.RequestId);
+                        }
+                        catch
+                        {
+                            // skip 
+                        }
                     }
-                    catch
-                    {
-                        // skip 
-                    }
-
                 }
             }
 
@@ -569,17 +588,12 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                         throw new ServiceResultException(StatusCodes.BadNodeIdUnknown, "Unknown request id");
                     }
 
-                    if (request.State != CertificateRequestState.Deleted)
+                    if (request.CertificateRequestState != CertificateRequestState.Deleted)
                     {
                         throw new ServiceResultException(StatusCodes.BadInvalidState);
                     }
 
-                    if (request.Certificate == null)
-                    {
-                        throw new ServiceResultException(StatusCodes.BadInvalidState);
-                    }
-
-                    request.State = CertificateRequestState.Revoked;
+                    request.CertificateRequestState = CertificateRequestState.Revoked;
                     request.RevokeTime = DateTime.UtcNow;
                     // erase information which is not required anymore
                     request.Certificate = null;
@@ -603,7 +617,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
         }
 
 
-        public async Task<FinishRequestResultModel> FinishRequestAsync(
+        public async Task<FetchRequestResultModel> FetchRequestAsync(
             string requestId,
             string applicationId)
         {
@@ -621,12 +635,12 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                 throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
             }
 
-            switch (request.State)
+            switch (request.CertificateRequestState)
             {
                 case CertificateRequestState.New:
                 case CertificateRequestState.Rejected:
                 case CertificateRequestState.Accepted:
-                    return new FinishRequestResultModel(request.State);
+                    return new FetchRequestResultModel(request.CertificateRequestState);
                 case CertificateRequestState.Approved:
                     break;
                 default:
@@ -639,10 +653,24 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             }
 
             // get private key
-            byte[] privateKey = await _certificateGroup.LoadPrivateKeyAsync(request.CertificateGroupId, requestId, request.PrivateKeyFormat);
+            byte[] privateKey = null;
+            if (request.PrivateKeyFormat != null)
+            {
+                try
+                {
+                    privateKey = await _certificateGroup.LoadPrivateKeyAsync(request.CertificateGroupId, requestId, request.PrivateKeyFormat);
+                }
+                catch
+                {
+                    // intentionally ignore error when reading private key
+                    // it may have been disabled by keyvault due to inactivity...
+                    request.PrivateKeyFormat = null;
+                    privateKey = null;
+                }
+            }
 
-            return new FinishRequestResultModel(
-                request.State,
+            return new FetchRequestResultModel(
+                request.CertificateRequestState,
                 applicationId,
                 requestId,
                 request.CertificateGroupId,
@@ -665,7 +693,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                 throw new ServiceResultException(StatusCodes.BadNodeIdUnknown);
             }
 
-            switch (request.State)
+            switch (request.CertificateRequestState)
             {
                 case CertificateRequestState.New:
                 case CertificateRequestState.Rejected:
@@ -681,7 +709,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             return new ReadRequestResultModel(
                 requestId,
                 request.ApplicationId,
-                request.State,
+                request.CertificateRequestState,
                 request.CertificateGroupId,
                 request.CertificateTypeId,
                 request.SigningRequest,
@@ -700,11 +728,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             IEnumerable<CertificateRequest> requests;
             if (appId == null && state == null)
             {
-                (nextPageLink, requests) = await _certificateRequests.GetPageAsync(x => x.State < CertificateRequestState.Deleted, nextPageLink, maxResults);
+                (nextPageLink, requests) = await _certificateRequests.GetPageAsync(x => x.CertificateRequestState < CertificateRequestState.Deleted, nextPageLink, maxResults);
             }
             else if (appId != null && state != null)
             {
-                (nextPageLink, requests) = await _certificateRequests.GetPageAsync(x => x.ApplicationId == appId && x.State == state, nextPageLink, maxResults);
+                (nextPageLink, requests) = await _certificateRequests.GetPageAsync(x => x.ApplicationId == appId && x.CertificateRequestState == state, nextPageLink, maxResults);
             }
             else if (appId != null)
             {
@@ -712,7 +740,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             }
             else
             {
-                (nextPageLink, requests) = await _certificateRequests.GetPageAsync(x => x.State == state, nextPageLink, maxResults);
+                (nextPageLink, requests) = await _certificateRequests.GetPageAsync(x => x.CertificateRequestState == state, nextPageLink, maxResults);
             }
             List<ReadRequestResultModel> result = new List<ReadRequestResultModel>();
             foreach (CertificateRequest request in requests)

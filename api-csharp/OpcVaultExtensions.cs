@@ -518,7 +518,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             }
 
             /// <summary>
-            /// Get CA Certificate chain
+            /// Get Issuer CA Certificate chain
             /// </summary>
             /// <param name='operations'>
             /// The operations group for this extension method.
@@ -527,13 +527,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             /// </param>
             /// <param name='maxResults'>
             /// </param>
-            public static X509Certificate2CollectionApiModel GetCertificateGroupCAChain(this IOpcVault operations, string group, int? maxResults = default(int?))
+            public static X509Certificate2CollectionApiModel GetCertificateGroupIssuerCAChain(this IOpcVault operations, string group, int? maxResults = default(int?))
             {
-                return operations.GetCertificateGroupCAChainAsync(group, maxResults).GetAwaiter().GetResult();
+                return operations.GetCertificateGroupIssuerCAChainAsync(group, maxResults).GetAwaiter().GetResult();
             }
 
             /// <summary>
-            /// Get CA Certificate chain
+            /// Get Issuer CA Certificate chain
             /// </summary>
             /// <param name='operations'>
             /// The operations group for this extension method.
@@ -545,16 +545,16 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<X509Certificate2CollectionApiModel> GetCertificateGroupCAChainAsync(this IOpcVault operations, string group, int? maxResults = default(int?), CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<X509Certificate2CollectionApiModel> GetCertificateGroupIssuerCAChainAsync(this IOpcVault operations, string group, int? maxResults = default(int?), CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.GetCertificateGroupCAChainWithHttpMessagesAsync(group, maxResults, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.GetCertificateGroupIssuerCAChainWithHttpMessagesAsync(group, maxResults, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }
             }
 
             /// <summary>
-            /// Get CA Certificate chain
+            /// Get Issuer CA Certificate chain
             /// </summary>
             /// <param name='operations'>
             /// The operations group for this extension method.
@@ -565,13 +565,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             /// </param>
             /// <param name='maxResults'>
             /// </param>
-            public static X509Certificate2CollectionApiModel GetCertificateGroupCAChainNext(this IOpcVault operations, string group, string nextPageLink = default(string), int? maxResults = default(int?))
+            public static X509Certificate2CollectionApiModel GetCertificateGroupIssuerCAChainNext(this IOpcVault operations, string group, string nextPageLink = default(string), int? maxResults = default(int?))
             {
-                return operations.GetCertificateGroupCAChainNextAsync(group, nextPageLink, maxResults).GetAwaiter().GetResult();
+                return operations.GetCertificateGroupIssuerCAChainNextAsync(group, nextPageLink, maxResults).GetAwaiter().GetResult();
             }
 
             /// <summary>
-            /// Get CA Certificate chain
+            /// Get Issuer CA Certificate chain
             /// </summary>
             /// <param name='operations'>
             /// The operations group for this extension method.
@@ -585,16 +585,16 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<X509Certificate2CollectionApiModel> GetCertificateGroupCAChainNextAsync(this IOpcVault operations, string group, string nextPageLink = default(string), int? maxResults = default(int?), CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<X509Certificate2CollectionApiModel> GetCertificateGroupIssuerCAChainNextAsync(this IOpcVault operations, string group, string nextPageLink = default(string), int? maxResults = default(int?), CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.GetCertificateGroupCAChainNextWithHttpMessagesAsync(group, nextPageLink, maxResults, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.GetCertificateGroupIssuerCAChainNextWithHttpMessagesAsync(group, nextPageLink, maxResults, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }
             }
 
             /// <summary>
-            /// Get CA CRL chain
+            /// Get Issuer CA CRL chain
             /// </summary>
             /// <param name='operations'>
             /// The operations group for this extension method.
@@ -603,13 +603,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             /// </param>
             /// <param name='maxResults'>
             /// </param>
-            public static X509CrlCollectionApiModel GetCertificateGroupCACrlChain(this IOpcVault operations, string group, int? maxResults = default(int?))
+            public static X509CrlCollectionApiModel GetCertificateGroupIssuerCACrlChain(this IOpcVault operations, string group, int? maxResults = default(int?))
             {
-                return operations.GetCertificateGroupCACrlChainAsync(group, maxResults).GetAwaiter().GetResult();
+                return operations.GetCertificateGroupIssuerCACrlChainAsync(group, maxResults).GetAwaiter().GetResult();
             }
 
             /// <summary>
-            /// Get CA CRL chain
+            /// Get Issuer CA CRL chain
             /// </summary>
             /// <param name='operations'>
             /// The operations group for this extension method.
@@ -621,16 +621,16 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<X509CrlCollectionApiModel> GetCertificateGroupCACrlChainAsync(this IOpcVault operations, string group, int? maxResults = default(int?), CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<X509CrlCollectionApiModel> GetCertificateGroupIssuerCACrlChainAsync(this IOpcVault operations, string group, int? maxResults = default(int?), CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.GetCertificateGroupCACrlChainWithHttpMessagesAsync(group, maxResults, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.GetCertificateGroupIssuerCACrlChainWithHttpMessagesAsync(group, maxResults, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }
             }
 
             /// <summary>
-            /// Get CA CRL chain
+            /// Get Issuer CA CRL chain
             /// </summary>
             /// <param name='operations'>
             /// The operations group for this extension method.
@@ -641,13 +641,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             /// </param>
             /// <param name='maxResults'>
             /// </param>
-            public static X509CrlCollectionApiModel GetCertificateGroupCACrlChainNext(this IOpcVault operations, string group, string nextPageLink = default(string), int? maxResults = default(int?))
+            public static X509CrlCollectionApiModel GetCertificateGroupIssuerCACrlChainNext(this IOpcVault operations, string group, string nextPageLink = default(string), int? maxResults = default(int?))
             {
-                return operations.GetCertificateGroupCACrlChainNextAsync(group, nextPageLink, maxResults).GetAwaiter().GetResult();
+                return operations.GetCertificateGroupIssuerCACrlChainNextAsync(group, nextPageLink, maxResults).GetAwaiter().GetResult();
             }
 
             /// <summary>
-            /// Get CA CRL chain
+            /// Get Issuer CA CRL chain
             /// </summary>
             /// <param name='operations'>
             /// The operations group for this extension method.
@@ -661,9 +661,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<X509CrlCollectionApiModel> GetCertificateGroupCACrlChainNextAsync(this IOpcVault operations, string group, string nextPageLink = default(string), int? maxResults = default(int?), CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<X509CrlCollectionApiModel> GetCertificateGroupIssuerCACrlChainNextAsync(this IOpcVault operations, string group, string nextPageLink = default(string), int? maxResults = default(int?), CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.GetCertificateGroupCACrlChainNextWithHttpMessagesAsync(group, nextPageLink, maxResults, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.GetCertificateGroupIssuerCACrlChainNextWithHttpMessagesAsync(group, nextPageLink, maxResults, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }
@@ -753,9 +753,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             /// </param>
             /// <param name='group'>
             /// </param>
-            public static X509Certificate2ApiModel CreateCertificateGroupCACert(this IOpcVault operations, string group)
+            public static X509Certificate2ApiModel CreateCertificateGroupIssuerCACert(this IOpcVault operations, string group)
             {
-                return operations.CreateCertificateGroupCACertAsync(group).GetAwaiter().GetResult();
+                return operations.CreateCertificateGroupIssuerCACertAsync(group).GetAwaiter().GetResult();
             }
 
             /// <summary>
@@ -769,9 +769,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<X509Certificate2ApiModel> CreateCertificateGroupCACertAsync(this IOpcVault operations, string group, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<X509Certificate2ApiModel> CreateCertificateGroupIssuerCACertAsync(this IOpcVault operations, string group, CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.CreateCertificateGroupCACertWithHttpMessagesAsync(group, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.CreateCertificateGroupIssuerCACertWithHttpMessagesAsync(group, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }

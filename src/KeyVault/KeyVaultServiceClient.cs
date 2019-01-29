@@ -332,7 +332,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         /// <summary>
         /// Imports a new CA certificate in group id, tags it for trusted or issuer store.
         /// </summary>
-        public async Task ImportCACertificate(string id, X509Certificate2Collection certificates, bool trusted, CancellationToken ct = default(CancellationToken))
+        public async Task ImportIssuerCACertificate(string id, X509Certificate2Collection certificates, bool trusted, CancellationToken ct = default(CancellationToken))
         {
             X509Certificate2 certificate = certificates[0];
             var attributes = CreateCertificateAttributes(certificate);
@@ -578,7 +578,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         /// <summary>
         /// Imports a new CRL for group id.
         /// </summary>
-        public async Task ImportCACrl(string id, X509Certificate2 certificate, Opc.Ua.X509CRL crl, CancellationToken ct = default(CancellationToken))
+        public async Task ImportIssuerCACrl(string id, X509Certificate2 certificate, Opc.Ua.X509CRL crl, CancellationToken ct = default(CancellationToken))
         {
             try
             {
@@ -586,7 +586,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
                 SecretAttributes secretAttributes = new SecretAttributes()
                 {
                     Enabled = true,
-                    Expires = crl.NextUpdateTime,
                     NotBefore = crl.UpdateTime
                 };
 
@@ -611,7 +610,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         /// <summary>
         /// Load CRL for CA cert in group.
         /// </summary>
-        public async Task<Opc.Ua.X509CRL> LoadCACrl(string id, X509Certificate2 certificate, CancellationToken ct = default(CancellationToken))
+        public async Task<Opc.Ua.X509CRL> LoadIssuerCACrl(string id, X509Certificate2 certificate, CancellationToken ct = default(CancellationToken))
         {
             string secretIdentifier = CrlSecretName(id, certificate);
             var secret = await _keyVaultClient.GetSecretAsync(_vaultBaseUrl, secretIdentifier, ct).ConfigureAwait(false);
@@ -634,8 +633,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
             SecretAttributes secretAttributes = new SecretAttributes()
             {
                 Enabled = true,
-                NotBefore = now - TimeSpan.FromDays(-1),
-                Expires = now + TimeSpan.FromDays(30),
+                NotBefore = now
             };
             var result = await _keyVaultClient.SetSecretAsync(
                 _vaultBaseUrl,
@@ -676,11 +674,27 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         public async Task AcceptCertKey(string id, string requestId, CancellationToken ct = default)
         {
             string secretIdentifier = KeySecretName(id, requestId);
-            var secretAttributes = new SecretAttributes
+            var secretItem = await _keyVaultClient.GetSecretVersionsAsync(_vaultBaseUrl, secretIdentifier, null, ct);
+            while (secretItem != null)
             {
-                Enabled = false
-            };
-            await _keyVaultClient.UpdateSecretAsync(_vaultBaseUrl, secretIdentifier, secretAttributes, null, ct).ConfigureAwait(false);
+                foreach (var secret in secretItem)
+                {
+                    var secretAttributes = new SecretAttributes
+                    {
+                        Enabled = false,
+                        Expires = DateTime.UtcNow
+                    };
+                    await _keyVaultClient.UpdateSecretAsync(secret.Id, null, secretAttributes, null, ct).ConfigureAwait(false);
+                }
+                if (secretItem.NextPageLink != null)
+                {
+                    secretItem = await _keyVaultClient.GetSecretVersionsNextAsync(secretItem.NextPageLink, ct);
+                }
+                else
+                {
+                    secretItem = null;
+                }
+            }
         }
 
         /// <summary>
@@ -789,7 +803,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
                     {
                         var certBundle = await _keyVaultClient.GetCertificateAsync(certItem.Id, ct).ConfigureAwait(false);
                         var cert = new X509Certificate2(certBundle.Cer);
-                        var crl = await LoadCACrl(id, cert, ct);
+                        var crl = await LoadIssuerCACrl(id, cert, ct);
                         if (issuer)
                         {
                             trustList.IssuerCertificates.Add(cert);
