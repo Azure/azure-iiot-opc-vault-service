@@ -11,7 +11,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Models
 {
     public sealed class CertificateGroupConfigurationApiModel
     {
-        [JsonProperty(PropertyName = "name", Order = 10)]
+        [JsonProperty(PropertyName = "id", Order = 10)]
         public string Id { get; set; }
 
         [JsonProperty(PropertyName = "certificateType", Order = 15)]
