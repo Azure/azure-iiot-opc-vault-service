@@ -153,7 +153,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
                 }
                 else
                 {
-                    throw new InvalidConfigurationException("Key Vault certificate subject(" + Certificate.Subject + ") does not match cert group subject " + Configuration.SubjectName);
+                    throw new ResourceInvalidStateException("Key Vault certificate subject(" + Certificate.Subject + ") does not match cert group subject " + Configuration.SubjectName);
                 }
             }
             catch (Exception e)

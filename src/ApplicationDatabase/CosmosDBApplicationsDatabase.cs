@@ -18,8 +18,7 @@ using Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB.Models;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Models;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Runtime;
-using Opc.Ua;
-using Opc.Ua.Gds.Server.Database;
+using ApplicationsDatabaseBase = Opc.Ua.Gds.Server.Database.ApplicationsDatabaseBase;
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
 {
@@ -41,6 +40,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
         private readonly ILogger _log;
         private readonly bool _autoApprove;
         private readonly ILifetimeScope _scope = null;
+        private int _appIdCounter = 1;
 
         public CosmosDBApplicationsDatabase(
             ILifetimeScope scope,
@@ -58,11 +58,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
         }
 
         #region IApplicationsDatabase
-        public Task Initialize()
+        public async Task Initialize()
         {
-            return _applications.CreateCollectionIfNotExistsAsync();
+            await _applications.CreateCollectionIfNotExistsAsync();
+            _appIdCounter = await GetMaxAppIDAsync();
         }
 
+        /// <inheritdoc/>
         public async Task<Application> RegisterApplicationAsync(Application application)
         {
             Guid applicationId = VerifyRegisterApplication(application);
@@ -71,103 +73,106 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                 return await UpdateApplicationAsync(application.ApplicationId.ToString(), application);
             }
 
-            application.ID = await GetMaxAppIDAsync();
+            // normalize Server Caps
+            application.ServerCapabilities = ServerCapabilities(application);
+            application.ApplicationId = Guid.NewGuid();
+            application.ID = _appIdCounter++;   // uncritical, CosmosDB catches not unique ids
             application.ApplicationState = ApplicationState.New;
             application.CreateTime = DateTime.UtcNow;
-            application.ApplicationId = Guid.NewGuid();
+            //
             if (_autoApprove)
             {
                 application.ApplicationState = ApplicationState.Approved;
                 application.ApproveTime = application.CreateTime;
             }
-            var result = await _applications.CreateAsync(application);
-            applicationId = new Guid(result.Id);
+            bool retry;
+            string resourceId = null;
+            do
+            {
+                retry = false;
+                try
+                {
+                    var result = await _applications.CreateAsync(application);
+                    resourceId = result.Id;
+                }
+                catch (DocumentClientException dce)
+                {
+                    if (dce.StatusCode == System.Net.HttpStatusCode.Conflict)
+                    {
+                        // retry with new guid and keys
+                        application.ApplicationId = Guid.NewGuid();
+                        application.ID = await GetMaxAppIDAsync();
+                        retry = true;
+                    }
+                }
+            } while (retry);
+            applicationId = ToGuidAndVerify(resourceId);
             return await _applications.GetAsync(applicationId);
         }
 
-        public Task<Application> GetApplicationAsync(string id)
+        /// <inheritdoc/>
+        public Task<Application> GetApplicationAsync(string applicationId)
         {
-            if (String.IsNullOrEmpty(id))
-            {
-                throw new ArgumentException("The id must be provided", nameof(id));
-            }
-
-            Guid appId = new Guid(id);
+            Guid appId = ToGuidAndVerify(applicationId);
             return _applications.GetAsync(appId);
         }
 
-        public async Task<Application> UpdateApplicationAsync(string id, Application application)
+        /// <inheritdoc/>
+        public async Task<Application> UpdateApplicationAsync(string applicationId, Application application)
         {
-            if (String.IsNullOrEmpty(id))
-            {
-                throw new ArgumentException("The id must be provided", nameof(id));
-            }
-
             if (application == null)
             {
-                throw new ArgumentException("The application must be provided", nameof(application));
+                throw new ArgumentNullException(nameof(application), "The application must be provided");
             }
 
+            Guid appGuid = ToGuidAndVerify(applicationId);
             Guid recordId = VerifyRegisterApplication(application);
-            Guid applicationId = new Guid(id);
-            if (applicationId == Guid.Empty)
-            {
-                throw new ArgumentException("The applicationId is invalid", nameof(id));
-            }
 
             string capabilities = ServerCapabilities(application);
 
-            if (applicationId != Guid.Empty)
+            bool retryUpdate;
+            do
             {
-                bool retryUpdate;
-                do
+                retryUpdate = false;
+
+                var record = await _applications.GetAsync(appGuid);
+                if (record == null)
                 {
-                    retryUpdate = false;
+                    throw new ResourceNotFoundException("A record with the specified application id does not exist.");
+                }
 
-                    var record = await _applications.GetAsync(applicationId);
-                    if (record == null)
-                    {
-                        throw new ArgumentException("A record with the specified application id does not exist.", nameof(id));
-                    }
+                if (record.ID == 0)
+                {
+                    record.ID = await GetMaxAppIDAsync();
+                }
 
-                    if (record.ID == 0)
+                record.UpdateTime = DateTime.UtcNow;
+                record.ApplicationUri = application.ApplicationUri;
+                record.ApplicationName = application.ApplicationName;
+                record.ApplicationType = application.ApplicationType;
+                record.ProductUri = application.ProductUri;
+                record.ServerCapabilities = capabilities;
+                record.ApplicationNames = application.ApplicationNames;
+                record.DiscoveryUrls = application.DiscoveryUrls;
+                try
+                {
+                    await _applications.UpdateAsync(appGuid, record, record.ETag);
+                }
+                catch (DocumentClientException dce)
+                {
+                    if (dce.StatusCode == HttpStatusCode.PreconditionFailed)
                     {
-                        record.ID = await GetMaxAppIDAsync();
+                        retryUpdate = true;
                     }
-
-                    record.UpdateTime = DateTime.UtcNow;
-                    record.ApplicationUri = application.ApplicationUri;
-                    record.ApplicationName = application.ApplicationName;
-                    record.ApplicationType = application.ApplicationType;
-                    record.ProductUri = application.ProductUri;
-                    record.ServerCapabilities = capabilities;
-                    record.ApplicationNames = application.ApplicationNames;
-                    record.DiscoveryUrls = application.DiscoveryUrls;
-                    try
-                    {
-                        await _applications.UpdateAsync(applicationId, record, record.ETag);
-                    }
-                    catch (DocumentClientException dce)
-                    {
-                        if (dce.StatusCode == HttpStatusCode.PreconditionFailed)
-                        {
-                            retryUpdate = true;
-                        }
-                    }
-                } while (retryUpdate);
-            }
-            return await _applications.GetAsync(applicationId);
+                }
+            } while (retryUpdate);
+            return await _applications.GetAsync(appGuid);
         }
 
-        public async Task<Application> ApproveApplicationAsync(string id, bool approved, bool force)
+        /// <inheritdoc/>
+        public async Task<Application> ApproveApplicationAsync(string applicationId, bool approved, bool force)
         {
-            if (String.IsNullOrEmpty(id))
-            {
-                throw new ArgumentException("The id must be provided", nameof(id));
-            }
-
-            Guid appId = new Guid(id);
-
+            Guid appId = ToGuidAndVerify(applicationId);
             bool retryUpdate;
             Application record;
             do
@@ -183,7 +188,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                 if (!force &&
                     record.ApplicationState != ApplicationState.New)
                 {
-                    throw new ServiceResultException(StatusCodes.BadInvalidState);
+                    throw new ResourceInvalidStateException("The record is not in a valid state for this operation.");
                 }
 
                 record.ApplicationState = approved ? ApplicationState.Approved : ApplicationState.Rejected;
@@ -205,16 +210,10 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             return record;
         }
 
-
-        public async Task<Application> UnregisterApplicationAsync(string id)
+        /// <inheritdoc/>
+        public async Task<Application> UnregisterApplicationAsync(string applicationId)
         {
-            if (String.IsNullOrEmpty(id))
-            {
-                throw new ArgumentException("The id must be provided", nameof(id));
-            }
-
-            Guid appId = new Guid(id);
-
+            Guid appId = ToGuidAndVerify(applicationId);
             bool retryUpdate;
             bool first = true;
             Application record;
@@ -232,10 +231,10 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
 
                 if (record.ApplicationState >= ApplicationState.Unregistered)
                 {
-                    throw new ServiceResultException(StatusCodes.BadInvalidState);
+                    throw new ResourceInvalidStateException("The record is not in a valid state for this operation.");
                 }
 
-                if (first)
+                if (first && _scope != null)
                 {
                     ICertificateRequest certificateRequestsService = _scope.Resolve<ICertificateRequest>();
                     // mark all requests as deleted
@@ -271,56 +270,63 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             return record;
         }
 
-        public async Task DeleteApplicationAsync(string id, bool force)
+        /// <inheritdoc/>
+        public async Task DeleteApplicationAsync(string applicationId, bool force)
         {
-            if (String.IsNullOrEmpty(id))
-            {
-                throw new ArgumentException("The id must be provided", nameof(id));
-            }
-
-            Guid appId = new Guid(id);
-
-            List<byte[]> certificates = new List<byte[]>();
-
+            Guid appId = ToGuidAndVerify(applicationId);
             var application = await _applications.GetAsync(appId);
-            if (application == null)
-            {
-                throw new ResourceNotFoundException("A record with the specified application id does not exist.");
-            }
-
             if (!force &&
                 application.ApplicationState < ApplicationState.Unregistered)
             {
-                throw new ServiceResultException(StatusCodes.BadInvalidState);
+                throw new ResourceInvalidStateException("The record is not in a valid state for this operation.");
             }
 
-            ICertificateRequest certificateRequestsService = _scope.Resolve<ICertificateRequest>();
-            // mark all requests as deleted
-            ReadRequestResultModel[] certificateRequests;
-            string nextPageLink = null;
-            do
+            if (_scope != null)
             {
-                (nextPageLink, certificateRequests) = await certificateRequestsService.QueryPageAsync(appId.ToString(), null, nextPageLink);
-                foreach (var request in certificateRequests)
+                ICertificateRequest certificateRequestsService = _scope.Resolve<ICertificateRequest>();
+                // mark all requests as deleted
+                ReadRequestResultModel[] certificateRequests;
+                string nextPageLink = null;
+                do
                 {
-                    await certificateRequestsService.DeleteAsync(request.RequestId);
-                }
-            } while (nextPageLink != null);
-
+                    (nextPageLink, certificateRequests) = await certificateRequestsService.QueryPageAsync(appId.ToString(), null, nextPageLink);
+                    foreach (var request in certificateRequests)
+                    {
+                        await certificateRequestsService.DeleteAsync(request.RequestId);
+                    }
+                } while (nextPageLink != null);
+            }
             await _applications.DeleteAsync(appId);
         }
 
+        /// <inheritdoc/>
         public async Task<IList<Application>> ListApplicationAsync(string applicationUri)
         {
             if (String.IsNullOrEmpty(applicationUri))
             {
-                throw new ArgumentException("The applicationUri must be provided", nameof(applicationUri));
+                throw new ArgumentNullException(nameof(applicationUri), "The applicationUri must be provided.");
+            }
+            if (!Uri.IsWellFormedUriString(applicationUri, UriKind.Absolute))
+            {
+                throw new ArgumentException(nameof(applicationUri), "The applicationUri is invalid.");
             }
 
-            var results = await _applications.GetAsync(ii => (ii.ApplicationUri == applicationUri && ii.ApplicationState == ApplicationState.Approved));
-            return results.ToList();
+            var queryParameters = new SqlParameterCollection();
+            string query = "SELECT * FROM Applications a WHERE ";
+            query += " a.ApplicationUri = @applicationUri";
+            queryParameters.Add(new SqlParameter("@applicationUri", applicationUri));
+            query += " AND a.ApplicationState = @applicationState";
+            queryParameters.Add(new SqlParameter("@applicationState", ApplicationState.Approved.ToString()));
+            SqlQuerySpec sqlQuerySpec = new SqlQuerySpec
+            {
+                QueryText = query,
+                Parameters = queryParameters
+            };
+            var sqlResults = await _applications.GetAsync(sqlQuerySpec);
+            return sqlResults.ToList();
         }
 
+        /// <inheritdoc/>
         public async Task<QueryApplicationsResponseModel> QueryApplicationsAsync(
             uint startingRecordId,
             uint maxRecordsToReturn,
@@ -433,6 +439,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             return new QueryApplicationsResponseModel(records.ToArray(), lastCounterResetTime, nextRecordId);
         }
 
+        /// <inheritdoc/>
         public async Task<QueryApplicationsPageResponseModel> QueryApplicationsPageAsync(
             string applicationName,
             string applicationUri,
@@ -538,6 +545,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
         #endregion
 
         #region Private Members
+        /// <summary>
+        /// Helper to create a SQL query for CosmosDB.
+        /// </summary>
+        /// <param name="startingRecordId">The first record Id</param>
+        /// <param name="maxRecordsToQuery">The max number of records</param>
+        /// <param name="applicationState">The application state filter</param>
+        /// <returns></returns>
         private SqlQuerySpec CreateServerQuery(uint startingRecordId, uint maxRecordsToQuery, ApplicationState? applicationState)
         {
             string query;
@@ -549,14 +563,14 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             }
             else
             {
-                query = String.Format("SELECT");
+                query = "SELECT";
             }
             query += " * FROM Applications a WHERE a.ID >= @startingRecord";
             queryParameters.Add(new SqlParameter("@startingRecord", startingRecordId));
             if (applicationState != null)
             {
-                query += " AND a.ApplicationState == @applicationState";
-                queryParameters.Add(new SqlParameter("@applicationState", applicationState));
+                query += " AND a.ApplicationState = @applicationState";
+                queryParameters.Add(new SqlParameter("@applicationState", applicationState.ToString()));
             }
             query += " ORDER BY a.ID";
             SqlQuerySpec sqlQuerySpec = new SqlQuerySpec
@@ -566,6 +580,12 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             };
             return sqlQuerySpec;
         }
+
+        /// <summary>
+        /// Validates all fields in an application record to be consistent with the OPC UA specification.
+        /// </summary>
+        /// <param name="application">The application</param>
+        /// <returns>The application Guid.</returns>
         private Guid VerifyRegisterApplication(Application application)
         {
             if (application == null)
@@ -583,8 +603,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                 throw new ArgumentException(application.ApplicationUri + " is not a valid URI.", nameof(application.ApplicationUri));
             }
 
-            if (((int)application.ApplicationType < (int)Opc.Ua.ApplicationType.Server) ||
-                ((int)application.ApplicationType > (int)Opc.Ua.ApplicationType.DiscoveryServer))
+            if ((application.ApplicationType < ApplicationType.Server) ||
+                (application.ApplicationType > ApplicationType.DiscoveryServer))
             {
                 throw new ArgumentException(application.ApplicationType.ToString() + " is not a valid ApplicationType.", nameof(application.ApplicationType));
             }
@@ -633,6 +653,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                 {
                     throw new ArgumentException("At least one Server Capability must be provided.", nameof(application.ServerCapabilities));
                 }
+
+                // TODO: check for valid servercapabilities
             }
             else
             {
@@ -653,7 +675,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
 
         public static string ServerCapabilities(Application application)
         {
-            if ((int)application.ApplicationType != (int)Opc.Ua.ApplicationType.Client)
+            if ((int)application.ApplicationType != (int)CosmosDB.Models.ApplicationType.Client)
             {
                 if (application.ServerCapabilities == null || application.ServerCapabilities.Length == 0)
                 {
@@ -696,6 +718,27 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             var maxAppIDEnum = await _applications.GetAsync(sqlQuerySpec);
             var maxAppID = maxAppIDEnum.SingleOrDefault();
             return (maxAppID != null) ? maxAppID.ID + 1 : 1;
+        }
+
+        private Guid ToGuidAndVerify(string applicationId)
+        {
+            try
+            {
+                if (String.IsNullOrEmpty(applicationId))
+                {
+                    throw new ArgumentNullException(nameof(applicationId), "The application id must be provided");
+                }
+                Guid guid = new Guid(applicationId);
+                if (guid == Guid.Empty)
+                {
+                    throw new ArgumentException("The applicationId is invalid");
+                }
+                return guid;
+            }
+            catch (FormatException)
+            {
+                throw new ArgumentException("The applicationId is invalid.");
+            }
         }
         #endregion
         #region Private Fields

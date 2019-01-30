@@ -16,7 +16,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB.Models
         DiscoveryServer = 3
     }
 
-    [Serializable]
     public enum ApplicationState : int
     {
         New = 0,

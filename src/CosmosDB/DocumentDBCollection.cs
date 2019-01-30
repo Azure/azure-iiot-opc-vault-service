@@ -13,6 +13,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB
     using Microsoft.Azure.Documents;
     using Microsoft.Azure.Documents.Client;
     using Microsoft.Azure.Documents.Linq;
+    using Microsoft.Azure.IIoT.Exceptions;
 
     /// <inheritdoc/>
     public class DocumentDBCollection<T> : IDocumentDBCollection<T> where T : class
@@ -57,11 +58,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB
             {
                 if (e.StatusCode == System.Net.HttpStatusCode.NotFound)
                 {
-                    return null;
+                    throw new ResourceNotFoundException("A record with the specified id does not exist.");
                 }
                 else
                 {
-                    throw;
+                    throw e;
                 }
             }
         }

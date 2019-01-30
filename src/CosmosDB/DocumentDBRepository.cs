@@ -67,7 +67,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB
                 {
                     new Newtonsoft.Json.Converters.StringEnumConverter()
                     {
-                        CamelCaseText = true,
+                        CamelCaseText = false,
                         AllowIntegerValues = true
                     }
                 }
