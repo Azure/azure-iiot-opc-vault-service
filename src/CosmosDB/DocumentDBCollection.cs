@@ -20,9 +20,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB
         const int DefaultMaxItemCount = 10;
         /// <inheritdoc/>
         public DocumentCollection Collection { get; private set; }
-        private readonly IDocumentDBRepository db;
-        private readonly string CollectionId;
-        private const int RequestLevelLowest = 400;
+        private readonly IDocumentDBRepository _db;
+        private readonly string _collectionId;
+        private const int _requestLevelLowest = 400;
 
         /// <inheritdoc/>
         public DocumentDBCollection(IDocumentDBRepository db) : this(db, typeof(T).Name)
@@ -41,9 +41,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB
                 throw new ArgumentNullException(nameof(db));
             }
 
-            this.CollectionId = collectionId;
-            this.db = db;
-            CreateCollectionIfNotExistsAsync().Wait();
+            this._collectionId = collectionId;
+            this._db = db;
         }
 
         /// <inheritdoc/>
@@ -51,7 +50,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB
         {
             try
             {
-                Document document = await db.Client.ReadDocumentAsync(UriFactory.CreateDocumentUri(db.DatabaseId, CollectionId, id.ToString()));
+                Document document = await _db.Client.ReadDocumentAsync(UriFactory.CreateDocumentUri(_db.DatabaseId, _collectionId, id.ToString()));
                 return (T)(dynamic)document;
             }
             catch (DocumentClientException e)
@@ -71,8 +70,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB
         public async Task<IEnumerable<T>> GetAsync(Expression<Func<T, bool>> predicate)
         {
             FeedOptions feedOptions = new FeedOptions { MaxItemCount = -1 };
-            IDocumentQuery<T> query = db.Client.CreateDocumentQuery<T>(
-                UriFactory.CreateDocumentCollectionUri(db.DatabaseId, CollectionId),
+            IDocumentQuery<T> query = _db.Client.CreateDocumentQuery<T>(
+                UriFactory.CreateDocumentCollectionUri(_db.DatabaseId, _collectionId),
                 feedOptions)
             .Where(predicate)
             .AsDocumentQuery();
@@ -90,8 +89,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB
         public async Task<IEnumerable<T>> GetAsync(SqlQuerySpec sqlQuerySpec)
         {
             FeedOptions feedOptions = new FeedOptions { MaxItemCount = -1 };
-            IDocumentQuery<T> query = db.Client.CreateDocumentQuery<T>(
-                UriFactory.CreateDocumentCollectionUri(db.DatabaseId, CollectionId),
+            IDocumentQuery<T> query = _db.Client.CreateDocumentQuery<T>(
+                UriFactory.CreateDocumentCollectionUri(_db.DatabaseId, _collectionId),
                 sqlQuerySpec,
                 feedOptions)
             .AsDocumentQuery();
@@ -118,8 +117,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB
                 MaxItemCount = maxItemCount ?? DefaultMaxItemCount,
                 RequestContinuation = continuationToken
             };
-            IDocumentQuery<T> query = db.Client.CreateDocumentQuery<T>(
-                UriFactory.CreateDocumentCollectionUri(db.DatabaseId, CollectionId),
+            IDocumentQuery<T> query = _db.Client.CreateDocumentQuery<T>(
+                UriFactory.CreateDocumentCollectionUri(_db.DatabaseId, _collectionId),
                 feedOptions)
             .Where(predicate)
             .AsDocumentQuery();
@@ -151,8 +150,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB
                 MaxItemCount = maxItemCount ?? DefaultMaxItemCount,
                 RequestContinuation = continuationToken
             };
-            IDocumentQuery<T> query = db.Client.CreateDocumentQuery<T>(
-                UriFactory.CreateDocumentCollectionUri(db.DatabaseId, CollectionId),
+            IDocumentQuery<T> query = _db.Client.CreateDocumentQuery<T>(
+                UriFactory.CreateDocumentCollectionUri(_db.DatabaseId, _collectionId),
                 sqlQuerySpec,
                 feedOptions)
             .AsDocumentQuery();
@@ -175,7 +174,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB
         /// <inheritdoc/>
         public async Task<Document> CreateAsync(T item)
         {
-            return await db.Client.CreateDocumentAsync(UriFactory.CreateDocumentCollectionUri(db.DatabaseId, CollectionId), item);
+            return await _db.Client.CreateDocumentAsync(UriFactory.CreateDocumentCollectionUri(_db.DatabaseId, _collectionId), item);
         }
 
         /// <inheritdoc/>
@@ -190,29 +189,35 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB
                 }
             };
 
-            return await db.Client.ReplaceDocumentAsync(UriFactory.CreateDocumentUri(db.DatabaseId, CollectionId, id.ToString()), item, ac);
+            return await _db.Client.ReplaceDocumentAsync(UriFactory.CreateDocumentUri(_db.DatabaseId, _collectionId, id.ToString()), item, ac);
         }
 
         /// <inheritdoc/>
-        public async Task DeleteAsync(Guid id)
+        public Task DeleteAsync(Guid id)
         {
-            await db.Client.DeleteDocumentAsync(UriFactory.CreateDocumentUri(db.DatabaseId, CollectionId, id.ToString()));
+            return _db.Client.DeleteDocumentAsync(UriFactory.CreateDocumentUri(_db.DatabaseId, _collectionId, id.ToString()));
         }
 
-        private async Task CreateCollectionIfNotExistsAsync()
+        /// <inheritdoc/>
+        public async Task CreateCollectionIfNotExistsAsync()
         {
             try
             {
-                Collection = await db.Client.ReadDocumentCollectionAsync(UriFactory.CreateDocumentCollectionUri(db.DatabaseId, CollectionId));
+                await _db.CreateRepositoryIfNotExistsAsync();
+                Collection = await _db.Client.ReadDocumentCollectionAsync(UriFactory.CreateDocumentCollectionUri(_db.DatabaseId, _collectionId));
             }
             catch (DocumentClientException e)
             {
                 if (e.StatusCode == System.Net.HttpStatusCode.NotFound)
                 {
-                    Collection = await db.Client.CreateDocumentCollectionAsync(
-                        UriFactory.CreateDatabaseUri(db.DatabaseId),
-                        new DocumentCollection { Id = CollectionId },
-                        new RequestOptions { OfferThroughput = RequestLevelLowest });
+                    Collection = await _db.Client.CreateDocumentCollectionAsync(
+                        UriFactory.CreateDatabaseUri(_db.DatabaseId),
+                        new DocumentCollection
+                        {
+                            Id = _collectionId,
+                            UniqueKeyPolicy = _db.UniqueKeyPolicy
+                        },
+                        new RequestOptions { OfferThroughput = _requestLevelLowest });
                 }
                 else
                 {

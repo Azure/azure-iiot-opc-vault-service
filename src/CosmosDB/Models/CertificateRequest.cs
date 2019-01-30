@@ -3,19 +3,19 @@
 //  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------
 
-using Newtonsoft.Json;
 using System;
+using Newtonsoft.Json;
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB.Models
 {
     public enum CertificateRequestState
     {
-        New,
-        Approved,
-        Rejected,
-        Accepted,
-        Deleted,
-        Revoked
+        New = 0,
+        Approved = 1,
+        Rejected = 2,
+        Accepted = 3,
+        Deleted = 4,
+        Revoked = 5
     }
 
     [Serializable]
@@ -36,10 +36,10 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB.Models
         public string PrivateKeyPassword { get; set; }
         public string AuthorityId { get; set; }
         public byte[] Certificate { get; set; }
-        public DateTime RequestTime { get; set; }
-        public DateTime ApproveRejectTime { get; set; }
-        public DateTime AcceptTime { get; set; }
-        public DateTime DeleteTime { get; set; }
-        public DateTime RevokeTime { get; set; }
+        public DateTime? RequestTime { get; set; }
+        public DateTime? ApproveRejectTime { get; set; }
+        public DateTime? AcceptTime { get; set; }
+        public DateTime? DeleteTime { get; set; }
+        public DateTime? RevokeTime { get; set; }
     }
 }

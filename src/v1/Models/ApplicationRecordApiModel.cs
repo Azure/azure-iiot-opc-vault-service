@@ -9,9 +9,24 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Models
 {
+
+    [Serializable]
+    public enum ApplicationType : int
+    {
+        [EnumMember(Value = "server")]
+        Server = 0,
+        [EnumMember(Value = "client")]
+        Client = 1,
+        [EnumMember(Value = "clientAndServer")]
+        ClientAndServer = 2,
+        [EnumMember(Value = "discoveryServer")]
+        DiscoveryServer = 3
+    }
+
     public sealed class ApplicationRecordApiModel
     {
         [JsonProperty(PropertyName = "applicationId")]
@@ -30,7 +45,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Models
         public string ApplicationName { get; set; }
 
         [JsonProperty(PropertyName = "applicationType")]
-        public int ApplicationType { get; set; }
+        public ApplicationType ApplicationType { get; set; }
 
         [JsonProperty(PropertyName = "applicationNames")]
         public IList<ApplicationNameApiModel> ApplicationNames { get; set; }
@@ -62,7 +77,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Models
             this.State = application.ApplicationState.ToString();
             this.ApplicationUri = application.ApplicationUri;
             this.ApplicationName = application.ApplicationName;
-            this.ApplicationType = application.ApplicationType;
+            this.ApplicationType = (ApplicationType)application.ApplicationType;
             var applicationNames = new List<ApplicationNameApiModel>();
             foreach (var applicationName in application.ApplicationNames)
             {
@@ -84,7 +99,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Models
             application.ApplicationId = this.ApplicationId != null ? new Guid(this.ApplicationId) : Guid.Empty;
             application.ApplicationUri = this.ApplicationUri;
             application.ApplicationName = this.ApplicationName;
-            application.ApplicationType = this.ApplicationType;
+            application.ApplicationType = (CosmosDB.Models.ApplicationType)this.ApplicationType;
             if (this.ApplicationNames != null)
             {
                 var applicationNames = new List<ApplicationName>();

@@ -4,9 +4,10 @@
 // ------------------------------------------------------------
 
 
+using System;
+using System.Text;
 using System.Text.RegularExpressions;
-using Microsoft.Azure.IIoT.Auth.Clients;
-using Microsoft.Azure.IIoT.Diagnostics;
+using Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB.Models;
 using Opc.Ua;
 using Opc.Ua.Gds;
 using Opc.Ua.Test;
@@ -35,6 +36,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
             IssuerCertificates = null;
         }
 
+        public Application Model;
         public ApplicationRecordDataType ApplicationRecord;
         public NodeId CertificateGroupId;
         public NodeId CertificateTypeId;
@@ -56,11 +58,12 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
             _randomStart = randomStart;
             _randomSource = new RandomSource(_randomStart);
             _dataGenerator = new DataGenerator(_randomSource);
+            _serverCapabilities = new Opc.Ua.Gds.Client.ServerCapabilities();
         }
 
         public ApplicationTestData RandomApplicationTestData()
         {
-            ApplicationType appType = (ApplicationType)_randomSource.NextInt32((int)ApplicationType.ClientAndServer);
+            Opc.Ua.ApplicationType appType = (Opc.Ua.ApplicationType)_randomSource.NextInt32((int)Opc.Ua.ApplicationType.ClientAndServer);
             string pureAppName = _dataGenerator.GetRandomString("en");
             pureAppName = Regex.Replace(pureAppName, @"[^\w\d\s]", "");
             string pureAppUri = Regex.Replace(pureAppName, @"[^\w\d]", "");
@@ -74,20 +77,31 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
             StringCollection serverCapabilities = new StringCollection();
             switch (appType)
             {
-                case ApplicationType.Client:
+                case Opc.Ua.ApplicationType.Client:
                     appName += " Client";
                     break;
-                case ApplicationType.ClientAndServer:
+                case Opc.Ua.ApplicationType.ClientAndServer:
                     appName += " Client and";
-                    goto case ApplicationType.Server;
-                case ApplicationType.Server:
+                    goto case Opc.Ua.ApplicationType.Server;
+                case Opc.Ua.ApplicationType.Server:
                     appName += " Server";
                     int port = (_dataGenerator.GetRandomInt16() & 0x1fff) + 50000;
                     discoveryUrls = RandomDiscoveryUrl(domainNames, port, pureAppUri);
+                    serverCapabilities = RandomServerCapabilities();
                     break;
             }
             ApplicationTestData testData = new ApplicationTestData
             {
+                Model = new Application
+                {
+                    ApplicationUri = appUri,
+                    ApplicationName = appName,
+                    ApplicationType = (CosmosDB.Models.ApplicationType)appType,
+                    ProductUri = prodUri,
+                    ServerCapabilities = ServerCapabilities(serverCapabilities.ToArray()),
+                    ApplicationNames = new ApplicationName[] { new ApplicationName { Locale = "en-us", Text = appName } },
+                    DiscoveryUrls = discoveryUrls.ToArray()
+                },
                 ApplicationRecord = new ApplicationRecordDataType
                 {
                     ApplicationNames = new LocalizedTextCollection { new LocalizedText("en-us", appName) },
@@ -147,9 +161,50 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
             return result;
         }
 
+        private StringCollection RandomServerCapabilities()
+        {
+            var serverCapabilities = new StringCollection();
+            int capabilities = _randomSource.NextInt32(8);
+            foreach (var cap in _serverCapabilities)
+            {
+                if (_randomSource.NextInt32(100) > 50)
+                {
+                    serverCapabilities.Add(cap.Id);
+                    if (capabilities-- == 0)
+                    {
+                        break;
+                    }
+                }
+            }
+            return serverCapabilities;
+        }
+
+        private string ServerCapabilities(string[] serverCapabilities)
+        {
+            StringBuilder capabilities = new StringBuilder();
+            if (serverCapabilities != null)
+            {
+                foreach (var capability in serverCapabilities)
+                {
+                    if (String.IsNullOrEmpty(capability))
+                    {
+                        continue;
+                    }
+
+                    if (capabilities.Length > 0)
+                    {
+                        capabilities.Append(',');
+                    }
+                    capabilities.Append(capability);
+                }
+            }
+            return capabilities.ToString();
+        }
+
         private int _randomStart = 1;
         private RandomSource _randomSource;
         private DataGenerator _dataGenerator;
+        private Opc.Ua.Gds.Client.ServerCapabilities _serverCapabilities;
     }
 
 }

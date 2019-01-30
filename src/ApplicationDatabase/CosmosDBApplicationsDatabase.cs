@@ -5,9 +5,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net;
-using System.Security;
 using System.Text;
 using System.Threading.Tasks;
 using Autofac;
@@ -23,38 +23,46 @@ using Opc.Ua.Gds.Server.Database;
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
 {
+    public static class CosmosDBApplicationsDatabaseFactory
+    {
+        public static IApplicationsDatabase Create(
+            ILifetimeScope scope,
+            IServicesConfig config,
+            IDocumentDBRepository db,
+            ILogger logger)
+        {
+            return new CosmosDBApplicationsDatabase(scope, config, db, logger);
+        }
+    }
+
     internal sealed class CosmosDBApplicationsDatabase : IApplicationsDatabase
     {
         const int _defaultRecordsPerQuery = 10;
         private readonly ILogger _log;
-        private readonly string _endpoint;
-        private readonly string _dataBaseId;
-        private readonly string _collectionId;
         private readonly bool _autoApprove;
-        private readonly SecureString _authKeyOrResourceToken;
         private readonly ILifetimeScope _scope = null;
 
         public CosmosDBApplicationsDatabase(
             ILifetimeScope scope,
             IServicesConfig config,
+            IDocumentDBRepository db,
             ILogger logger)
         {
             _scope = scope;
-            _endpoint = config.CosmosDBEndpoint;
-            _dataBaseId = config.CosmosDBDatabase;
-            _collectionId = config.CosmosDBCollection;
             _autoApprove = config.ApplicationsAutoApprove;
-            _authKeyOrResourceToken = new SecureString();
-            foreach (char ch in config.CosmosDBToken)
-            {
-                _authKeyOrResourceToken.AppendChar(ch);
-            }
             _log = logger;
-            _log.Debug("Creating new instance of `CosmosDBApplicationsDatabase` service " + config.CosmosDBEndpoint, () => { });
-            Initialize();
+            _log.Debug("Creating new instance of `CosmosDBApplicationsDatabase` service " + config.CosmosDBCollection, () => { });
+            // set unique key in CosmosDB for application ID 
+            db.UniqueKeyPolicy.UniqueKeys.Add(new UniqueKey { Paths = new Collection<string> { "/" + nameof(Application.ID) } });
+            _applications = new DocumentDBCollection<Application>(db, config.CosmosDBCollection);
         }
 
         #region IApplicationsDatabase
+        public Task Initialize()
+        {
+            return _applications.CreateCollectionIfNotExistsAsync();
+        }
+
         public async Task<Application> RegisterApplicationAsync(Application application)
         {
             Guid applicationId = VerifyRegisterApplication(application);
@@ -64,7 +72,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             }
 
             application.ID = await GetMaxAppIDAsync();
-            application.ApplicationState = _autoApprove ? ApplicationState.Approved : ApplicationState.New;
+            application.ApplicationState = ApplicationState.New;
             application.CreateTime = DateTime.UtcNow;
             application.ApplicationId = Guid.NewGuid();
             if (_autoApprove)
@@ -77,7 +85,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             return await _applications.GetAsync(applicationId);
         }
 
-        public async Task<Application> GetApplicationAsync(string id)
+        public Task<Application> GetApplicationAsync(string id)
         {
             if (String.IsNullOrEmpty(id))
             {
@@ -85,7 +93,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             }
 
             Guid appId = new Guid(id);
-            return await _applications.GetAsync(appId);
+            return _applications.GetAsync(appId);
         }
 
         public async Task<Application> UpdateApplicationAsync(string id, Application application)
@@ -456,7 +464,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                 maxRecordsToReturn = _defaultRecordsPerQuery;
             }
             ApplicationState? applicationState = ApplicationState.Approved;
-            if (anyState != null && (bool) anyState)
+            if (anyState != null && (bool)anyState)
             {
                 applicationState = null;
             }
@@ -530,12 +538,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
         #endregion
 
         #region Private Members
-        private void Initialize()
-        {
-            _db = new DocumentDBRepository(_endpoint, _dataBaseId, _authKeyOrResourceToken);
-            _applications = new DocumentDBCollection<Application>(_db, _collectionId);
-        }
-
         private SqlQuerySpec CreateServerQuery(uint startingRecordId, uint maxRecordsToQuery, ApplicationState? applicationState)
         {
             string query;
@@ -581,8 +583,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                 throw new ArgumentException(application.ApplicationUri + " is not a valid URI.", nameof(application.ApplicationUri));
             }
 
-            if (application.ApplicationType < (int)Opc.Ua.ApplicationType.Server ||
-                application.ApplicationType > (int)Opc.Ua.ApplicationType.DiscoveryServer)
+            if (((int)application.ApplicationType < (int)Opc.Ua.ApplicationType.Server) ||
+                ((int)application.ApplicationType > (int)Opc.Ua.ApplicationType.DiscoveryServer))
             {
                 throw new ArgumentException(application.ApplicationType.ToString() + " is not a valid ApplicationType.", nameof(application.ApplicationType));
             }
@@ -620,7 +622,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                 }
             }
 
-            if (application.ApplicationType != (int)Opc.Ua.ApplicationType.Client)
+            if ((int)application.ApplicationType != (int)Opc.Ua.ApplicationType.Client)
             {
                 if (application.DiscoveryUrls == null || application.DiscoveryUrls.Length == 0)
                 {
@@ -651,7 +653,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
 
         public static string ServerCapabilities(Application application)
         {
-            if (application.ApplicationType != (int)Opc.Ua.ApplicationType.Client)
+            if ((int)application.ApplicationType != (int)Opc.Ua.ApplicationType.Client)
             {
                 if (application.ServerCapabilities == null || application.ServerCapabilities.Length == 0)
                 {
@@ -685,6 +687,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
 
         private async Task<int> GetMaxAppIDAsync()
         {
+            // TODO: use unique keys helper
             // find new ID for QueryServers
             SqlQuerySpec sqlQuerySpec = new SqlQuerySpec
             {
@@ -696,7 +699,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
         }
         #endregion
         #region Private Fields
-        private DocumentDBRepository _db;
         private IDocumentDBCollection<Application> _applications;
         #endregion
     }

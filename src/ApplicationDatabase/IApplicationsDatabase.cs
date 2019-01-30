@@ -13,6 +13,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
 {
     public interface IApplicationsDatabase
     {
+        Task Initialize();
         Task<Application> RegisterApplicationAsync(Application application);
         Task<Application> GetApplicationAsync(string id);
         Task<Application> UpdateApplicationAsync(string id, Application application);

@@ -14,6 +14,7 @@ using Microsoft.Azure.IIoT.Diagnostics;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Models;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Runtime;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test.Helpers;
+using Microsoft.Azure.KeyVault.Models;
 using Microsoft.Extensions.Configuration;
 using Opc.Ua;
 using TestCaseOrdering;
@@ -44,12 +45,12 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
             _configuration = builder.Build();
             _configuration.Bind("OpcVault", _serviceConfig);
             _configuration.Bind("Auth", _clientConfig);
+            SkipOnInvalidConfiguration();
         }
 
         [SkippableFact, Trait(Constants.Type, Constants.UnitTest), TestPriority(100)]
         private async Task KeyVaultPurgeCACertificateAsync()
         {
-            SkipOnInvalidConfiguration();
             KeyVaultCertificateGroup keyVault = new KeyVaultCertificateGroup(_serviceConfig, _clientConfig, _logger);
             await keyVault.PurgeAsync();
         }
@@ -58,7 +59,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
         [SkippableFact, Trait(Constants.Type, Constants.UnitTest), TestPriority(200)]
         public async Task KeyVaultCreateCACertificateAsync()
         {
-            SkipOnInvalidConfiguration();
             KeyVaultCertificateGroup keyVault = new KeyVaultCertificateGroup(_serviceConfig, _clientConfig, _logger);
             string[] groups = await keyVault.GetCertificateGroupIds();
             foreach (string group in groups)
@@ -170,6 +170,10 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
                     issuerCerts
                     );
                 certCollection.Add(newKeyPair.Certificate);
+
+                // disable and delete private key from KeyVault (requires set/delete rights)
+                await keyVault.AcceptPrivateKeyAsync(group, requestId.ToString());
+                await keyVault.DeletePrivateKeyAsync(group, requestId.ToString());
             }
             return certCollection;
         }
@@ -256,6 +260,81 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
                 Assert.False(caCert.HasPrivateKey);
                 crl.VerifySignature(caCert, true);
                 Assert.True(Opc.Ua.Utils.CompareDistinguishedName(crl.Issuer, caCert.Issuer));
+                // disable and delete private key from KeyVault (requires set/delete rights)
+                await keyVault.AcceptPrivateKeyAsync(group, requestId.ToString());
+                await keyVault.DeletePrivateKeyAsync(group, requestId.ToString());
+            }
+        }
+
+        [SkippableFact, Trait(Constants.Type, Constants.UnitTest), TestPriority(600)]
+        public async Task KeyVaultNewKeyPairLoadThenDeletePrivateKeyAsync()
+        {
+            SkipOnInvalidConfiguration();
+            KeyVaultCertificateGroup keyVault = new KeyVaultCertificateGroup(_serviceConfig, _clientConfig, _logger);
+            await keyVault.Init();
+            string[] groups = await keyVault.GetCertificateGroupIds();
+            foreach (string group in groups)
+            {
+                ApplicationTestData randomApp = _randomGenerator.RandomApplicationTestData();
+                Guid requestId = Guid.NewGuid();
+                Opc.Ua.Gds.Server.X509Certificate2KeyPair newKeyPair = await keyVault.NewKeyPairRequestAsync(
+                    group,
+                    requestId.ToString(),
+                    randomApp.ApplicationRecord.ApplicationUri,
+                    randomApp.Subject,
+                    randomApp.DomainNames.ToArray(),
+                    randomApp.PrivateKeyFormat,
+                    randomApp.PrivateKeyPassword
+                    );
+                Assert.NotNull(newKeyPair);
+                Assert.False(newKeyPair.Certificate.HasPrivateKey);
+                Assert.True(Opc.Ua.Utils.CompareDistinguishedName(randomApp.Subject, newKeyPair.Certificate.Subject));
+                Assert.False(Opc.Ua.Utils.CompareDistinguishedName(newKeyPair.Certificate.Issuer, newKeyPair.Certificate.Subject));
+
+                X509Certificate2Collection issuerCerts = await keyVault.GetIssuerCACertificateChainAsync(group);
+                Assert.NotNull(issuerCerts);
+                Assert.True(issuerCerts.Count >= 1);
+
+                X509TestUtils.VerifyApplicationCertIntegrity(
+                    newKeyPair.Certificate,
+                    newKeyPair.PrivateKey,
+                    randomApp.PrivateKeyPassword,
+                    randomApp.PrivateKeyFormat,
+                    issuerCerts
+                    );
+
+                // test to load the key from KeyVault
+                var privateKey = await keyVault.LoadPrivateKeyAsync(group, requestId.ToString(), randomApp.PrivateKeyFormat);
+                X509Certificate2 privateKeyX509;
+                if (randomApp.PrivateKeyFormat == "PFX")
+                {
+                    privateKeyX509 = CertificateFactory.CreateCertificateFromPKCS12(privateKey, randomApp.PrivateKeyPassword);
+                }
+                else
+                {
+                    privateKeyX509 = CertificateFactory.CreateCertificateWithPEMPrivateKey(newKeyPair.Certificate, privateKey, randomApp.PrivateKeyPassword);
+                }
+                Assert.True(privateKeyX509.HasPrivateKey);
+
+                X509TestUtils.VerifyApplicationCertIntegrity(
+                    newKeyPair.Certificate,
+                    privateKey,
+                    randomApp.PrivateKeyPassword,
+                    randomApp.PrivateKeyFormat,
+                    issuerCerts
+                    );
+
+                await keyVault.AcceptPrivateKeyAsync(group, requestId.ToString());
+                await Assert.ThrowsAsync<KeyVaultErrorException>(async () =>
+                {
+                    privateKey = await keyVault.LoadPrivateKeyAsync(group, requestId.ToString(), randomApp.PrivateKeyFormat);
+                });
+                await keyVault.AcceptPrivateKeyAsync(group, requestId.ToString());
+                await keyVault.DeletePrivateKeyAsync(group, requestId.ToString());
+                await Assert.ThrowsAsync<KeyVaultErrorException>(async () =>
+                {
+                    await keyVault.DeletePrivateKeyAsync(group, requestId.ToString());
+                });
             }
         }
 
@@ -283,7 +362,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
         [SkippableFact, Trait(Constants.Type, Constants.UnitTest), TestPriority(2000)]
         public async Task CreateCAAndAppCertificatesThenRevokeAll()
         {
-            SkipOnInvalidConfiguration();
             X509Certificate2Collection certCollection = new X509Certificate2Collection();
             for (int i = 0; i < 3; i++)
             {

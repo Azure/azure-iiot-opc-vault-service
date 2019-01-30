@@ -11,6 +11,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Azure.IIoT.Diagnostics;
+    using Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB;
     using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Runtime;
     using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Swagger;
     using Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1;
@@ -152,7 +153,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             return new AutofacServiceProvider(ApplicationContainer);
         }
 
-
         /// <summary>
         /// This method is called by the runtime, after the ConfigureServices
         /// method above and used to add middleware
@@ -232,6 +232,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                 .AsImplementedInterfaces().SingleInstance();
             builder.RegisterType<CosmosDBCertificateRequest>()
                 .AsImplementedInterfaces().SingleInstance();
+            builder.RegisterType<OpcVaultDocumentDbRepository>()
+                .AsImplementedInterfaces().SingleInstance();
+            builder.RegisterType<WarmStartDatabase>()
+                .AsImplementedInterfaces().SingleInstance();
+
             return builder.Build();
         }
     }

@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
@@ -34,45 +33,32 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
 
         internal IApplicationsDatabase _applicationsDatabase;
         internal ICertificateGroup _certificateGroup;
-        private readonly string _endpoint;
-        private readonly string _dataBaseId;
-        private readonly string _collectionId;
         private readonly ILogger _log;
-        private SecureString _authKeyOrResourceToken;
 
         public CosmosDBCertificateRequest(
             IApplicationsDatabase database,
             ICertificateGroup certificateGroup,
             IServicesConfig config,
+            IDocumentDBRepository db,
             ILogger logger)
         {
             _applicationsDatabase = database;
             _certificateGroup = certificateGroup;
-            _dataBaseId = config.CosmosDBDatabase;
-            _endpoint = config.CosmosDBEndpoint;
-            _collectionId = config.CosmosDBCollection;
-            _authKeyOrResourceToken = new SecureString();
-            foreach (char ch in config.CosmosDBToken)
-            {
-                _authKeyOrResourceToken.AppendChar(ch);
-            }
             _log = logger;
-            _log.Debug("Creating new instance of `CosmosDBApplicationsDatabase` service " + config.CosmosDBEndpoint, () => { });
-            Initialize();
+            _certificateRequests = new DocumentDBCollection<CosmosDB.Models.CertificateRequest>(db, config.CosmosDBCollection);
 
             // well known groups
             DefaultApplicationGroupId = Opc.Ua.Gds.ObjectIds.Directory_CertificateGroups_DefaultApplicationGroup;
             DefaultHttpsGroupId = Opc.Ua.Gds.ObjectIds.Directory_CertificateGroups_DefaultHttpsGroup;
             DefaultUserTokenGroupId = Opc.Ua.Gds.ObjectIds.Directory_CertificateGroups_DefaultUserTokenGroup;
 
+            _log.Debug("Created new instance of `CosmosDBApplicationsDatabase` service " + config.CosmosDBCollection, () => { });
         }
 
         #region ICertificateRequest
         public Task Initialize()
         {
-            var db = new DocumentDBRepository(_endpoint, _dataBaseId, _authKeyOrResourceToken);
-            _certificateRequests = new DocumentDBCollection<CosmosDB.Models.CertificateRequest>(db, _collectionId);
-            return Task.CompletedTask;
+            return _certificateRequests.CreateCollectionIfNotExistsAsync();
         }
 
         public async Task<ICertificateRequest> OnBehalfOfRequest(HttpRequest request)
@@ -784,8 +770,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                 throw new ArgumentException(application.ApplicationUri + " is not a valid URI.", "ApplicationUri");
             }
 
-            if (application.ApplicationType < (int)Opc.Ua.ApplicationType.Server ||
-                application.ApplicationType > (int)Opc.Ua.ApplicationType.DiscoveryServer)
+            if ((int)application.ApplicationType < (int)Opc.Ua.ApplicationType.Server ||
+                (int)application.ApplicationType > (int)Opc.Ua.ApplicationType.DiscoveryServer)
             {
                 throw new ArgumentException(application.ApplicationType.ToString() + " is not a valid ApplicationType.", "ApplicationType");
             }
@@ -821,7 +807,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                 }
             }
 
-            if (application.ApplicationType != (int)Opc.Ua.ApplicationType.Client)
+            if ((int)application.ApplicationType != (int)Opc.Ua.ApplicationType.Client)
             {
                 if (application.DiscoveryUrls == null || application.DiscoveryUrls.Length == 0)
                 {
@@ -852,7 +838,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
 
         private static string ServerCapabilities(Application application)
         {
-            if (application.ApplicationType != (int)Opc.Ua.ApplicationType.Client)
+            if ((int)application.ApplicationType != (int)Opc.Ua.ApplicationType.Client)
             {
                 if (application.ServerCapabilities == null || application.ServerCapabilities.Length == 0)
                 {
