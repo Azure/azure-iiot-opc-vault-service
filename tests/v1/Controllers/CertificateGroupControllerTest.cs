@@ -13,12 +13,12 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test.v1.Controllers
     public class CertificateGroupControllerTest
     {
         /// <summary>The test logger</summary>
-        private readonly ITestOutputHelper log;
+        private readonly ITestOutputHelper _log;
 
-        private readonly Mock<ICertificateGroup> group;
-        private readonly CertificateGroupController target;
+        private readonly Mock<ICertificateGroup> _group;
+        private readonly CertificateGroupController _target;
 
-        private const string DateFormat = "yyyy-MM-dd'T'HH:mm:sszzz";
+        public const string DateFormat = "yyyy-MM-dd'T'HH:mm:sszzz";
 
         // Execute this code before every test
         // Note: for complex setups, where many dependencies need to be
@@ -29,15 +29,15 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test.v1.Controllers
         public CertificateGroupControllerTest(ITestOutputHelper log)
         {
             // This is a logger, in case we want to output some text during the test
-            this.log = log;
+            _log = log;
 
             // This is a dependency of the controller, that we mock, so that
             // we can test the class in isolation
             // Moq Quickstart: https://github.com/Moq/moq4/wiki/Quickstart
-            this.group = new Mock<ICertificateGroup>();
+            _group = new Mock<ICertificateGroup>();
 
             // By convention we call "target" the class under test
-            this.target = new CertificateGroupController(this.group.Object);
+            _target = new CertificateGroupController(_group.Object);
         }
 
         [Fact, Trait(Constants.Type, Constants.ControllerTest)]
@@ -55,18 +55,18 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test.v1.Controllers
 
             // Inject a fake response when Devices.GetAsync() is invoked
             // Moq Quickstart: https://github.com/Moq/moq4/wiki/Quickstart
-            this.group.Setup(x => x.GetCertificateGroupConfiguration(id)).ReturnsAsync(configuration);
+            _group.Setup(x => x.GetCertificateGroupConfiguration(id)).ReturnsAsync(configuration);
 
             // Act
             // Note: don't use "var" so to implicitly assert that the
             // method is returning an object of the expected type. We test only
             // public methods, i.e. to test code inside private methods, we
             // write a test that starts from a public method.
-            CertificateGroupConfigurationApiModel result = this.target.GetCertificateGroupConfigurationAsync(id).Result;
+            CertificateGroupConfigurationApiModel result = _target.GetCertificateGroupConfigurationAsync(id).Result;
 
             // Verify that Devices.GetAsync() has been called, exactly once
             // with the correct parameters
-            this.group.Verify(x => x.GetCertificateGroupConfiguration(It.Is<string>(s => s == id)), Times.Once);
+            _group.Verify(x => x.GetCertificateGroupConfiguration(It.Is<string>(s => s == id)), Times.Once);
         }
 
         [Fact, Trait(Constants.Type, Constants.ControllerTest)]

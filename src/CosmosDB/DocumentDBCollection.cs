@@ -18,8 +18,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB
     /// <inheritdoc/>
     public class DocumentDBCollection<T> : IDocumentDBCollection<T> where T : class
     {
-        const int DefaultMaxItemCount = 10;
         /// <inheritdoc/>
+        public const int DefaultMaxItemCount = 10;
         public DocumentCollection Collection { get; private set; }
         private readonly IDocumentDBRepository _db;
         private readonly string _collectionId;
@@ -42,7 +42,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB
                 throw new ArgumentNullException(nameof(db));
             }
 
-            this._collectionId = collectionId;
+            _collectionId = collectionId;
             this._db = db;
         }
 

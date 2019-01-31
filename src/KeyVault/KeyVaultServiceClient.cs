@@ -34,21 +34,22 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
     /// </summary>
     public class KeyVaultServiceClient
     {
-        const int MaxResults = 5;
-        const string ContentTypeJson = "application/json";
+        public const int MaxResults = 5;
+        public const string ContentTypeJson = "application/json";
         // see RFC 2585
-        const string ContentTypeCert = "application/pkix-cert";
-        const string ContentTypeCrl = "application/pkix-crl";
+        public const string ContentTypeCert = "application/pkix-cert";
+        public const string ContentTypeCrl = "application/pkix-crl";
         // see CertificateContentType.Pfx and
-        const string ContentTypePfx = "application/x-pkcs12";
+        public const string ContentTypePfx = "application/x-pkcs12";
         // see CertificateContentType.Pem
-        const string ContentTypePem = "application/x-pem-file";
+        public const string ContentTypePem = "application/x-pem-file";
 
         // trust list tags
-        const string TagIssuerList = "Issuer";
-        const string TagTrustedList = "Trusted";
+        public const string TagIssuerList = "Issuer";
+        public const string TagTrustedList = "Trusted";
 
-        const string GroupSecret = "groups";
+        // TODO: make group secret name configurable
+        public const string GroupSecret = "groups";
 
         /// <summary>
         ///
@@ -133,7 +134,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         /// <summary>
         /// Read the OpcVault CertificateConfigurationGroups as Json.
         /// </summary>
-        public async Task<string> GetCertificateConfigurationGroupsAsync(CancellationToken ct = default(CancellationToken))
+        public async Task<string> GetCertificateConfigurationGroupsAsync(CancellationToken ct = default)
         {
             SecretBundle secret = await _keyVaultClient.GetSecretAsync(_vaultBaseUrl, GroupSecret, ct).ConfigureAwait(false);
             return secret.Value;
@@ -142,7 +143,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         /// <summary>
         /// Write the OpcVault CertificateConfigurationGroups as Json.
         /// </summary>
-        public async Task<string> PutCertificateConfigurationGroupsAsync(string json, CancellationToken ct = default(CancellationToken))
+        public async Task<string> PutCertificateConfigurationGroupsAsync(string json, CancellationToken ct = default)
         {
             SecretBundle secret = await _keyVaultClient.SetSecretAsync(_vaultBaseUrl, GroupSecret, json, null, ContentTypeJson, null, ct).ConfigureAwait(false);
             return secret.Value;
@@ -154,7 +155,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         /// <param name="name">Key Vault name</param>
         /// <param name="ct">CancellationToken</param>
         /// <returns></returns>
-        internal async Task<CertificateBundle> GetCertificateAsync(string name, CancellationToken ct = default(CancellationToken))
+        internal async Task<CertificateBundle> GetCertificateAsync(string name, CancellationToken ct = default)
         {
             return await _keyVaultClient.GetCertificateAsync(_vaultBaseUrl, name, ct).ConfigureAwait(false);
         }
@@ -165,7 +166,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         /// <param name="id"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        public async Task<X509Certificate2Collection> GetCertificateVersionsAsync(string id, CancellationToken ct = default(CancellationToken))
+        public async Task<X509Certificate2Collection> GetCertificateVersionsAsync(string id, CancellationToken ct = default)
         {
             var certificates = new X509Certificate2Collection();
             try
@@ -202,7 +203,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         /// <param name="id"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        public async Task<IList<CertificateKeyInfo>> GetCertificateVersionsKeyInfoAsync(string id, CancellationToken ct = default(CancellationToken))
+        public async Task<IList<CertificateKeyInfo>> GetCertificateVersionsKeyInfoAsync(string id, CancellationToken ct = default)
         {
             var result = new List<CertificateKeyInfo>();
             try
@@ -241,7 +242,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         /// <summary>
         /// Load the signing CA certificate for signing operations.
         /// </summary>
-        internal Task<X509Certificate2> LoadSigningCertificateAsync(string signingCertificateKey, X509Certificate2 publicCert, CancellationToken ct = default(CancellationToken))
+        internal Task<X509Certificate2> LoadSigningCertificateAsync(string signingCertificateKey, X509Certificate2 publicCert, CancellationToken ct = default)
         {
 #if LOADPRIVATEKEY
             var secret = await _keyVaultClient.GetSecretAsync(signingCertificateKey, ct);
@@ -272,7 +273,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
             byte[] digest,
             HashAlgorithmName hashAlgorithm,
             RSASignaturePadding padding,
-            CancellationToken ct = default(CancellationToken))
+            CancellationToken ct = default)
         {
             string algorithm;
 
@@ -332,7 +333,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         /// <summary>
         /// Imports a new CA certificate in group id, tags it for trusted or issuer store.
         /// </summary>
-        public async Task ImportIssuerCACertificate(string id, X509Certificate2Collection certificates, bool trusted, CancellationToken ct = default(CancellationToken))
+        public async Task ImportIssuerCACertificate(string id, X509Certificate2Collection certificates, bool trusted, CancellationToken ct = default)
         {
             X509Certificate2 certificate = certificates[0];
             var attributes = CreateCertificateAttributes(certificate);
@@ -578,7 +579,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         /// <summary>
         /// Imports a new CRL for group id.
         /// </summary>
-        public async Task ImportIssuerCACrl(string id, X509Certificate2 certificate, Opc.Ua.X509CRL crl, CancellationToken ct = default(CancellationToken))
+        public async Task ImportIssuerCACrl(string id, X509Certificate2 certificate, Opc.Ua.X509CRL crl, CancellationToken ct = default)
         {
             try
             {
@@ -610,7 +611,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         /// <summary>
         /// Load CRL for CA cert in group.
         /// </summary>
-        public async Task<Opc.Ua.X509CRL> LoadIssuerCACrl(string id, X509Certificate2 certificate, CancellationToken ct = default(CancellationToken))
+        public async Task<Opc.Ua.X509CRL> LoadIssuerCACrl(string id, X509Certificate2 certificate, CancellationToken ct = default)
         {
             string secretIdentifier = CrlSecretName(id, certificate);
             var secret = await _keyVaultClient.GetSecretAsync(_vaultBaseUrl, secretIdentifier, ct).ConfigureAwait(false);
@@ -625,7 +626,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         /// <summary>
         /// Imports a Private Key for group id and certificate.
         /// </summary>
-        public async Task ImportCertKey(string id, string requestId, byte[] privateKey, string privateKeyFormat, CancellationToken ct = default(CancellationToken))
+        public async Task ImportCertKey(string id, string requestId, byte[] privateKey, string privateKeyFormat, CancellationToken ct = default)
         {
             var contentType = PrivateKeyFormatToContentType(privateKeyFormat);
             string secretIdentifier = KeySecretName(id, requestId);
@@ -649,7 +650,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         /// <summary>
         /// Load Private Key for certificate in group.
         /// </summary>
-        public async Task<byte[]> LoadCertKey(string id, string requestId, string privateKeyFormat, CancellationToken ct = default(CancellationToken))
+        public async Task<byte[]> LoadCertKey(string id, string requestId, string privateKeyFormat, CancellationToken ct = default)
         {
             var contentType = PrivateKeyFormatToContentType(privateKeyFormat);
             string secretIdentifier = KeySecretName(id, requestId);
@@ -841,7 +842,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         /// <summary>
         /// Purge all CRL and Certificates groups. Use for unit test only!
         /// </summary>
-        public async Task PurgeAsync(CancellationToken ct = default(CancellationToken))
+        public async Task PurgeAsync(CancellationToken ct = default)
         {
             var secretItems = await _keyVaultClient.GetSecretsAsync(_vaultBaseUrl, MaxResults, ct).ConfigureAwait(false);
             while (secretItems != null)
@@ -988,7 +989,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
             return id + "Crl" + certificate.Thumbprint;
         }
 
-        private async Task<X509CRL> LoadCrlSecret(string secretIdentifier, CancellationToken ct = default(CancellationToken))
+        private async Task<X509CRL> LoadCrlSecret(string secretIdentifier, CancellationToken ct = default)
         {
             var secret = await _keyVaultClient.GetSecretAsync(_vaultBaseUrl, secretIdentifier, ct).ConfigureAwait(false);
             if (secret.ContentType == ContentTypeCrl)
@@ -999,7 +1000,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
             return null;
         }
 
-        private async Task<X509Certificate2> LoadCertSecret(string secretIdentifier, CancellationToken ct = default(CancellationToken))
+        private async Task<X509Certificate2> LoadCertSecret(string secretIdentifier, CancellationToken ct = default)
         {
             var secret = await _keyVaultClient.GetSecretAsync(_vaultBaseUrl, secretIdentifier, ct).ConfigureAwait(false);
             if (secret.ContentType == ContentTypeCrl)
@@ -1023,8 +1024,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
             throw new Exception("Unknown Private Key format.");
         }
 
-        private string _vaultBaseUrl;
-        private bool _keyStoreHSM;
+        private readonly string _vaultBaseUrl;
+        private readonly bool _keyStoreHSM;
         private IKeyVaultClient _keyVaultClient;
         private ILogger _logger;
         private ClientAssertionCertificate _assertionCert;

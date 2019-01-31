@@ -28,10 +28,10 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
 
     public class ApplicationDatabaseTestFixture : IDisposable
     {
+        private readonly IClientConfig _clientConfig = new ClientConfig();
+        private readonly IDocumentDBRepository _documentDBRepository;
         private ServicesConfig _serviceConfig = new ServicesConfig();
-        private IClientConfig _clientConfig = new ClientConfig();
         private IConfigurationRoot _configuration;
-        private IDocumentDBRepository _documentDBRepository;
         public TraceLogger _logger = new TraceLogger(new LogConfig());
         public IApplicationsDatabase _applicationsDatabase;
         public IList<ApplicationTestData> _applicationTestSet;
