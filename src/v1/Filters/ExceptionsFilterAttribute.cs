@@ -64,6 +64,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Filters
                     break;
                 case JsonReaderException jre:
                 case BadRequestException br:
+                case ArgumentNullException ane:
                 case ArgumentException are:
                     context.Result = GetResponse(HttpStatusCode.BadRequest,
                         context.Exception);

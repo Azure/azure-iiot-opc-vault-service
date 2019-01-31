@@ -97,7 +97,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
 
                 if (crlDistributionPoint != null)
                 {
-                    string serial = BitConverter.ToString(serialNumber).Replace("-","").ToLower();
+                    string serial = BitConverter.ToString(serialNumber).Replace("-", "").ToLower();
                     // add CRL endpoint, if available
                     request.CertificateExtensions.Add(
                         BuildX509CRLDistributionPoints(crlDistributionPoint.Replace("%serial%", serial))
@@ -484,6 +484,10 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
             foreach (string domainName in domainNames)
             {
                 IPAddress ipAddr;
+                if (String.IsNullOrWhiteSpace(domainName))
+                {
+                    continue;
+                }
                 if (IPAddress.TryParse(domainName, out ipAddr))
                 {
                     sanBuilder.AddIpAddress(ipAddr);

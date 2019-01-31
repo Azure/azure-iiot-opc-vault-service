@@ -35,10 +35,17 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB.Models
     [Serializable]
     public class Application
     {
+        public static readonly string ClassTypeName = "Application";
+        public Application()
+        {
+            this.ClassType = ClassTypeName;
+        }
+
         [JsonProperty(PropertyName = "id")]
         public Guid ApplicationId { get; set; }
         [JsonProperty(PropertyName = "_etag")]
         public string ETag { get; set; }
+        public string ClassType { get; set; }
         public int ID { get; set; }
         public ApplicationState ApplicationState { get; set; }
         public string ApplicationUri { get; set; }

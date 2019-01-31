@@ -21,10 +21,18 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB.Models
     [Serializable]
     public class CertificateRequest
     {
+        public static readonly string ClassTypeName = "CertificateRequest";
+        public CertificateRequest()
+        {
+            this.ClassType = ClassTypeName;
+        }
+
         [JsonProperty(PropertyName = "id")]
         public Guid RequestId { get; set; }
         [JsonProperty(PropertyName = "_etag")]
         public string ETag { get; set; }
+        public string ClassType { get; set; }
+        public int ID { get; set; }
         public string ApplicationId { get; set; }
         public CertificateRequestState CertificateRequestState { get; set; }
         public string CertificateGroupId { get; set; }

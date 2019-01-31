@@ -14,7 +14,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB
         public OpcVaultDocumentDbRepository(IServicesConfig config) :
             base(config.CosmosDBEndpoint, config.CosmosDBDatabase, config.CosmosDBToken)
         {
-            // future
             _authKeyOrResourceToken = new SecureString();
             foreach (char ch in config.CosmosDBToken)
             {

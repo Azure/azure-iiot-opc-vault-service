@@ -53,7 +53,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             _log = logger;
             _log.Debug("Creating new instance of `CosmosDBApplicationsDatabase` service " + config.CosmosDBCollection, () => { });
             // set unique key in CosmosDB for application ID 
-            db.UniqueKeyPolicy.UniqueKeys.Add(new UniqueKey { Paths = new Collection<string> { "/" + nameof(Application.ID) } });
+            db.UniqueKeyPolicy.UniqueKeys.Add(new UniqueKey { Paths = new Collection<string> { "/" + nameof(Application.ClassType), "/" + nameof(Application.ID) } });
             _applications = new DocumentDBCollection<Application>(db, config.CosmosDBCollection);
         }
 
@@ -76,7 +76,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             // normalize Server Caps
             application.ServerCapabilities = ServerCapabilities(application);
             application.ApplicationId = Guid.NewGuid();
-            application.ID = _appIdCounter++;   // uncritical, CosmosDB catches not unique ids
+            application.ID = _appIdCounter++;
             application.ApplicationState = ApplicationState.New;
             application.CreateTime = DateTime.UtcNow;
             //
@@ -101,7 +101,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                     {
                         // retry with new guid and keys
                         application.ApplicationId = Guid.NewGuid();
-                        application.ID = await GetMaxAppIDAsync();
+                        _appIdCounter = await GetMaxAppIDAsync();
+                        application.ID = _appIdCounter++;
                         retry = true;
                     }
                 }
@@ -312,11 +313,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             }
 
             var queryParameters = new SqlParameterCollection();
-            string query = "SELECT * FROM Applications a WHERE ";
+            string query = "SELECT * FROM Applications a WHERE";
             query += " a.ApplicationUri = @applicationUri";
             queryParameters.Add(new SqlParameter("@applicationUri", applicationUri));
             query += " AND a.ApplicationState = @applicationState";
             queryParameters.Add(new SqlParameter("@applicationState", ApplicationState.Approved.ToString()));
+            query += " AND a.ClassType = @classType";
+            queryParameters.Add(new SqlParameter("@classType", Application.ClassTypeName));
             SqlQuerySpec sqlQuerySpec = new SqlQuerySpec
             {
                 QueryText = query,
@@ -572,6 +575,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                 query += " AND a.ApplicationState = @applicationState";
                 queryParameters.Add(new SqlParameter("@applicationState", applicationState.ToString()));
             }
+            query += " AND a.ClassType = @classType";
+            queryParameters.Add(new SqlParameter("@classType", Application.ClassTypeName));
             query += " ORDER BY a.ID";
             SqlQuerySpec sqlQuerySpec = new SqlQuerySpec
             {
@@ -707,19 +712,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             return capabilities.ToString();
         }
 
-        private async Task<int> GetMaxAppIDAsync()
-        {
-            // TODO: use unique keys helper
-            // find new ID for QueryServers
-            SqlQuerySpec sqlQuerySpec = new SqlQuerySpec
-            {
-                QueryText = "SELECT TOP 1 * FROM Applications a ORDER BY a.ID DESC"
-            };
-            var maxAppIDEnum = await _applications.GetAsync(sqlQuerySpec);
-            var maxAppID = maxAppIDEnum.SingleOrDefault();
-            return (maxAppID != null) ? maxAppID.ID + 1 : 1;
-        }
-
         private Guid ToGuidAndVerify(string applicationId)
         {
             try
@@ -738,6 +730,26 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             catch (FormatException)
             {
                 throw new ArgumentException("The applicationId is invalid.");
+            }
+        }
+
+        private async Task<int> GetMaxAppIDAsync()
+        {
+            try
+            {
+                // find new ID for QueryServers
+                SqlQuerySpec sqlQuerySpec = new SqlQuerySpec
+                {
+                    QueryText = "SELECT TOP 1 * FROM Applications a WHERE a.ClassType = @classType ORDER BY a.ID DESC",
+                    Parameters = new SqlParameterCollection { new SqlParameter("@classType", Application.ClassTypeName) }
+                };
+                var maxIDEnum = await _applications.GetAsync(sqlQuerySpec);
+                var maxID = maxIDEnum.SingleOrDefault();
+                return (maxID != null) ? maxID.ID + 1 : 1;
+            }
+            catch
+            {
+                return 1;
             }
         }
         #endregion
