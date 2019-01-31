@@ -49,6 +49,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Models
         {
             this.State = state;
             this.ApplicationId = applicationId;
+            this.RequestId = requestId;
             this.CertificateGroupId = certificateGroupId;
             this.CertificateTypeId = certificateTypeId;
             this.SignedCertificate = signedCertificate;

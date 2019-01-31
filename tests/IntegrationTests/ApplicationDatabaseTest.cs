@@ -92,11 +92,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
     [TestCaseOrderer("TestCaseOrdering.PriorityOrderer", "Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test")]
     public class ApplicationDatabaseTest : IClassFixture<ApplicationDatabaseTestFixture>
     {
+        ITestOutputHelper _log;
         ApplicationDatabaseTestFixture _fixture;
-
-        public TraceLogger _logger;
-        public IApplicationsDatabase _applicationsDatabase;
-        public IList<ApplicationTestData> _applicationTestSet;
+        TraceLogger _logger;
+        IApplicationsDatabase _applicationsDatabase;
+        IList<ApplicationTestData> _applicationTestSet;
 
         public ApplicationDatabaseTest(ApplicationDatabaseTestFixture fixture, ITestOutputHelper log)
         {
@@ -128,6 +128,28 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
                 Assert.NotNull(applicationModel);
             }
             _fixture.RegistrationOk = true;
+        }
+
+        /// <summary>
+        /// Test to clean the database from collisions with the test set.
+        /// </summary>
+        [SkippableFact, Trait(Constants.Type, Constants.UnitTest), TestPriority(100)]
+        private async Task CleanupAllApplications()
+        {
+            foreach (var application in _applicationTestSet)
+            {
+                var applicationModelList = await _applicationsDatabase.ListApplicationAsync(application.Model.ApplicationUri);
+                Assert.NotNull(applicationModelList);
+                foreach (var response in applicationModelList)
+                {
+                    try
+                    {
+                        await _applicationsDatabase.DeleteApplicationAsync(response.ApplicationId.ToString(), true);
+                    }
+                    catch { }
+                }
+            }
+            _fixture.RegistrationOk = false;
         }
 
         /// <summary>
@@ -420,8 +442,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
         {
             return (Application)JsonConvert.DeserializeObject(JsonConvert.SerializeObject(app), typeof(Application));
         }
-        /// <summary>The test logger</summary>
-        private readonly ITestOutputHelper _log;
     }
 
 

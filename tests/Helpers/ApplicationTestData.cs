@@ -5,6 +5,7 @@
 
 
 using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB.Models;
@@ -48,6 +49,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
         public byte[] Certificate;
         public byte[] PrivateKey;
         public byte[][] IssuerCertificates;
+        public IList<string> RequestIds;
     }
 
     public class ApplicationTestDataGenerator
@@ -113,7 +115,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
                 },
                 DomainNames = domainNames,
                 Subject = string.Format("CN={0},DC={1},O=OPC Foundation", appName, localhost),
-                PrivateKeyFormat = privateKeyFormat
+                PrivateKeyFormat = privateKeyFormat,
+                RequestIds = new List<string>()
             };
             return testData;
         }

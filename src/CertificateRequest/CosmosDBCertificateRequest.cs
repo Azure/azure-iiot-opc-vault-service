@@ -24,6 +24,20 @@ using CertificateRequestState = Microsoft.Azure.IIoT.OpcUa.Services.Vault.Cosmos
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
 {
+    public static class CosmosDBCertificateRequestFactory
+    {
+        public static ICertificateRequest Create(
+            IApplicationsDatabase database,
+            ICertificateGroup certificateGroup,
+            IServicesConfig config,
+            IDocumentDBRepository db,
+            ILogger logger
+            )
+        {
+            return new CosmosDBCertificateRequest(database, certificateGroup, config, db, logger);
+        }
+    }
+
     internal sealed class CosmosDBCertificateRequest : Object, ICertificateRequest
     {
         internal IApplicationsDatabase _applicationsDatabase;
@@ -377,7 +391,14 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
 
                 if (request.PrivateKeyFormat != null && first)
                 {
-                    await _certificateGroup.DeletePrivateKeyAsync(request.CertificateGroupId, requestId);
+                    try
+                    {
+                        await _certificateGroup.DeletePrivateKeyAsync(request.CertificateGroupId, requestId);
+                    }
+                    catch 
+                    {
+                        // TODO: error handling here
+                    }
                 }
 
                 first = false;
@@ -414,6 +435,12 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                 retryUpdate = false;
 
                 CertificateRequest request = await _certificateRequests.GetAsync(reqId);
+
+                if (request.CertificateRequestState != CertificateRequestState.Approved &&
+                    request.CertificateRequestState != CertificateRequestState.Accepted)
+                {
+                    throw new ResourceInvalidStateException("The record is not in a valid state for this operation.");
+                }
 
                 request.CertificateRequestState = CertificateRequestState.Deleted;
 
@@ -606,26 +633,33 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
 
             CertificateRequest request = await _certificateRequests.GetAsync(reqId);
 
+            if (request.ApplicationId != application.ApplicationId.ToString())
+            {
+                throw new ArgumentException("The recordId does not match the applicationId.");
+            }
+
             switch (request.CertificateRequestState)
             {
                 case CertificateRequestState.New:
                 case CertificateRequestState.Rejected:
+                case CertificateRequestState.Revoked:
+                case CertificateRequestState.Deleted:
+                    return new FetchRequestResultModel(request.CertificateRequestState)
+                    {
+                        ApplicationId = applicationId,
+                        RequestId = requestId
+                    };
                 case CertificateRequestState.Accepted:
-                    return new FetchRequestResultModel(request.CertificateRequestState);
                 case CertificateRequestState.Approved:
                     break;
                 default:
                     throw new ResourceInvalidStateException("The record is not in a valid state for this operation.");
             }
 
-            if (request.ApplicationId != application.ApplicationId.ToString())
-            {
-                throw new ArgumentException("The record applicationId does not match the application.");
-            }
-
             // get private key
             byte[] privateKey = null;
-            if (request.PrivateKeyFormat != null)
+            if (request.CertificateRequestState == CertificateRequestState.Approved &&
+                request.PrivateKeyFormat != null)
             {
                 try
                 {
