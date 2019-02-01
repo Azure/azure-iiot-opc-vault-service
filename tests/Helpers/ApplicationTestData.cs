@@ -6,12 +6,15 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB.Models;
+using Newtonsoft.Json;
 using Opc.Ua;
 using Opc.Ua.Gds;
 using Opc.Ua.Test;
+using Xunit;
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
 {
@@ -50,6 +53,96 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
         public byte[] PrivateKey;
         public byte[][] IssuerCertificates;
         public IList<string> RequestIds;
+
+        /// <summary>
+        /// Convert the Server Capability array representation to a comma separated string.
+        /// </summary>
+        public static string ServerCapabilities(string[] serverCapabilities)
+        {
+            StringBuilder capabilities = new StringBuilder();
+            if (serverCapabilities != null)
+            {
+                foreach (var capability in serverCapabilities)
+                {
+                    if (String.IsNullOrEmpty(capability))
+                    {
+                        continue;
+                    }
+
+                    if (capabilities.Length > 0)
+                    {
+                        capabilities.Append(',');
+                    }
+                    capabilities.Append(capability);
+                }
+            }
+            return capabilities.ToString();
+        }
+
+        /// <summary>
+        /// Helper to assert the application model data which should remain equal.
+        /// </summary>
+        /// <param name="expected">The expected Application model data</param>
+        /// <param name="actual">The actualy Application model data</param>
+        public static void AssertEqualApplicationModelData(Application expected, Application actual)
+        {
+            Assert.Equal(expected.ApplicationName, actual.ApplicationName);
+            Assert.Equal(expected.ApplicationType, actual.ApplicationType);
+            Assert.Equal(expected.ApplicationUri, actual.ApplicationUri);
+            Assert.Equal(expected.DiscoveryProfileUri, actual.DiscoveryProfileUri);
+            Assert.Equal(expected.ProductUri, actual.ProductUri);
+            Assert.Equal(ServerCapabilities(expected), ServerCapabilities(actual));
+            Assert.Equal(JsonConvert.SerializeObject(expected.ApplicationNames), JsonConvert.SerializeObject(actual.ApplicationNames));
+            Assert.Equal(JsonConvert.SerializeObject(expected.DiscoveryUrls), JsonConvert.SerializeObject(actual.DiscoveryUrls));
+        }
+
+        /// <summary>
+        /// Normalize and validate the server capabilites.
+        /// </summary>
+        /// <param name="application">The application with server capabilities.</param>
+        /// <returns></returns>
+        public static string ServerCapabilities(Application application)
+        {
+            if ((int)application.ApplicationType != (int)CosmosDB.Models.ApplicationType.Client)
+            {
+                if (application.ServerCapabilities == null || application.ServerCapabilities.Length == 0)
+                {
+                    throw new ArgumentException("At least one Server Capability must be provided.", nameof(application.ServerCapabilities));
+                }
+            }
+
+            // TODO validate against specified capabilites.
+
+            StringBuilder capabilities = new StringBuilder();
+            if (application.ServerCapabilities != null)
+            {
+                var sortedCaps = application.ServerCapabilities.Split(",").ToList();
+                sortedCaps.Sort();
+                foreach (var capability in sortedCaps)
+                {
+                    if (String.IsNullOrEmpty(capability))
+                    {
+                        continue;
+                    }
+
+                    if (capabilities.Length > 0)
+                    {
+                        capabilities.Append(',');
+                    }
+
+                    capabilities.Append(capability);
+                }
+            }
+
+            return capabilities.ToString();
+        }
+
+        public static Application ApplicationDeepCopy(Application app)
+        {
+            // serialize/deserialize to avoid using MemberwiseClone
+            return (Application)JsonConvert.DeserializeObject(JsonConvert.SerializeObject(app), typeof(Application));
+        }
+
     }
 
     public class ApplicationTestDataGenerator
@@ -100,7 +193,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
                     ApplicationName = appName,
                     ApplicationType = (CosmosDB.Models.ApplicationType)appType,
                     ProductUri = prodUri,
-                    ServerCapabilities = ServerCapabilities(serverCapabilities.ToArray()),
+                    ServerCapabilities = ApplicationTestData.ServerCapabilities(serverCapabilities.ToArray()),
                     ApplicationNames = new ApplicationName[] { new ApplicationName { Locale = "en-us", Text = appName } },
                     DiscoveryUrls = discoveryUrls.ToArray()
                 },
@@ -180,28 +273,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
                 }
             }
             return serverCapabilities;
-        }
-
-        private string ServerCapabilities(string[] serverCapabilities)
-        {
-            StringBuilder capabilities = new StringBuilder();
-            if (serverCapabilities != null)
-            {
-                foreach (var capability in serverCapabilities)
-                {
-                    if (String.IsNullOrEmpty(capability))
-                    {
-                        continue;
-                    }
-
-                    if (capabilities.Length > 0)
-                    {
-                        capabilities.Append(',');
-                    }
-                    capabilities.Append(capability);
-                }
-            }
-            return capabilities.ToString();
         }
 
         private int _randomStart = 1;

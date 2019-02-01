@@ -43,7 +43,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
 
         public ApplicationDatabaseTestFixture()
         {
-            _randomGenerator = new ApplicationTestDataGenerator(_randomStart);
             var builder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("testsettings.json", optional: false, reloadOnChange: true)
@@ -52,27 +51,29 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
             _configuration = builder.Build();
             _configuration.Bind("OpcVault", _serviceConfig);
             _configuration.Bind("Auth", _clientConfig);
-            SkipOnInvalidConfiguration();
-            _documentDBRepository = new OpcVaultDocumentDbRepository(_serviceConfig);
-            _applicationsDatabase = CosmosDBApplicationsDatabaseFactory.Create(null, _serviceConfig, _documentDBRepository, _logger);
-            // create test set
-            _applicationTestSet = new List<ApplicationTestData>();
-            for (int i = 0; i < _testSetSize; i++)
+            if (!InvalidConfiguration())
             {
-                var randomApp = _randomGenerator.RandomApplicationTestData();
-                _applicationTestSet.Add(randomApp);
+                _randomGenerator = new ApplicationTestDataGenerator(_randomStart);
+                _documentDBRepository = new OpcVaultDocumentDbRepository(_serviceConfig);
+                _applicationsDatabase = CosmosDBApplicationsDatabaseFactory.Create(null, _serviceConfig, _documentDBRepository, _logger);
+                // create test set
+                _applicationTestSet = new List<ApplicationTestData>();
+                for (int i = 0; i < _testSetSize; i++)
+                {
+                    var randomApp = _randomGenerator.RandomApplicationTestData();
+                    _applicationTestSet.Add(randomApp);
+                }
+                // try initialize DB
+                _applicationsDatabase.Initialize().Wait();
             }
-            // try initialize DB
-            _applicationsDatabase.Initialize().Wait();
             RegistrationOk = false;
         }
 
         public void Dispose()
         {
-            //throw new NotImplementedException();
         }
 
-        private void SkipOnInvalidConfiguration()
+        public void SkipOnInvalidConfiguration()
         {
             Skip.If(InvalidConfiguration(), "Missing valid CosmosDB configuration.");
         }
@@ -103,6 +104,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
             _fixture = fixture;
             _log = log;
             // fixture
+            _fixture.SkipOnInvalidConfiguration();
             _logger = fixture._logger;
             _applicationsDatabase = fixture._applicationsDatabase;
             _applicationTestSet = fixture._applicationTestSet;
@@ -123,7 +125,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
                 var applicationModel = await _applicationsDatabase.RegisterApplicationAsync(application.Model);
                 Assert.NotNull(applicationModel);
                 Assert.NotEqual(applicationModel.ApplicationId, Guid.Empty);
-                AssertEqualApplicationModelData(applicationModel, application.Model);
+                ApplicationTestData.AssertEqualApplicationModelData(applicationModel, application.Model);
                 application.Model = applicationModel;
                 Assert.NotNull(applicationModel);
             }
@@ -164,7 +166,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
             });
             await Assert.ThrowsAsync<ResourceNotFoundException>(async () =>
             {
-                var testModelCopy = ApplicationDeepCopy(_applicationTestSet[0].Model);
+                var testModelCopy = ApplicationTestData.ApplicationDeepCopy(_applicationTestSet[0].Model);
                 testModelCopy.ApplicationId = Guid.NewGuid();
                 await _applicationsDatabase.RegisterApplicationAsync(testModelCopy);
             });
@@ -218,7 +220,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
                 Assert.NotNull(applicationModel);
                 Assert.NotEqual(applicationModel.ApplicationId, Guid.Empty);
                 Assert.Equal(ApplicationState.Rejected, applicationModel.ApplicationState);
-                AssertEqualApplicationModelData(applicationModel, application.Model);
+                ApplicationTestData.AssertEqualApplicationModelData(applicationModel, application.Model);
 
                 // approve rejected app should fail
                 await Assert.ThrowsAsync<ResourceInvalidStateException>(async () =>
@@ -231,7 +233,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
                 Assert.NotNull(applicationModel);
                 Assert.NotEqual(applicationModel.ApplicationId, Guid.Empty);
                 Assert.Equal(ApplicationState.Approved, applicationModel.ApplicationState);
-                AssertEqualApplicationModelData(applicationModel, application.Model);
+                ApplicationTestData.AssertEqualApplicationModelData(applicationModel, application.Model);
                 fullPasses++;
             }
             // not enough test passes to verify
@@ -264,7 +266,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
                 Assert.NotNull(applicationModel);
                 Assert.NotEqual(applicationModel.ApplicationId, Guid.Empty);
                 Assert.Equal(applicationModel.ApplicationId, applicationModel.ApplicationId);
-                AssertEqualApplicationModelData(applicationModel, application.Model);
+                ApplicationTestData.AssertEqualApplicationModelData(applicationModel, application.Model);
             }
         }
 
@@ -360,7 +362,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
                 Assert.Equal(applicationModel.ApplicationId, applicationModel.ApplicationId);
                 Assert.Equal(ApplicationState.Unregistered, applicationModel.ApplicationState);
                 Assert.NotNull(applicationModel.DeleteTime);
-                AssertEqualApplicationModelData(applicationModel, application.Model);
+                ApplicationTestData.AssertEqualApplicationModelData(applicationModel, application.Model);
             }
         }
 
@@ -387,61 +389,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
             }
         }
 
-        /// <summary>
-        /// Assert the application model data which should remain equal.
-        /// </summary>
-        /// <param name="expected">The Application test data</param>
-        /// <param name="actual">The Application model data</param>
-        private void AssertEqualApplicationModelData(Application expected, Application actual)
-        {
-            Assert.Equal(expected.ApplicationName, actual.ApplicationName);
-            Assert.Equal(expected.ApplicationType, actual.ApplicationType);
-            Assert.Equal(expected.ApplicationUri, actual.ApplicationUri);
-            Assert.Equal(expected.DiscoveryProfileUri, actual.DiscoveryProfileUri);
-            Assert.Equal(expected.ProductUri, actual.ProductUri);
-            Assert.Equal(ServerCapabilities(expected), ServerCapabilities(actual));
-            Assert.Equal(JsonConvert.SerializeObject(expected.ApplicationNames), JsonConvert.SerializeObject(actual.ApplicationNames));
-            Assert.Equal(JsonConvert.SerializeObject(expected.DiscoveryUrls), JsonConvert.SerializeObject(actual.DiscoveryUrls));
-        }
-
-        public static string ServerCapabilities(Application application)
-        {
-            if ((int)application.ApplicationType != (int)CosmosDB.Models.ApplicationType.Client)
-            {
-                if (application.ServerCapabilities == null || application.ServerCapabilities.Length == 0)
-                {
-                    throw new ArgumentException("At least one Server Capability must be provided.", nameof(application.ServerCapabilities));
-                }
-            }
-
-            StringBuilder capabilities = new StringBuilder();
-            if (application.ServerCapabilities != null)
-            {
-                var sortedCaps = application.ServerCapabilities.Split(",").ToList();
-                sortedCaps.Sort();
-                foreach (var capability in sortedCaps)
-                {
-                    if (String.IsNullOrEmpty(capability))
-                    {
-                        continue;
-                    }
-
-                    if (capabilities.Length > 0)
-                    {
-                        capabilities.Append(',');
-                    }
-
-                    capabilities.Append(capability);
-                }
-            }
-
-            return capabilities.ToString();
-        }
-
-        private Application ApplicationDeepCopy(Application app)
-        {
-            return (Application)JsonConvert.DeserializeObject(JsonConvert.SerializeObject(app), typeof(Application));
-        }
     }
 
 

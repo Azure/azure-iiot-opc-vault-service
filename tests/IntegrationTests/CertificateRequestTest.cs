@@ -160,7 +160,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
                 var applicationModel = await _applicationsDatabase.RegisterApplicationAsync(application.Model);
                 Assert.NotNull(applicationModel);
                 Assert.NotEqual(applicationModel.ApplicationId, Guid.Empty);
-                AssertEqualApplicationModelData(applicationModel, application.Model);
+                ApplicationTestData.AssertEqualApplicationModelData(applicationModel, application.Model);
                 application.Model = applicationModel;
                 Assert.NotNull(applicationModel);
             }
@@ -379,7 +379,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
                     {
                         await _certificateRequest.AcceptAsync(requestId);
                         request = await _certificateRequest.ReadAsync(requestId);
-                        Assert.Equal(CertificateRequestState.Approved, request.State);
+                        Assert.Equal(CertificateRequestState.Accepted, request.State);
                     }
                     else
                     {
@@ -603,59 +603,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
             }
         }
 
-        /// <summary>
-        /// Assert the application model data which should remain equal.
-        /// </summary>
-        /// <param name="expected">The Application test data</param>
-        /// <param name="actual">The Application model data</param>
-        private void AssertEqualApplicationModelData(Application expected, Application actual)
-        {
-            Assert.Equal(expected.ApplicationName, actual.ApplicationName);
-            Assert.Equal(expected.ApplicationType, actual.ApplicationType);
-            Assert.Equal(expected.ApplicationUri, actual.ApplicationUri);
-            Assert.Equal(expected.DiscoveryProfileUri, actual.DiscoveryProfileUri);
-            Assert.Equal(expected.ProductUri, actual.ProductUri);
-            Assert.Equal(ServerCapabilities(expected), ServerCapabilities(actual));
-            Assert.Equal(JsonConvert.SerializeObject(expected.ApplicationNames), JsonConvert.SerializeObject(actual.ApplicationNames));
-            Assert.Equal(JsonConvert.SerializeObject(expected.DiscoveryUrls), JsonConvert.SerializeObject(actual.DiscoveryUrls));
-        }
-
-        public static string ServerCapabilities(Application application)
-        {
-            if ((int)application.ApplicationType != (int)CosmosDB.Models.ApplicationType.Client)
-            {
-                if (application.ServerCapabilities == null || application.ServerCapabilities.Length == 0)
-                {
-                    throw new ArgumentException("At least one Server Capability must be provided.", nameof(application.ServerCapabilities));
-                }
-            }
-
-            StringBuilder capabilities = new StringBuilder();
-            if (application.ServerCapabilities != null)
-            {
-                var sortedCaps = application.ServerCapabilities.Split(",").ToList();
-                sortedCaps.Sort();
-                foreach (var capability in sortedCaps)
-                {
-                    if (String.IsNullOrEmpty(capability))
-                    {
-                        continue;
-                    }
-
-                    if (capabilities.Length > 0)
-                    {
-                        capabilities.Append(',');
-                    }
-
-                    capabilities.Append(capability);
-                }
-            }
-
-            return capabilities.ToString();
-        }
 
         /// <summary>
-        /// Test helper to test fetch at various states of requests in the workflow.
+        /// Test helper to test fetch for various states of requests in the workflow.
         /// </summary>
         private async Task FetchRequestsAllApplications(bool purged = false)
         {
