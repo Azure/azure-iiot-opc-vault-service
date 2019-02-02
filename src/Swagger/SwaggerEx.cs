@@ -59,8 +59,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Swagger
                 // Add annotations
                 options.EnableAnnotations();
 
-                // send all enums as string 
-                // options.DescribeAllEnumsAsStrings();
+                // send all enums as string
+                // required for x-ms-enum
+                options.DescribeAllEnumsAsStrings();
 
                 // Add help
                 options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory,
@@ -200,23 +201,14 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Swagger
                     // Most of the model enums are nullable
                     paramType = paramType.GetGenericArguments()[0];
                 }
-#if CONFLICT_WITH_DescribeAllEnumsAsStrings
                 if (paramType.IsEnum)
                 {
                     extensions.Add("x-ms-enum", new
                     {
                         name = paramType.Name,
-                        modelAsString = false,
-                        values = paramType
-                            .GetFields(BindingFlags.Static | BindingFlags.Public)
-                            .Select(field => new
-                            {
-                                name = field.Name,
-                                value = field.Name,
-                            })
+                        modelAsString = false
                     });
                 }
-#endif
             }
         }
 

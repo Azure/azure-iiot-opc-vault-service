@@ -19,7 +19,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Models
         public string ApplicationUri { get; set; }
 
         [JsonProperty(PropertyName = "applicationType", Order = 40)]
-        public uint ApplicationType { get; set; }
+        public QueryApplicationType ApplicationType { get; set; }
 
         [JsonProperty(PropertyName = "productUri", Order = 50)]
         public string ProductUri { get; set; }
@@ -36,7 +36,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Models
         public QueryApplicationsPageApiModel(
             string applicationName,
             string applicationUri,
-            uint applicationType,
+            QueryApplicationType applicationType,
             string productUri,
             IList<string> serverCapabilities,
             string nextPageLink = null,

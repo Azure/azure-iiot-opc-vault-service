@@ -5,6 +5,7 @@
 
 
 using System;
+using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Models
@@ -18,7 +19,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Models
         public string ApplicationId { get; set; }
 
         [JsonProperty(PropertyName = "state", Order = 15)]
-        public string State { get; set; }
+        [Required]
+        public CertificateRequestState State { get; set; }
 
         [JsonProperty(PropertyName = "certificateGroupId", Order = 20)]
         public string CertificateGroupId { get; set; }
@@ -51,7 +53,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Models
         {
             this.RequestId = requestId;
             this.ApplicationId = applicationId;
-            this.State = state.ToString();
+            this.State = (CertificateRequestState)state;
             this.CertificateGroupId = certificateGroupId;
             this.CertificateTypeId = certificateTypeId;
             this.SignedCertificate = (signedCertificate != null) ? Convert.ToBase64String(signedCertificate) : null;

@@ -127,7 +127,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Controllers
                 query.MaxRecordsToReturn,
                 query.ApplicationName,
                 query.ApplicationUri,
-                query.ApplicationType,
+                (uint)query.ApplicationType,
                 query.ProductUri,
                 query.ServerCapabilities,
                 anyState
@@ -149,7 +149,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Controllers
             var result = await _applicationDatabase.QueryApplicationsPageAsync(
                 query.ApplicationName,
                 query.ApplicationUri,
-                query.ApplicationType,
+                (uint)query.ApplicationType,
                 query.ProductUri,
                 query.ServerCapabilities,
                 query.NextPageLink,

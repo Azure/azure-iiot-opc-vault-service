@@ -9,6 +9,7 @@ using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Models
 {
@@ -17,10 +18,12 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Models
         [JsonProperty(PropertyName = "applications", Order = 10)]
         public IList<ApplicationRecordApiModel> Applications { get; set; }
 
-        [JsonProperty(PropertyName = "lastCounterResetTime", Required = Required.Always, Order = 20)]
+        [JsonProperty(PropertyName = "lastCounterResetTime", Order = 20)]
+        [Required]
         public DateTime LastCounterResetTime { get; set; }
 
-        [JsonProperty(PropertyName = "nextRecordId", Required = Required.Always, Order = 30)]
+        [JsonProperty(PropertyName = "nextRecordId", Order = 30)]
+        [Required]
         public int NextRecordId { get; set; }
 
         public QueryApplicationsResponseApiModel(QueryApplicationsResponseModel model)

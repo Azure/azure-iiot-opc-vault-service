@@ -7,9 +7,22 @@
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Models
 {
+    public enum QueryApplicationType : uint
+    {
+        [EnumMember(Value = "any")]
+        Any = 0,
+        [EnumMember(Value = "client")]
+        Client = 1,
+        [EnumMember(Value = "server")]
+        Server = 2,
+        [EnumMember(Value = "clientAndServer")]
+        ClientAndServer = 3
+    }
+
     public sealed class QueryApplicationsApiModel
     {
         [JsonProperty(PropertyName = "startingRecordId", Order = 10)]
@@ -25,7 +38,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Models
         public string ApplicationUri { get; set; }
 
         [JsonProperty(PropertyName = "applicationType", Order = 50)]
-        public uint ApplicationType { get; set; }
+        public QueryApplicationType ApplicationType { get; set; }
 
         [JsonProperty(PropertyName = "productUri", Order = 60)]
         public string ProductUri { get; set; }
@@ -38,7 +51,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Models
             uint maxRecordsToReturn,
             string applicationName,
             string applicationUri,
-            uint applicationType,
+            QueryApplicationType applicationType,
             string productUri,
             IList<string> serverCapabilities
             )
