@@ -31,7 +31,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models
         /// class.
         /// </summary>
         /// <param name="applicationType">Possible values include: 'any',
-        /// 'client', 'server', 'clientAndServer'</param>
+        /// 'server', 'client', 'clientAndServer'</param>
         public QueryApplicationsPageApiModel(string applicationName = default(string), string applicationUri = default(string), QueryApplicationType? applicationType = default(QueryApplicationType?), string productUri = default(string), IList<string> serverCapabilities = default(IList<string>), string nextPageLink = default(string), int? maxRecordsToReturn = default(int?))
         {
             ApplicationName = applicationName;
@@ -60,7 +60,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models
         public string ApplicationUri { get; set; }
 
         /// <summary>
-        /// Gets or sets possible values include: 'any', 'client', 'server',
+        /// Gets or sets possible values include: 'any', 'server', 'client',
         /// 'clientAndServer'
         /// </summary>
         [JsonProperty(PropertyName = "applicationType")]

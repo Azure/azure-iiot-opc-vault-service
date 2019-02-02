@@ -23,10 +23,10 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models
     {
         [EnumMember(Value = "any")]
         Any,
-        [EnumMember(Value = "client")]
-        Client,
         [EnumMember(Value = "server")]
         Server,
+        [EnumMember(Value = "client")]
+        Client,
         [EnumMember(Value = "clientAndServer")]
         ClientAndServer
     }
@@ -43,10 +43,10 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models
             {
                 case QueryApplicationType.Any:
                     return "any";
-                case QueryApplicationType.Client:
-                    return "client";
                 case QueryApplicationType.Server:
                     return "server";
+                case QueryApplicationType.Client:
+                    return "client";
                 case QueryApplicationType.ClientAndServer:
                     return "clientAndServer";
             }
@@ -59,10 +59,10 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models
             {
                 case "any":
                     return QueryApplicationType.Any;
-                case "client":
-                    return QueryApplicationType.Client;
                 case "server":
                     return QueryApplicationType.Server;
+                case "client":
+                    return QueryApplicationType.Client;
                 case "clientAndServer":
                     return QueryApplicationType.ClientAndServer;
             }

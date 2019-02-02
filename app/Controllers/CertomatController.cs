@@ -21,8 +21,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
     [Authorize]
     public class CertomatController : DownloadController
     {
-        const int _applicationTypeClient = 1;
-
         public CertomatController(
             OpcVaultApiOptions opcVaultOptions,
             AzureADOptions azureADOptions,
@@ -89,7 +87,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
                 AuthorizeClient();
                 try
                 {
-                    if (apiModel.ApplicationType == _applicationTypeClient)
+                    if (apiModel.ApplicationType == ApplicationType.Client)
                     {
                         apiModel.ServerCapabilities = null;
                         apiModel.DiscoveryUrls = null;

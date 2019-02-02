@@ -44,12 +44,15 @@ namespace Opc.Ua.Gds.Server.Database.OpcVault
 
             string capabilities = base.ServerCapabilities(application);
 
-            ApplicationRecordApiModel applicationModel = new ApplicationRecordApiModel
+            ApplicationRecordApiModel applicationModel = new ApplicationRecordApiModel(
+                ApplicationState.New,
+                (Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models.ApplicationType)application.ApplicationType,
+                applicationId
+                )
             {
-                ApplicationId = applicationId,
                 ApplicationUri = application.ApplicationUri,
                 ApplicationName = application.ApplicationNames[0].Text,
-                ApplicationType = (int)application.ApplicationType,
+                //ApplicationType = (ApplicationType)application.ApplicationType,
                 ProductUri = application.ProductUri,
                 ServerCapabilities = capabilities
             };
@@ -232,7 +235,7 @@ namespace Opc.Ua.Gds.Server.Database.OpcVault
                 (int)maxRecordsToReturn,
                 applicationName,
                 applicationUri,
-                1, // server only
+                QueryApplicationType.Server,
                 productUri,
                 serverCapabilities?.ToList()
                 );
@@ -279,7 +282,7 @@ namespace Opc.Ua.Gds.Server.Database.OpcVault
                 (int)maxRecordsToReturn,
                 applicationName,
                 applicationUri,
-                (int)applicationType,
+                (QueryApplicationType)applicationType,
                 productUri,
                 serverCapabilities?.ToList()
                 );
