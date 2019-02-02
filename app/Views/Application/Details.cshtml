@@ -29,6 +29,14 @@
         </dd>
 
         <dt>
+            @Html.DisplayNameFor(model => model.State)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.State)
+        </dd>
+
+        <dt>
             @Html.DisplayNameFor(model => model.ApplicationName)
         </dt>
 
@@ -60,17 +68,17 @@
             @Html.DisplayFor(model => model.ProductUri)
         </dd>
         <!--
-        <dt>
-            @Html.DisplayNameFor(model => model.ApplicationNames)
-        </dt>
+    <dt>
+        @Html.DisplayNameFor(model => model.ApplicationNames)
+    </dt>
 
-        @foreach (var applicationName in Model.ApplicationNames)
-        {
-            <dd>
-                @Html.DisplayFor(model => applicationName.Text)
-            </dd>
-        }
-        -->
+    @foreach (var applicationName in Model.ApplicationNames)
+    {
+        <dd>
+            @Html.DisplayFor(model => applicationName.Text)
+        </dd>
+    }
+    -->
         @if (Model.DiscoveryUrls != null)
         {
 
@@ -96,22 +104,22 @@
             </dd>
         }
         <!--
-                <dt>
-                    @Html.DisplayNameFor(model => model.GatewayServerUri)
-                </dt>
+            <dt>
+                @Html.DisplayNameFor(model => model.GatewayServerUri)
+            </dt>
 
-                <dd>
-                    @Html.DisplayFor(model => model.GatewayServerUri)
-                </dd>
+            <dd>
+                @Html.DisplayFor(model => model.GatewayServerUri)
+            </dd>
 
-                <dt>
-                    @Html.DisplayNameFor(model => model.DiscoveryProfileUri)
-                </dt>
+            <dt>
+                @Html.DisplayNameFor(model => model.DiscoveryProfileUri)
+            </dt>
 
-                <dd>
-                    @Html.DisplayFor(model => model.DiscoveryProfileUri)
-                </dd>
-        -->
+            <dd>
+                @Html.DisplayFor(model => model.DiscoveryProfileUri)
+            </dd>
+    -->
     </dl>
 </div>
 <p>

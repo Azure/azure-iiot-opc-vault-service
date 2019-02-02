@@ -1,4 +1,4 @@
-﻿@model Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Models.ApplicationRecordRegisterApiModel
+@model Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Models.ApplicationRecordRegisterApiModel
 
 @{
     ViewBag.Title = "Certomat";
@@ -123,12 +123,14 @@ else
         else
         {
             @Html.HiddenFor(model => Model.ServerCapabilities);
-            @for (int i = 0; i < Model.DiscoveryUrls.Count(); i++)
+            @if (Model.DiscoveryUrls != null)
             {
-                @Html.HiddenFor(model => Model.DiscoveryUrls[i]);
+                @for (int i = 0; i < Model.DiscoveryUrls.Count(); i++)
+                {
+                    @Html.HiddenFor(model => Model.DiscoveryUrls[i]);
+                }
             }
         }
-
         @if (ViewData["ErrorMessage"] != null)
         {
             <hr />
