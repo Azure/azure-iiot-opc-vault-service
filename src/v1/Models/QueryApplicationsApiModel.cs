@@ -15,10 +15,10 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Models
     {
         [EnumMember(Value = "any")]
         Any = 0,
-        [EnumMember(Value = "client")]
-        Client = 1,
         [EnumMember(Value = "server")]
-        Server = 2,
+        Server = 1,
+        [EnumMember(Value = "client")]
+        Client = 2,
         [EnumMember(Value = "clientAndServer")]
         ClientAndServer = 3
     }
