@@ -337,6 +337,10 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         /// </return>
         public async Task<HttpOperationResponse<ApplicationRecordApiModel>> RegisterApplicationWithHttpMessagesAsync(ApplicationRecordApiModel application = default(ApplicationRecordApiModel), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
         {
+            if (application != null)
+            {
+                application.Validate();
+            }
             // Tracing
             bool _shouldTrace = ServiceClientTracing.IsEnabled;
             string _invocationId = null;
@@ -620,6 +624,10 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         /// </return>
         public async Task<HttpOperationResponse<ApplicationRecordApiModel>> UpdateApplicationWithHttpMessagesAsync(string applicationId, ApplicationRecordApiModel application = default(ApplicationRecordApiModel), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
         {
+            if (application != null)
+            {
+                application.Validate();
+            }
             if (applicationId == null)
             {
                 throw new ValidationException(ValidationRules.CannotBeNull, "applicationId");
@@ -1896,6 +1904,10 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             if (group == null)
             {
                 throw new ValidationException(ValidationRules.CannotBeNull, "group");
+            }
+            if (config != null)
+            {
+                config.Validate();
             }
             // Tracing
             bool _shouldTrace = ServiceClientTracing.IsEnabled;
@@ -4713,7 +4725,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         /// optional, query for application id
         /// </param>
         /// <param name='requestState'>
-        /// optional, query for request state
+        /// optional, query for request state. Possible values include: 'New',
+        /// 'Approved', 'Rejected', 'Accepted', 'Deleted', 'Revoked'
         /// </param>
         /// <param name='maxResults'>
         /// optional, the maximum number of result per page
@@ -4733,7 +4746,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         /// <return>
         /// A response object containing the response body and response headers.
         /// </return>
-        public async Task<HttpOperationResponse<CertificateRequestRecordQueryResponseApiModel>> QueryCertificateRequestsWithHttpMessagesAsync(string appId = default(string), int? requestState = default(int?), int? maxResults = default(int?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<HttpOperationResponse<CertificateRequestRecordQueryResponseApiModel>> QueryCertificateRequestsWithHttpMessagesAsync(string appId = default(string), string requestState = default(string), int? maxResults = default(int?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
         {
             // Tracing
             bool _shouldTrace = ServiceClientTracing.IsEnabled;

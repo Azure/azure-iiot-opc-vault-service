@@ -569,7 +569,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         /// optional, query for application id
         /// </param>
         /// <param name='requestState'>
-        /// optional, query for request state
+        /// optional, query for request state. Possible values include: 'New',
+        /// 'Approved', 'Rejected', 'Accepted', 'Deleted', 'Revoked'
         /// </param>
         /// <param name='maxResults'>
         /// optional, the maximum number of result per page
@@ -580,7 +581,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse<CertificateRequestRecordQueryResponseApiModel>> QueryCertificateRequestsWithHttpMessagesAsync(string appId = default(string), int? requestState = default(int?), int? maxResults = default(int?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse<CertificateRequestRecordQueryResponseApiModel>> QueryCertificateRequestsWithHttpMessagesAsync(string appId = default(string), string requestState = default(string), int? maxResults = default(int?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Query for next page of requests.

@@ -66,6 +66,16 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models
         /// </exception>
         public virtual void Validate()
         {
+            if (Applications != null)
+            {
+                foreach (var element in Applications)
+                {
+                    if (element != null)
+                    {
+                        element.Validate();
+                    }
+                }
+            }
         }
     }
 }

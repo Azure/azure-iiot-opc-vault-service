@@ -28,7 +28,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models
         /// <summary>
         /// Initializes a new instance of the QueryApplicationsApiModel class.
         /// </summary>
-        public QueryApplicationsApiModel(int? startingRecordId = default(int?), int? maxRecordsToReturn = default(int?), string applicationName = default(string), string applicationUri = default(string), int? applicationType = default(int?), string productUri = default(string), IList<string> serverCapabilities = default(IList<string>))
+        /// <param name="applicationType">Possible values include: 'any',
+        /// 'client', 'server', 'clientAndServer'</param>
+        public QueryApplicationsApiModel(int? startingRecordId = default(int?), int? maxRecordsToReturn = default(int?), string applicationName = default(string), string applicationUri = default(string), QueryApplicationType? applicationType = default(QueryApplicationType?), string productUri = default(string), IList<string> serverCapabilities = default(IList<string>))
         {
             StartingRecordId = startingRecordId;
             MaxRecordsToReturn = maxRecordsToReturn;
@@ -66,9 +68,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models
         public string ApplicationUri { get; set; }
 
         /// <summary>
+        /// Gets or sets possible values include: 'any', 'client', 'server',
+        /// 'clientAndServer'
         /// </summary>
         [JsonProperty(PropertyName = "applicationType")]
-        public int? ApplicationType { get; set; }
+        public QueryApplicationType? ApplicationType { get; set; }
 
         /// <summary>
         /// </summary>

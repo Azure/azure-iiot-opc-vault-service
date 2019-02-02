@@ -1213,12 +1213,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             /// optional, query for application id
             /// </param>
             /// <param name='requestState'>
-            /// optional, query for request state
+            /// optional, query for request state. Possible values include: 'New',
+            /// 'Approved', 'Rejected', 'Accepted', 'Deleted', 'Revoked'
             /// </param>
             /// <param name='maxResults'>
             /// optional, the maximum number of result per page
             /// </param>
-            public static CertificateRequestRecordQueryResponseApiModel QueryCertificateRequests(this IOpcVault operations, string appId = default(string), int? requestState = default(int?), int? maxResults = default(int?))
+            public static CertificateRequestRecordQueryResponseApiModel QueryCertificateRequests(this IOpcVault operations, string appId = default(string), string requestState = default(string), int? maxResults = default(int?))
             {
                 return operations.QueryCertificateRequestsAsync(appId, requestState, maxResults).GetAwaiter().GetResult();
             }
@@ -1233,7 +1234,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             /// optional, query for application id
             /// </param>
             /// <param name='requestState'>
-            /// optional, query for request state
+            /// optional, query for request state. Possible values include: 'New',
+            /// 'Approved', 'Rejected', 'Accepted', 'Deleted', 'Revoked'
             /// </param>
             /// <param name='maxResults'>
             /// optional, the maximum number of result per page
@@ -1241,7 +1243,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<CertificateRequestRecordQueryResponseApiModel> QueryCertificateRequestsAsync(this IOpcVault operations, string appId = default(string), int? requestState = default(int?), int? maxResults = default(int?), CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<CertificateRequestRecordQueryResponseApiModel> QueryCertificateRequestsAsync(this IOpcVault operations, string appId = default(string), string requestState = default(string), int? maxResults = default(int?), CancellationToken cancellationToken = default(CancellationToken))
             {
                 using (var _result = await operations.QueryCertificateRequestsWithHttpMessagesAsync(appId, requestState, maxResults, null, cancellationToken).ConfigureAwait(false))
                 {
