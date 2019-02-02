@@ -137,7 +137,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Controllers
 
         /// <summary>Query applications</summary>
         [HttpPost("query/page")]
-        //[AutoRestExtension(ContinuationTokenLinkName = "nextPageLink")]
         public async Task<QueryApplicationsPageResponseApiModel> QueryApplicationsPageAsync(
             [FromBody] QueryApplicationsPageApiModel query,
             bool? anyState)

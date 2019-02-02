@@ -546,7 +546,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
 
         public async Task RevokeGroupAsync(string groupId, bool? allVersions)
         {
-            // TODO: implement all versions to renew all CSR for all CA versions
             var queryParameters = new SqlParameterCollection();
             string query = "SELECT * FROM CertificateRequest r WHERE ";
             query += " r.CertificateRequestState = @state";
@@ -585,7 +584,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                 }
             }
 
-            await _certificateGroup.RevokeCertificatesAsync(groupId, certCollection);
+            var remainingCertificates = await _certificateGroup.RevokeCertificatesAsync(groupId, certCollection);
 
             foreach (var reqId in deletedRequests)
             {
@@ -597,8 +596,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
 
                     if (request.CertificateRequestState != CertificateRequestState.Deleted)
                     {
-                        throw new ResourceInvalidStateException("The record is not in a valid state for this operation.");
+                        // skip, there may have been a concurrent update to the database.
+                        continue;
                     }
+
+                    // TODO: test for remaining certificates
 
                     request.CertificateRequestState = CertificateRequestState.Revoked;
                     request.RevokeTime = DateTime.UtcNow;

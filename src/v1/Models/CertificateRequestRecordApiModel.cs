@@ -10,6 +10,22 @@ using Newtonsoft.Json;
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Models
 {
+    public enum CertificateRequestState
+    {
+        [EnumMember(Value = "New")]
+        New = 0,
+        [EnumMember(Value = "Approved")]
+        Approved = 1,
+        [EnumMember(Value = "Rejected")]
+        Rejected = 2,
+        [EnumMember(Value = "Accepted")]
+        Accepted = 3,
+        [EnumMember(Value = "Deleted")]
+        Deleted = 4,
+        [EnumMember(Value = "Revoked")]
+        Revoked = 5
+    }
+
     public sealed class CertificateRequestRecordApiModel
     {
         [JsonProperty(PropertyName = "requestId", Order = 5)]

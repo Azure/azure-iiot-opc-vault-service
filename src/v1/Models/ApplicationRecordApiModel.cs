@@ -27,6 +27,20 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Models
         DiscoveryServer = 3
     }
 
+    public enum ApplicationState
+    {
+        [EnumMember(Value = "New")]
+        New = 0,
+        [EnumMember(Value = "Approved")]
+        Approved = 1,
+        [EnumMember(Value = "Rejected")]
+        Rejected = 2,
+        [EnumMember(Value = "Unregistered")]
+        Unregistered = 3,
+        [EnumMember(Value = "Deleted")]
+        Deleted = 4
+    }
+
     public sealed class ApplicationRecordApiModel
     {
         [JsonProperty(PropertyName = "applicationId")]
