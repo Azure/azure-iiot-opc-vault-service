@@ -4,9 +4,8 @@
 // ------------------------------------------------------------
 
 
-using Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB.Models;
-using Newtonsoft.Json;
 using System;
+using Newtonsoft.Json;
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Models
 {
@@ -42,7 +41,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Models
         public FetchRequestResultApiModel(
             string requestId,
             string applicationId,
-            CertificateRequestState state,
+            CosmosDB.Models.CertificateRequestState state,
             string certificateGroupId,
             string certificateTypeId,
             byte[] signedCertificate,

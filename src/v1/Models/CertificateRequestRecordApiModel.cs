@@ -5,7 +5,7 @@
 
 
 using System.Collections.Generic;
-using Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB.Models;
+using System.Runtime.Serialization;
 using Newtonsoft.Json;
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Models
@@ -58,7 +58,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Models
         public CertificateRequestRecordApiModel(
             string requestId,
             string applicationId,
-            CertificateRequestState state,
+            CosmosDB.Models.CertificateRequestState state,
             string certificateGroupId,
             string certificateTypeId,
             bool signingRequest,
