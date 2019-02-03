@@ -15,31 +15,35 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models
     using System.Collections.Generic;
     using System.Linq;
 
-    public partial class QueryApplicationsApiModel
+    public partial class QueryApplicationsByIdApiModel
     {
         /// <summary>
-        /// Initializes a new instance of the QueryApplicationsApiModel class.
+        /// Initializes a new instance of the QueryApplicationsByIdApiModel
+        /// class.
         /// </summary>
-        public QueryApplicationsApiModel()
+        public QueryApplicationsByIdApiModel()
         {
             CustomInit();
         }
 
         /// <summary>
-        /// Initializes a new instance of the QueryApplicationsApiModel class.
+        /// Initializes a new instance of the QueryApplicationsByIdApiModel
+        /// class.
         /// </summary>
         /// <param name="applicationType">Possible values include: 'any',
         /// 'server', 'client', 'clientAndServer'</param>
         /// <param name="applicationState">Possible values include: 'any',
         /// 'new', 'approved', 'rejected', 'unregistered', 'deleted'</param>
-        public QueryApplicationsApiModel(string applicationName = default(string), string applicationUri = default(string), QueryApplicationType? applicationType = default(QueryApplicationType?), string productUri = default(string), IList<string> serverCapabilities = default(IList<string>), QueryApplicationState? applicationState = default(QueryApplicationState?))
+        public QueryApplicationsByIdApiModel(int? startingRecordId = default(int?), int? maxRecordsToReturn = default(int?), string applicationName = default(string), string applicationUri = default(string), QueryApplicationType? applicationType = default(QueryApplicationType?), QueryApplicationState? applicationState = default(QueryApplicationState?), string productUri = default(string), IList<string> serverCapabilities = default(IList<string>))
         {
+            StartingRecordId = startingRecordId;
+            MaxRecordsToReturn = maxRecordsToReturn;
             ApplicationName = applicationName;
             ApplicationUri = applicationUri;
             ApplicationType = applicationType;
+            ApplicationState = applicationState;
             ProductUri = productUri;
             ServerCapabilities = serverCapabilities;
-            ApplicationState = applicationState;
             CustomInit();
         }
 
@@ -47,6 +51,16 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models
         /// An initialization method that performs custom operations like setting defaults
         /// </summary>
         partial void CustomInit();
+
+        /// <summary>
+        /// </summary>
+        [JsonProperty(PropertyName = "startingRecordId")]
+        public int? StartingRecordId { get; set; }
+
+        /// <summary>
+        /// </summary>
+        [JsonProperty(PropertyName = "maxRecordsToReturn")]
+        public int? MaxRecordsToReturn { get; set; }
 
         /// <summary>
         /// </summary>
@@ -66,6 +80,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models
         public QueryApplicationType? ApplicationType { get; set; }
 
         /// <summary>
+        /// Gets or sets possible values include: 'any', 'new', 'approved',
+        /// 'rejected', 'unregistered', 'deleted'
+        /// </summary>
+        [JsonProperty(PropertyName = "applicationState")]
+        public QueryApplicationState? ApplicationState { get; set; }
+
+        /// <summary>
         /// </summary>
         [JsonProperty(PropertyName = "productUri")]
         public string ProductUri { get; set; }
@@ -74,13 +95,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models
         /// </summary>
         [JsonProperty(PropertyName = "serverCapabilities")]
         public IList<string> ServerCapabilities { get; set; }
-
-        /// <summary>
-        /// Gets or sets possible values include: 'any', 'new', 'approved',
-        /// 'rejected', 'unregistered', 'deleted'
-        /// </summary>
-        [JsonProperty(PropertyName = "applicationState")]
-        public QueryApplicationState? ApplicationState { get; set; }
 
     }
 }
