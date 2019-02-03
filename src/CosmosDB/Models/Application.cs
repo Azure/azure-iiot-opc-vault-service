@@ -25,6 +25,17 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB.Models
         Deleted = 4
     }
 
+    [Flags]
+    public enum QueryApplicationState : uint
+    {
+        Any = 0,
+        New = 1,
+        Approved = 2,
+        Rejected = 4,
+        Unregistered = 8,
+        Deleted = 16
+    }
+
     [Serializable]
     public class ApplicationName
     {

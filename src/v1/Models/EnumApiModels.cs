@@ -4,6 +4,7 @@
 // ------------------------------------------------------------
 
 
+using System;
 using System.Runtime.Serialization;
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Models
@@ -51,6 +52,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Models
         Revoked = 5
     }
 
+    [Flags]
     public enum QueryApplicationType : uint
     {
         [EnumMember(Value = "any")]
@@ -63,5 +65,21 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Models
         ClientAndServer = 3
     }
 
+    [Flags]
+    public enum QueryApplicationState : uint
+    {
+        [EnumMember(Value = "any")]
+        Any = 0,
+        [EnumMember(Value = "new")]
+        New = 1,
+        [EnumMember(Value = "approved")]
+        Approved = 2,
+        [EnumMember(Value = "rejected")]
+        Rejected = 4,
+        [EnumMember(Value = "unregistered")]
+        Unregistered = 8,
+        [EnumMember(Value = "deleted")]
+        Deleted = 16
+    }
 
 }

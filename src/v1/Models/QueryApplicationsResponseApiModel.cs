@@ -4,12 +4,10 @@
 // ------------------------------------------------------------
 
 
+using System.Collections.Generic;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB.Models;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Models;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Models
 {
@@ -18,13 +16,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Models
         [JsonProperty(PropertyName = "applications", Order = 10)]
         public IList<ApplicationRecordApiModel> Applications { get; set; }
 
-        [JsonProperty(PropertyName = "lastCounterResetTime", Order = 20)]
-        [Required]
-        public DateTime LastCounterResetTime { get; set; }
-
-        [JsonProperty(PropertyName = "nextRecordId", Order = 30)]
-        [Required]
-        public int NextRecordId { get; set; }
+        [JsonProperty(PropertyName = "nextPageLink", Order = 20)]
+        public string NextPageLink { get; set; }
 
         public QueryApplicationsResponseApiModel(QueryApplicationsResponseModel model)
         {
@@ -34,8 +27,23 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Models
                 applicationsList.Add(new ApplicationRecordApiModel(application));
             }
             Applications = applicationsList;
-            LastCounterResetTime = model.LastCounterResetTime;
-            NextRecordId = model.NextRecordId;
+            NextPageLink = model.NextPageLink;
+        }
+
+        public QueryApplicationsResponseApiModel(IList<Application> applications, string nextPageLink = null)
+        {
+            var applicationsList = new List<ApplicationRecordApiModel>();
+            foreach (Application application in applications)
+            {
+                applicationsList.Add(new ApplicationRecordApiModel(application));
+            }
+            Applications = applicationsList;
+            NextPageLink = nextPageLink;
+        }
+        public QueryApplicationsResponseApiModel(IList<ApplicationRecordApiModel> applications, string nextPageLink = null)
+        {
+            Applications = applications;
+            NextPageLink = nextPageLink;
         }
 
     }
