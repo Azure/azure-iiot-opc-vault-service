@@ -57,7 +57,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models
         /// <summary>
         /// </summary>
         [JsonProperty(PropertyName = "applicationId")]
-        public string ApplicationId { get; private set; }
+        public string ApplicationId { get; set; }
 
         /// <summary>
         /// </summary>
