@@ -74,7 +74,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Controllers
         /// </remarks>
         /// <param name="application">The updated application</param>
         /// <returns>The updated application record</returns>
-        [HttpPatch("{applicationId}")]
+        [HttpPut("{applicationId}")]
         [Authorize(Policy = Policies.CanWrite)]
         public async Task<ApplicationRecordApiModel> UpdateApplicationAsync([FromBody] ApplicationRecordApiModel application)
         {

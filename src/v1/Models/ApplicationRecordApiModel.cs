@@ -23,8 +23,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Models
         public int ID { get; }
 
         [JsonProperty(PropertyName = "state")]
-        [Required]
-        public ApplicationState State { get; }
+        public ApplicationState State { get; set; }
 
         [JsonProperty(PropertyName = "applicationUri")]
         public string ApplicationUri { get; set; }
