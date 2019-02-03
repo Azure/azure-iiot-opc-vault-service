@@ -1183,8 +1183,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         /// The returned model can contain a nex page link if more results are
         /// available.
         /// </remarks>
-        /// <param name='uri'>
-        /// </param>
         /// <param name='applicationUri'>
         /// The application Uri
         /// </param>
@@ -1215,11 +1213,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         /// <return>
         /// A response object containing the response body and response headers.
         /// </return>
-        public async Task<HttpOperationResponse<QueryApplicationsResponseApiModel>> ListApplicationsWithHttpMessagesAsync(string uri, string applicationUri = default(string), string nextPageLink = default(string), int? pageSize = default(int?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<HttpOperationResponse<QueryApplicationsResponseApiModel>> ListApplicationsWithHttpMessagesAsync(string applicationUri, string nextPageLink = default(string), int? pageSize = default(int?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
         {
-            if (uri == null)
+            if (applicationUri == null)
             {
-                throw new ValidationException(ValidationRules.CannotBeNull, "uri");
+                throw new ValidationException(ValidationRules.CannotBeNull, "applicationUri");
             }
             // Tracing
             bool _shouldTrace = ServiceClientTracing.IsEnabled;
@@ -1231,19 +1229,14 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
                 tracingParameters.Add("applicationUri", applicationUri);
                 tracingParameters.Add("nextPageLink", nextPageLink);
                 tracingParameters.Add("pageSize", pageSize);
-                tracingParameters.Add("uri", uri);
                 tracingParameters.Add("cancellationToken", cancellationToken);
                 ServiceClientTracing.Enter(_invocationId, this, "ListApplications", tracingParameters);
             }
             // Construct URL
             var _baseUrl = BaseUri.AbsoluteUri;
-            var _url = new System.Uri(new System.Uri(_baseUrl + (_baseUrl.EndsWith("/") ? "" : "/")), "v1/app/find/{uri}").ToString();
-            _url = _url.Replace("{uri}", System.Uri.EscapeDataString(uri));
+            var _url = new System.Uri(new System.Uri(_baseUrl + (_baseUrl.EndsWith("/") ? "" : "/")), "v1/app/find/{applicationUri}").ToString();
+            _url = _url.Replace("{applicationUri}", System.Uri.EscapeDataString(applicationUri));
             List<string> _queryParameters = new List<string>();
-            if (applicationUri != null)
-            {
-                _queryParameters.Add(string.Format("applicationUri={0}", System.Uri.EscapeDataString(applicationUri)));
-            }
             if (nextPageLink != null)
             {
                 _queryParameters.Add(string.Format("nextPageLink={0}", System.Uri.EscapeDataString(nextPageLink)));
@@ -1369,7 +1362,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         /// <return>
         /// A response object containing the response body and response headers.
         /// </return>
-        public async Task<HttpOperationResponse<QueryApplicationsByIdResponseApiModel>> QueryApplicationsWithHttpMessagesAsync(QueryApplicationsByIdApiModel query = default(QueryApplicationsByIdApiModel), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<HttpOperationResponse<QueryApplicationsByIdResponseApiModel>> QueryApplicationsByIdWithHttpMessagesAsync(QueryApplicationsByIdApiModel query = default(QueryApplicationsByIdApiModel), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
         {
             // Tracing
             bool _shouldTrace = ServiceClientTracing.IsEnabled;
@@ -1380,7 +1373,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
                 Dictionary<string, object> tracingParameters = new Dictionary<string, object>();
                 tracingParameters.Add("query", query);
                 tracingParameters.Add("cancellationToken", cancellationToken);
-                ServiceClientTracing.Enter(_invocationId, this, "QueryApplications", tracingParameters);
+                ServiceClientTracing.Enter(_invocationId, this, "QueryApplicationsById", tracingParameters);
             }
             // Construct URL
             var _baseUrl = BaseUri.AbsoluteUri;
@@ -1511,7 +1504,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         /// <return>
         /// A response object containing the response body and response headers.
         /// </return>
-        public async Task<HttpOperationResponse<QueryApplicationsResponseApiModel>> QueryApplications1WithHttpMessagesAsync(QueryApplicationsApiModel query = default(QueryApplicationsApiModel), string nextPageLink = default(string), int? pageSize = default(int?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<HttpOperationResponse<QueryApplicationsResponseApiModel>> QueryApplicationsWithHttpMessagesAsync(QueryApplicationsApiModel query = default(QueryApplicationsApiModel), string nextPageLink = default(string), int? pageSize = default(int?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
         {
             // Tracing
             bool _shouldTrace = ServiceClientTracing.IsEnabled;
@@ -1524,7 +1517,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
                 tracingParameters.Add("nextPageLink", nextPageLink);
                 tracingParameters.Add("pageSize", pageSize);
                 tracingParameters.Add("cancellationToken", cancellationToken);
-                ServiceClientTracing.Enter(_invocationId, this, "QueryApplications1", tracingParameters);
+                ServiceClientTracing.Enter(_invocationId, this, "QueryApplications", tracingParameters);
             }
             // Construct URL
             var _baseUrl = BaseUri.AbsoluteUri;

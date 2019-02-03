@@ -59,7 +59,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
                     break;
                 }
                 nextPageLink = requests.NextPageLink;
-                requests = await opcVault.QueryCertificateRequestsNextAsync(nextPageLink);
+                requests = await opcVault.QueryCertificateRequestsAsync(nextPageLink);
             }
 
             return View(indexRequests);

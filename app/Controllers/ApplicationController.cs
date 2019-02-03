@@ -42,17 +42,18 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
         public async Task<ActionResult> IndexAsync()
         {
             AuthorizeClient();
-            var applicationQuery = new QueryApplicationsPageApiModel();
+            var applicationQuery = new QueryApplicationsApiModel();
             var applicationsTrimmed = new List<ApplicationRecordTrimmedApiModel>();
+            string nextPageLink = null;
             do
             {
-                var applications = await _opcVault.QueryApplicationsPageAsync(applicationQuery);
+                var applications = await _opcVault.QueryApplicationsAsync(applicationQuery, nextPageLink);
                 foreach (var app in applications.Applications)
                 {
                     applicationsTrimmed.Add(new ApplicationRecordTrimmedApiModel(app));
                 }
-                applicationQuery.NextPageLink = applications.NextPageLink;
-            } while (applicationQuery.NextPageLink != null);
+                nextPageLink = applications.NextPageLink;
+            } while (nextPageLink != null);
             return View(applicationsTrimmed);
         }
 

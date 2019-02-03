@@ -111,14 +111,17 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
                 try
                 {
                     var applications = await opcVault.ListApplicationsAsync(apiModel.ApplicationUri);
-                    if (applications == null || applications.Count == 0)
+                    if (applications == null ||
+                        applications.Applications == null ||
+                        applications.Applications.Count == 0)
                     {
                         ViewData["ErrorMessage"] =
                             "Couldn't find the application with ApplicationUri " + apiModel.ApplicationUri;
                     }
                     else
                     {
-                        return RedirectToAction("Register", new { id = applications[0].ApplicationId });
+                        var lastApp = applications.Applications.LastOrDefault();
+                        return RedirectToAction("Register", new { id = lastApp.ApplicationId });
                     }
                 }
                 catch (Exception ex)

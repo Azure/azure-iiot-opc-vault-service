@@ -34,16 +34,16 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models
         /// 'server', 'client', 'clientAndServer'</param>
         /// <param name="applicationState">Possible values include: 'any',
         /// 'new', 'approved', 'rejected', 'unregistered', 'deleted'</param>
-        public QueryApplicationsByIdApiModel(int? startingRecordId = default(int?), int? maxRecordsToReturn = default(int?), string applicationName = default(string), string applicationUri = default(string), QueryApplicationType? applicationType = default(QueryApplicationType?), QueryApplicationState? applicationState = default(QueryApplicationState?), string productUri = default(string), IList<string> serverCapabilities = default(IList<string>))
+        public QueryApplicationsByIdApiModel(int? startingRecordId = default(int?), int? maxRecordsToReturn = default(int?), string applicationName = default(string), string applicationUri = default(string), QueryApplicationType? applicationType = default(QueryApplicationType?), string productUri = default(string), IList<string> serverCapabilities = default(IList<string>), QueryApplicationState? applicationState = default(QueryApplicationState?))
         {
             StartingRecordId = startingRecordId;
             MaxRecordsToReturn = maxRecordsToReturn;
             ApplicationName = applicationName;
             ApplicationUri = applicationUri;
             ApplicationType = applicationType;
-            ApplicationState = applicationState;
             ProductUri = productUri;
             ServerCapabilities = serverCapabilities;
+            ApplicationState = applicationState;
             CustomInit();
         }
 
@@ -80,13 +80,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models
         public QueryApplicationType? ApplicationType { get; set; }
 
         /// <summary>
-        /// Gets or sets possible values include: 'any', 'new', 'approved',
-        /// 'rejected', 'unregistered', 'deleted'
-        /// </summary>
-        [JsonProperty(PropertyName = "applicationState")]
-        public QueryApplicationState? ApplicationState { get; set; }
-
-        /// <summary>
         /// </summary>
         [JsonProperty(PropertyName = "productUri")]
         public string ProductUri { get; set; }
@@ -95,6 +88,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models
         /// </summary>
         [JsonProperty(PropertyName = "serverCapabilities")]
         public IList<string> ServerCapabilities { get; set; }
+
+        /// <summary>
+        /// Gets or sets possible values include: 'any', 'new', 'approved',
+        /// 'rejected', 'unregistered', 'deleted'
+        /// </summary>
+        [JsonProperty(PropertyName = "applicationState")]
+        public QueryApplicationState? ApplicationState { get; set; }
 
     }
 }

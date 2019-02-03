@@ -283,8 +283,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
-            /// <param name='uri'>
-            /// </param>
             /// <param name='applicationUri'>
             /// The application Uri
             /// </param>
@@ -294,9 +292,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             /// <param name='pageSize'>
             /// optional, the maximum number of result per page
             /// </param>
-            public static QueryApplicationsResponseApiModel ListApplications(this IOpcVault operations, string uri, string applicationUri = default(string), string nextPageLink = default(string), int? pageSize = default(int?))
+            public static QueryApplicationsResponseApiModel ListApplications(this IOpcVault operations, string applicationUri, string nextPageLink = default(string), int? pageSize = default(int?))
             {
-                return operations.ListApplicationsAsync(uri, applicationUri, nextPageLink, pageSize).GetAwaiter().GetResult();
+                return operations.ListApplicationsAsync(applicationUri, nextPageLink, pageSize).GetAwaiter().GetResult();
             }
 
             /// <summary>
@@ -311,8 +309,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
-            /// <param name='uri'>
-            /// </param>
             /// <param name='applicationUri'>
             /// The application Uri
             /// </param>
@@ -325,9 +321,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<QueryApplicationsResponseApiModel> ListApplicationsAsync(this IOpcVault operations, string uri, string applicationUri = default(string), string nextPageLink = default(string), int? pageSize = default(int?), CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<QueryApplicationsResponseApiModel> ListApplicationsAsync(this IOpcVault operations, string applicationUri, string nextPageLink = default(string), int? pageSize = default(int?), CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.ListApplicationsWithHttpMessagesAsync(uri, applicationUri, nextPageLink, pageSize, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.ListApplicationsWithHttpMessagesAsync(applicationUri, nextPageLink, pageSize, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }
@@ -341,9 +337,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             /// </param>
             /// <param name='query'>
             /// </param>
-            public static QueryApplicationsByIdResponseApiModel QueryApplications(this IOpcVault operations, QueryApplicationsByIdApiModel query = default(QueryApplicationsByIdApiModel))
+            public static QueryApplicationsByIdResponseApiModel QueryApplicationsById(this IOpcVault operations, QueryApplicationsByIdApiModel query = default(QueryApplicationsByIdApiModel))
             {
-                return operations.QueryApplicationsAsync(query).GetAwaiter().GetResult();
+                return operations.QueryApplicationsByIdAsync(query).GetAwaiter().GetResult();
             }
 
             /// <summary>
@@ -357,9 +353,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<QueryApplicationsByIdResponseApiModel> QueryApplicationsAsync(this IOpcVault operations, QueryApplicationsByIdApiModel query = default(QueryApplicationsByIdApiModel), CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<QueryApplicationsByIdResponseApiModel> QueryApplicationsByIdAsync(this IOpcVault operations, QueryApplicationsByIdApiModel query = default(QueryApplicationsByIdApiModel), CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.QueryApplicationsWithHttpMessagesAsync(query, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.QueryApplicationsByIdWithHttpMessagesAsync(query, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }
@@ -380,9 +376,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             /// <param name='pageSize'>
             /// optional, the maximum number of result per page
             /// </param>
-            public static QueryApplicationsResponseApiModel QueryApplications1(this IOpcVault operations, QueryApplicationsApiModel query = default(QueryApplicationsApiModel), string nextPageLink = default(string), int? pageSize = default(int?))
+            public static QueryApplicationsResponseApiModel QueryApplications(this IOpcVault operations, QueryApplicationsApiModel query = default(QueryApplicationsApiModel), string nextPageLink = default(string), int? pageSize = default(int?))
             {
-                return operations.QueryApplications1Async(query, nextPageLink, pageSize).GetAwaiter().GetResult();
+                return operations.QueryApplicationsAsync(query, nextPageLink, pageSize).GetAwaiter().GetResult();
             }
 
             /// <summary>
@@ -403,9 +399,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<QueryApplicationsResponseApiModel> QueryApplications1Async(this IOpcVault operations, QueryApplicationsApiModel query = default(QueryApplicationsApiModel), string nextPageLink = default(string), int? pageSize = default(int?), CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<QueryApplicationsResponseApiModel> QueryApplicationsAsync(this IOpcVault operations, QueryApplicationsApiModel query = default(QueryApplicationsApiModel), string nextPageLink = default(string), int? pageSize = default(int?), CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.QueryApplications1WithHttpMessagesAsync(query, nextPageLink, pageSize, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.QueryApplicationsWithHttpMessagesAsync(query, nextPageLink, pageSize, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }
