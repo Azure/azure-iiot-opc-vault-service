@@ -17,13 +17,14 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Models
     public sealed class ApplicationRecordApiModel
     {
         [JsonProperty(PropertyName = "applicationId")]
-        public string ApplicationId { get; }
+        public string ApplicationId { get; set; }
 
         [JsonProperty(PropertyName = "id")]
         public int ID { get; }
 
         [JsonProperty(PropertyName = "state")]
-        public ApplicationState State { get; set; }
+        [Required]
+        public ApplicationState State { get; }
 
         [JsonProperty(PropertyName = "applicationUri")]
         public string ApplicationUri { get; set; }

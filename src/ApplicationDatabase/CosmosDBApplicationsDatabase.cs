@@ -562,14 +562,29 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             QueryApplicationState queryState = applicationState ?? QueryApplicationState.Approved;
             if (queryState != 0)
             {
+                bool first = true;
                 foreach (QueryApplicationState state in Enum.GetValues(typeof(QueryApplicationState)))
                 {
+                    if (state == 0) continue;
                     if ((queryState & state) == state)
                     {
                         var sqlParm = "@" + state.ToString().ToLower();
-                        query += " AND a.ApplicationState = " + sqlParm;
+                        if (first)
+                        {
+                            query += " AND (";
+                        }
+                        else
+                        {
+                            query += " OR";
+                        }
+                        query += " a.ApplicationState = " + sqlParm;
                         queryParameters.Add(new SqlParameter(sqlParm, state.ToString()));
+                        first = false;
                     }
+                }
+                if (!first)
+                {
+                    query += " )";
                 }
             }
             query += " AND a.ClassType = @classType";
