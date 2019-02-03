@@ -106,7 +106,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Models
             application.ApplicationId = this.ApplicationId != null ? new Guid(this.ApplicationId) : Guid.Empty;
             application.ApplicationUri = this.ApplicationUri;
             application.ApplicationName = this.ApplicationName;
-            application.ApplicationType = (CosmosDB.Models.ApplicationType)this.ApplicationType;
+            application.ApplicationType = (Types.ApplicationType)this.ApplicationType;
             if (this.ApplicationNames != null)
             {
                 var applicationNames = new List<CosmosDB.Models.ApplicationName>();

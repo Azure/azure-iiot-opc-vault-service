@@ -150,10 +150,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Controllers
         /// Delete request. Mark the certificate for revocation.
         /// </summary>
         /// <remarks>
-        /// The request must be in the 'Approved' or 'Accepted' state.
-        /// By deleting the request it is actually not physically deleted, but marked
-        /// for revocation. The public certificate is still available for revocation.
-        /// The request is in the 'Deleted' state after this call.
+        /// If the request is in the 'Approved' or 'Accepted' state, 
+        /// the request is set in the 'Deleted' state.
+        /// A deleted request is marked for revocation.
+        /// The public certificate is still available for the revocation procedure.
+        /// If the request is in the 'New' or 'Rejected' state, 
+        /// the request is set in the 'Removed' state.
+        /// The request is in the 'Deleted' or 'Removed'state after this call.
         /// Requires Manager role.
         /// </remarks>
         /// <param name="requestId">The certificate request id</param>
@@ -257,7 +260,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Controllers
             ReadRequestResultModel[] results;
             (nextPageLink, results) = await _certificateRequest.QueryPageAsync(
                 appId,
-                (CosmosDB.Models.CertificateRequestState?)requestState,
+                (Types.CertificateRequestState?)requestState,
                 nextPageLink,
                 pageSize);
             return new CertificateRequestQueryResponseApiModel(results, nextPageLink);

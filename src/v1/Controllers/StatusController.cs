@@ -49,7 +49,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Controllers
             string applicationMessage = "Alive and well";
             try
             {
-                var apps = await _applicationDatabase.QueryApplicationsByIdAsync(0, 1, null, null, 0, null, null, CosmosDB.Models.QueryApplicationState.Any);
+                var apps = await _applicationDatabase.QueryApplicationsByIdAsync(0, 1, null, null, 0, null, null, Types.QueryApplicationState.Any);
                 applicationOk = apps != null;
             }
             catch (Exception ex)

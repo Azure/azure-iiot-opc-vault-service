@@ -191,7 +191,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Controllers
                 (uint)query.ApplicationType,
                 query.ProductUri,
                 query.ServerCapabilities,
-                (CosmosDB.Models.QueryApplicationState?)query.ApplicationState
+                (Types.QueryApplicationState?)query.ApplicationState
                 );
             return new QueryApplicationsByIdResponseApiModel(result);
         }
@@ -226,7 +226,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Controllers
                 (uint)query.ApplicationType,
                 query.ProductUri,
                 query.ServerCapabilities,
-                (CosmosDB.Models.QueryApplicationState?)query.ApplicationState,
+                (Types.QueryApplicationState?)query.ApplicationState,
                 nextPageLink,
                 pageSize);
             return new QueryApplicationsResponseApiModel(result);

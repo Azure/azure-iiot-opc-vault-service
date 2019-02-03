@@ -4,13 +4,16 @@
 // ------------------------------------------------------------
 
 
-using Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB.Models;
-using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB.Models;
+using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Models;
+using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Types;
+
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
 {
+
     public interface IApplicationsDatabase
     {
         Task Initialize();
@@ -32,13 +35,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             QueryApplicationState? applicationState = null
             );
         Task<QueryApplicationsResponseModel> QueryApplicationsAsync(
-            string applicationName, 
-            string applicationUri, 
-            uint applicationType, 
+            string applicationName,
+            string applicationUri,
+            uint applicationType,
             string productUri,
             IList<string> serverCapabilities,
             QueryApplicationState? applicationState = null,
-            string nextPageLink = null, 
+            string nextPageLink = null,
             int? pageSize = null);
     }
 }

@@ -18,6 +18,7 @@ using Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB.Models;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Models;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Runtime;
+using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Types;
 using ApplicationsDatabaseBase = Opc.Ua.Gds.Server.Database.ApplicationsDatabaseBase;
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
@@ -246,7 +247,10 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
                         (nextPageLink, certificateRequests) = await certificateRequestsService.QueryPageAsync(appId.ToString(), null, nextPageLink);
                         foreach (var request in certificateRequests)
                         {
-                            await certificateRequestsService.DeleteAsync(request.RequestId);
+                            if (request.State < CertificateRequestState.Deleted)
+                            {
+                                await certificateRequestsService.DeleteAsync(request.RequestId);
+                            }
                         }
                     } while (nextPageLink != null);
                 }
@@ -692,7 +696,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
 
         public static string ServerCapabilities(Application application)
         {
-            if ((int)application.ApplicationType != (int)CosmosDB.Models.ApplicationType.Client)
+            if ((int)application.ApplicationType != (int)ApplicationType.Client)
             {
                 if (application.ServerCapabilities == null || application.ServerCapabilities.Length == 0)
                 {

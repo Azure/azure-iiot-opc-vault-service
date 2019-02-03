@@ -49,7 +49,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Models
         [EnumMember(Value = "deleted")]
         Deleted = 4,
         [EnumMember(Value = "revoked")]
-        Revoked = 5
+        Revoked = 5,
+        [EnumMember(Value = "removed")]
+        Removed = 6
     }
 
     [Flags]

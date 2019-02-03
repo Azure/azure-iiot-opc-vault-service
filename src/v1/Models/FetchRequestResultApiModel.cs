@@ -43,7 +43,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Models
         public FetchRequestResultApiModel(
             string requestId,
             string applicationId,
-            CosmosDB.Models.CertificateRequestState state,
+            Types.CertificateRequestState state,
             string certificateGroupId,
             string certificateTypeId,
             byte[] signedCertificate,
