@@ -11,8 +11,6 @@
 namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
 {
     using Models;
-    using System.Collections;
-    using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -24,10 +22,16 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             /// <summary>
             /// Register new application.
             /// </summary>
+            /// <remarks>
+            /// After registration an application is in the 'New' state and needs
+            /// approval by a manager to be avavilable for certificate operation.
+            /// Requires Writer role.
+            /// </remarks>
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
             /// <param name='application'>
+            /// The new application
             /// </param>
             public static ApplicationRecordApiModel RegisterApplication(this IOpcVault operations, ApplicationRecordApiModel application = default(ApplicationRecordApiModel))
             {
@@ -37,10 +41,16 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             /// <summary>
             /// Register new application.
             /// </summary>
+            /// <remarks>
+            /// After registration an application is in the 'New' state and needs
+            /// approval by a manager to be avavilable for certificate operation.
+            /// Requires Writer role.
+            /// </remarks>
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
             /// <param name='application'>
+            /// The new application
             /// </param>
             /// <param name='cancellationToken'>
             /// The cancellation token.
@@ -60,6 +70,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             /// The operations group for this extension method.
             /// </param>
             /// <param name='applicationId'>
+            /// The application id
             /// </param>
             public static ApplicationRecordApiModel GetApplication(this IOpcVault operations, string applicationId)
             {
@@ -73,6 +84,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             /// The operations group for this extension method.
             /// </param>
             /// <param name='applicationId'>
+            /// The application id
             /// </param>
             /// <param name='cancellationToken'>
             /// The cancellation token.
@@ -86,50 +98,16 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             }
 
             /// <summary>
-            /// Update application.
-            /// </summary>
-            /// <param name='operations'>
-            /// The operations group for this extension method.
-            /// </param>
-            /// <param name='applicationId'>
-            /// </param>
-            /// <param name='application'>
-            /// </param>
-            public static ApplicationRecordApiModel UpdateApplication(this IOpcVault operations, string applicationId, ApplicationRecordApiModel application = default(ApplicationRecordApiModel))
-            {
-                return operations.UpdateApplicationAsync(applicationId, application).GetAwaiter().GetResult();
-            }
-
-            /// <summary>
-            /// Update application.
-            /// </summary>
-            /// <param name='operations'>
-            /// The operations group for this extension method.
-            /// </param>
-            /// <param name='applicationId'>
-            /// </param>
-            /// <param name='application'>
-            /// </param>
-            /// <param name='cancellationToken'>
-            /// The cancellation token.
-            /// </param>
-            public static async Task<ApplicationRecordApiModel> UpdateApplicationAsync(this IOpcVault operations, string applicationId, ApplicationRecordApiModel application = default(ApplicationRecordApiModel), CancellationToken cancellationToken = default(CancellationToken))
-            {
-                using (var _result = await operations.UpdateApplicationWithHttpMessagesAsync(applicationId, application, null, cancellationToken).ConfigureAwait(false))
-                {
-                    return _result.Body;
-                }
-            }
-
-            /// <summary>
             /// Delete application.
             /// </summary>
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
             /// <param name='applicationId'>
+            /// The application id
             /// </param>
             /// <param name='force'>
+            /// optional, skip sanity checks and force to delete application
             /// </param>
             public static void DeleteApplication(this IOpcVault operations, string applicationId, bool? force = default(bool?))
             {
@@ -143,8 +121,10 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             /// The operations group for this extension method.
             /// </param>
             /// <param name='applicationId'>
+            /// The application id
             /// </param>
             /// <param name='force'>
+            /// optional, skip sanity checks and force to delete application
             /// </param>
             /// <param name='cancellationToken'>
             /// The cancellation token.
@@ -155,16 +135,73 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             }
 
             /// <summary>
-            /// Approve or reject new application.
+            /// Update application.
             /// </summary>
+            /// <remarks>
+            /// Update the application with given application id, however state information
+            /// is unchanged.
+            /// Requires Writer role.
+            /// </remarks>
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
             /// <param name='applicationId'>
             /// </param>
+            /// <param name='application'>
+            /// The updated application
+            /// </param>
+            public static ApplicationRecordApiModel UpdateApplication(this IOpcVault operations, string applicationId, ApplicationRecordApiModel application = default(ApplicationRecordApiModel))
+            {
+                return operations.UpdateApplicationAsync(applicationId, application).GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Update application.
+            /// </summary>
+            /// <remarks>
+            /// Update the application with given application id, however state information
+            /// is unchanged.
+            /// Requires Writer role.
+            /// </remarks>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='applicationId'>
+            /// </param>
+            /// <param name='application'>
+            /// The updated application
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<ApplicationRecordApiModel> UpdateApplicationAsync(this IOpcVault operations, string applicationId, ApplicationRecordApiModel application = default(ApplicationRecordApiModel), CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.UpdateApplicationWithHttpMessagesAsync(applicationId, application, null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <summary>
+            /// Approve or reject a new application.
+            /// &lt;remarks&gt;
+            /// A manager can approve a new application or force an application from any
+            /// state.
+            /// After approval the application is in the 'Approved' or 'Rejected' state.
+            /// Requires Manager role.
+            /// &lt;/remarks&gt;
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='applicationId'>
+            /// The application id
+            /// </param>
             /// <param name='approved'>
+            /// approve or reject the new application
             /// </param>
             /// <param name='force'>
+            /// optional, force application in new state
             /// </param>
             public static ApplicationRecordApiModel ApproveApplication(this IOpcVault operations, string applicationId, bool approved, bool? force = default(bool?))
             {
@@ -172,16 +209,25 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             }
 
             /// <summary>
-            /// Approve or reject new application.
+            /// Approve or reject a new application.
+            /// &lt;remarks&gt;
+            /// A manager can approve a new application or force an application from any
+            /// state.
+            /// After approval the application is in the 'Approved' or 'Rejected' state.
+            /// Requires Manager role.
+            /// &lt;/remarks&gt;
             /// </summary>
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
             /// <param name='applicationId'>
+            /// The application id
             /// </param>
             /// <param name='approved'>
+            /// approve or reject the new application
             /// </param>
             /// <param name='force'>
+            /// optional, force application in new state
             /// </param>
             /// <param name='cancellationToken'>
             /// The cancellation token.
@@ -201,10 +247,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             /// The operations group for this extension method.
             /// </param>
             /// <param name='applicationId'>
+            /// The application id
             /// </param>
-            public static ApplicationRecordApiModel UnregisterApplication(this IOpcVault operations, string applicationId)
+            public static void UnregisterApplication(this IOpcVault operations, string applicationId)
             {
-                return operations.UnregisterApplicationAsync(applicationId).GetAwaiter().GetResult();
+                operations.UnregisterApplicationAsync(applicationId).GetAwaiter().GetResult();
             }
 
             /// <summary>
@@ -214,117 +261,151 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             /// The operations group for this extension method.
             /// </param>
             /// <param name='applicationId'>
+            /// The application id
             /// </param>
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<ApplicationRecordApiModel> UnregisterApplicationAsync(this IOpcVault operations, string applicationId, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task UnregisterApplicationAsync(this IOpcVault operations, string applicationId, CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.UnregisterApplicationWithHttpMessagesAsync(applicationId, null, cancellationToken).ConfigureAwait(false))
-                {
-                    return _result.Body;
-                }
+                (await operations.UnregisterApplicationWithHttpMessagesAsync(applicationId, null, cancellationToken).ConfigureAwait(false)).Dispose();
             }
 
             /// <summary>
-            /// Find applications
+            /// List applications with matching application Uri.
             /// </summary>
+            /// <remarks>
+            /// List applications that match the application Uri.
+            /// Application Uris may have duplicates in the application database.
+            /// The returned model can contain a nex page link if more results are
+            /// available.
+            /// </remarks>
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
             /// <param name='uri'>
             /// </param>
-            public static IList<ApplicationRecordApiModel> ListApplications(this IOpcVault operations, string uri)
+            /// <param name='applicationUri'>
+            /// The application Uri
+            /// </param>
+            /// <param name='nextPageLink'>
+            /// optional, link to next page
+            /// </param>
+            /// <param name='pageSize'>
+            /// optional, the maximum number of result per page
+            /// </param>
+            public static QueryApplicationsResponseApiModel ListApplications(this IOpcVault operations, string uri, string applicationUri = default(string), string nextPageLink = default(string), int? pageSize = default(int?))
             {
-                return operations.ListApplicationsAsync(uri).GetAwaiter().GetResult();
+                return operations.ListApplicationsAsync(uri, applicationUri, nextPageLink, pageSize).GetAwaiter().GetResult();
             }
 
             /// <summary>
-            /// Find applications
+            /// List applications with matching application Uri.
             /// </summary>
+            /// <remarks>
+            /// List applications that match the application Uri.
+            /// Application Uris may have duplicates in the application database.
+            /// The returned model can contain a nex page link if more results are
+            /// available.
+            /// </remarks>
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
             /// <param name='uri'>
             /// </param>
+            /// <param name='applicationUri'>
+            /// The application Uri
+            /// </param>
+            /// <param name='nextPageLink'>
+            /// optional, link to next page
+            /// </param>
+            /// <param name='pageSize'>
+            /// optional, the maximum number of result per page
+            /// </param>
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<IList<ApplicationRecordApiModel>> ListApplicationsAsync(this IOpcVault operations, string uri, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<QueryApplicationsResponseApiModel> ListApplicationsAsync(this IOpcVault operations, string uri, string applicationUri = default(string), string nextPageLink = default(string), int? pageSize = default(int?), CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.ListApplicationsWithHttpMessagesAsync(uri, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.ListApplicationsWithHttpMessagesAsync(uri, applicationUri, nextPageLink, pageSize, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }
             }
 
             /// <summary>
-            /// Query applications
+            /// Query applications by id.
             /// </summary>
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
             /// <param name='query'>
             /// </param>
-            /// <param name='anyState'>
-            /// </param>
-            public static QueryApplicationsResponseApiModel QueryApplications(this IOpcVault operations, QueryApplicationsApiModel query = default(QueryApplicationsApiModel), bool? anyState = default(bool?))
+            public static QueryApplicationsByIdResponseApiModel QueryApplications(this IOpcVault operations, QueryApplicationsByIdApiModel query = default(QueryApplicationsByIdApiModel))
             {
-                return operations.QueryApplicationsAsync(query, anyState).GetAwaiter().GetResult();
+                return operations.QueryApplicationsAsync(query).GetAwaiter().GetResult();
             }
 
             /// <summary>
-            /// Query applications
+            /// Query applications by id.
             /// </summary>
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
             /// <param name='query'>
-            /// </param>
-            /// <param name='anyState'>
             /// </param>
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<QueryApplicationsResponseApiModel> QueryApplicationsAsync(this IOpcVault operations, QueryApplicationsApiModel query = default(QueryApplicationsApiModel), bool? anyState = default(bool?), CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<QueryApplicationsByIdResponseApiModel> QueryApplicationsAsync(this IOpcVault operations, QueryApplicationsByIdApiModel query = default(QueryApplicationsByIdApiModel), CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.QueryApplicationsWithHttpMessagesAsync(query, anyState, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.QueryApplicationsWithHttpMessagesAsync(query, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }
             }
 
             /// <summary>
-            /// Query applications
+            /// Query applications.
             /// </summary>
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
             /// <param name='query'>
+            /// The Application query parameters
             /// </param>
-            /// <param name='anyState'>
+            /// <param name='nextPageLink'>
+            /// optional, link to next page
             /// </param>
-            public static QueryApplicationsPageResponseApiModel QueryApplicationsPage(this IOpcVault operations, QueryApplicationsPageApiModel query = default(QueryApplicationsPageApiModel), bool? anyState = default(bool?))
+            /// <param name='pageSize'>
+            /// optional, the maximum number of result per page
+            /// </param>
+            public static QueryApplicationsResponseApiModel QueryApplications1(this IOpcVault operations, QueryApplicationsApiModel query = default(QueryApplicationsApiModel), string nextPageLink = default(string), int? pageSize = default(int?))
             {
-                return operations.QueryApplicationsPageAsync(query, anyState).GetAwaiter().GetResult();
+                return operations.QueryApplications1Async(query, nextPageLink, pageSize).GetAwaiter().GetResult();
             }
 
             /// <summary>
-            /// Query applications
+            /// Query applications.
             /// </summary>
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
             /// <param name='query'>
+            /// The Application query parameters
             /// </param>
-            /// <param name='anyState'>
+            /// <param name='nextPageLink'>
+            /// optional, link to next page
+            /// </param>
+            /// <param name='pageSize'>
+            /// optional, the maximum number of result per page
             /// </param>
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<QueryApplicationsPageResponseApiModel> QueryApplicationsPageAsync(this IOpcVault operations, QueryApplicationsPageApiModel query = default(QueryApplicationsPageApiModel), bool? anyState = default(bool?), CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<QueryApplicationsResponseApiModel> QueryApplications1Async(this IOpcVault operations, QueryApplicationsApiModel query = default(QueryApplicationsApiModel), string nextPageLink = default(string), int? pageSize = default(int?), CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.QueryApplicationsPageWithHttpMessagesAsync(query, anyState, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.QueryApplications1WithHttpMessagesAsync(query, nextPageLink, pageSize, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }
@@ -1169,10 +1250,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             /// The certificate group id
             /// </param>
             /// <param name='allVersions'>
+            /// optional, if all certs for all CA versions should be revoked. Default: true
             /// </param>
-            public static void RevokeGroup(this IOpcVault operations, string group, bool? allVersions = default(bool?))
+            public static void RevokeCertificateGroup(this IOpcVault operations, string group, bool? allVersions = default(bool?))
             {
-                operations.RevokeGroupAsync(group, allVersions).GetAwaiter().GetResult();
+                operations.RevokeCertificateGroupAsync(group, allVersions).GetAwaiter().GetResult();
             }
 
             /// <summary>
@@ -1194,18 +1276,24 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             /// The certificate group id
             /// </param>
             /// <param name='allVersions'>
+            /// optional, if all certs for all CA versions should be revoked. Default: true
             /// </param>
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task RevokeGroupAsync(this IOpcVault operations, string group, bool? allVersions = default(bool?), CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task RevokeCertificateGroupAsync(this IOpcVault operations, string group, bool? allVersions = default(bool?), CancellationToken cancellationToken = default(CancellationToken))
             {
-                (await operations.RevokeGroupWithHttpMessagesAsync(group, allVersions, null, cancellationToken).ConfigureAwait(false)).Dispose();
+                (await operations.RevokeCertificateGroupWithHttpMessagesAsync(group, allVersions, null, cancellationToken).ConfigureAwait(false)).Dispose();
             }
 
             /// <summary>
-            /// Query for requests.
+            /// Query for certificate requests.
             /// </summary>
+            /// <remarks>
+            /// Get all certificate requests in paged form.
+            /// The returned model can contain a link to the next page if more results are
+            /// available.
+            /// </remarks>
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
@@ -1213,91 +1301,50 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             /// optional, query for application id
             /// </param>
             /// <param name='requestState'>
-            /// optional, query for request state. Possible values include: 'New',
-            /// 'Approved', 'Rejected', 'Accepted', 'Deleted', 'Revoked'
-            /// </param>
-            /// <param name='maxResults'>
-            /// optional, the maximum number of result per page
-            /// </param>
-            public static CertificateRequestRecordQueryResponseApiModel QueryCertificateRequests(this IOpcVault operations, string appId = default(string), string requestState = default(string), int? maxResults = default(int?))
-            {
-                return operations.QueryCertificateRequestsAsync(appId, requestState, maxResults).GetAwaiter().GetResult();
-            }
-
-            /// <summary>
-            /// Query for requests.
-            /// </summary>
-            /// <param name='operations'>
-            /// The operations group for this extension method.
-            /// </param>
-            /// <param name='appId'>
-            /// optional, query for application id
-            /// </param>
-            /// <param name='requestState'>
-            /// optional, query for request state. Possible values include: 'New',
-            /// 'Approved', 'Rejected', 'Accepted', 'Deleted', 'Revoked'
-            /// </param>
-            /// <param name='maxResults'>
-            /// optional, the maximum number of result per page
-            /// </param>
-            /// <param name='cancellationToken'>
-            /// The cancellation token.
-            /// </param>
-            public static async Task<CertificateRequestRecordQueryResponseApiModel> QueryCertificateRequestsAsync(this IOpcVault operations, string appId = default(string), string requestState = default(string), int? maxResults = default(int?), CancellationToken cancellationToken = default(CancellationToken))
-            {
-                using (var _result = await operations.QueryCertificateRequestsWithHttpMessagesAsync(appId, requestState, maxResults, null, cancellationToken).ConfigureAwait(false))
-                {
-                    return _result.Body;
-                }
-            }
-
-            /// <summary>
-            /// Query for next page of requests.
-            /// </summary>
-            /// <param name='operations'>
-            /// The operations group for this extension method.
+            /// optional, query for request state. Possible values include: 'new',
+            /// 'approved', 'rejected', 'accepted', 'deleted', 'revoked'
             /// </param>
             /// <param name='nextPageLink'>
-            /// next page link from previous query
+            /// optional, link to next page
             /// </param>
-            /// <param name='appId'>
-            /// optional, query for application id
-            /// </param>
-            /// <param name='requestState'>
-            /// optional, query for request state
-            /// </param>
-            /// <param name='maxResults'>
+            /// <param name='pageSize'>
             /// optional, the maximum number of result per page
             /// </param>
-            public static CertificateRequestRecordQueryResponseApiModel QueryCertificateRequestsNext(this IOpcVault operations, string nextPageLink = default(string), string appId = default(string), string requestState = default(string), int? maxResults = default(int?))
+            public static CertificateRequestQueryResponseApiModel QueryCertificateRequests(this IOpcVault operations, string appId = default(string), string requestState = default(string), string nextPageLink = default(string), int? pageSize = default(int?))
             {
-                return operations.QueryCertificateRequestsNextAsync(nextPageLink, appId, requestState, maxResults).GetAwaiter().GetResult();
+                return operations.QueryCertificateRequestsAsync(appId, requestState, nextPageLink, pageSize).GetAwaiter().GetResult();
             }
 
             /// <summary>
-            /// Query for next page of requests.
+            /// Query for certificate requests.
             /// </summary>
+            /// <remarks>
+            /// Get all certificate requests in paged form.
+            /// The returned model can contain a link to the next page if more results are
+            /// available.
+            /// </remarks>
             /// <param name='operations'>
             /// The operations group for this extension method.
-            /// </param>
-            /// <param name='nextPageLink'>
-            /// next page link from previous query
             /// </param>
             /// <param name='appId'>
             /// optional, query for application id
             /// </param>
             /// <param name='requestState'>
-            /// optional, query for request state
+            /// optional, query for request state. Possible values include: 'new',
+            /// 'approved', 'rejected', 'accepted', 'deleted', 'revoked'
             /// </param>
-            /// <param name='maxResults'>
+            /// <param name='nextPageLink'>
+            /// optional, link to next page
+            /// </param>
+            /// <param name='pageSize'>
             /// optional, the maximum number of result per page
             /// </param>
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<CertificateRequestRecordQueryResponseApiModel> QueryCertificateRequestsNextAsync(this IOpcVault operations, string nextPageLink = default(string), string appId = default(string), string requestState = default(string), int? maxResults = default(int?), CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<CertificateRequestQueryResponseApiModel> QueryCertificateRequestsAsync(this IOpcVault operations, string appId = default(string), string requestState = default(string), string nextPageLink = default(string), int? pageSize = default(int?), CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.QueryCertificateRequestsNextWithHttpMessagesAsync(nextPageLink, appId, requestState, maxResults, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.QueryCertificateRequestsWithHttpMessagesAsync(appId, requestState, nextPageLink, pageSize, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }
@@ -1308,8 +1355,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             /// </summary>
             /// <remarks>
             /// Can be called in any state.
-            /// Returns only state information in 'New', 'Rejected', 'Deleted' and
-            /// 'Revoked' state.
+            /// Returns only cert request information in 'New', 'Rejected',
+            /// 'Deleted' and 'Revoked' state.
             /// Fetches private key in 'Approved' state, if requested.
             /// Fetches the public certificate in 'Approved' and 'Accepted' state.
             /// After a successful fetch in 'Approved' state, the request should be
@@ -1333,8 +1380,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             /// </summary>
             /// <remarks>
             /// Can be called in any state.
-            /// Returns only state information in 'New', 'Rejected', 'Deleted' and
-            /// 'Revoked' state.
+            /// Returns only cert request information in 'New', 'Rejected',
+            /// 'Deleted' and 'Revoked' state.
             /// Fetches private key in 'Approved' state, if requested.
             /// Fetches the public certificate in 'Approved' and 'Accepted' state.
             /// After a successful fetch in 'Approved' state, the request should be

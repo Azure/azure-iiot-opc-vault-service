@@ -26,8 +26,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models
         /// <summary>
         /// Initializes a new instance of the FetchRequestResultApiModel class.
         /// </summary>
-        /// <param name="state">Possible values include: 'New', 'Approved',
-        /// 'Rejected', 'Accepted', 'Deleted', 'Revoked'</param>
+        /// <param name="state">Possible values include: 'new', 'approved',
+        /// 'rejected', 'accepted', 'deleted', 'revoked'</param>
         public FetchRequestResultApiModel(CertificateRequestState state, string requestId = default(string), string applicationId = default(string), string certificateGroupId = default(string), string certificateTypeId = default(string), string signedCertificate = default(string), string privateKeyFormat = default(string), string privateKey = default(string), string authorityId = default(string))
         {
             RequestId = requestId;
@@ -58,8 +58,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models
         public string ApplicationId { get; set; }
 
         /// <summary>
-        /// Gets or sets possible values include: 'New', 'Approved',
-        /// 'Rejected', 'Accepted', 'Deleted', 'Revoked'
+        /// Gets or sets possible values include: 'new', 'approved',
+        /// 'rejected', 'accepted', 'deleted', 'revoked'
         /// </summary>
         [JsonProperty(PropertyName = "state")]
         public CertificateRequestState State { get; set; }

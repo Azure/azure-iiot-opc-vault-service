@@ -48,7 +48,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         /// <summary>
         /// Register new application.
         /// </summary>
+        /// <remarks>
+        /// After registration an application is in the 'New' state and needs
+        /// approval by a manager to be avavilable for certificate operation.
+        /// Requires Writer role.
+        /// </remarks>
         /// <param name='application'>
+        /// The new application
         /// </param>
         /// <param name='customHeaders'>
         /// The headers that will be added to request.
@@ -62,6 +68,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         /// Get application.
         /// </summary>
         /// <param name='applicationId'>
+        /// The application id
         /// </param>
         /// <param name='customHeaders'>
         /// The headers that will be added to request.
@@ -72,26 +79,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         Task<HttpOperationResponse<ApplicationRecordApiModel>> GetApplicationWithHttpMessagesAsync(string applicationId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
-        /// Update application.
-        /// </summary>
-        /// <param name='applicationId'>
-        /// </param>
-        /// <param name='application'>
-        /// </param>
-        /// <param name='customHeaders'>
-        /// The headers that will be added to request.
-        /// </param>
-        /// <param name='cancellationToken'>
-        /// The cancellation token.
-        /// </param>
-        Task<HttpOperationResponse<ApplicationRecordApiModel>> UpdateApplicationWithHttpMessagesAsync(string applicationId, ApplicationRecordApiModel application = default(ApplicationRecordApiModel), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
-
-        /// <summary>
         /// Delete application.
         /// </summary>
         /// <param name='applicationId'>
+        /// The application id
         /// </param>
         /// <param name='force'>
+        /// optional, skip sanity checks and force to delete application
         /// </param>
         /// <param name='customHeaders'>
         /// The headers that will be added to request.
@@ -102,13 +96,44 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         Task<HttpOperationResponse> DeleteApplicationWithHttpMessagesAsync(string applicationId, bool? force = default(bool?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
-        /// Approve or reject new application.
+        /// Update application.
         /// </summary>
+        /// <remarks>
+        /// Update the application with given application id, however state
+        /// information is unchanged.
+        /// Requires Writer role.
+        /// </remarks>
         /// <param name='applicationId'>
         /// </param>
+        /// <param name='application'>
+        /// The updated application
+        /// </param>
+        /// <param name='customHeaders'>
+        /// The headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        Task<HttpOperationResponse<ApplicationRecordApiModel>> UpdateApplicationWithHttpMessagesAsync(string applicationId, ApplicationRecordApiModel application = default(ApplicationRecordApiModel), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Approve or reject a new application.
+        /// &lt;remarks&gt;
+        /// A manager can approve a new application or force an application
+        /// from any state.
+        /// After approval the application is in the 'Approved' or 'Rejected'
+        /// state.
+        /// Requires Manager role.
+        /// &lt;/remarks&gt;
+        /// </summary>
+        /// <param name='applicationId'>
+        /// The application id
+        /// </param>
         /// <param name='approved'>
+        /// approve or reject the new application
         /// </param>
         /// <param name='force'>
+        /// optional, force application in new state
         /// </param>
         /// <param name='customHeaders'>
         /// The headers that will be added to request.
@@ -122,6 +147,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         /// Unregister application.
         /// </summary>
         /// <param name='applicationId'>
+        /// The application id
         /// </param>
         /// <param name='customHeaders'>
         /// The headers that will be added to request.
@@ -129,42 +155,60 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse<ApplicationRecordApiModel>> UnregisterApplicationWithHttpMessagesAsync(string applicationId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse> UnregisterApplicationWithHttpMessagesAsync(string applicationId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
-        /// Find applications
+        /// List applications with matching application Uri.
         /// </summary>
+        /// <remarks>
+        /// List applications that match the application Uri.
+        /// Application Uris may have duplicates in the application database.
+        /// The returned model can contain a nex page link if more results are
+        /// available.
+        /// </remarks>
         /// <param name='uri'>
         /// </param>
+        /// <param name='applicationUri'>
+        /// The application Uri
+        /// </param>
+        /// <param name='nextPageLink'>
+        /// optional, link to next page
+        /// </param>
+        /// <param name='pageSize'>
+        /// optional, the maximum number of result per page
+        /// </param>
         /// <param name='customHeaders'>
         /// The headers that will be added to request.
         /// </param>
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse<IList<ApplicationRecordApiModel>>> ListApplicationsWithHttpMessagesAsync(string uri, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse<QueryApplicationsResponseApiModel>> ListApplicationsWithHttpMessagesAsync(string uri, string applicationUri = default(string), string nextPageLink = default(string), int? pageSize = default(int?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
-        /// Query applications
+        /// Query applications by id.
         /// </summary>
         /// <param name='query'>
         /// </param>
-        /// <param name='anyState'>
-        /// </param>
         /// <param name='customHeaders'>
         /// The headers that will be added to request.
         /// </param>
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse<QueryApplicationsResponseApiModel>> QueryApplicationsWithHttpMessagesAsync(QueryApplicationsApiModel query = default(QueryApplicationsApiModel), bool? anyState = default(bool?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse<QueryApplicationsByIdResponseApiModel>> QueryApplicationsWithHttpMessagesAsync(QueryApplicationsByIdApiModel query = default(QueryApplicationsByIdApiModel), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
-        /// Query applications
+        /// Query applications.
         /// </summary>
         /// <param name='query'>
+        /// The Application query parameters
         /// </param>
-        /// <param name='anyState'>
+        /// <param name='nextPageLink'>
+        /// optional, link to next page
+        /// </param>
+        /// <param name='pageSize'>
+        /// optional, the maximum number of result per page
         /// </param>
         /// <param name='customHeaders'>
         /// The headers that will be added to request.
@@ -172,7 +216,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse<QueryApplicationsPageResponseApiModel>> QueryApplicationsPageWithHttpMessagesAsync(QueryApplicationsPageApiModel query = default(QueryApplicationsPageApiModel), bool? anyState = default(bool?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse<QueryApplicationsResponseApiModel>> QueryApplications1WithHttpMessagesAsync(QueryApplicationsApiModel query = default(QueryApplicationsApiModel), string nextPageLink = default(string), int? pageSize = default(int?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <param name='customHeaders'>
         /// The headers that will be added to request.
@@ -553,6 +597,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         /// The certificate group id
         /// </param>
         /// <param name='allVersions'>
+        /// optional, if all certs for all CA versions should be revoked.
+        /// Default: true
         /// </param>
         /// <param name='customHeaders'>
         /// The headers that will be added to request.
@@ -560,42 +606,28 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse> RevokeGroupWithHttpMessagesAsync(string group, bool? allVersions = default(bool?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse> RevokeCertificateGroupWithHttpMessagesAsync(string group, bool? allVersions = default(bool?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
-        /// Query for requests.
+        /// Query for certificate requests.
         /// </summary>
+        /// <remarks>
+        /// Get all certificate requests in paged form.
+        /// The returned model can contain a link to the next page if more
+        /// results are
+        /// available.
+        /// </remarks>
         /// <param name='appId'>
         /// optional, query for application id
         /// </param>
         /// <param name='requestState'>
-        /// optional, query for request state. Possible values include: 'New',
-        /// 'Approved', 'Rejected', 'Accepted', 'Deleted', 'Revoked'
+        /// optional, query for request state. Possible values include: 'new',
+        /// 'approved', 'rejected', 'accepted', 'deleted', 'revoked'
         /// </param>
-        /// <param name='maxResults'>
-        /// optional, the maximum number of result per page
-        /// </param>
-        /// <param name='customHeaders'>
-        /// The headers that will be added to request.
-        /// </param>
-        /// <param name='cancellationToken'>
-        /// The cancellation token.
-        /// </param>
-        Task<HttpOperationResponse<CertificateRequestRecordQueryResponseApiModel>> QueryCertificateRequestsWithHttpMessagesAsync(string appId = default(string), string requestState = default(string), int? maxResults = default(int?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
-
-        /// <summary>
-        /// Query for next page of requests.
-        /// </summary>
         /// <param name='nextPageLink'>
-        /// next page link from previous query
+        /// optional, link to next page
         /// </param>
-        /// <param name='appId'>
-        /// optional, query for application id
-        /// </param>
-        /// <param name='requestState'>
-        /// optional, query for request state
-        /// </param>
-        /// <param name='maxResults'>
+        /// <param name='pageSize'>
         /// optional, the maximum number of result per page
         /// </param>
         /// <param name='customHeaders'>
@@ -604,15 +636,15 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse<CertificateRequestRecordQueryResponseApiModel>> QueryCertificateRequestsNextWithHttpMessagesAsync(string nextPageLink = default(string), string appId = default(string), string requestState = default(string), int? maxResults = default(int?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse<CertificateRequestQueryResponseApiModel>> QueryCertificateRequestsWithHttpMessagesAsync(string appId = default(string), string requestState = default(string), string nextPageLink = default(string), int? pageSize = default(int?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Fetch certificate request approval result.
         /// </summary>
         /// <remarks>
         /// Can be called in any state.
-        /// Returns only state information in 'New', 'Rejected', 'Deleted' and
-        /// 'Revoked' state.
+        /// Returns only cert request information in 'New', 'Rejected',
+        /// 'Deleted' and 'Revoked' state.
         /// Fetches private key in 'Approved' state, if requested.
         /// Fetches the public certificate in 'Approved' and 'Accepted' state.
         /// After a successful fetch in 'Approved' state, the request should be

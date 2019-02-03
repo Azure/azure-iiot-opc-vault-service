@@ -21,17 +21,17 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models
     [JsonConverter(typeof(StringEnumConverter))]
     public enum CertificateRequestState
     {
-        [EnumMember(Value = "New")]
+        [EnumMember(Value = "new")]
         New,
-        [EnumMember(Value = "Approved")]
+        [EnumMember(Value = "approved")]
         Approved,
-        [EnumMember(Value = "Rejected")]
+        [EnumMember(Value = "rejected")]
         Rejected,
-        [EnumMember(Value = "Accepted")]
+        [EnumMember(Value = "accepted")]
         Accepted,
-        [EnumMember(Value = "Deleted")]
+        [EnumMember(Value = "deleted")]
         Deleted,
-        [EnumMember(Value = "Revoked")]
+        [EnumMember(Value = "revoked")]
         Revoked
     }
     internal static class CertificateRequestStateEnumExtension
@@ -46,17 +46,17 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models
             switch( value )
             {
                 case CertificateRequestState.New:
-                    return "New";
+                    return "new";
                 case CertificateRequestState.Approved:
-                    return "Approved";
+                    return "approved";
                 case CertificateRequestState.Rejected:
-                    return "Rejected";
+                    return "rejected";
                 case CertificateRequestState.Accepted:
-                    return "Accepted";
+                    return "accepted";
                 case CertificateRequestState.Deleted:
-                    return "Deleted";
+                    return "deleted";
                 case CertificateRequestState.Revoked:
-                    return "Revoked";
+                    return "revoked";
             }
             return null;
         }
@@ -65,17 +65,17 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models
         {
             switch( value )
             {
-                case "New":
+                case "new":
                     return CertificateRequestState.New;
-                case "Approved":
+                case "approved":
                     return CertificateRequestState.Approved;
-                case "Rejected":
+                case "rejected":
                     return CertificateRequestState.Rejected;
-                case "Accepted":
+                case "accepted":
                     return CertificateRequestState.Accepted;
-                case "Deleted":
+                case "deleted":
                     return CertificateRequestState.Deleted;
-                case "Revoked":
+                case "revoked":
                     return CertificateRequestState.Revoked;
             }
             return null;
