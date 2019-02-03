@@ -5,11 +5,14 @@
 
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.IIoT.Http;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Models;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Runtime;
+using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Swagger;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Auth;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Filters;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Models;
@@ -214,48 +217,48 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Controllers
         /// Requires Approver role.
         /// Approver needs signing rights in KeyVault.
         /// </remarks>
-        /// <param name="group">The certificate group id</param>
+        /// <param name="groupId">The certificate group id</param>
         /// <param name="allVersions"></param>
         /// <returns></returns>
-        [HttpPost("{group}/revokegroup")]
+        [HttpPost("{groupId}/revokegroup")]
         [Authorize(Policy = Policies.CanSign)]
-        public async Task RevokeGroupAsync(string group, bool? allVersions)
+        public async Task RevokeCertificateGroupAsync(string groupId, bool? allVersions)
         {
             var onBehalfOfCertificateRequest = await this._certificateRequest.OnBehalfOfRequest(Request);
-            await onBehalfOfCertificateRequest.RevokeGroupAsync(group, allVersions);
+            await onBehalfOfCertificateRequest.RevokeGroupAsync(groupId, allVersions);
         }
 
         /// <summary>
-        /// Query for requests.
+        /// Query for certificate requests.
         /// </summary>
+        /// Get all certificate requests in paged form.
+        /// The returned model can contain a link to the next page if more results are
+        /// available.
         /// <param name="appId">optional, query for application id</param>
         /// <param name="requestState">optional, query for request state</param>
-        /// <param name="maxResults">optional, the maximum number of result per page</param>
+        /// <param name="nextPageLink">optional, link to next page </param>
+        /// <param name="pageSize">optional, the maximum number of result per page</param>
         /// <returns>Matching requests, next page link</returns>
         [HttpGet("query")]
-        public async Task<CertificateRequestRecordQueryResponseApiModel> QueryCertificateRequestsAsync(string appId, CertificateRequestState? requestState, int? maxResults)
+        [AutoRestExtension(NextPageLinkName = "nextPageLink")]
+        public async Task<CertificateRequestQueryResponseApiModel> QueryCertificateRequestsAsync(
+            string appId,
+            CertificateRequestState? requestState,
+            [FromQuery] string nextPageLink,
+            [FromQuery] int? pageSize)
         {
+            if (Request.Headers.ContainsKey(HttpHeader.MaxItemCount))
+            {
+                pageSize = int.Parse(Request.Headers[HttpHeader.MaxItemCount]
+                    .FirstOrDefault());
+            }
             ReadRequestResultModel[] results;
-            string nextPageLink;
-            (nextPageLink, results) = await _certificateRequest.QueryPageAsync(appId, (CosmosDB.Models.CertificateRequestState?)requestState, null, maxResults);
-            return new CertificateRequestRecordQueryResponseApiModel(results, nextPageLink);
-        }
-
-        /// <summary>
-        /// Query for next page of requests.
-        /// </summary>
-        /// <param name="nextPageLink">next page link from previous query</param>
-        /// <param name="appId">optional, query for application id</param>
-        /// <param name="requestState">optional, query for request state</param>
-        /// <param name="maxResults">optional, the maximum number of result per page</param>
-        /// <returns>Matching requests, next page link</returns>
-        [HttpPost("query/next")]
-        public async Task<CertificateRequestRecordQueryResponseApiModel> QueryCertificateRequestsNextAsync([FromBody] string nextPageLink, string appId, string requestState, int? maxResults)
-        {
-            var parsedState = ParseCertificateState(requestState);
-            ReadRequestResultModel[] results;
-            (nextPageLink, results) = await _certificateRequest.QueryPageAsync(appId, (CosmosDB.Models.CertificateRequestState?)parsedState, nextPageLink, maxResults);
-            return new CertificateRequestRecordQueryResponseApiModel(results, nextPageLink);
+            (nextPageLink, results) = await _certificateRequest.QueryPageAsync(
+                appId,
+                (CosmosDB.Models.CertificateRequestState?)requestState,
+                nextPageLink,
+                pageSize);
+            return new CertificateRequestQueryResponseApiModel(results, nextPageLink);
         }
 
         /// <summary>
@@ -284,7 +287,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Controllers
         /// </summary>
         /// <remarks>
         /// Can be called in any state.
-        /// Returns only state information in 'New', 'Rejected', 'Deleted' and 'Revoked' state.
+        /// Returns only cert request information in 'New', 'Rejected',
+        /// 'Deleted' and 'Revoked' state.
         /// Fetches private key in 'Approved' state, if requested.
         /// Fetches the public certificate in 'Approved' and 'Accepted' state.
         /// After a successful fetch in 'Approved' state, the request should be

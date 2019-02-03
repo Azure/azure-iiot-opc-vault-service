@@ -244,11 +244,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Swagger
                     {
                         operation.Extensions.Add("x-ms-long-running-operation", true);
                     }
-                    if (!string.IsNullOrEmpty(attribute.ContinuationTokenLinkName))
+                    if (!string.IsNullOrEmpty(attribute.NextPageLinkName))
                     {
                         operation.Extensions.Add("x-ms-pageable",
                             new Dictionary<string, string> {
-                                { "nextLinkName", attribute.ContinuationTokenLinkName }
+                                { "nextLinkName", attribute.NextPageLinkName }
                             });
                     }
                     if (attribute.ResponseTypeIsFileStream)
