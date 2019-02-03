@@ -1,7 +1,7 @@
 @model Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Models.ApplicationRecordRegisterApiModel
 
 @{
-    ViewBag.Title = "Certomat";
+    ViewBag.Title = "Application";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -163,7 +163,7 @@ else
                 {
                     <input type="submit" name="reg" value="Register" class="btn btn-default" />
                 }
-                @Html.ActionLink("Clear Form", "Register", "Certomat", new { id = "" }, new { @class = "btn btn-default" })
+                @Html.ActionLink("Clear Form", "Register", new { id = "" }, new { @class = "btn btn-default" })
             </div>
         </div>
     </div>
@@ -173,7 +173,7 @@ else
     <hr />
     <img src="~/images/opcvaultflowstep1.svg" alt="OpcVault Registration" class="img-responsive" />
     <hr />
-    @Html.ActionLink("Back to Register New", "Register", "Certomat", new { id = "" })
+    @Html.ActionLink("Back to Register New", "Register", new { id = "" })
 </div>
 
 
