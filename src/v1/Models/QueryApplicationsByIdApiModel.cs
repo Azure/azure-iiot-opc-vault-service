@@ -4,10 +4,8 @@
 // ------------------------------------------------------------
 
 
-using Newtonsoft.Json;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization;
+using Newtonsoft.Json;
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Models
 {
@@ -35,7 +33,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Models
         [JsonProperty(PropertyName = "serverCapabilities", Order = 70)]
         public IList<string> ServerCapabilities { get; set; }
 
-        [JsonProperty(PropertyName = "applicationState", Order = 55)]
+        [JsonProperty(PropertyName = "applicationState", Order = 80)]
         public QueryApplicationState? ApplicationState { get; set; }
 
         public QueryApplicationsByIdApiModel(
@@ -54,9 +52,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Models
             this.ApplicationName = applicationName;
             this.ApplicationUri = applicationUri;
             this.ApplicationType = applicationType;
-            this.ApplicationState = applicationState;
             this.ProductUri = productUri;
             this.ServerCapabilities = serverCapabilities;
+            this.ApplicationState = applicationState;
         }
 
     }

@@ -142,16 +142,16 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Controllers
         /// List applications with matching application Uri.
         /// </summary>
         /// <remarks>
-        /// List applications that match the application Uri.
+        /// List approved applications that match the application Uri.
         /// Application Uris may have duplicates in the application database.
-        /// The returned model can contain a nex page link if more results are
+        /// The returned model can contain a next page link if more results are
         /// available.
         /// </remarks>
         /// <param name="applicationUri">The application Uri</param>
         /// <param name="nextPageLink">optional, link to next page </param>
         /// <param name="pageSize">optional, the maximum number of result per page</param>
         /// <returns>The application records</returns>
-        [HttpGet("find/{uri}")]
+        [HttpGet("find/{applicationUri}")]
         [AutoRestExtension(NextPageLinkName = "nextPageLink")]
         public async Task<QueryApplicationsResponseApiModel> ListApplicationsAsync(
             string applicationUri,
@@ -175,7 +175,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Controllers
         /// <param name="query"></param>
         /// <returns></returns>
         [HttpPost("querybyid")]
-        public async Task<QueryApplicationsByIdResponseApiModel> QueryApplicationsAsync(
+        public async Task<QueryApplicationsByIdResponseApiModel> QueryApplicationsByIdAsync(
             [FromBody] QueryApplicationsByIdApiModel query)
         {
             if (query == null)
