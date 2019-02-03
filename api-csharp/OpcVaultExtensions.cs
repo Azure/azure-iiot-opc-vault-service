@@ -98,43 +98,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             }
 
             /// <summary>
-            /// Delete application.
-            /// </summary>
-            /// <param name='operations'>
-            /// The operations group for this extension method.
-            /// </param>
-            /// <param name='applicationId'>
-            /// The application id
-            /// </param>
-            /// <param name='force'>
-            /// optional, skip sanity checks and force to delete application
-            /// </param>
-            public static void DeleteApplication(this IOpcVault operations, string applicationId, bool? force = default(bool?))
-            {
-                operations.DeleteApplicationAsync(applicationId, force).GetAwaiter().GetResult();
-            }
-
-            /// <summary>
-            /// Delete application.
-            /// </summary>
-            /// <param name='operations'>
-            /// The operations group for this extension method.
-            /// </param>
-            /// <param name='applicationId'>
-            /// The application id
-            /// </param>
-            /// <param name='force'>
-            /// optional, skip sanity checks and force to delete application
-            /// </param>
-            /// <param name='cancellationToken'>
-            /// The cancellation token.
-            /// </param>
-            public static async Task DeleteApplicationAsync(this IOpcVault operations, string applicationId, bool? force = default(bool?), CancellationToken cancellationToken = default(CancellationToken))
-            {
-                (await operations.DeleteApplicationWithHttpMessagesAsync(applicationId, force, null, cancellationToken).ConfigureAwait(false)).Dispose();
-            }
-
-            /// <summary>
             /// Update application.
             /// </summary>
             /// <remarks>
@@ -180,6 +143,43 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
                 {
                     return _result.Body;
                 }
+            }
+
+            /// <summary>
+            /// Delete application.
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='applicationId'>
+            /// The application id
+            /// </param>
+            /// <param name='force'>
+            /// optional, skip sanity checks and force to delete application
+            /// </param>
+            public static void DeleteApplication(this IOpcVault operations, string applicationId, bool? force = default(bool?))
+            {
+                operations.DeleteApplicationAsync(applicationId, force).GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Delete application.
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='applicationId'>
+            /// The application id
+            /// </param>
+            /// <param name='force'>
+            /// optional, skip sanity checks and force to delete application
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task DeleteApplicationAsync(this IOpcVault operations, string applicationId, bool? force = default(bool?), CancellationToken cancellationToken = default(CancellationToken))
+            {
+                (await operations.DeleteApplicationWithHttpMessagesAsync(applicationId, force, null, cancellationToken).ConfigureAwait(false)).Dispose();
             }
 
             /// <summary>
@@ -275,9 +275,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             /// List applications with matching application Uri.
             /// </summary>
             /// <remarks>
-            /// List applications that match the application Uri.
+            /// List approved applications that match the application Uri.
             /// Application Uris may have duplicates in the application database.
-            /// The returned model can contain a nex page link if more results are
+            /// The returned model can contain a next page link if more results are
             /// available.
             /// </remarks>
             /// <param name='operations'>
@@ -301,9 +301,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             /// List applications with matching application Uri.
             /// </summary>
             /// <remarks>
-            /// List applications that match the application Uri.
+            /// List approved applications that match the application Uri.
             /// Application Uris may have duplicates in the application database.
-            /// The returned model can contain a nex page link if more results are
+            /// The returned model can contain a next page link if more results are
             /// available.
             /// </remarks>
             /// <param name='operations'>
@@ -407,6 +407,14 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
                 }
             }
 
+            /// <summary>
+            /// Get Certificate Group Names.
+            /// </summary>
+            /// <remarks>
+            /// Returns a list of supported group names. The names are typically used as
+            /// parameter.
+            /// The Default group name is 'Default'.
+            /// </remarks>
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
@@ -415,6 +423,14 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
                 return operations.GetCertificateGroupsAsync().GetAwaiter().GetResult();
             }
 
+            /// <summary>
+            /// Get Certificate Group Names.
+            /// </summary>
+            /// <remarks>
+            /// Returns a list of supported group names. The names are typically used as
+            /// parameter.
+            /// The Default group name is 'Default'.
+            /// </remarks>
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
@@ -430,12 +446,18 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             }
 
             /// <summary>
-            /// Get group configuration
+            /// Get group configuration.
             /// </summary>
+            /// <remarks>
+            /// The group configuration for a group is stored in KeyVault and contains
+            /// information
+            /// about the CA subject, the lifetime and the security algorithms used.
+            /// </remarks>
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
             /// <param name='group'>
+            /// The group name
             /// </param>
             public static CertificateGroupConfigurationApiModel GetCertificateGroupConfiguration(this IOpcVault operations, string group)
             {
@@ -443,12 +465,18 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             }
 
             /// <summary>
-            /// Get group configuration
+            /// Get group configuration.
             /// </summary>
+            /// <remarks>
+            /// The group configuration for a group is stored in KeyVault and contains
+            /// information
+            /// about the CA subject, the lifetime and the security algorithms used.
+            /// </remarks>
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
             /// <param name='group'>
+            /// The group name
             /// </param>
             /// <param name='cancellationToken'>
             /// The cancellation token.
@@ -462,14 +490,33 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             }
 
             /// <summary>
-            /// Update group configuration
+            /// Update group configuration.
             /// </summary>
+            /// <remarks>
+            /// Updates the configuration for a certificate group.
+            /// Use this function with care and only if you are aware of the security
+            /// implications.
+            /// - A change of the subject requires to issue a new CA certificate.
+            /// . A change of the lifetime and security parameter of the issuer certificate
+            /// takes
+            /// effect on the next Issuer CA key generation.
+            /// - A change in lifetime for issued certificates takes effect on the next
+            /// request approval.
+            /// In general, security parameters should not be changed after a security
+            /// group is established.
+            /// Instead, a new certificate group with new parameters shoudl be created for
+            /// all subsequent
+            /// operations.
+            /// Requires manager role.
+            /// </remarks>
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
             /// <param name='group'>
+            /// The group name
             /// </param>
             /// <param name='config'>
+            /// The group configuration
             /// </param>
             public static CertificateGroupConfigurationApiModel UpdateCertificateGroupConfiguration(this IOpcVault operations, string group, CertificateGroupConfigurationApiModel config = default(CertificateGroupConfigurationApiModel))
             {
@@ -477,14 +524,33 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             }
 
             /// <summary>
-            /// Update group configuration
+            /// Update group configuration.
             /// </summary>
+            /// <remarks>
+            /// Updates the configuration for a certificate group.
+            /// Use this function with care and only if you are aware of the security
+            /// implications.
+            /// - A change of the subject requires to issue a new CA certificate.
+            /// . A change of the lifetime and security parameter of the issuer certificate
+            /// takes
+            /// effect on the next Issuer CA key generation.
+            /// - A change in lifetime for issued certificates takes effect on the next
+            /// request approval.
+            /// In general, security parameters should not be changed after a security
+            /// group is established.
+            /// Instead, a new certificate group with new parameters shoudl be created for
+            /// all subsequent
+            /// operations.
+            /// Requires manager role.
+            /// </remarks>
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
             /// <param name='group'>
+            /// The group name
             /// </param>
             /// <param name='config'>
+            /// The group configuration
             /// </param>
             /// <param name='cancellationToken'>
             /// The cancellation token.
@@ -498,12 +564,19 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             }
 
             /// <summary>
-            /// Delete group configuration
+            /// Delete a group configuration.
             /// </summary>
+            /// <remarks>
+            /// Deletes a group with configuration.
+            /// After this operation the Issuer CA, CRLs and keys become inaccessible.
+            /// Use this function with extreme caution.
+            /// Requires manager role.
+            /// </remarks>
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
             /// <param name='group'>
+            /// The group name
             /// </param>
             public static void DeleteCertificateGroup(this IOpcVault operations, string group)
             {
@@ -511,12 +584,19 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             }
 
             /// <summary>
-            /// Delete group configuration
+            /// Delete a group configuration.
             /// </summary>
+            /// <remarks>
+            /// Deletes a group with configuration.
+            /// After this operation the Issuer CA, CRLs and keys become inaccessible.
+            /// Use this function with extreme caution.
+            /// Requires manager role.
+            /// </remarks>
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
             /// <param name='group'>
+            /// The group name
             /// </param>
             /// <param name='cancellationToken'>
             /// The cancellation token.
@@ -527,16 +607,26 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             }
 
             /// <summary>
-            /// Create new group configuration
+            /// Create new group configuration.
             /// </summary>
+            /// <remarks>
+            /// Creates a new group with configuration.
+            /// The security parameters are preset with defaults.
+            /// The group should be updated with final settings before the Issuer CA
+            /// certificate is created for the first time.
+            /// Requires manager role.
+            /// </remarks>
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
             /// <param name='group'>
+            /// The group name
             /// </param>
             /// <param name='subject'>
+            /// The Issuer CA subject
             /// </param>
             /// <param name='certType'>
+            /// The certificate type
             /// </param>
             public static CertificateGroupConfigurationApiModel CreateCertificateGroup(this IOpcVault operations, string group, string subject, string certType)
             {
@@ -544,16 +634,26 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             }
 
             /// <summary>
-            /// Create new group configuration
+            /// Create new group configuration.
             /// </summary>
+            /// <remarks>
+            /// Creates a new group with configuration.
+            /// The security parameters are preset with defaults.
+            /// The group should be updated with final settings before the Issuer CA
+            /// certificate is created for the first time.
+            /// Requires manager role.
+            /// </remarks>
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
             /// <param name='group'>
+            /// The group name
             /// </param>
             /// <param name='subject'>
+            /// The Issuer CA subject
             /// </param>
             /// <param name='certType'>
+            /// The certificate type
             /// </param>
             /// <param name='cancellationToken'>
             /// The cancellation token.
@@ -567,8 +667,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             }
 
             /// <summary>
-            /// Get group configuration
+            /// Get all group configurations.
             /// </summary>
+            /// <remarks>
+            /// The group configurations for all groups are stored in KeyVault and contain
+            /// information
+            /// about the CA subject, the lifetime and the security algorithms used.
+            /// </remarks>
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
@@ -578,8 +683,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             }
 
             /// <summary>
-            /// Get group configuration
+            /// Get all group configurations.
             /// </summary>
+            /// <remarks>
+            /// The group configurations for all groups are stored in KeyVault and contain
+            /// information
+            /// about the CA subject, the lifetime and the security algorithms used.
+            /// </remarks>
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
@@ -595,235 +705,233 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             }
 
             /// <summary>
-            /// Get Issuer CA Certificate chain
+            /// Get Issuer CA Certificate versions.
             /// </summary>
+            /// <remarks>
+            /// Returns all Issuer CA certificate versions.
+            /// By default only the thumbprints, subject, lifetime and state are returned.
+            /// </remarks>
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
             /// <param name='group'>
+            /// The group name
             /// </param>
-            /// <param name='maxResults'>
+            /// <param name='withCertificates'>
+            /// Optional, true to include the full certificates
             /// </param>
-            public static X509Certificate2CollectionApiModel GetCertificateGroupIssuerCAChain(this IOpcVault operations, string group, int? maxResults = default(int?))
+            /// <param name='nextPageLink'>
+            /// optional, link to next page
+            /// </param>
+            /// <param name='pageSize'>
+            /// optional, the maximum number of result per page
+            /// </param>
+            public static X509Certificate2CollectionApiModel GetCertificateGroupIssuerCAVersions(this IOpcVault operations, string group, bool? withCertificates = default(bool?), string nextPageLink = default(string), int? pageSize = default(int?))
             {
-                return operations.GetCertificateGroupIssuerCAChainAsync(group, maxResults).GetAwaiter().GetResult();
+                return operations.GetCertificateGroupIssuerCAVersionsAsync(group, withCertificates, nextPageLink, pageSize).GetAwaiter().GetResult();
             }
 
             /// <summary>
-            /// Get Issuer CA Certificate chain
+            /// Get Issuer CA Certificate versions.
             /// </summary>
+            /// <remarks>
+            /// Returns all Issuer CA certificate versions.
+            /// By default only the thumbprints, subject, lifetime and state are returned.
+            /// </remarks>
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
             /// <param name='group'>
+            /// The group name
             /// </param>
-            /// <param name='maxResults'>
+            /// <param name='withCertificates'>
+            /// Optional, true to include the full certificates
+            /// </param>
+            /// <param name='nextPageLink'>
+            /// optional, link to next page
+            /// </param>
+            /// <param name='pageSize'>
+            /// optional, the maximum number of result per page
             /// </param>
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<X509Certificate2CollectionApiModel> GetCertificateGroupIssuerCAChainAsync(this IOpcVault operations, string group, int? maxResults = default(int?), CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<X509Certificate2CollectionApiModel> GetCertificateGroupIssuerCAVersionsAsync(this IOpcVault operations, string group, bool? withCertificates = default(bool?), string nextPageLink = default(string), int? pageSize = default(int?), CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.GetCertificateGroupIssuerCAChainWithHttpMessagesAsync(group, maxResults, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.GetCertificateGroupIssuerCAVersionsWithHttpMessagesAsync(group, withCertificates, nextPageLink, pageSize, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }
             }
 
             /// <summary>
-            /// Get Issuer CA Certificate chain
+            /// Get Issuer CA Certificate chain.
             /// </summary>
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
             /// <param name='group'>
+            /// The group name
+            /// </param>
+            /// <param name='thumbPrint'>
+            /// optional, the thumbrint of the Issuer CA Certificate
             /// </param>
             /// <param name='nextPageLink'>
+            /// optional, link to next page
             /// </param>
-            /// <param name='maxResults'>
+            /// <param name='pageSize'>
+            /// optional, the maximum number of result per page
             /// </param>
-            public static X509Certificate2CollectionApiModel GetCertificateGroupIssuerCAChainNext(this IOpcVault operations, string group, string nextPageLink = default(string), int? maxResults = default(int?))
+            public static X509Certificate2CollectionApiModel GetCertificateGroupIssuerCAChain(this IOpcVault operations, string group, string thumbPrint = default(string), string nextPageLink = default(string), int? pageSize = default(int?))
             {
-                return operations.GetCertificateGroupIssuerCAChainNextAsync(group, nextPageLink, maxResults).GetAwaiter().GetResult();
+                return operations.GetCertificateGroupIssuerCAChainAsync(group, thumbPrint, nextPageLink, pageSize).GetAwaiter().GetResult();
             }
 
             /// <summary>
-            /// Get Issuer CA Certificate chain
+            /// Get Issuer CA Certificate chain.
             /// </summary>
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
             /// <param name='group'>
+            /// The group name
+            /// </param>
+            /// <param name='thumbPrint'>
+            /// optional, the thumbrint of the Issuer CA Certificate
             /// </param>
             /// <param name='nextPageLink'>
+            /// optional, link to next page
             /// </param>
-            /// <param name='maxResults'>
+            /// <param name='pageSize'>
+            /// optional, the maximum number of result per page
             /// </param>
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<X509Certificate2CollectionApiModel> GetCertificateGroupIssuerCAChainNextAsync(this IOpcVault operations, string group, string nextPageLink = default(string), int? maxResults = default(int?), CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<X509Certificate2CollectionApiModel> GetCertificateGroupIssuerCAChainAsync(this IOpcVault operations, string group, string thumbPrint = default(string), string nextPageLink = default(string), int? pageSize = default(int?), CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.GetCertificateGroupIssuerCAChainNextWithHttpMessagesAsync(group, nextPageLink, maxResults, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.GetCertificateGroupIssuerCAChainWithHttpMessagesAsync(group, thumbPrint, nextPageLink, pageSize, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }
             }
 
             /// <summary>
-            /// Get Issuer CA CRL chain
+            /// Get Issuer CA CRL chain.
             /// </summary>
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
             /// <param name='group'>
+            /// The group name
             /// </param>
-            /// <param name='maxResults'>
+            /// <param name='thumbPrint'>
+            /// optional, the thumbrint of the Issuer CA Certificate
             /// </param>
-            public static X509CrlCollectionApiModel GetCertificateGroupIssuerCACrlChain(this IOpcVault operations, string group, int? maxResults = default(int?))
+            /// <param name='nextPageLink'>
+            /// optional, link to next page
+            /// </param>
+            /// <param name='pageSize'>
+            /// optional, the maximum number of result per page
+            /// </param>
+            public static X509CrlCollectionApiModel GetCertificateGroupIssuerCACrlChain(this IOpcVault operations, string group, string thumbPrint = default(string), string nextPageLink = default(string), int? pageSize = default(int?))
             {
-                return operations.GetCertificateGroupIssuerCACrlChainAsync(group, maxResults).GetAwaiter().GetResult();
+                return operations.GetCertificateGroupIssuerCACrlChainAsync(group, thumbPrint, nextPageLink, pageSize).GetAwaiter().GetResult();
             }
 
             /// <summary>
-            /// Get Issuer CA CRL chain
+            /// Get Issuer CA CRL chain.
             /// </summary>
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
             /// <param name='group'>
+            /// The group name
             /// </param>
-            /// <param name='maxResults'>
+            /// <param name='thumbPrint'>
+            /// optional, the thumbrint of the Issuer CA Certificate
+            /// </param>
+            /// <param name='nextPageLink'>
+            /// optional, link to next page
+            /// </param>
+            /// <param name='pageSize'>
+            /// optional, the maximum number of result per page
             /// </param>
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<X509CrlCollectionApiModel> GetCertificateGroupIssuerCACrlChainAsync(this IOpcVault operations, string group, int? maxResults = default(int?), CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<X509CrlCollectionApiModel> GetCertificateGroupIssuerCACrlChainAsync(this IOpcVault operations, string group, string thumbPrint = default(string), string nextPageLink = default(string), int? pageSize = default(int?), CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.GetCertificateGroupIssuerCACrlChainWithHttpMessagesAsync(group, maxResults, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.GetCertificateGroupIssuerCACrlChainWithHttpMessagesAsync(group, thumbPrint, nextPageLink, pageSize, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }
             }
 
             /// <summary>
-            /// Get Issuer CA CRL chain
+            /// Get Trust lists.
             /// </summary>
+            /// <remarks>
+            /// The trust lists contain lists for Issuer and Trusted certificates.
+            /// The Issuer and Trusted list can each contain CA certificates with CRLs,
+            /// signed certificates and self signed certificates.
+            /// By default the trusted list contains all versions of Issuer CA certificates
+            /// and their latest CRLs.
+            /// The issuer list contains certificates and CRLs which might be needed to
+            /// validate chains.
+            /// </remarks>
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
             /// <param name='group'>
             /// </param>
             /// <param name='nextPageLink'>
+            /// optional, link to next page
             /// </param>
-            /// <param name='maxResults'>
+            /// <param name='pageSize'>
+            /// optional, the maximum number of result per page
             /// </param>
-            public static X509CrlCollectionApiModel GetCertificateGroupIssuerCACrlChainNext(this IOpcVault operations, string group, string nextPageLink = default(string), int? maxResults = default(int?))
+            public static TrustListApiModel GetCertificateGroupTrustList(this IOpcVault operations, string group, string nextPageLink = default(string), int? pageSize = default(int?))
             {
-                return operations.GetCertificateGroupIssuerCACrlChainNextAsync(group, nextPageLink, maxResults).GetAwaiter().GetResult();
+                return operations.GetCertificateGroupTrustListAsync(group, nextPageLink, pageSize).GetAwaiter().GetResult();
             }
 
             /// <summary>
-            /// Get Issuer CA CRL chain
+            /// Get Trust lists.
             /// </summary>
+            /// <remarks>
+            /// The trust lists contain lists for Issuer and Trusted certificates.
+            /// The Issuer and Trusted list can each contain CA certificates with CRLs,
+            /// signed certificates and self signed certificates.
+            /// By default the trusted list contains all versions of Issuer CA certificates
+            /// and their latest CRLs.
+            /// The issuer list contains certificates and CRLs which might be needed to
+            /// validate chains.
+            /// </remarks>
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
             /// <param name='group'>
             /// </param>
             /// <param name='nextPageLink'>
+            /// optional, link to next page
             /// </param>
-            /// <param name='maxResults'>
+            /// <param name='pageSize'>
+            /// optional, the maximum number of result per page
             /// </param>
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<X509CrlCollectionApiModel> GetCertificateGroupIssuerCACrlChainNextAsync(this IOpcVault operations, string group, string nextPageLink = default(string), int? maxResults = default(int?), CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<TrustListApiModel> GetCertificateGroupTrustListAsync(this IOpcVault operations, string group, string nextPageLink = default(string), int? pageSize = default(int?), CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.GetCertificateGroupIssuerCACrlChainNextWithHttpMessagesAsync(group, nextPageLink, maxResults, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.GetCertificateGroupTrustListWithHttpMessagesAsync(group, nextPageLink, pageSize, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }
             }
 
             /// <summary>
-            /// Get trust list
-            /// </summary>
-            /// <param name='operations'>
-            /// The operations group for this extension method.
-            /// </param>
-            /// <param name='group'>
-            /// </param>
-            /// <param name='maxResults'>
-            /// </param>
-            public static TrustListApiModel GetCertificateGroupTrustList(this IOpcVault operations, string group, int? maxResults = default(int?))
-            {
-                return operations.GetCertificateGroupTrustListAsync(group, maxResults).GetAwaiter().GetResult();
-            }
-
-            /// <summary>
-            /// Get trust list
-            /// </summary>
-            /// <param name='operations'>
-            /// The operations group for this extension method.
-            /// </param>
-            /// <param name='group'>
-            /// </param>
-            /// <param name='maxResults'>
-            /// </param>
-            /// <param name='cancellationToken'>
-            /// The cancellation token.
-            /// </param>
-            public static async Task<TrustListApiModel> GetCertificateGroupTrustListAsync(this IOpcVault operations, string group, int? maxResults = default(int?), CancellationToken cancellationToken = default(CancellationToken))
-            {
-                using (var _result = await operations.GetCertificateGroupTrustListWithHttpMessagesAsync(group, maxResults, null, cancellationToken).ConfigureAwait(false))
-                {
-                    return _result.Body;
-                }
-            }
-
-            /// <summary>
-            /// Get trust list
-            /// </summary>
-            /// <param name='operations'>
-            /// The operations group for this extension method.
-            /// </param>
-            /// <param name='group'>
-            /// </param>
-            /// <param name='nextPageLink'>
-            /// </param>
-            /// <param name='maxResults'>
-            /// </param>
-            public static TrustListApiModel GetCertificateGroupTrustListNext(this IOpcVault operations, string group, string nextPageLink = default(string), int? maxResults = default(int?))
-            {
-                return operations.GetCertificateGroupTrustListNextAsync(group, nextPageLink, maxResults).GetAwaiter().GetResult();
-            }
-
-            /// <summary>
-            /// Get trust list
-            /// </summary>
-            /// <param name='operations'>
-            /// The operations group for this extension method.
-            /// </param>
-            /// <param name='group'>
-            /// </param>
-            /// <param name='nextPageLink'>
-            /// </param>
-            /// <param name='maxResults'>
-            /// </param>
-            /// <param name='cancellationToken'>
-            /// The cancellation token.
-            /// </param>
-            public static async Task<TrustListApiModel> GetCertificateGroupTrustListNextAsync(this IOpcVault operations, string group, string nextPageLink = default(string), int? maxResults = default(int?), CancellationToken cancellationToken = default(CancellationToken))
-            {
-                using (var _result = await operations.GetCertificateGroupTrustListNextWithHttpMessagesAsync(group, nextPageLink, maxResults, null, cancellationToken).ConfigureAwait(false))
-                {
-                    return _result.Body;
-                }
-            }
-
-            /// <summary>
-            /// Create new CA Certificate
+            /// Create a new Issuer CA Certificate.
             /// </summary>
             /// <param name='operations'>
             /// The operations group for this extension method.
@@ -836,7 +944,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             }
 
             /// <summary>
-            /// Create new CA Certificate
+            /// Create a new Issuer CA Certificate.
             /// </summary>
             /// <param name='operations'>
             /// The operations group for this extension method.

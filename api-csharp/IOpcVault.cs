@@ -79,23 +79,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         Task<HttpOperationResponse<ApplicationRecordApiModel>> GetApplicationWithHttpMessagesAsync(string applicationId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
-        /// Delete application.
-        /// </summary>
-        /// <param name='applicationId'>
-        /// The application id
-        /// </param>
-        /// <param name='force'>
-        /// optional, skip sanity checks and force to delete application
-        /// </param>
-        /// <param name='customHeaders'>
-        /// The headers that will be added to request.
-        /// </param>
-        /// <param name='cancellationToken'>
-        /// The cancellation token.
-        /// </param>
-        Task<HttpOperationResponse> DeleteApplicationWithHttpMessagesAsync(string applicationId, bool? force = default(bool?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
-
-        /// <summary>
         /// Update application.
         /// </summary>
         /// <remarks>
@@ -115,6 +98,23 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         /// The cancellation token.
         /// </param>
         Task<HttpOperationResponse<ApplicationRecordApiModel>> UpdateApplicationWithHttpMessagesAsync(string applicationId, ApplicationRecordApiModel application = default(ApplicationRecordApiModel), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Delete application.
+        /// </summary>
+        /// <param name='applicationId'>
+        /// The application id
+        /// </param>
+        /// <param name='force'>
+        /// optional, skip sanity checks and force to delete application
+        /// </param>
+        /// <param name='customHeaders'>
+        /// The headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        Task<HttpOperationResponse> DeleteApplicationWithHttpMessagesAsync(string applicationId, bool? force = default(bool?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Approve or reject a new application.
@@ -161,9 +161,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         /// List applications with matching application Uri.
         /// </summary>
         /// <remarks>
-        /// List applications that match the application Uri.
+        /// List approved applications that match the application Uri.
         /// Application Uris may have duplicates in the application database.
-        /// The returned model can contain a nex page link if more results are
+        /// The returned model can contain a next page link if more results are
         /// available.
         /// </remarks>
         /// <param name='applicationUri'>
@@ -216,6 +216,14 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         /// </param>
         Task<HttpOperationResponse<QueryApplicationsResponseApiModel>> QueryApplicationsWithHttpMessagesAsync(QueryApplicationsApiModel query = default(QueryApplicationsApiModel), string nextPageLink = default(string), int? pageSize = default(int?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
+        /// <summary>
+        /// Get Certificate Group Names.
+        /// </summary>
+        /// <remarks>
+        /// Returns a list of supported group names. The names are typically
+        /// used as parameter.
+        /// The Default group name is 'Default'.
+        /// </remarks>
         /// <param name='customHeaders'>
         /// The headers that will be added to request.
         /// </param>
@@ -225,9 +233,16 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         Task<HttpOperationResponse<CertificateGroupListApiModel>> GetCertificateGroupsWithHttpMessagesAsync(Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
-        /// Get group configuration
+        /// Get group configuration.
         /// </summary>
+        /// <remarks>
+        /// The group configuration for a group is stored in KeyVault and
+        /// contains information
+        /// about the CA subject, the lifetime and the security algorithms
+        /// used.
+        /// </remarks>
         /// <param name='group'>
+        /// The group name
         /// </param>
         /// <param name='customHeaders'>
         /// The headers that will be added to request.
@@ -238,11 +253,30 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         Task<HttpOperationResponse<CertificateGroupConfigurationApiModel>> GetCertificateGroupConfigurationWithHttpMessagesAsync(string group, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
-        /// Update group configuration
+        /// Update group configuration.
         /// </summary>
+        /// <remarks>
+        /// Updates the configuration for a certificate group.
+        /// Use this function with care and only if you are aware of the
+        /// security implications.
+        /// - A change of the subject requires to issue a new CA certificate.
+        /// . A change of the lifetime and security parameter of the issuer
+        /// certificate takes
+        /// effect on the next Issuer CA key generation.
+        /// - A change in lifetime for issued certificates takes effect on the
+        /// next request approval.
+        /// In general, security parameters should not be changed after a
+        /// security group is established.
+        /// Instead, a new certificate group with new parameters shoudl be
+        /// created for all subsequent
+        /// operations.
+        /// Requires manager role.
+        /// </remarks>
         /// <param name='group'>
+        /// The group name
         /// </param>
         /// <param name='config'>
+        /// The group configuration
         /// </param>
         /// <param name='customHeaders'>
         /// The headers that will be added to request.
@@ -253,9 +287,17 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         Task<HttpOperationResponse<CertificateGroupConfigurationApiModel>> UpdateCertificateGroupConfigurationWithHttpMessagesAsync(string group, CertificateGroupConfigurationApiModel config = default(CertificateGroupConfigurationApiModel), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
-        /// Delete group configuration
+        /// Delete a group configuration.
         /// </summary>
+        /// <remarks>
+        /// Deletes a group with configuration.
+        /// After this operation the Issuer CA, CRLs and keys become
+        /// inaccessible.
+        /// Use this function with extreme caution.
+        /// Requires manager role.
+        /// </remarks>
         /// <param name='group'>
+        /// The group name
         /// </param>
         /// <param name='customHeaders'>
         /// The headers that will be added to request.
@@ -266,13 +308,24 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         Task<HttpOperationResponse> DeleteCertificateGroupWithHttpMessagesAsync(string group, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
-        /// Create new group configuration
+        /// Create new group configuration.
         /// </summary>
+        /// <remarks>
+        /// Creates a new group with configuration.
+        /// The security parameters are preset with defaults.
+        /// The group should be updated with final settings before the Issuer
+        /// CA
+        /// certificate is created for the first time.
+        /// Requires manager role.
+        /// </remarks>
         /// <param name='group'>
+        /// The group name
         /// </param>
         /// <param name='subject'>
+        /// The Issuer CA subject
         /// </param>
         /// <param name='certType'>
+        /// The certificate type
         /// </param>
         /// <param name='customHeaders'>
         /// The headers that will be added to request.
@@ -283,8 +336,14 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         Task<HttpOperationResponse<CertificateGroupConfigurationApiModel>> CreateCertificateGroupWithHttpMessagesAsync(string group, string subject, string certType, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
-        /// Get group configuration
+        /// Get all group configurations.
         /// </summary>
+        /// <remarks>
+        /// The group configurations for all groups are stored in KeyVault and
+        /// contain information
+        /// about the CA subject, the lifetime and the security algorithms
+        /// used.
+        /// </remarks>
         /// <param name='customHeaders'>
         /// The headers that will be added to request.
         /// </param>
@@ -294,11 +353,24 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         Task<HttpOperationResponse<CertificateGroupConfigurationCollectionApiModel>> GetCertificateGroupsConfigurationWithHttpMessagesAsync(Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
-        /// Get Issuer CA Certificate chain
+        /// Get Issuer CA Certificate versions.
         /// </summary>
+        /// <remarks>
+        /// Returns all Issuer CA certificate versions.
+        /// By default only the thumbprints, subject, lifetime and state are
+        /// returned.
+        /// </remarks>
         /// <param name='group'>
+        /// The group name
         /// </param>
-        /// <param name='maxResults'>
+        /// <param name='withCertificates'>
+        /// Optional, true to include the full certificates
+        /// </param>
+        /// <param name='nextPageLink'>
+        /// optional, link to next page
+        /// </param>
+        /// <param name='pageSize'>
+        /// optional, the maximum number of result per page
         /// </param>
         /// <param name='customHeaders'>
         /// The headers that will be added to request.
@@ -306,31 +378,76 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse<X509Certificate2CollectionApiModel>> GetCertificateGroupIssuerCAChainWithHttpMessagesAsync(string group, int? maxResults = default(int?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse<X509Certificate2CollectionApiModel>> GetCertificateGroupIssuerCAVersionsWithHttpMessagesAsync(string group, bool? withCertificates = default(bool?), string nextPageLink = default(string), int? pageSize = default(int?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
-        /// Get Issuer CA Certificate chain
+        /// Get Issuer CA Certificate chain.
         /// </summary>
+        /// <param name='group'>
+        /// The group name
+        /// </param>
+        /// <param name='thumbPrint'>
+        /// optional, the thumbrint of the Issuer CA Certificate
+        /// </param>
+        /// <param name='nextPageLink'>
+        /// optional, link to next page
+        /// </param>
+        /// <param name='pageSize'>
+        /// optional, the maximum number of result per page
+        /// </param>
+        /// <param name='customHeaders'>
+        /// The headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        Task<HttpOperationResponse<X509Certificate2CollectionApiModel>> GetCertificateGroupIssuerCAChainWithHttpMessagesAsync(string group, string thumbPrint = default(string), string nextPageLink = default(string), int? pageSize = default(int?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Get Issuer CA CRL chain.
+        /// </summary>
+        /// <param name='group'>
+        /// The group name
+        /// </param>
+        /// <param name='thumbPrint'>
+        /// optional, the thumbrint of the Issuer CA Certificate
+        /// </param>
+        /// <param name='nextPageLink'>
+        /// optional, link to next page
+        /// </param>
+        /// <param name='pageSize'>
+        /// optional, the maximum number of result per page
+        /// </param>
+        /// <param name='customHeaders'>
+        /// The headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        Task<HttpOperationResponse<X509CrlCollectionApiModel>> GetCertificateGroupIssuerCACrlChainWithHttpMessagesAsync(string group, string thumbPrint = default(string), string nextPageLink = default(string), int? pageSize = default(int?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Get Trust lists.
+        /// </summary>
+        /// <remarks>
+        /// The trust lists contain lists for Issuer and Trusted certificates.
+        /// The Issuer and Trusted list can each contain CA certificates with
+        /// CRLs,
+        /// signed certificates and self signed certificates.
+        /// By default the trusted list contains all versions of Issuer CA
+        /// certificates
+        /// and their latest CRLs.
+        /// The issuer list contains certificates and CRLs which might be
+        /// needed to
+        /// validate chains.
+        /// </remarks>
         /// <param name='group'>
         /// </param>
         /// <param name='nextPageLink'>
+        /// optional, link to next page
         /// </param>
-        /// <param name='maxResults'>
-        /// </param>
-        /// <param name='customHeaders'>
-        /// The headers that will be added to request.
-        /// </param>
-        /// <param name='cancellationToken'>
-        /// The cancellation token.
-        /// </param>
-        Task<HttpOperationResponse<X509Certificate2CollectionApiModel>> GetCertificateGroupIssuerCAChainNextWithHttpMessagesAsync(string group, string nextPageLink = default(string), int? maxResults = default(int?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
-
-        /// <summary>
-        /// Get Issuer CA CRL chain
-        /// </summary>
-        /// <param name='group'>
-        /// </param>
-        /// <param name='maxResults'>
+        /// <param name='pageSize'>
+        /// optional, the maximum number of result per page
         /// </param>
         /// <param name='customHeaders'>
         /// The headers that will be added to request.
@@ -338,59 +455,10 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse<X509CrlCollectionApiModel>> GetCertificateGroupIssuerCACrlChainWithHttpMessagesAsync(string group, int? maxResults = default(int?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse<TrustListApiModel>> GetCertificateGroupTrustListWithHttpMessagesAsync(string group, string nextPageLink = default(string), int? pageSize = default(int?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
-        /// Get Issuer CA CRL chain
-        /// </summary>
-        /// <param name='group'>
-        /// </param>
-        /// <param name='nextPageLink'>
-        /// </param>
-        /// <param name='maxResults'>
-        /// </param>
-        /// <param name='customHeaders'>
-        /// The headers that will be added to request.
-        /// </param>
-        /// <param name='cancellationToken'>
-        /// The cancellation token.
-        /// </param>
-        Task<HttpOperationResponse<X509CrlCollectionApiModel>> GetCertificateGroupIssuerCACrlChainNextWithHttpMessagesAsync(string group, string nextPageLink = default(string), int? maxResults = default(int?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
-
-        /// <summary>
-        /// Get trust list
-        /// </summary>
-        /// <param name='group'>
-        /// </param>
-        /// <param name='maxResults'>
-        /// </param>
-        /// <param name='customHeaders'>
-        /// The headers that will be added to request.
-        /// </param>
-        /// <param name='cancellationToken'>
-        /// The cancellation token.
-        /// </param>
-        Task<HttpOperationResponse<TrustListApiModel>> GetCertificateGroupTrustListWithHttpMessagesAsync(string group, int? maxResults = default(int?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
-
-        /// <summary>
-        /// Get trust list
-        /// </summary>
-        /// <param name='group'>
-        /// </param>
-        /// <param name='nextPageLink'>
-        /// </param>
-        /// <param name='maxResults'>
-        /// </param>
-        /// <param name='customHeaders'>
-        /// The headers that will be added to request.
-        /// </param>
-        /// <param name='cancellationToken'>
-        /// The cancellation token.
-        /// </param>
-        Task<HttpOperationResponse<TrustListApiModel>> GetCertificateGroupTrustListNextWithHttpMessagesAsync(string group, string nextPageLink = default(string), int? maxResults = default(int?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
-
-        /// <summary>
-        /// Create new CA Certificate
+        /// Create a new Issuer CA Certificate.
         /// </summary>
         /// <param name='group'>
         /// </param>

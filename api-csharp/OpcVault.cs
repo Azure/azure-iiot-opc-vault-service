@@ -602,6 +602,165 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         }
 
         /// <summary>
+        /// Update application.
+        /// </summary>
+        /// <remarks>
+        /// Update the application with given application id, however state information
+        /// is unchanged.
+        /// Requires Writer role.
+        /// </remarks>
+        /// <param name='applicationId'>
+        /// </param>
+        /// <param name='application'>
+        /// The updated application
+        /// </param>
+        /// <param name='customHeaders'>
+        /// Headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        /// <exception cref="HttpOperationException">
+        /// Thrown when the operation returned an invalid status code
+        /// </exception>
+        /// <exception cref="SerializationException">
+        /// Thrown when unable to deserialize the response
+        /// </exception>
+        /// <exception cref="ValidationException">
+        /// Thrown when a required parameter is null
+        /// </exception>
+        /// <exception cref="System.ArgumentNullException">
+        /// Thrown when a required parameter is null
+        /// </exception>
+        /// <return>
+        /// A response object containing the response body and response headers.
+        /// </return>
+        public async Task<HttpOperationResponse<ApplicationRecordApiModel>> UpdateApplicationWithHttpMessagesAsync(string applicationId, ApplicationRecordApiModel application = default(ApplicationRecordApiModel), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (application != null)
+            {
+                application.Validate();
+            }
+            if (applicationId == null)
+            {
+                throw new ValidationException(ValidationRules.CannotBeNull, "applicationId");
+            }
+            // Tracing
+            bool _shouldTrace = ServiceClientTracing.IsEnabled;
+            string _invocationId = null;
+            if (_shouldTrace)
+            {
+                _invocationId = ServiceClientTracing.NextInvocationId.ToString();
+                Dictionary<string, object> tracingParameters = new Dictionary<string, object>();
+                tracingParameters.Add("application", application);
+                tracingParameters.Add("applicationId", applicationId);
+                tracingParameters.Add("cancellationToken", cancellationToken);
+                ServiceClientTracing.Enter(_invocationId, this, "UpdateApplication", tracingParameters);
+            }
+            // Construct URL
+            var _baseUrl = BaseUri.AbsoluteUri;
+            var _url = new System.Uri(new System.Uri(_baseUrl + (_baseUrl.EndsWith("/") ? "" : "/")), "v1/app/{applicationId}").ToString();
+            _url = _url.Replace("{applicationId}", System.Uri.EscapeDataString(applicationId));
+            // Create HTTP transport objects
+            var _httpRequest = new HttpRequestMessage();
+            HttpResponseMessage _httpResponse = null;
+            _httpRequest.Method = new HttpMethod("PUT");
+            _httpRequest.RequestUri = new System.Uri(_url);
+            // Set Headers
+
+
+            if (customHeaders != null)
+            {
+                foreach(var _header in customHeaders)
+                {
+                    if (_httpRequest.Headers.Contains(_header.Key))
+                    {
+                        _httpRequest.Headers.Remove(_header.Key);
+                    }
+                    _httpRequest.Headers.TryAddWithoutValidation(_header.Key, _header.Value);
+                }
+            }
+
+            // Serialize Request
+            string _requestContent = null;
+            if(application != null)
+            {
+                _requestContent = SafeJsonConvert.SerializeObject(application, SerializationSettings);
+                _httpRequest.Content = new StringContent(_requestContent, System.Text.Encoding.UTF8);
+                _httpRequest.Content.Headers.ContentType =System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json-patch+json; charset=utf-8");
+            }
+            // Set Credentials
+            if (Credentials != null)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                await Credentials.ProcessHttpRequestAsync(_httpRequest, cancellationToken).ConfigureAwait(false);
+            }
+            // Send Request
+            if (_shouldTrace)
+            {
+                ServiceClientTracing.SendRequest(_invocationId, _httpRequest);
+            }
+            cancellationToken.ThrowIfCancellationRequested();
+            _httpResponse = await HttpClient.SendAsync(_httpRequest, cancellationToken).ConfigureAwait(false);
+            if (_shouldTrace)
+            {
+                ServiceClientTracing.ReceiveResponse(_invocationId, _httpResponse);
+            }
+            HttpStatusCode _statusCode = _httpResponse.StatusCode;
+            cancellationToken.ThrowIfCancellationRequested();
+            string _responseContent = null;
+            if ((int)_statusCode != 200 && (int)_statusCode != 401 && (int)_statusCode != 403)
+            {
+                var ex = new HttpOperationException(string.Format("Operation returned an invalid status code '{0}'", _statusCode));
+                if (_httpResponse.Content != null) {
+                    _responseContent = await _httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+                }
+                else {
+                    _responseContent = string.Empty;
+                }
+                ex.Request = new HttpRequestMessageWrapper(_httpRequest, _requestContent);
+                ex.Response = new HttpResponseMessageWrapper(_httpResponse, _responseContent);
+                if (_shouldTrace)
+                {
+                    ServiceClientTracing.Error(_invocationId, ex);
+                }
+                _httpRequest.Dispose();
+                if (_httpResponse != null)
+                {
+                    _httpResponse.Dispose();
+                }
+                throw ex;
+            }
+            // Create Result
+            var _result = new HttpOperationResponse<ApplicationRecordApiModel>();
+            _result.Request = _httpRequest;
+            _result.Response = _httpResponse;
+            // Deserialize Response
+            if ((int)_statusCode == 200)
+            {
+                _responseContent = await _httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+                try
+                {
+                    _result.Body = SafeJsonConvert.DeserializeObject<ApplicationRecordApiModel>(_responseContent, DeserializationSettings);
+                }
+                catch (JsonException ex)
+                {
+                    _httpRequest.Dispose();
+                    if (_httpResponse != null)
+                    {
+                        _httpResponse.Dispose();
+                    }
+                    throw new SerializationException("Unable to deserialize the response.", _responseContent, ex);
+                }
+            }
+            if (_shouldTrace)
+            {
+                ServiceClientTracing.Exit(_invocationId, _result);
+            }
+            return _result;
+        }
+
+        /// <summary>
         /// Delete application.
         /// </summary>
         /// <param name='applicationId'>
@@ -727,161 +886,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             var _result = new HttpOperationResponse();
             _result.Request = _httpRequest;
             _result.Response = _httpResponse;
-            if (_shouldTrace)
-            {
-                ServiceClientTracing.Exit(_invocationId, _result);
-            }
-            return _result;
-        }
-
-        /// <summary>
-        /// Update application.
-        /// </summary>
-        /// <remarks>
-        /// Update the application with given application id, however state information
-        /// is unchanged.
-        /// Requires Writer role.
-        /// </remarks>
-        /// <param name='applicationId'>
-        /// </param>
-        /// <param name='application'>
-        /// The updated application
-        /// </param>
-        /// <param name='customHeaders'>
-        /// Headers that will be added to request.
-        /// </param>
-        /// <param name='cancellationToken'>
-        /// The cancellation token.
-        /// </param>
-        /// <exception cref="HttpOperationException">
-        /// Thrown when the operation returned an invalid status code
-        /// </exception>
-        /// <exception cref="SerializationException">
-        /// Thrown when unable to deserialize the response
-        /// </exception>
-        /// <exception cref="ValidationException">
-        /// Thrown when a required parameter is null
-        /// </exception>
-        /// <exception cref="System.ArgumentNullException">
-        /// Thrown when a required parameter is null
-        /// </exception>
-        /// <return>
-        /// A response object containing the response body and response headers.
-        /// </return>
-        public async Task<HttpOperationResponse<ApplicationRecordApiModel>> UpdateApplicationWithHttpMessagesAsync(string applicationId, ApplicationRecordApiModel application = default(ApplicationRecordApiModel), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            if (applicationId == null)
-            {
-                throw new ValidationException(ValidationRules.CannotBeNull, "applicationId");
-            }
-            // Tracing
-            bool _shouldTrace = ServiceClientTracing.IsEnabled;
-            string _invocationId = null;
-            if (_shouldTrace)
-            {
-                _invocationId = ServiceClientTracing.NextInvocationId.ToString();
-                Dictionary<string, object> tracingParameters = new Dictionary<string, object>();
-                tracingParameters.Add("application", application);
-                tracingParameters.Add("applicationId", applicationId);
-                tracingParameters.Add("cancellationToken", cancellationToken);
-                ServiceClientTracing.Enter(_invocationId, this, "UpdateApplication", tracingParameters);
-            }
-            // Construct URL
-            var _baseUrl = BaseUri.AbsoluteUri;
-            var _url = new System.Uri(new System.Uri(_baseUrl + (_baseUrl.EndsWith("/") ? "" : "/")), "v1/app/{applicationId}").ToString();
-            _url = _url.Replace("{applicationId}", System.Uri.EscapeDataString(applicationId));
-            // Create HTTP transport objects
-            var _httpRequest = new HttpRequestMessage();
-            HttpResponseMessage _httpResponse = null;
-            _httpRequest.Method = new HttpMethod("PATCH");
-            _httpRequest.RequestUri = new System.Uri(_url);
-            // Set Headers
-
-
-            if (customHeaders != null)
-            {
-                foreach(var _header in customHeaders)
-                {
-                    if (_httpRequest.Headers.Contains(_header.Key))
-                    {
-                        _httpRequest.Headers.Remove(_header.Key);
-                    }
-                    _httpRequest.Headers.TryAddWithoutValidation(_header.Key, _header.Value);
-                }
-            }
-
-            // Serialize Request
-            string _requestContent = null;
-            if(application != null)
-            {
-                _requestContent = SafeJsonConvert.SerializeObject(application, SerializationSettings);
-                _httpRequest.Content = new StringContent(_requestContent, System.Text.Encoding.UTF8);
-                _httpRequest.Content.Headers.ContentType =System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json-patch+json; charset=utf-8");
-            }
-            // Set Credentials
-            if (Credentials != null)
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                await Credentials.ProcessHttpRequestAsync(_httpRequest, cancellationToken).ConfigureAwait(false);
-            }
-            // Send Request
-            if (_shouldTrace)
-            {
-                ServiceClientTracing.SendRequest(_invocationId, _httpRequest);
-            }
-            cancellationToken.ThrowIfCancellationRequested();
-            _httpResponse = await HttpClient.SendAsync(_httpRequest, cancellationToken).ConfigureAwait(false);
-            if (_shouldTrace)
-            {
-                ServiceClientTracing.ReceiveResponse(_invocationId, _httpResponse);
-            }
-            HttpStatusCode _statusCode = _httpResponse.StatusCode;
-            cancellationToken.ThrowIfCancellationRequested();
-            string _responseContent = null;
-            if ((int)_statusCode != 200 && (int)_statusCode != 401 && (int)_statusCode != 403)
-            {
-                var ex = new HttpOperationException(string.Format("Operation returned an invalid status code '{0}'", _statusCode));
-                if (_httpResponse.Content != null) {
-                    _responseContent = await _httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
-                }
-                else {
-                    _responseContent = string.Empty;
-                }
-                ex.Request = new HttpRequestMessageWrapper(_httpRequest, _requestContent);
-                ex.Response = new HttpResponseMessageWrapper(_httpResponse, _responseContent);
-                if (_shouldTrace)
-                {
-                    ServiceClientTracing.Error(_invocationId, ex);
-                }
-                _httpRequest.Dispose();
-                if (_httpResponse != null)
-                {
-                    _httpResponse.Dispose();
-                }
-                throw ex;
-            }
-            // Create Result
-            var _result = new HttpOperationResponse<ApplicationRecordApiModel>();
-            _result.Request = _httpRequest;
-            _result.Response = _httpResponse;
-            // Deserialize Response
-            if ((int)_statusCode == 200)
-            {
-                _responseContent = await _httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
-                try
-                {
-                    _result.Body = SafeJsonConvert.DeserializeObject<ApplicationRecordApiModel>(_responseContent, DeserializationSettings);
-                }
-                catch (JsonException ex)
-                {
-                    _httpRequest.Dispose();
-                    if (_httpResponse != null)
-                    {
-                        _httpResponse.Dispose();
-                    }
-                    throw new SerializationException("Unable to deserialize the response.", _responseContent, ex);
-                }
-            }
             if (_shouldTrace)
             {
                 ServiceClientTracing.Exit(_invocationId, _result);
@@ -1178,9 +1182,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         /// List applications with matching application Uri.
         /// </summary>
         /// <remarks>
-        /// List applications that match the application Uri.
+        /// List approved applications that match the application Uri.
         /// Application Uris may have duplicates in the application database.
-        /// The returned model can contain a nex page link if more results are
+        /// The returned model can contain a next page link if more results are
         /// available.
         /// </remarks>
         /// <param name='applicationUri'>
@@ -1634,6 +1638,14 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             return _result;
         }
 
+        /// <summary>
+        /// Get Certificate Group Names.
+        /// </summary>
+        /// <remarks>
+        /// Returns a list of supported group names. The names are typically used as
+        /// parameter.
+        /// The Default group name is 'Default'.
+        /// </remarks>
         /// <param name='customHeaders'>
         /// Headers that will be added to request.
         /// </param>
@@ -1758,9 +1770,15 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         }
 
         /// <summary>
-        /// Get group configuration
+        /// Get group configuration.
         /// </summary>
+        /// <remarks>
+        /// The group configuration for a group is stored in KeyVault and contains
+        /// information
+        /// about the CA subject, the lifetime and the security algorithms used.
+        /// </remarks>
         /// <param name='group'>
+        /// The group name
         /// </param>
         /// <param name='customHeaders'>
         /// Headers that will be added to request.
@@ -1898,11 +1916,30 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         }
 
         /// <summary>
-        /// Update group configuration
+        /// Update group configuration.
         /// </summary>
+        /// <remarks>
+        /// Updates the configuration for a certificate group.
+        /// Use this function with care and only if you are aware of the security
+        /// implications.
+        /// - A change of the subject requires to issue a new CA certificate.
+        /// . A change of the lifetime and security parameter of the issuer certificate
+        /// takes
+        /// effect on the next Issuer CA key generation.
+        /// - A change in lifetime for issued certificates takes effect on the next
+        /// request approval.
+        /// In general, security parameters should not be changed after a security
+        /// group is established.
+        /// Instead, a new certificate group with new parameters shoudl be created for
+        /// all subsequent
+        /// operations.
+        /// Requires manager role.
+        /// </remarks>
         /// <param name='group'>
+        /// The group name
         /// </param>
         /// <param name='config'>
+        /// The group configuration
         /// </param>
         /// <param name='customHeaders'>
         /// Headers that will be added to request.
@@ -2051,9 +2088,16 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         }
 
         /// <summary>
-        /// Delete group configuration
+        /// Delete a group configuration.
         /// </summary>
+        /// <remarks>
+        /// Deletes a group with configuration.
+        /// After this operation the Issuer CA, CRLs and keys become inaccessible.
+        /// Use this function with extreme caution.
+        /// Requires manager role.
+        /// </remarks>
         /// <param name='group'>
+        /// The group name
         /// </param>
         /// <param name='customHeaders'>
         /// Headers that will be added to request.
@@ -2170,13 +2214,23 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         }
 
         /// <summary>
-        /// Create new group configuration
+        /// Create new group configuration.
         /// </summary>
+        /// <remarks>
+        /// Creates a new group with configuration.
+        /// The security parameters are preset with defaults.
+        /// The group should be updated with final settings before the Issuer CA
+        /// certificate is created for the first time.
+        /// Requires manager role.
+        /// </remarks>
         /// <param name='group'>
+        /// The group name
         /// </param>
         /// <param name='subject'>
+        /// The Issuer CA subject
         /// </param>
         /// <param name='certType'>
+        /// The certificate type
         /// </param>
         /// <param name='customHeaders'>
         /// Headers that will be added to request.
@@ -2326,8 +2380,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         }
 
         /// <summary>
-        /// Get group configuration
+        /// Get all group configurations.
         /// </summary>
+        /// <remarks>
+        /// The group configurations for all groups are stored in KeyVault and contain
+        /// information
+        /// about the CA subject, the lifetime and the security algorithms used.
+        /// </remarks>
         /// <param name='customHeaders'>
         /// Headers that will be added to request.
         /// </param>
@@ -2452,11 +2511,23 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         }
 
         /// <summary>
-        /// Get Issuer CA Certificate chain
+        /// Get Issuer CA Certificate versions.
         /// </summary>
+        /// <remarks>
+        /// Returns all Issuer CA certificate versions.
+        /// By default only the thumbprints, subject, lifetime and state are returned.
+        /// </remarks>
         /// <param name='group'>
+        /// The group name
         /// </param>
-        /// <param name='maxResults'>
+        /// <param name='withCertificates'>
+        /// Optional, true to include the full certificates
+        /// </param>
+        /// <param name='nextPageLink'>
+        /// optional, link to next page
+        /// </param>
+        /// <param name='pageSize'>
+        /// optional, the maximum number of result per page
         /// </param>
         /// <param name='customHeaders'>
         /// Headers that will be added to request.
@@ -2479,7 +2550,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         /// <return>
         /// A response object containing the response body and response headers.
         /// </return>
-        public async Task<HttpOperationResponse<X509Certificate2CollectionApiModel>> GetCertificateGroupIssuerCAChainWithHttpMessagesAsync(string group, int? maxResults = default(int?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<HttpOperationResponse<X509Certificate2CollectionApiModel>> GetCertificateGroupIssuerCAVersionsWithHttpMessagesAsync(string group, bool? withCertificates = default(bool?), string nextPageLink = default(string), int? pageSize = default(int?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (group == null)
             {
@@ -2493,7 +2564,179 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
                 _invocationId = ServiceClientTracing.NextInvocationId.ToString();
                 Dictionary<string, object> tracingParameters = new Dictionary<string, object>();
                 tracingParameters.Add("group", group);
-                tracingParameters.Add("maxResults", maxResults);
+                tracingParameters.Add("withCertificates", withCertificates);
+                tracingParameters.Add("nextPageLink", nextPageLink);
+                tracingParameters.Add("pageSize", pageSize);
+                tracingParameters.Add("cancellationToken", cancellationToken);
+                ServiceClientTracing.Enter(_invocationId, this, "GetCertificateGroupIssuerCAVersions", tracingParameters);
+            }
+            // Construct URL
+            var _baseUrl = BaseUri.AbsoluteUri;
+            var _url = new System.Uri(new System.Uri(_baseUrl + (_baseUrl.EndsWith("/") ? "" : "/")), "v1/group/{group}/issuercaversions").ToString();
+            _url = _url.Replace("{group}", System.Uri.EscapeDataString(group));
+            List<string> _queryParameters = new List<string>();
+            if (withCertificates != null)
+            {
+                _queryParameters.Add(string.Format("withCertificates={0}", System.Uri.EscapeDataString(SafeJsonConvert.SerializeObject(withCertificates, SerializationSettings).Trim('"'))));
+            }
+            if (nextPageLink != null)
+            {
+                _queryParameters.Add(string.Format("nextPageLink={0}", System.Uri.EscapeDataString(nextPageLink)));
+            }
+            if (pageSize != null)
+            {
+                _queryParameters.Add(string.Format("pageSize={0}", System.Uri.EscapeDataString(SafeJsonConvert.SerializeObject(pageSize, SerializationSettings).Trim('"'))));
+            }
+            if (_queryParameters.Count > 0)
+            {
+                _url += "?" + string.Join("&", _queryParameters);
+            }
+            // Create HTTP transport objects
+            var _httpRequest = new HttpRequestMessage();
+            HttpResponseMessage _httpResponse = null;
+            _httpRequest.Method = new HttpMethod("GET");
+            _httpRequest.RequestUri = new System.Uri(_url);
+            // Set Headers
+
+
+            if (customHeaders != null)
+            {
+                foreach(var _header in customHeaders)
+                {
+                    if (_httpRequest.Headers.Contains(_header.Key))
+                    {
+                        _httpRequest.Headers.Remove(_header.Key);
+                    }
+                    _httpRequest.Headers.TryAddWithoutValidation(_header.Key, _header.Value);
+                }
+            }
+
+            // Serialize Request
+            string _requestContent = null;
+            // Set Credentials
+            if (Credentials != null)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                await Credentials.ProcessHttpRequestAsync(_httpRequest, cancellationToken).ConfigureAwait(false);
+            }
+            // Send Request
+            if (_shouldTrace)
+            {
+                ServiceClientTracing.SendRequest(_invocationId, _httpRequest);
+            }
+            cancellationToken.ThrowIfCancellationRequested();
+            _httpResponse = await HttpClient.SendAsync(_httpRequest, cancellationToken).ConfigureAwait(false);
+            if (_shouldTrace)
+            {
+                ServiceClientTracing.ReceiveResponse(_invocationId, _httpResponse);
+            }
+            HttpStatusCode _statusCode = _httpResponse.StatusCode;
+            cancellationToken.ThrowIfCancellationRequested();
+            string _responseContent = null;
+            if ((int)_statusCode != 200 && (int)_statusCode != 401 && (int)_statusCode != 403)
+            {
+                var ex = new HttpOperationException(string.Format("Operation returned an invalid status code '{0}'", _statusCode));
+                if (_httpResponse.Content != null) {
+                    _responseContent = await _httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+                }
+                else {
+                    _responseContent = string.Empty;
+                }
+                ex.Request = new HttpRequestMessageWrapper(_httpRequest, _requestContent);
+                ex.Response = new HttpResponseMessageWrapper(_httpResponse, _responseContent);
+                if (_shouldTrace)
+                {
+                    ServiceClientTracing.Error(_invocationId, ex);
+                }
+                _httpRequest.Dispose();
+                if (_httpResponse != null)
+                {
+                    _httpResponse.Dispose();
+                }
+                throw ex;
+            }
+            // Create Result
+            var _result = new HttpOperationResponse<X509Certificate2CollectionApiModel>();
+            _result.Request = _httpRequest;
+            _result.Response = _httpResponse;
+            // Deserialize Response
+            if ((int)_statusCode == 200)
+            {
+                _responseContent = await _httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+                try
+                {
+                    _result.Body = SafeJsonConvert.DeserializeObject<X509Certificate2CollectionApiModel>(_responseContent, DeserializationSettings);
+                }
+                catch (JsonException ex)
+                {
+                    _httpRequest.Dispose();
+                    if (_httpResponse != null)
+                    {
+                        _httpResponse.Dispose();
+                    }
+                    throw new SerializationException("Unable to deserialize the response.", _responseContent, ex);
+                }
+            }
+            if (_shouldTrace)
+            {
+                ServiceClientTracing.Exit(_invocationId, _result);
+            }
+            return _result;
+        }
+
+        /// <summary>
+        /// Get Issuer CA Certificate chain.
+        /// </summary>
+        /// <param name='group'>
+        /// The group name
+        /// </param>
+        /// <param name='thumbPrint'>
+        /// optional, the thumbrint of the Issuer CA Certificate
+        /// </param>
+        /// <param name='nextPageLink'>
+        /// optional, link to next page
+        /// </param>
+        /// <param name='pageSize'>
+        /// optional, the maximum number of result per page
+        /// </param>
+        /// <param name='customHeaders'>
+        /// Headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        /// <exception cref="HttpOperationException">
+        /// Thrown when the operation returned an invalid status code
+        /// </exception>
+        /// <exception cref="SerializationException">
+        /// Thrown when unable to deserialize the response
+        /// </exception>
+        /// <exception cref="ValidationException">
+        /// Thrown when a required parameter is null
+        /// </exception>
+        /// <exception cref="System.ArgumentNullException">
+        /// Thrown when a required parameter is null
+        /// </exception>
+        /// <return>
+        /// A response object containing the response body and response headers.
+        /// </return>
+        public async Task<HttpOperationResponse<X509Certificate2CollectionApiModel>> GetCertificateGroupIssuerCAChainWithHttpMessagesAsync(string group, string thumbPrint = default(string), string nextPageLink = default(string), int? pageSize = default(int?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (group == null)
+            {
+                throw new ValidationException(ValidationRules.CannotBeNull, "group");
+            }
+            // Tracing
+            bool _shouldTrace = ServiceClientTracing.IsEnabled;
+            string _invocationId = null;
+            if (_shouldTrace)
+            {
+                _invocationId = ServiceClientTracing.NextInvocationId.ToString();
+                Dictionary<string, object> tracingParameters = new Dictionary<string, object>();
+                tracingParameters.Add("group", group);
+                tracingParameters.Add("thumbPrint", thumbPrint);
+                tracingParameters.Add("nextPageLink", nextPageLink);
+                tracingParameters.Add("pageSize", pageSize);
                 tracingParameters.Add("cancellationToken", cancellationToken);
                 ServiceClientTracing.Enter(_invocationId, this, "GetCertificateGroupIssuerCAChain", tracingParameters);
             }
@@ -2502,9 +2745,17 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             var _url = new System.Uri(new System.Uri(_baseUrl + (_baseUrl.EndsWith("/") ? "" : "/")), "v1/group/{group}/issuerca").ToString();
             _url = _url.Replace("{group}", System.Uri.EscapeDataString(group));
             List<string> _queryParameters = new List<string>();
-            if (maxResults != null)
+            if (thumbPrint != null)
             {
-                _queryParameters.Add(string.Format("maxResults={0}", System.Uri.EscapeDataString(SafeJsonConvert.SerializeObject(maxResults, SerializationSettings).Trim('"'))));
+                _queryParameters.Add(string.Format("thumbPrint={0}", System.Uri.EscapeDataString(thumbPrint)));
+            }
+            if (nextPageLink != null)
+            {
+                _queryParameters.Add(string.Format("nextPageLink={0}", System.Uri.EscapeDataString(nextPageLink)));
+            }
+            if (pageSize != null)
+            {
+                _queryParameters.Add(string.Format("pageSize={0}", System.Uri.EscapeDataString(SafeJsonConvert.SerializeObject(pageSize, SerializationSettings).Trim('"'))));
             }
             if (_queryParameters.Count > 0)
             {
@@ -2604,13 +2855,19 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         }
 
         /// <summary>
-        /// Get Issuer CA Certificate chain
+        /// Get Issuer CA CRL chain.
         /// </summary>
         /// <param name='group'>
+        /// The group name
+        /// </param>
+        /// <param name='thumbPrint'>
+        /// optional, the thumbrint of the Issuer CA Certificate
         /// </param>
         /// <param name='nextPageLink'>
+        /// optional, link to next page
         /// </param>
-        /// <param name='maxResults'>
+        /// <param name='pageSize'>
+        /// optional, the maximum number of result per page
         /// </param>
         /// <param name='customHeaders'>
         /// Headers that will be added to request.
@@ -2633,7 +2890,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         /// <return>
         /// A response object containing the response body and response headers.
         /// </return>
-        public async Task<HttpOperationResponse<X509Certificate2CollectionApiModel>> GetCertificateGroupIssuerCAChainNextWithHttpMessagesAsync(string group, string nextPageLink = default(string), int? maxResults = default(int?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<HttpOperationResponse<X509CrlCollectionApiModel>> GetCertificateGroupIssuerCACrlChainWithHttpMessagesAsync(string group, string thumbPrint = default(string), string nextPageLink = default(string), int? pageSize = default(int?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (group == null)
             {
@@ -2647,166 +2904,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
                 _invocationId = ServiceClientTracing.NextInvocationId.ToString();
                 Dictionary<string, object> tracingParameters = new Dictionary<string, object>();
                 tracingParameters.Add("group", group);
+                tracingParameters.Add("thumbPrint", thumbPrint);
                 tracingParameters.Add("nextPageLink", nextPageLink);
-                tracingParameters.Add("maxResults", maxResults);
-                tracingParameters.Add("cancellationToken", cancellationToken);
-                ServiceClientTracing.Enter(_invocationId, this, "GetCertificateGroupIssuerCAChainNext", tracingParameters);
-            }
-            // Construct URL
-            var _baseUrl = BaseUri.AbsoluteUri;
-            var _url = new System.Uri(new System.Uri(_baseUrl + (_baseUrl.EndsWith("/") ? "" : "/")), "v1/group/{group}/issuerca/next").ToString();
-            _url = _url.Replace("{group}", System.Uri.EscapeDataString(group));
-            List<string> _queryParameters = new List<string>();
-            if (maxResults != null)
-            {
-                _queryParameters.Add(string.Format("maxResults={0}", System.Uri.EscapeDataString(SafeJsonConvert.SerializeObject(maxResults, SerializationSettings).Trim('"'))));
-            }
-            if (_queryParameters.Count > 0)
-            {
-                _url += "?" + string.Join("&", _queryParameters);
-            }
-            // Create HTTP transport objects
-            var _httpRequest = new HttpRequestMessage();
-            HttpResponseMessage _httpResponse = null;
-            _httpRequest.Method = new HttpMethod("POST");
-            _httpRequest.RequestUri = new System.Uri(_url);
-            // Set Headers
-
-
-            if (customHeaders != null)
-            {
-                foreach(var _header in customHeaders)
-                {
-                    if (_httpRequest.Headers.Contains(_header.Key))
-                    {
-                        _httpRequest.Headers.Remove(_header.Key);
-                    }
-                    _httpRequest.Headers.TryAddWithoutValidation(_header.Key, _header.Value);
-                }
-            }
-
-            // Serialize Request
-            string _requestContent = null;
-            if(nextPageLink != null)
-            {
-                _requestContent = SafeJsonConvert.SerializeObject(nextPageLink, SerializationSettings);
-                _httpRequest.Content = new StringContent(_requestContent, System.Text.Encoding.UTF8);
-                _httpRequest.Content.Headers.ContentType =System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json-patch+json; charset=utf-8");
-            }
-            // Set Credentials
-            if (Credentials != null)
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                await Credentials.ProcessHttpRequestAsync(_httpRequest, cancellationToken).ConfigureAwait(false);
-            }
-            // Send Request
-            if (_shouldTrace)
-            {
-                ServiceClientTracing.SendRequest(_invocationId, _httpRequest);
-            }
-            cancellationToken.ThrowIfCancellationRequested();
-            _httpResponse = await HttpClient.SendAsync(_httpRequest, cancellationToken).ConfigureAwait(false);
-            if (_shouldTrace)
-            {
-                ServiceClientTracing.ReceiveResponse(_invocationId, _httpResponse);
-            }
-            HttpStatusCode _statusCode = _httpResponse.StatusCode;
-            cancellationToken.ThrowIfCancellationRequested();
-            string _responseContent = null;
-            if ((int)_statusCode != 200 && (int)_statusCode != 401 && (int)_statusCode != 403)
-            {
-                var ex = new HttpOperationException(string.Format("Operation returned an invalid status code '{0}'", _statusCode));
-                if (_httpResponse.Content != null) {
-                    _responseContent = await _httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
-                }
-                else {
-                    _responseContent = string.Empty;
-                }
-                ex.Request = new HttpRequestMessageWrapper(_httpRequest, _requestContent);
-                ex.Response = new HttpResponseMessageWrapper(_httpResponse, _responseContent);
-                if (_shouldTrace)
-                {
-                    ServiceClientTracing.Error(_invocationId, ex);
-                }
-                _httpRequest.Dispose();
-                if (_httpResponse != null)
-                {
-                    _httpResponse.Dispose();
-                }
-                throw ex;
-            }
-            // Create Result
-            var _result = new HttpOperationResponse<X509Certificate2CollectionApiModel>();
-            _result.Request = _httpRequest;
-            _result.Response = _httpResponse;
-            // Deserialize Response
-            if ((int)_statusCode == 200)
-            {
-                _responseContent = await _httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
-                try
-                {
-                    _result.Body = SafeJsonConvert.DeserializeObject<X509Certificate2CollectionApiModel>(_responseContent, DeserializationSettings);
-                }
-                catch (JsonException ex)
-                {
-                    _httpRequest.Dispose();
-                    if (_httpResponse != null)
-                    {
-                        _httpResponse.Dispose();
-                    }
-                    throw new SerializationException("Unable to deserialize the response.", _responseContent, ex);
-                }
-            }
-            if (_shouldTrace)
-            {
-                ServiceClientTracing.Exit(_invocationId, _result);
-            }
-            return _result;
-        }
-
-        /// <summary>
-        /// Get Issuer CA CRL chain
-        /// </summary>
-        /// <param name='group'>
-        /// </param>
-        /// <param name='maxResults'>
-        /// </param>
-        /// <param name='customHeaders'>
-        /// Headers that will be added to request.
-        /// </param>
-        /// <param name='cancellationToken'>
-        /// The cancellation token.
-        /// </param>
-        /// <exception cref="HttpOperationException">
-        /// Thrown when the operation returned an invalid status code
-        /// </exception>
-        /// <exception cref="SerializationException">
-        /// Thrown when unable to deserialize the response
-        /// </exception>
-        /// <exception cref="ValidationException">
-        /// Thrown when a required parameter is null
-        /// </exception>
-        /// <exception cref="System.ArgumentNullException">
-        /// Thrown when a required parameter is null
-        /// </exception>
-        /// <return>
-        /// A response object containing the response body and response headers.
-        /// </return>
-        public async Task<HttpOperationResponse<X509CrlCollectionApiModel>> GetCertificateGroupIssuerCACrlChainWithHttpMessagesAsync(string group, int? maxResults = default(int?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            if (group == null)
-            {
-                throw new ValidationException(ValidationRules.CannotBeNull, "group");
-            }
-            // Tracing
-            bool _shouldTrace = ServiceClientTracing.IsEnabled;
-            string _invocationId = null;
-            if (_shouldTrace)
-            {
-                _invocationId = ServiceClientTracing.NextInvocationId.ToString();
-                Dictionary<string, object> tracingParameters = new Dictionary<string, object>();
-                tracingParameters.Add("group", group);
-                tracingParameters.Add("maxResults", maxResults);
+                tracingParameters.Add("pageSize", pageSize);
                 tracingParameters.Add("cancellationToken", cancellationToken);
                 ServiceClientTracing.Enter(_invocationId, this, "GetCertificateGroupIssuerCACrlChain", tracingParameters);
             }
@@ -2815,9 +2915,17 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             var _url = new System.Uri(new System.Uri(_baseUrl + (_baseUrl.EndsWith("/") ? "" : "/")), "v1/group/{group}/issuercacrl").ToString();
             _url = _url.Replace("{group}", System.Uri.EscapeDataString(group));
             List<string> _queryParameters = new List<string>();
-            if (maxResults != null)
+            if (thumbPrint != null)
             {
-                _queryParameters.Add(string.Format("maxResults={0}", System.Uri.EscapeDataString(SafeJsonConvert.SerializeObject(maxResults, SerializationSettings).Trim('"'))));
+                _queryParameters.Add(string.Format("thumbPrint={0}", System.Uri.EscapeDataString(thumbPrint)));
+            }
+            if (nextPageLink != null)
+            {
+                _queryParameters.Add(string.Format("nextPageLink={0}", System.Uri.EscapeDataString(nextPageLink)));
+            }
+            if (pageSize != null)
+            {
+                _queryParameters.Add(string.Format("pageSize={0}", System.Uri.EscapeDataString(SafeJsonConvert.SerializeObject(pageSize, SerializationSettings).Trim('"'))));
             }
             if (_queryParameters.Count > 0)
             {
@@ -2917,13 +3025,24 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         }
 
         /// <summary>
-        /// Get Issuer CA CRL chain
+        /// Get Trust lists.
         /// </summary>
+        /// <remarks>
+        /// The trust lists contain lists for Issuer and Trusted certificates.
+        /// The Issuer and Trusted list can each contain CA certificates with CRLs,
+        /// signed certificates and self signed certificates.
+        /// By default the trusted list contains all versions of Issuer CA certificates
+        /// and their latest CRLs.
+        /// The issuer list contains certificates and CRLs which might be needed to
+        /// validate chains.
+        /// </remarks>
         /// <param name='group'>
         /// </param>
         /// <param name='nextPageLink'>
+        /// optional, link to next page
         /// </param>
-        /// <param name='maxResults'>
+        /// <param name='pageSize'>
+        /// optional, the maximum number of result per page
         /// </param>
         /// <param name='customHeaders'>
         /// Headers that will be added to request.
@@ -2946,7 +3065,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         /// <return>
         /// A response object containing the response body and response headers.
         /// </return>
-        public async Task<HttpOperationResponse<X509CrlCollectionApiModel>> GetCertificateGroupIssuerCACrlChainNextWithHttpMessagesAsync(string group, string nextPageLink = default(string), int? maxResults = default(int?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<HttpOperationResponse<TrustListApiModel>> GetCertificateGroupTrustListWithHttpMessagesAsync(string group, string nextPageLink = default(string), int? pageSize = default(int?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (group == null)
             {
@@ -2961,165 +3080,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
                 Dictionary<string, object> tracingParameters = new Dictionary<string, object>();
                 tracingParameters.Add("group", group);
                 tracingParameters.Add("nextPageLink", nextPageLink);
-                tracingParameters.Add("maxResults", maxResults);
-                tracingParameters.Add("cancellationToken", cancellationToken);
-                ServiceClientTracing.Enter(_invocationId, this, "GetCertificateGroupIssuerCACrlChainNext", tracingParameters);
-            }
-            // Construct URL
-            var _baseUrl = BaseUri.AbsoluteUri;
-            var _url = new System.Uri(new System.Uri(_baseUrl + (_baseUrl.EndsWith("/") ? "" : "/")), "v1/group/{group}/issuercacrl/next").ToString();
-            _url = _url.Replace("{group}", System.Uri.EscapeDataString(group));
-            List<string> _queryParameters = new List<string>();
-            if (maxResults != null)
-            {
-                _queryParameters.Add(string.Format("maxResults={0}", System.Uri.EscapeDataString(SafeJsonConvert.SerializeObject(maxResults, SerializationSettings).Trim('"'))));
-            }
-            if (_queryParameters.Count > 0)
-            {
-                _url += "?" + string.Join("&", _queryParameters);
-            }
-            // Create HTTP transport objects
-            var _httpRequest = new HttpRequestMessage();
-            HttpResponseMessage _httpResponse = null;
-            _httpRequest.Method = new HttpMethod("POST");
-            _httpRequest.RequestUri = new System.Uri(_url);
-            // Set Headers
-
-
-            if (customHeaders != null)
-            {
-                foreach(var _header in customHeaders)
-                {
-                    if (_httpRequest.Headers.Contains(_header.Key))
-                    {
-                        _httpRequest.Headers.Remove(_header.Key);
-                    }
-                    _httpRequest.Headers.TryAddWithoutValidation(_header.Key, _header.Value);
-                }
-            }
-
-            // Serialize Request
-            string _requestContent = null;
-            if(nextPageLink != null)
-            {
-                _requestContent = SafeJsonConvert.SerializeObject(nextPageLink, SerializationSettings);
-                _httpRequest.Content = new StringContent(_requestContent, System.Text.Encoding.UTF8);
-                _httpRequest.Content.Headers.ContentType =System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json-patch+json; charset=utf-8");
-            }
-            // Set Credentials
-            if (Credentials != null)
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                await Credentials.ProcessHttpRequestAsync(_httpRequest, cancellationToken).ConfigureAwait(false);
-            }
-            // Send Request
-            if (_shouldTrace)
-            {
-                ServiceClientTracing.SendRequest(_invocationId, _httpRequest);
-            }
-            cancellationToken.ThrowIfCancellationRequested();
-            _httpResponse = await HttpClient.SendAsync(_httpRequest, cancellationToken).ConfigureAwait(false);
-            if (_shouldTrace)
-            {
-                ServiceClientTracing.ReceiveResponse(_invocationId, _httpResponse);
-            }
-            HttpStatusCode _statusCode = _httpResponse.StatusCode;
-            cancellationToken.ThrowIfCancellationRequested();
-            string _responseContent = null;
-            if ((int)_statusCode != 200 && (int)_statusCode != 401 && (int)_statusCode != 403)
-            {
-                var ex = new HttpOperationException(string.Format("Operation returned an invalid status code '{0}'", _statusCode));
-                if (_httpResponse.Content != null) {
-                    _responseContent = await _httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
-                }
-                else {
-                    _responseContent = string.Empty;
-                }
-                ex.Request = new HttpRequestMessageWrapper(_httpRequest, _requestContent);
-                ex.Response = new HttpResponseMessageWrapper(_httpResponse, _responseContent);
-                if (_shouldTrace)
-                {
-                    ServiceClientTracing.Error(_invocationId, ex);
-                }
-                _httpRequest.Dispose();
-                if (_httpResponse != null)
-                {
-                    _httpResponse.Dispose();
-                }
-                throw ex;
-            }
-            // Create Result
-            var _result = new HttpOperationResponse<X509CrlCollectionApiModel>();
-            _result.Request = _httpRequest;
-            _result.Response = _httpResponse;
-            // Deserialize Response
-            if ((int)_statusCode == 200)
-            {
-                _responseContent = await _httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
-                try
-                {
-                    _result.Body = SafeJsonConvert.DeserializeObject<X509CrlCollectionApiModel>(_responseContent, DeserializationSettings);
-                }
-                catch (JsonException ex)
-                {
-                    _httpRequest.Dispose();
-                    if (_httpResponse != null)
-                    {
-                        _httpResponse.Dispose();
-                    }
-                    throw new SerializationException("Unable to deserialize the response.", _responseContent, ex);
-                }
-            }
-            if (_shouldTrace)
-            {
-                ServiceClientTracing.Exit(_invocationId, _result);
-            }
-            return _result;
-        }
-
-        /// <summary>
-        /// Get trust list
-        /// </summary>
-        /// <param name='group'>
-        /// </param>
-        /// <param name='maxResults'>
-        /// </param>
-        /// <param name='customHeaders'>
-        /// Headers that will be added to request.
-        /// </param>
-        /// <param name='cancellationToken'>
-        /// The cancellation token.
-        /// </param>
-        /// <exception cref="HttpOperationException">
-        /// Thrown when the operation returned an invalid status code
-        /// </exception>
-        /// <exception cref="SerializationException">
-        /// Thrown when unable to deserialize the response
-        /// </exception>
-        /// <exception cref="ValidationException">
-        /// Thrown when a required parameter is null
-        /// </exception>
-        /// <exception cref="System.ArgumentNullException">
-        /// Thrown when a required parameter is null
-        /// </exception>
-        /// <return>
-        /// A response object containing the response body and response headers.
-        /// </return>
-        public async Task<HttpOperationResponse<TrustListApiModel>> GetCertificateGroupTrustListWithHttpMessagesAsync(string group, int? maxResults = default(int?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            if (group == null)
-            {
-                throw new ValidationException(ValidationRules.CannotBeNull, "group");
-            }
-            // Tracing
-            bool _shouldTrace = ServiceClientTracing.IsEnabled;
-            string _invocationId = null;
-            if (_shouldTrace)
-            {
-                _invocationId = ServiceClientTracing.NextInvocationId.ToString();
-                Dictionary<string, object> tracingParameters = new Dictionary<string, object>();
-                tracingParameters.Add("group", group);
-                tracingParameters.Add("maxResults", maxResults);
+                tracingParameters.Add("pageSize", pageSize);
                 tracingParameters.Add("cancellationToken", cancellationToken);
                 ServiceClientTracing.Enter(_invocationId, this, "GetCertificateGroupTrustList", tracingParameters);
             }
@@ -3128,9 +3089,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
             var _url = new System.Uri(new System.Uri(_baseUrl + (_baseUrl.EndsWith("/") ? "" : "/")), "v1/group/{group}/trustlist").ToString();
             _url = _url.Replace("{group}", System.Uri.EscapeDataString(group));
             List<string> _queryParameters = new List<string>();
-            if (maxResults != null)
+            if (nextPageLink != null)
             {
-                _queryParameters.Add(string.Format("maxResults={0}", System.Uri.EscapeDataString(SafeJsonConvert.SerializeObject(maxResults, SerializationSettings).Trim('"'))));
+                _queryParameters.Add(string.Format("nextPageLink={0}", System.Uri.EscapeDataString(nextPageLink)));
+            }
+            if (pageSize != null)
+            {
+                _queryParameters.Add(string.Format("pageSize={0}", System.Uri.EscapeDataString(SafeJsonConvert.SerializeObject(pageSize, SerializationSettings).Trim('"'))));
             }
             if (_queryParameters.Count > 0)
             {
@@ -3230,168 +3195,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         }
 
         /// <summary>
-        /// Get trust list
-        /// </summary>
-        /// <param name='group'>
-        /// </param>
-        /// <param name='nextPageLink'>
-        /// </param>
-        /// <param name='maxResults'>
-        /// </param>
-        /// <param name='customHeaders'>
-        /// Headers that will be added to request.
-        /// </param>
-        /// <param name='cancellationToken'>
-        /// The cancellation token.
-        /// </param>
-        /// <exception cref="HttpOperationException">
-        /// Thrown when the operation returned an invalid status code
-        /// </exception>
-        /// <exception cref="SerializationException">
-        /// Thrown when unable to deserialize the response
-        /// </exception>
-        /// <exception cref="ValidationException">
-        /// Thrown when a required parameter is null
-        /// </exception>
-        /// <exception cref="System.ArgumentNullException">
-        /// Thrown when a required parameter is null
-        /// </exception>
-        /// <return>
-        /// A response object containing the response body and response headers.
-        /// </return>
-        public async Task<HttpOperationResponse<TrustListApiModel>> GetCertificateGroupTrustListNextWithHttpMessagesAsync(string group, string nextPageLink = default(string), int? maxResults = default(int?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            if (group == null)
-            {
-                throw new ValidationException(ValidationRules.CannotBeNull, "group");
-            }
-            // Tracing
-            bool _shouldTrace = ServiceClientTracing.IsEnabled;
-            string _invocationId = null;
-            if (_shouldTrace)
-            {
-                _invocationId = ServiceClientTracing.NextInvocationId.ToString();
-                Dictionary<string, object> tracingParameters = new Dictionary<string, object>();
-                tracingParameters.Add("group", group);
-                tracingParameters.Add("nextPageLink", nextPageLink);
-                tracingParameters.Add("maxResults", maxResults);
-                tracingParameters.Add("cancellationToken", cancellationToken);
-                ServiceClientTracing.Enter(_invocationId, this, "GetCertificateGroupTrustListNext", tracingParameters);
-            }
-            // Construct URL
-            var _baseUrl = BaseUri.AbsoluteUri;
-            var _url = new System.Uri(new System.Uri(_baseUrl + (_baseUrl.EndsWith("/") ? "" : "/")), "v1/group/{group}/trustlist/next").ToString();
-            _url = _url.Replace("{group}", System.Uri.EscapeDataString(group));
-            List<string> _queryParameters = new List<string>();
-            if (maxResults != null)
-            {
-                _queryParameters.Add(string.Format("maxResults={0}", System.Uri.EscapeDataString(SafeJsonConvert.SerializeObject(maxResults, SerializationSettings).Trim('"'))));
-            }
-            if (_queryParameters.Count > 0)
-            {
-                _url += "?" + string.Join("&", _queryParameters);
-            }
-            // Create HTTP transport objects
-            var _httpRequest = new HttpRequestMessage();
-            HttpResponseMessage _httpResponse = null;
-            _httpRequest.Method = new HttpMethod("POST");
-            _httpRequest.RequestUri = new System.Uri(_url);
-            // Set Headers
-
-
-            if (customHeaders != null)
-            {
-                foreach(var _header in customHeaders)
-                {
-                    if (_httpRequest.Headers.Contains(_header.Key))
-                    {
-                        _httpRequest.Headers.Remove(_header.Key);
-                    }
-                    _httpRequest.Headers.TryAddWithoutValidation(_header.Key, _header.Value);
-                }
-            }
-
-            // Serialize Request
-            string _requestContent = null;
-            if(nextPageLink != null)
-            {
-                _requestContent = SafeJsonConvert.SerializeObject(nextPageLink, SerializationSettings);
-                _httpRequest.Content = new StringContent(_requestContent, System.Text.Encoding.UTF8);
-                _httpRequest.Content.Headers.ContentType =System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json-patch+json; charset=utf-8");
-            }
-            // Set Credentials
-            if (Credentials != null)
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                await Credentials.ProcessHttpRequestAsync(_httpRequest, cancellationToken).ConfigureAwait(false);
-            }
-            // Send Request
-            if (_shouldTrace)
-            {
-                ServiceClientTracing.SendRequest(_invocationId, _httpRequest);
-            }
-            cancellationToken.ThrowIfCancellationRequested();
-            _httpResponse = await HttpClient.SendAsync(_httpRequest, cancellationToken).ConfigureAwait(false);
-            if (_shouldTrace)
-            {
-                ServiceClientTracing.ReceiveResponse(_invocationId, _httpResponse);
-            }
-            HttpStatusCode _statusCode = _httpResponse.StatusCode;
-            cancellationToken.ThrowIfCancellationRequested();
-            string _responseContent = null;
-            if ((int)_statusCode != 200 && (int)_statusCode != 401 && (int)_statusCode != 403)
-            {
-                var ex = new HttpOperationException(string.Format("Operation returned an invalid status code '{0}'", _statusCode));
-                if (_httpResponse.Content != null) {
-                    _responseContent = await _httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
-                }
-                else {
-                    _responseContent = string.Empty;
-                }
-                ex.Request = new HttpRequestMessageWrapper(_httpRequest, _requestContent);
-                ex.Response = new HttpResponseMessageWrapper(_httpResponse, _responseContent);
-                if (_shouldTrace)
-                {
-                    ServiceClientTracing.Error(_invocationId, ex);
-                }
-                _httpRequest.Dispose();
-                if (_httpResponse != null)
-                {
-                    _httpResponse.Dispose();
-                }
-                throw ex;
-            }
-            // Create Result
-            var _result = new HttpOperationResponse<TrustListApiModel>();
-            _result.Request = _httpRequest;
-            _result.Response = _httpResponse;
-            // Deserialize Response
-            if ((int)_statusCode == 200)
-            {
-                _responseContent = await _httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
-                try
-                {
-                    _result.Body = SafeJsonConvert.DeserializeObject<TrustListApiModel>(_responseContent, DeserializationSettings);
-                }
-                catch (JsonException ex)
-                {
-                    _httpRequest.Dispose();
-                    if (_httpResponse != null)
-                    {
-                        _httpResponse.Dispose();
-                    }
-                    throw new SerializationException("Unable to deserialize the response.", _responseContent, ex);
-                }
-            }
-            if (_shouldTrace)
-            {
-                ServiceClientTracing.Exit(_invocationId, _result);
-            }
-            return _result;
-        }
-
-        /// <summary>
-        /// Create new CA Certificate
+        /// Create a new Issuer CA Certificate.
         /// </summary>
         /// <param name='group'>
         /// </param>
