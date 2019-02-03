@@ -11,17 +11,6 @@ using System.Runtime.Serialization;
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Models
 {
-    public enum QueryApplicationType : uint
-    {
-        [EnumMember(Value = "any")]
-        Any = 0,
-        [EnumMember(Value = "server")]
-        Server = 1,
-        [EnumMember(Value = "client")]
-        Client = 2,
-        [EnumMember(Value = "clientAndServer")]
-        ClientAndServer = 3
-    }
 
     public sealed class QueryApplicationsApiModel
     {

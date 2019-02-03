@@ -33,6 +33,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Controllers
         /// <summary>
         /// Register new application.
         /// </summary>
+        /// <remarks>
+        /// After registration an application is in the 'New' state and needs
+        /// approval by a manager to be avavilable for certificate operation.
+        /// Requires Writer role.
+        /// </remarks>
+        /// <param name="application">The new application</param>
+        /// <returns>The registered application record</returns>
         [HttpPost("register")]
         [Authorize(Policy = Policies.CanWrite)]
         public async Task<ApplicationRecordApiModel> RegisterApplicationAsync([FromBody] ApplicationRecordApiModel application)
@@ -49,6 +56,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Controllers
         /// <summary>
         /// Get application.
         /// </summary>
+        /// <param name="applicationId">The application id</param>
+        /// <returns>The application record</returns>
         [HttpGet("{applicationId}")]
         public async Task<ApplicationRecordApiModel> GetApplicationAsync(string applicationId)
         {
@@ -58,7 +67,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Controllers
         /// <summary>
         /// Update application.
         /// </summary>
-        [HttpPut("{applicationId}")]
+        /// <remarks>
+        /// Update the application with given application id, however state information is unchanged.
+        /// Requires Writer role.
+        /// </remarks>
+        /// <param name="application">The updated application</param>
+        /// <returns>The updated application record</returns>
+        [HttpPatch("{applicationId}")]
         [Authorize(Policy = Policies.CanWrite)]
         public async Task<ApplicationRecordApiModel> UpdateApplicationAsync([FromBody] ApplicationRecordApiModel application)
         {
@@ -72,8 +87,17 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Controllers
         }
 
         /// <summary>
-        /// Approve or reject new application.
+        /// Approve or reject a new application.
+        /// <remarks>
+        /// A manager can approve a new application or force an application from any state.
+        /// After approval the application is in the 'Approved' or 'Rejected' state.
+        /// Requires Manager role.
+        /// </remarks>
         /// </summary>
+        /// <param name="applicationId">The application id</param>
+        /// <param name="approved">approve or reject the new application</param>
+        /// <param name="force">optional, force application in new state</param>
+        /// <returns>The updated application record</returns>
         [HttpPost("{applicationId}/{approved}/approve")]
         [Authorize(Policy = Policies.CanManage)]
         public async Task<ApplicationRecordApiModel> ApproveApplicationAsync(string applicationId, bool approved, bool? force)
@@ -84,16 +108,28 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Controllers
         /// <summary>
         /// Unregister application.
         /// </summary>
-        [HttpPost("{applicationId}/unregister")]
+        /// Unregisters the application record and all associated information.
+        /// The application record remains in the database in 'Unregistered' state.
+        /// Certificate Requests associated with the application id are set to the 'Deleted' state,
+        /// and will be revoked with the next CRL update.
+        /// Requires Writer role.
+        /// <param name="applicationId">The application id</param>
+        [HttpDelete("{applicationId}/unregister")]
         [Authorize(Policy = Policies.CanWrite)]
-        public async Task<ApplicationRecordApiModel> UnregisterApplicationAsync(string applicationId)
+        public async Task UnregisterApplicationAsync(string applicationId)
         {
-            return new ApplicationRecordApiModel(await _applicationDatabase.UnregisterApplicationAsync(applicationId));
+            await _applicationDatabase.UnregisterApplicationAsync(applicationId);
         }
 
         /// <summary>
         /// Delete application.
         /// </summary>
+        /// Deletes the application record.
+        /// Certificate Requests associated with the application id are set in the deleted state,
+        /// and will be revoked with the next CRL update.
+        /// Requires Manager role.
+        /// <param name="applicationId">The application id</param>
+        /// <param name="force">optional, skip sanity checks and force to delete application</param>
         [HttpDelete("{applicationId}")]
         [Authorize(Policy = Policies.CanManage)]
         public async Task DeleteApplicationAsync(string applicationId, bool? force)
@@ -101,21 +137,32 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Controllers
             await _applicationDatabase.DeleteApplicationAsync(applicationId, force ?? false);
         }
 
-        /// <summary>Find applications</summary>
+        /// <summary>
+        /// List applications with matching appllicatin Uri.
+        /// </summary>
+        /// <param name="applicationUri">The application Uri</param>
+        /// <returns>The application records</returns>
         [HttpGet("find/{uri}")]
-        public async Task<IList<ApplicationRecordApiModel>> ListApplicationsAsync(string uri)
+        public async Task<IList<ApplicationRecordApiModel>> ListApplicationsAsync(string applicationUri)
         {
             var modelResult = new List<ApplicationRecordApiModel>();
-            foreach (var record in await _applicationDatabase.ListApplicationAsync(uri))
+            foreach (var record in await _applicationDatabase.ListApplicationAsync(applicationUri))
             {
                 modelResult.Add(new ApplicationRecordApiModel(record));
             }
             return modelResult;
         }
 
-        /// <summary>Query applications</summary>
+        /// <summary>
+        /// Query applications.
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="anyState"></param>
+        /// <returns></returns>
         [HttpPost("query")]
-        public async Task<QueryApplicationsResponseApiModel> QueryApplicationsAsync([FromBody] QueryApplicationsApiModel query, bool? anyState)
+        public async Task<QueryApplicationsResponseApiModel> QueryApplicationsAsync(
+            [FromBody] QueryApplicationsApiModel query,
+            bool? anyState)
         {
             if (query == null)
             {

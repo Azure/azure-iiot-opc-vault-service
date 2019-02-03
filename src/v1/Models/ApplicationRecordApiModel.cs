@@ -14,32 +14,6 @@ using Newtonsoft.Json;
 namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Models
 {
 
-    public enum ApplicationType : int
-    {
-        [EnumMember(Value = "server")]
-        Server = 0,
-        [EnumMember(Value = "client")]
-        Client = 1,
-        [EnumMember(Value = "clientAndServer")]
-        ClientAndServer = 2,
-        [EnumMember(Value = "discoveryServer")]
-        DiscoveryServer = 3
-    }
-
-    public enum ApplicationState : int
-    {
-        [EnumMember(Value = "new")]
-        New = 0,
-        [EnumMember(Value = "approved")]
-        Approved = 1,
-        [EnumMember(Value = "rejected")]
-        Rejected = 2,
-        [EnumMember(Value = "unregistered")]
-        Unregistered = 3,
-        [EnumMember(Value = "deleted")]
-        Deleted = 4
-    }
-
     public sealed class ApplicationRecordApiModel
     {
         [JsonProperty(PropertyName = "applicationId")]

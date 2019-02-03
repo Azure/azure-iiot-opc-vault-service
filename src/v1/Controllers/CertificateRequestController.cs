@@ -201,7 +201,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Controllers
         [Authorize(Policy = Policies.CanSign)]
         public async Task RevokeCertificateRequestAsync(string requestId)
         {
-            var onBehalfOfCertificateRequest = await this._certificateRequest.OnBehalfOfRequest(Request);
+            var onBehalfOfCertificateRequest = await _certificateRequest.OnBehalfOfRequest(Request);
             await onBehalfOfCertificateRequest.RevokeAsync(requestId);
         }
 
@@ -217,23 +217,25 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Controllers
         /// Requires Approver role.
         /// Approver needs signing rights in KeyVault.
         /// </remarks>
-        /// <param name="groupId">The certificate group id</param>
-        /// <param name="allVersions"></param>
+        /// <param name="group">The certificate group id</param>
+        /// <param name="allVersions">optional, if all certs for all CA versions should be revoked. Default: true</param>
         /// <returns></returns>
-        [HttpPost("{groupId}/revokegroup")]
+        [HttpPost("{group}/revokegroup")]
         [Authorize(Policy = Policies.CanSign)]
-        public async Task RevokeCertificateGroupAsync(string groupId, bool? allVersions)
+        public async Task RevokeCertificateGroupAsync(string group, bool? allVersions)
         {
-            var onBehalfOfCertificateRequest = await this._certificateRequest.OnBehalfOfRequest(Request);
-            await onBehalfOfCertificateRequest.RevokeGroupAsync(groupId, allVersions);
+            var onBehalfOfCertificateRequest = await _certificateRequest.OnBehalfOfRequest(Request);
+            await onBehalfOfCertificateRequest.RevokeGroupAsync(group, allVersions ?? true);
         }
 
         /// <summary>
         /// Query for certificate requests.
         /// </summary>
+        /// <remarks>
         /// Get all certificate requests in paged form.
         /// The returned model can contain a link to the next page if more results are
         /// available.
+        /// </remarks>
         /// <param name="appId">optional, query for application id</param>
         /// <param name="requestState">optional, query for request state</param>
         /// <param name="nextPageLink">optional, link to next page </param>
