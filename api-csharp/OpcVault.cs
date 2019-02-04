@@ -1923,14 +1923,14 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         /// Use this function with care and only if you are aware of the security
         /// implications.
         /// - A change of the subject requires to issue a new CA certificate.
-        /// . A change of the lifetime and security parameter of the issuer certificate
+        /// - A change of the lifetime and security parameter of the issuer certificate
         /// takes
         /// effect on the next Issuer CA key generation.
         /// - A change in lifetime for issued certificates takes effect on the next
         /// request approval.
         /// In general, security parameters should not be changed after a security
         /// group is established.
-        /// Instead, a new certificate group with new parameters shoudl be created for
+        /// Instead, a new certificate group with new parameters should be created for
         /// all subsequent
         /// operations.
         /// Requires manager role.
@@ -4027,10 +4027,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         /// Delete request. Mark the certificate for revocation.
         /// </summary>
         /// <remarks>
-        /// The request must be in the 'Approved' or 'Accepted' state.
-        /// By deleting the request it is actually not physically deleted, but marked
-        /// for revocation. The public certificate is still available for revocation.
-        /// The request is in the 'Deleted' state after this call.
+        /// If the request is in the 'Approved' or 'Accepted' state,
+        /// the request is set in the 'Deleted' state.
+        /// A deleted request is marked for revocation.
+        /// The public certificate is still available for the revocation procedure.
+        /// If the request is in the 'New' or 'Rejected' state,
+        /// the request is set in the 'Removed' state.
+        /// The request is in the 'Deleted' or 'Removed'state after this call.
         /// Requires Manager role.
         /// </remarks>
         /// <param name='requestId'>
@@ -4562,7 +4565,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         /// </param>
         /// <param name='requestState'>
         /// optional, query for request state. Possible values include: 'new',
-        /// 'approved', 'rejected', 'accepted', 'deleted', 'revoked'
+        /// 'approved', 'rejected', 'accepted', 'deleted', 'revoked', 'removed'
         /// </param>
         /// <param name='nextPageLink'>
         /// optional, link to next page
@@ -4877,7 +4880,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         }
 
         /// <summary>
-        /// returns the status
+        /// Get the status.
         /// </summary>
         /// <param name='customHeaders'>
         /// Headers that will be added to request.
