@@ -74,11 +74,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Controllers
         /// Updates the configuration for a certificate group.
         /// Use this function with care and only if you are aware of the security implications.
         /// - A change of the subject requires to issue a new CA certificate.
-        /// . A change of the lifetime and security parameter of the issuer certificate takes
+        /// - A change of the lifetime and security parameter of the issuer certificate takes
         /// effect on the next Issuer CA key generation.
         /// - A change in lifetime for issued certificates takes effect on the next request approval.
         /// In general, security parameters should not be changed after a security group is established.
-        /// Instead, a new certificate group with new parameters shoudl be created for all subsequent
+        /// Instead, a new certificate group with new parameters should be created for all subsequent
         /// operations.
         /// Requires manager role.
         /// </remarks>
