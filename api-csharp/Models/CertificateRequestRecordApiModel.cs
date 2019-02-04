@@ -31,7 +31,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models
         /// class.
         /// </summary>
         /// <param name="state">Possible values include: 'new', 'approved',
-        /// 'rejected', 'accepted', 'deleted', 'revoked'</param>
+        /// 'rejected', 'accepted', 'deleted', 'revoked', 'removed'</param>
         public CertificateRequestRecordApiModel(CertificateRequestState state, bool signingRequest, string requestId = default(string), string applicationId = default(string), string certificateGroupId = default(string), string certificateTypeId = default(string), string subjectName = default(string), IList<string> domainNames = default(IList<string>), string privateKeyFormat = default(string))
         {
             RequestId = requestId;
@@ -63,7 +63,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models
 
         /// <summary>
         /// Gets possible values include: 'new', 'approved', 'rejected',
-        /// 'accepted', 'deleted', 'revoked'
+        /// 'accepted', 'deleted', 'revoked', 'removed'
         /// </summary>
         [JsonProperty(PropertyName = "state")]
         public CertificateRequestState State { get; private set; }

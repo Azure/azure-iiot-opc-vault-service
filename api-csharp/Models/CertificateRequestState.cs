@@ -32,7 +32,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models
         [EnumMember(Value = "deleted")]
         Deleted,
         [EnumMember(Value = "revoked")]
-        Revoked
+        Revoked,
+        [EnumMember(Value = "removed")]
+        Removed
     }
     internal static class CertificateRequestStateEnumExtension
     {
@@ -57,6 +59,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models
                     return "deleted";
                 case CertificateRequestState.Revoked:
                     return "revoked";
+                case CertificateRequestState.Removed:
+                    return "removed";
             }
             return null;
         }
@@ -77,6 +81,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models
                     return CertificateRequestState.Deleted;
                 case "revoked":
                     return CertificateRequestState.Revoked;
+                case "removed":
+                    return CertificateRequestState.Removed;
             }
             return null;
         }
