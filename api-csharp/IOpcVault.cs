@@ -67,6 +67,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         /// <summary>
         /// Get application.
         /// </summary>
+        /// <remarks>
+        /// Returns the record of any application.
+        /// </remarks>
         /// <param name='applicationId'>
         /// The application id
         /// </param>
@@ -102,6 +105,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         /// <summary>
         /// Delete application.
         /// </summary>
+        /// <remarks>
+        /// Deletes the application record.
+        /// Certificate Requests associated with the application id are set in
+        /// the deleted state,
+        /// and will be revoked with the next CRL update.
+        /// Requires Manager role.
+        /// </remarks>
         /// <param name='applicationId'>
         /// The application id
         /// </param>
@@ -146,6 +156,15 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         /// <summary>
         /// Unregister application.
         /// </summary>
+        /// <remarks>
+        /// Unregisters the application record and all associated information.
+        /// The application record remains in the database in 'Unregistered'
+        /// state.
+        /// Certificate Requests associated with the application id are set to
+        /// the 'Deleted' state,
+        /// and will be revoked with the next CRL update.
+        /// Requires Writer role.
+        /// </remarks>
         /// <param name='applicationId'>
         /// The application id
         /// </param>
@@ -186,6 +205,10 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         /// <summary>
         /// Query applications by id.
         /// </summary>
+        /// <remarks>
+        /// A query model which supports the OPC UA Global Discovery Server
+        /// query.
+        /// </remarks>
         /// <param name='query'>
         /// </param>
         /// <param name='customHeaders'>
@@ -199,6 +222,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Api.Vault
         /// <summary>
         /// Query applications.
         /// </summary>
+        /// <remarks>
+        /// List applications that match the query model.
+        /// The returned model can contain a next page link if more results are
+        /// available.
+        /// </remarks>
         /// <param name='query'>
         /// The Application query parameters
         /// </param>
