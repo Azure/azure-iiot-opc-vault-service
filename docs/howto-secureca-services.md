@@ -23,11 +23,11 @@ The service defines the following roles:
 - **Approver**: The approver role is assigned to a user to approve or reject certificate requests. The role does not include any other role.
   - In addition to the Approver role to access the microservice the user must also have signing rights in Key Vault to be able to sign the certificates.
   - The Writer and Approver role should be assigned to different users.
-  - Ideally, Writer, Approver and Administrator role are assigned to different users. For additional security, a user with Approver role needs also Signing rights in KeyVault to issue certificates or to renew an Issuer CA certificate.
   - The main role of the Approver is the Approval of the generation and rejection of certificate requests.
 - **Administrator**: The administrator role is assigned to a user to manage the certificate groups. The role does not support the Approver role, but includes the Writer role.
   - The administrator can manage the certificate groups, change the configuration and revoke application certificates by issueing a new CRL.
-  - In addition to the service role, his role includes but is not limited to:
+  - Ideally, Writer, Approver and Administrator role are assigned to different users. For additional security, a user with Approver or Administrator role needs also Key Signing rights in KeyVault to issue certificates or to renew an Issuer CA certificate.
+  - In addition to the service role, his role includes also but is not limited to:
     1. Responsible for administering the implementation of the CA’s security practices.
     2. Management of the generation, revocation, and suspension of certificates. 
     3. Cryptographic key life cycle management (e.g. the renewal of the Issuer CA keys).
@@ -119,25 +119,31 @@ In **Azure**:
 - **Application Insights**: (optional) Monitoring solution for web service and application.
 - **AzureAD Application Registration**: A registration for the sample application, the service and the edge module.
 
+For the cloud services all hostnames, Resource Groups, Resource Names, Subscription Id, TenantId used to deploy the service should be documented. 
+
 In **IoT Edge** or local a **Server**:
 - **Global Discovery Server**: To support a factory network Global Discovery Server. 
-- 
+
+For the edge devices the hostnames and IP addresses and should be documented. 
+
 ### Document the Certification Authorities (CAs)
 
 The CA hierarchy documentation must contain all operated CAs including all related 
 subordinate CAs, parent CAs, and root CAs, even when they are not managed by the service. 
 An exhaustive set of all non-expired CA certificates may be provided instead of formal documentation.
 
-**Important note:** The OPC Vault sample application supports for download of all certificates used and prodcued in the service for documentation.
+**Important note:** The OPC Vault sample application supports for download of all certificates used and produced in the service for documentation.
 
 ### Document the issued certificates by all Certification Authorities (CAs)
 
 An exhaustive set of all certificates issued in the past 12 months should be provided for documentation.
 
+**Important note:** The OPC Vault sample application supports for download of all certificates used and produced in the service for documentation.
+
 ### Document the SOP for securely deleting cryptographic keys
 
 Key deletion may only rarely happen during the lifetime of a CA, this is why no user has KeyVault Certificate Delete 
-rights assigned and why there are no APIs exposed to delete an Issuer CA certificate. 
+right assigned and why there are no APIs exposed to delete an Issuer CA certificate. 
 The manual standard operating procedure for securely deleting certification authority cryptographic keys is only available by directly
 accessing the KeyVault in the Azure portal and by deleting the certificate group in KeyVault. To ensure immediate deletion
 [KeyVault soft delete](https://docs.microsoft.com/en-us/azure/key-vault/key-vault-ovw-soft-delete) should be disabled.
@@ -149,15 +155,16 @@ accessing the KeyVault in the Azure portal and by deleting the certificate group
 The OPC Vault service is an online Certification Authorities (CAs) that issues end entity certificates to subscribers.
 The Microservice follows these guidelines in the default implementation.
 
-1. All certificates must include the following X.509 fields as specified below:
+- All certificates must include the following X.509 fields as specified below:
   - The content of the version field must be v3. 
   - The contents of the serialNumber field must include at least 8 bytes of entropy obtained from a FIPS 140 approved random number generator.
+**Important Note:** The OPC Vault serial number is by default 20 byte and obtained from OS cryptographic random number generator. The random number generator is FIPS 140 approved o Windows devices, however not on Linux flavors. This fact needs to be considered when choosing a service deployment which uses Linux VMs or Linux docker containers, on which the underlying technology OpenSSL is usually not FIPS 140 approved.
   - The issuerUniqueID and subjectUniqueID fields must not be present.
-  - **Important Note:** The CRL Distribution Point (CDP) is not present in OPC OPC Vault CA Certificates, because there are custom methods used in OPC UA to distribute CRLs.
+**Important Note:** The CRL Distribution Point (CDP) is not present in OPC OPC Vault CA Certificates, because there are custom methods used in OPC UA to distribute CRLs.
   - End-entity certificates must be identified with the Basic Constraints extension in accordance with IETF RFC 5280.
   - The pathLenConstraint field must be set to 0 for the Issuing CA certificate. 
   - The Extended Key Usage extension must be present and contain the minimum set of Extended Key Usage object identifiers (OIDs). The anyExtendedKeyUsage OID (2.5.29.37.0) must not be specified. 
-1. Approved asymmetric algorithms, key lengths, hash functions and padding modes must be used.
+- Approved asymmetric algorithms, key lengths, hash functions and padding modes must be used.
   - **RSA** and **SHA-2** are the only supported algorithms (*).
   - RSA may be used for encryption, key exchange and signature.
   - RSA encryption must use only the OAEP, RSA-KEM, or RSA-PSS padding modes.
@@ -165,7 +172,7 @@ The Microservice follows these guidelines in the default implementation.
   - Use the SHA-2 family of hash algorithms (SHA256, SHA384, and SHA512).
   - RSA Root CA keys with a typical lifetime >= 20 years must be 4096 bits or greater.
   - RSA Issuer CA keys must be at least 2048 bits; if the CA certificate expiration date is after 2030, the CA key must be 4096 bits or greater.
-3. Certificate Lifetime
+- Certificate Lifetime
   - Root CA certificates: The maximum certificate validity period for root CAs must not exceed 25 years.
   - Sub CA or online Issuer CA certificates: The maximum certificate validity period for CAs that are online and issue only subscriber 
 certificates must not exceed 6 years. For these CAs the related private signature key must not be used longer than 3 years to issue new certificates. 
@@ -173,7 +180,7 @@ certificates must not exceed 6 years. For these CAs the related private signatur
   - All asymmetric keys must have a maximum five-year lifetime, recommended one-year lifetime. 
 **Important Note:** By default the lifetimes of application certificates issued with OpcVault have a lifetime of 2 years and should be replaced every year. 
   - Whenever a certificate is renewed, it is renewed with a new key.
-2. OPC UA specific extensions in application instance certificates
+- OPC UA specific extensions in application instance certificates
   - The subjectAltName extension includes the application Uri and hostnames, which may also include FQDN, IPv4 and IPv6 addresses.
   - The keyUsage includes digitalSignature, nonRepudiation, keyEncipherment and dataEncipherment.
   - The extendedKeyUsage includes serverAuth and/or clientAuth.
@@ -181,8 +188,8 @@ certificates must not exceed 6 years. For these CAs the related private signatur
 
 ### Certificate Authority (CA) keys and certificates must meet minimum requirements
 
--**Private keys**: **RSA** keys must be at least 2048 bits; if the CA certificate expiration date is after 2030, the CA key must be 4096 bits or greater.
--**Lifetime**: The maximum certificate validity period for CAs that are online and issue only subscriber certificates must not exceed 6 years. For these CAs the related private signature key must not be used longer than 3 years to issue new certificates.
+- **Private keys**: **RSA** keys must be at least 2048 bits; if the CA certificate expiration date is after 2030, the CA key must be 4096 bits or greater.
+- **Lifetime**: The maximum certificate validity period for CAs that are online and issue only subscriber certificates must not exceed 6 years. For these CAs the related private signature key must not be used longer than 3 years to issue new certificates.
 
 ### CA keys are protected using Hardware Security Modules (HSM)
 
@@ -214,6 +221,7 @@ The Issuer CA key generation in OPCVault is simplified due to the secure storage
 
 However, when an external Root certification authority is being used, 
 a Certificate Authority (CA) key generation ceremony must adhere to the following requirements:
+
 The CA key generation ceremony must be performed against a documented script that includes at least the following items: 
 1. Definition of roles and participant responsibilities
 2. Approval for conduct of the CA key generation ceremony
