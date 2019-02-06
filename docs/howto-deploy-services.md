@@ -11,7 +11,7 @@ The samples are all written for .NetStandard, which is needed to build the servi
 All the tools you need for .Net Standard come with the .Net Core tools. See [here](https://docs.microsoft.com/en-us/dotnet/articles/core/getting-started) for what you need.
 
 1. [Install .NET Core 2.1+][dotnet-install].
-2. [Install Docker][docker-url].
+2. [Install Docker][docker-url] (optional, only if the local docker build is required).
 4. Install the [Azure Command Line tools for PowerShell][powershell-install].
 5. Sign up for an [Azure Subscription][azure-free].
 
@@ -20,7 +20,8 @@ All the tools you need for .Net Standard come with the .Net Core tools. See [her
 If you have not done so yet, clone this Github repository.  Open a command prompt or terminal and run:
 
 ```bash
-git clone https://github.com/Azure/azure-iiot-opc-vault-service && cd azure-iiot-opc-vault-service 
+git clone https://github.com/Azure/azure-iiot-opc-vault-service
+cd azure-iiot-opc-vault-service 
 ```
 
 or clone the repo directly in Visual Studio 2017.
