@@ -305,7 +305,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
                 catch (Exception ex)
                 {
                     errorMessage =
-                    "Failed to create signing request." +
+                    "Failed to approve signing request." +
                     "Message: " + ex.Message;
                 }
                 return RedirectToAction("Details", new { id, errorMessage });

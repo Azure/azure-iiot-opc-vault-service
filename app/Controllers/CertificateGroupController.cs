@@ -44,12 +44,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
         /// List all certificate groups.
         /// </summary>
         [ActionName("Index")]
-        public async Task<ActionResult> IndexAsync()
+        public async Task<ActionResult> IndexAsync(string error)
         {
             AuthorizeClient();
             try
             {
                 var requests = await _opcVault.GetCertificateGroupsConfigurationAsync();
+                ViewData["ErrorMessage"] = error;
                 return View(requests.Groups);
             }
             catch (Exception ex)
@@ -228,10 +229,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
                 {
                     Certificates = certList.ToArray()
                 };
-                if (error != null)
-                {
-                    ViewData["ErrorMessage"] = error;
-                }
+                ViewData["ErrorMessage"] = error;
                 return View(modelCollection);
             }
             catch (Exception ex)
