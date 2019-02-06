@@ -31,6 +31,7 @@ A Powershell script provides an easy way to deploy the OPC UA Vault service and 
 
 1. Open a Powershell window at the repo root. 
 3. Go to the deploy folder `cd deploy`
+3. Choose a name for `myResourceGroup` which is unlikely to cause a conflict with other deployed web pages. See [below](#Website-name-already-in-use) how web page names are chosen based on the name of the resource group.
 5. Start the deployment with `.\deploy.ps1` for interactive installation<br>
 or enter a full command line:  
 `.\deploy.ps1  -subscriptionName "MySubscriptionName" -resourceGroupLocation "East US" -tenantId "myTenantId" -resourceGroupName "myResourceGroup"`
@@ -40,7 +41,7 @@ or enter a full command line:
 
 ```
 To access the web client go to:
-https://myResourceGroup-app.azurewebsites.net
+https://myResourceGroup.azurewebsites.net
 
 To access the web service go to:
 https://myResourceGroup-service.azurewebsites.net
@@ -53,8 +54,8 @@ To start the local dotnet GDS server:
 ```
 In case you run into issues please follow the steps [below](#Troubleshooting-deployment-failures).
 
-6. Give the web app and the web service a few minutes to start up for the first time.
-10. Open your favorite browser and open the application page: `https://myResourceGroup-app.azurewebsites.net`
+8. Open your favorite browser and open the application page: `https://myResourceGroup-app.azurewebsites.net`
+8. Give the web app and the web service a few minutes to warm up after deployment.
 11. To take a look at the Swagger Api open: `https://myResourceGroup-service.azurewebsites.net`
 13. To start a local GDS server with dotnet start `.\myResourceGroup-gds.cmd` or with docker start `.\myResourceGroup-dockergds.cmd`.
 
@@ -64,6 +65,18 @@ As a sidenote, it is possible to redeploy a build with exactly the same settings
 
 Please find an article describing how to use the Certificate Management Service [here](howto-use-cert-services.md).
 
+## Delete the Certificate management services from the subscription
+
+1. Sign in to the Azure portal: `https://portal.azure.com`.
+2. Go to the resource group in which the service was deployed.
+3. Select `Delete resource group` and confirm.
+4. After a short while all deployed servcie components are deleted.
+5. Now go to `Azure Active Directory/App registrations`.
+6. There should be 3 registrations listed for each deployed resource group with the following names:
+`resourcegroup-client`, `resourcegroup-module`, `resourcegroup-service`.
+Each registration needs to be deleted separately.
+7. Now all deployed components are removed.
+
 ## Troubleshooting deployment failures
 
 ### Resource group name
@@ -72,7 +85,8 @@ Ensure you use a short and simple resource group name.  The name is used also to
 
 ### Website name already in use
 
-It is possible that the name of the website is already in use.  If you run into this error, you need to use a different resource group name.
+It is possible that the name of the website is already in use.  If you run into this error, you need to use a different resource group name. The names in use by the deployment scrip are: https://resourcegroupname.azurewebsites.net and https://resourgroupname-service.azurewebsites.net.
+Other names of services are built by the combination of short name hashes and are unlikely to conflict with other services.
 
 ### Azure Active Directory (AAD) Registration 
 
