@@ -90,8 +90,8 @@ else
         </dd>
         <dt>Download as Base64</dt>
         <dd>
-            @Html.ActionLink("Issuer", "..\\CertificateRequest\\DownloadIssuerBase64", new { groupId = Model.Name }, htmlAttributes: new { @class = "btn btn-default" })
-            @Html.ActionLink("Crl", "..\\CertificateRequest\\DownloadIssuerCrlBase64", new { groupId = Model.Name }, htmlAttributes: new { @class = "btn btn-default" })
+            @Html.ActionLink("Issuer", "DownloadIssuerBase64", "CertificateRequest", new { groupId = Model.Name }, htmlAttributes: new { @class = "btn btn-default" })
+            @Html.ActionLink("Crl", "DownloadIssuerCrlBase64", "CertificateRequest", new { groupId = Model.Name }, htmlAttributes: new { @class = "btn btn-default" })
         </dd>
     </dl>
     <hr />

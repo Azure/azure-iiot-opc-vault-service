@@ -16,7 +16,7 @@
         </dt>
 
         <dd>
-            @Html.ActionLink(application.ApplicationName, "..\\Application\\Details", new { id = application.ApplicationId })
+            @Html.ActionLink(application.ApplicationName, "Details", "Application", new { id = application.ApplicationId })
         </dd>
 
         <dt>
@@ -24,7 +24,7 @@
         </dt>
 
         <dd>
-            @Html.ActionLink(application.ApplicationUri, "..\\Application\\Details", new { id = Model.ApplicationId })
+            @Html.ActionLink(application.ApplicationUri, "Details", "Application", new { id = Model.ApplicationId })
         </dd>
 
         <dt>

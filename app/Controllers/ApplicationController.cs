@@ -261,7 +261,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
                 }
             }
 
-            if (!String.IsNullOrWhiteSpace(apiModel.DiscoveryUrls.Last()) &&
+            if (apiModel.DiscoveryUrls != null &&
+                !String.IsNullOrWhiteSpace(apiModel.DiscoveryUrls.Last()) &&
                 command == "add")
             {
                 apiModel.DiscoveryUrls.Add("");

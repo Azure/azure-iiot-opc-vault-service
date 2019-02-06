@@ -51,10 +51,10 @@
                 @Html.ActionLink("Edit", "Register", new { id = item.ApplicationId }/*, new { @class = "btn btn-default" }*/) |
                 @Html.ActionLink("Details", "Details", new { id = item.ApplicationId })  |
                 @Html.ActionLink("Unregister", "Unregister", new { id = item.ApplicationId }) |
-                @Html.ActionLink("New Request", "..\\CertificateRequest\\Request", new { id = item.ApplicationId })
+                @Html.ActionLink("New Request", "Request", "CertificateRequest", new { id = item.ApplicationId })
                 <!--
-                    @Html.ActionLink("New KeyPair", "..\\CertificateRequest\\StartNewKeyPair", new { id = item.ApplicationId }) |
-                    @Html.ActionLink("New Certificate", "..\\CertificateRequest\\StartSigning", new { id = item.ApplicationId })
+                    @Html.ActionLink("New KeyPair", "StartNewKeyPair", "CertificateRequest", new { id = item.ApplicationId }) |
+                    @Html.ActionLink("New Certificate", "StartSigning", "CertificateRequest", new { id = item.ApplicationId })
                 -->
             </td>
         </tr>

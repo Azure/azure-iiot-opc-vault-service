@@ -28,10 +28,10 @@
     {
         <tr>
             <td>
-                @Html.ActionLink(request.ApplicationNameTrimmed, "..\\Application\\Details", new { id = request.ApplicationId })
+                @Html.ActionLink(request.ApplicationNameTrimmed, "Details", "Application", new { id = request.ApplicationId })
             </td>
             <td>
-                @Html.ActionLink(request.ApplicationUriTrimmed, "..\\Application\\Details", new { id = request.ApplicationId })
+                @Html.ActionLink(request.ApplicationUriTrimmed, "Details", "Application", new { id = request.ApplicationId })
             </td>
             <td>
                 @Html.DisplayFor(requestItem => request.State)

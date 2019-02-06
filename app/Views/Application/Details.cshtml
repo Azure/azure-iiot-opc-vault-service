@@ -114,7 +114,7 @@
 <p>
     @Html.ActionLink("Edit", "Register", new { id = Model.ApplicationId }, new { @class = "btn btn-default" })
     @Html.ActionLink("Unregister", "Unregister", new { id = Model.ApplicationId }, new { @class = "btn btn-default" })
-    @Html.ActionLink("Request New Certificate", "..\\CertificateRequest\\Request", new { id = Model.ApplicationId }, new { @class = "btn btn-default" })
+    @Html.ActionLink("Request New Certificate", "Request", "CertificateRequest", new { id = Model.ApplicationId }, new { @class = "btn btn-default" })
 </p>
 <p>
     <hr />
