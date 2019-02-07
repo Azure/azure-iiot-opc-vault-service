@@ -28,7 +28,7 @@ or clone the repo directly in Visual Studio 2017.
 
 ### Build and Deploy the Azure service on Windows
 
-A Powershell script provides an easy way to deploy the OPC UA Vault service and the application.<br>
+A Powershell script provides an easy way to deploy the OPC Vault microservice and the application.<br>
 
 1. Open a Powershell window at the repo root. 
 3. Go to the deploy folder `cd deploy`
@@ -86,7 +86,7 @@ Ensure you use a short and simple resource group name.  The name is used also to
 
 ### Website name already in use
 
-It is possible that the name of the website is already in use.  If you run into this error, you need to use a different resource group name. The names in use by the deployment scrip are: https://resourcegroupname.azurewebsites.net and https://resourgroupname-service.azurewebsites.net.
+It is possible that the name of the website is already in use.  If you run into this error, you need to use a different resource group name. The hostnames in use by the deployment script are: https://resourcegroupname.azurewebsites.net and https://resourgroupname-service.azurewebsites.net.
 Other names of services are built by the combination of short name hashes and are unlikely to conflict with other services.
 
 ### Azure Active Directory (AAD) Registration 
@@ -144,7 +144,7 @@ AAD tenant to use.
 Optional, to deploy for development. Use debug build and set the ASP.Net Environment to Development. Create .publishsettings for import in Visual Studio 2017 to allow to deploy the app and the service directly.
 
 ```
--onlyBuild
+-onlyBuild 0|1
 ```
 
 Optional, to rebuild and to redeploy only the web apps and to rebuild the docker containers.
