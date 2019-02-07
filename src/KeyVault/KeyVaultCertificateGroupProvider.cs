@@ -360,7 +360,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         /// <summary>
         /// Creates a new key pair with KeyVault and signs it with KeyVault.
         /// </summary>
-        public async Task<Opc.Ua.Gds.Server.X509Certificate2KeyPair> NewKeyPairRequestKeyVaultCertAsync(
+        public override async Task<Opc.Ua.Gds.Server.X509Certificate2KeyPair> NewKeyPairRequestAsync(
             ApplicationRecordDataType application,
             string subjectName,
             string[] domainNames,
@@ -406,7 +406,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         /// <summary>
         /// Creates a new key pair with KeyVault and signs it with KeyVault.
         /// </summary>
-        public override async Task<Opc.Ua.Gds.Server.X509Certificate2KeyPair> NewKeyPairRequestAsync(
+        public async Task<Opc.Ua.Gds.Server.X509Certificate2KeyPair> NewKeyPairRequestKeyVaultCertAsync(
             ApplicationRecordDataType application,
             string subjectName,
             string[] domainNames,
@@ -418,7 +418,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
             DateTime notBefore = TrimmedNotBeforeDate();
             DateTime notAfter = notBefore.AddMonths(Configuration.DefaultCertificateLifetime);
             // create new cert with KeyVault
-            using (var signedCertWithPrivateKey = await _keyVaultServiceClient.CreateSignedKeyPairKeyAsync(
+            using (var signedCertWithPrivateKey = await _keyVaultServiceClient.CreateSignedKeyPairCertAsync(
                 Configuration.Id,
                 Certificate,
                 application.ApplicationUri,
