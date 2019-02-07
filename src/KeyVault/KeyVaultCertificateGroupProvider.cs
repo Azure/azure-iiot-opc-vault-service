@@ -358,53 +358,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         }
 
         /// <summary>
-        /// Creates a new key pair with KeyVault and signs it with KeyVault.
-        /// </summary>
-        public override async Task<Opc.Ua.Gds.Server.X509Certificate2KeyPair> NewKeyPairRequestAsync(
-            ApplicationRecordDataType application,
-            string subjectName,
-            string[] domainNames,
-            string privateKeyFormat,
-            string privateKeyPassword)
-        {
-            await LoadPublicAssets().ConfigureAwait(false);
-
-            DateTime notBefore = TrimmedNotBeforeDate();
-            DateTime notAfter = notBefore.AddMonths(Configuration.DefaultCertificateLifetime);
-            // create new cert with KeyVault
-            using (var signedCertWithPrivateKey = await _keyVaultServiceClient.CreateSignedKeyPairCertAsync(
-                Configuration.Id,
-                Certificate,
-                application.ApplicationUri,
-                application.ApplicationNames.Count > 0 ? application.ApplicationNames[0].Text : "ApplicationName",
-                subjectName,
-                domainNames,
-                notBefore,
-                notAfter,
-                Configuration.DefaultCertificateKeySize,
-                Configuration.DefaultCertificateHashSize,
-                new KeyVaultSignatureGenerator(_keyVaultServiceClient, _caCertKeyIdentifier, Certificate)
-                ).ConfigureAwait(false))
-            {
-                byte[] privateKey;
-                if (privateKeyFormat == "PFX")
-                {
-                    privateKey = signedCertWithPrivateKey.Export(X509ContentType.Pfx, privateKeyPassword);
-                }
-                else if (privateKeyFormat == "PEM")
-                {
-                    privateKey = CertificateFactory.ExportPrivateKeyAsPEM(signedCertWithPrivateKey);
-                }
-                else
-                {
-                    throw new ServiceResultException(StatusCodes.BadInvalidArgument, "Invalid private key format");
-                }
-                return new Opc.Ua.Gds.Server.X509Certificate2KeyPair(new X509Certificate2(signedCertWithPrivateKey.RawData), privateKeyFormat, privateKey);
-            }
-        }
-
-        /// <summary>
-        /// Creates a new key pair with KeyVault and signs it with KeyVault.
+        /// Creates a new key pair as KeyVault certificate and signs it with KeyVault.
         /// </summary>
         public async Task<Opc.Ua.Gds.Server.X509Certificate2KeyPair> NewKeyPairRequestKeyVaultCertAsync(
             ApplicationRecordDataType application,
@@ -452,7 +406,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         /// <summary>
         /// Creates a new key pair with certificate offline and signs it with KeyVault.
         /// </summary>
-        public async Task<Opc.Ua.Gds.Server.X509Certificate2KeyPair> NewKeyPairRequestPureAsync(
+        public override async Task<Opc.Ua.Gds.Server.X509Certificate2KeyPair> NewKeyPairRequestAsync(
             ApplicationRecordDataType application,
             string subjectName,
             string[] domainNames,
