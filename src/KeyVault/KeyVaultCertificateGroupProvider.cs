@@ -21,10 +21,13 @@ using static Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault.KeyVaultCertFact
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
 {
+    /// <summary>
+    /// The certificate provider for a group where the Issuer CA cert and Crl are stored in KeyVault.
+    /// </summary>
     public sealed class KeyVaultCertificateGroupProvider : Opc.Ua.Gds.Server.CertificateGroup
     {
+        // the latest Crl of this cert group
         public X509CRL Crl;
-        public X509SignatureGenerator x509SignatureGenerator;
         public CertificateGroupConfigurationModel CertificateGroupConfiguration;
 
         private KeyVaultCertificateGroupProvider(
@@ -425,10 +428,17 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
             string privateKeyFormat,
             string privateKeyPassword)
         {
+            if (!privateKeyFormat.Equals("PFX", StringComparison.OrdinalIgnoreCase) &&
+                !privateKeyFormat.Equals("PEM", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new ServiceResultException(StatusCodes.BadInvalidArgument, "Invalid private key format");
+            }
+
+
             DateTime notBefore = DateTime.UtcNow.AddDays(-1);
             // create public/private key pair
             using (RSA keyPair = RSA.Create(Configuration.DefaultCertificateKeySize))
-            { 
+            {
                 await LoadPublicAssets().ConfigureAwait(false);
 
                 string authorityInformationAccess = BuildAuthorityInformationAccessUrl();
@@ -451,11 +461,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
                 using (var signedCertWithPrivateKey = CreateCertificateWithPrivateKey(signedCert, keyPair))
                 {
                     byte[] privateKey;
-                    if (privateKeyFormat == "PFX")
+                    if (privateKeyFormat.Equals("PFX", StringComparison.OrdinalIgnoreCase))
                     {
                         privateKey = signedCertWithPrivateKey.Export(X509ContentType.Pfx, privateKeyPassword);
                     }
-                    else if (privateKeyFormat == "PEM")
+                    else if (privateKeyFormat.Equals("PEM", StringComparison.OrdinalIgnoreCase))
                     {
                         privateKey = CertificateFactory.ExportPrivateKeyAsPEM(signedCertWithPrivateKey);
                     }
@@ -463,7 +473,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
                     {
                         throw new ServiceResultException(StatusCodes.BadInvalidArgument, "Invalid private key format");
                     }
-
                     return new Opc.Ua.Gds.Server.X509Certificate2KeyPair(new X509Certificate2(signedCertWithPrivateKey.RawData), privateKeyFormat, privateKey);
                 }
             }
@@ -596,7 +605,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
                 _caCertSecretIdentifier,
                 Certificate);
 #else
-            throw new NotSupportedException("Loading a private key from key Vault is not supported.");
+            throw new NotSupportedException("Loading a private key from Key Vault is not supported.");
 #endif
         }
         private async Task LoadPublicAssets()
@@ -636,9 +645,19 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
 
         private static void ValidateConfiguration(CertificateGroupConfigurationModel update)
         {
+            char[] delimiters = new char[] { ' ', '\r', '\n' };
+            var updateIdWords = update.Id.Split(delimiters, StringSplitOptions.RemoveEmptyEntries);
+
+            if (updateIdWords.Length != 1)
+            {
+                throw new ArgumentException("Invalid number of words in group Id");
+            }
+
+            update.Id = updateIdWords[0];
+
             if (!update.Id.All(char.IsLetterOrDigit))
             {
-                throw new ArgumentException("Invalid Id");
+                throw new ArgumentException("Invalid characters in group Id");
             }
 
             // verify subject 
@@ -647,6 +666,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
                 subjectList.Count == 0)
             {
                 throw new ArgumentException("Invalid Subject");
+            }
+
+            if (!subjectList.Any(c => c.StartsWith("CN=", StringComparison.InvariantCulture)))
+            {
+                throw new ArgumentException("Invalid Subject, must have a common name entry");
             }
 
             try
@@ -674,28 +698,33 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
                 update.DefaultCertificateKeySize % 1024 != 0 ||
                 update.DefaultCertificateKeySize > 2048)
             {
-                throw new ArgumentException("Invalid key size");
+                throw new ArgumentException("Invalid key size, must be 2048, 3072 or 4096");
             }
 
             if (update.IssuerCACertificateKeySize < 2048 ||
                 update.IssuerCACertificateKeySize % 1024 != 0 ||
                 update.IssuerCACertificateKeySize > 4096)
             {
-                throw new ArgumentException("Invalid key size");
+                throw new ArgumentException("Invalid key size, must be 2048, 3072 or 4096");
+            }
+
+            if (update.DefaultCertificateKeySize <= update.IssuerCACertificateKeySize)
+            {
+                throw new ArgumentException("Invalid key size, Isser CA key must be >= application key");
             }
 
             if (update.DefaultCertificateHashSize < 256 ||
                 update.DefaultCertificateHashSize % 128 != 0 ||
                 update.DefaultCertificateHashSize > 512)
             {
-                throw new ArgumentException("Invalid hash size");
+                throw new ArgumentException("Invalid hash size, must be 256, 384 or 512");
             }
 
             if (update.IssuerCACertificateHashSize < 256 ||
                 update.IssuerCACertificateHashSize % 128 != 0 ||
                 update.IssuerCACertificateHashSize > 512)
             {
-                throw new ArgumentException("Invalid hash size");
+                throw new ArgumentException("Invalid hash size, must be 256, 384 or 512");
             }
         }
 
@@ -791,17 +820,17 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         /// </summary>
         private static Org.BouncyCastle.Crypto.Parameters.RsaPrivateCrtKeyParameters GetPrivateKeyParameter(RSA rsaKey)
         {
-                RSAParameters rsaParams = rsaKey.ExportParameters(true);
-                var keyParams = new Org.BouncyCastle.Crypto.Parameters.RsaPrivateCrtKeyParameters(
-                    new Org.BouncyCastle.Math.BigInteger(1, rsaParams.Modulus),
-                    new Org.BouncyCastle.Math.BigInteger(1, rsaParams.Exponent),
-                    new Org.BouncyCastle.Math.BigInteger(1, rsaParams.D),
-                    new Org.BouncyCastle.Math.BigInteger(1, rsaParams.P),
-                    new Org.BouncyCastle.Math.BigInteger(1, rsaParams.Q),
-                    new Org.BouncyCastle.Math.BigInteger(1, rsaParams.DP),
-                    new Org.BouncyCastle.Math.BigInteger(1, rsaParams.DQ),
-                    new Org.BouncyCastle.Math.BigInteger(1, rsaParams.InverseQ));
-                return keyParams;
+            RSAParameters rsaParams = rsaKey.ExportParameters(true);
+            var keyParams = new Org.BouncyCastle.Crypto.Parameters.RsaPrivateCrtKeyParameters(
+                new Org.BouncyCastle.Math.BigInteger(1, rsaParams.Modulus),
+                new Org.BouncyCastle.Math.BigInteger(1, rsaParams.Exponent),
+                new Org.BouncyCastle.Math.BigInteger(1, rsaParams.D),
+                new Org.BouncyCastle.Math.BigInteger(1, rsaParams.P),
+                new Org.BouncyCastle.Math.BigInteger(1, rsaParams.Q),
+                new Org.BouncyCastle.Math.BigInteger(1, rsaParams.DP),
+                new Org.BouncyCastle.Math.BigInteger(1, rsaParams.DQ),
+                new Org.BouncyCastle.Math.BigInteger(1, rsaParams.InverseQ));
+            return keyParams;
         }
 
         private DateTime TrimmedNotBeforeDate()
