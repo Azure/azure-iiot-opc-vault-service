@@ -20,7 +20,6 @@ using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Microsoft.Rest;
 using Opc.Ua;
-using static Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault.KeyVaultCertFactory;
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
 {
@@ -29,8 +28,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         public X509Certificate2 Certificate { get; set; }
         public string KeyIdentifier { get; set; }
     }
+
     /// <summary>
-    ///
+    /// The KeyVault service client.
     /// </summary>
     public class KeyVaultServiceClient
     {
@@ -52,7 +52,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         public const string GroupSecret = "groups";
 
         /// <summary>
-        ///
+        /// Create the service client for KeyVault, with user or service credentials.
         /// </summary>
         /// <param name="vaultBaseUrl">The Url of the Key Vault.</param>
         /// <param name="keyStoreHSM">The KeyVault is HSM backed.</param>
@@ -490,6 +490,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
             int keySize,
             int hashSize,
             KeyVaultSignatureGenerator generator,
+            string authorityInformationAccess,
             CancellationToken ct = default)
         {
             CertificateOperation createResult = null;
@@ -538,7 +539,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
                     (ushort)hashSize,
                     issuerCert,
                     publicKey,
-                    generator);
+                    generator,
+                    extensionUrl: authorityInformationAccess);
 
                 // merge signed cert with keystore
                 var mergeResult = await _keyVaultClient.MergeCertificateAsync(
