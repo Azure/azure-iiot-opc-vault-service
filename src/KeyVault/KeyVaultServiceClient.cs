@@ -48,17 +48,21 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         public const string TagIssuerList = "Issuer";
         public const string TagTrustedList = "Trusted";
 
-        // TODO: make group secret name configurable
-        public const string GroupSecret = "groups";
-
         /// <summary>
         /// Create the service client for KeyVault, with user or service credentials.
         /// </summary>
+        /// <param name="groupSecret">The name of the secret for group configuration</param>
         /// <param name="vaultBaseUrl">The Url of the Key Vault.</param>
         /// <param name="keyStoreHSM">The KeyVault is HSM backed.</param>
         /// <param name="logger">The logger.</param>
-        public KeyVaultServiceClient(string vaultBaseUrl, bool keyStoreHSM, ILogger logger)
+        public KeyVaultServiceClient(
+            string groupSecret,
+            string vaultBaseUrl,
+            bool keyStoreHSM,
+            ILogger logger
+            )
         {
+            _groupSecret = groupSecret;
             _vaultBaseUrl = vaultBaseUrl;
             _keyStoreHSM = keyStoreHSM;
             _logger = logger;
@@ -136,7 +140,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         /// </summary>
         public async Task<string> GetCertificateConfigurationGroupsAsync(CancellationToken ct = default)
         {
-            SecretBundle secret = await _keyVaultClient.GetSecretAsync(_vaultBaseUrl, GroupSecret, ct).ConfigureAwait(false);
+            SecretBundle secret = await _keyVaultClient.GetSecretAsync(_vaultBaseUrl, _groupSecret, ct).ConfigureAwait(false);
             return secret.Value;
         }
 
@@ -145,7 +149,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         /// </summary>
         public async Task<string> PutCertificateConfigurationGroupsAsync(string json, CancellationToken ct = default)
         {
-            SecretBundle secret = await _keyVaultClient.SetSecretAsync(_vaultBaseUrl, GroupSecret, json, null, ContentTypeJson, null, ct).ConfigureAwait(false);
+            SecretBundle secret = await _keyVaultClient.SetSecretAsync(_vaultBaseUrl, _groupSecret, json, null, ContentTypeJson, null, ct).ConfigureAwait(false);
             return secret.Value;
         }
 
@@ -374,6 +378,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
                 // intentionally ignore errors
             }
 
+            string caTempCertIdentifier = null;
+
             try
             {
                 // policy self signed, new key
@@ -399,7 +405,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
                 }
                 var createdCertificateBundle = await _keyVaultClient.GetCertificateAsync(_vaultBaseUrl, id).ConfigureAwait(false);
                 var caCertKeyIdentifier = createdCertificateBundle.KeyIdentifier.Identifier;
-                var caTempCertIdentifier = createdCertificateBundle.CertificateIdentifier.Identifier;
+                caTempCertIdentifier = createdCertificateBundle.CertificateIdentifier.Identifier;
 
                 // policy unknown issuer, reuse key
                 var policyUnknownReuse = CreateCertificatePolicy(subject, keySize, false, true);
@@ -455,18 +461,31 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
                     new X509Certificate2Collection(signedcert)
                     );
 
-                // disable the temp cert for self signing operation
-                var attr = new CertificateAttributes()
-                {
-                    Enabled = false
-                };
-                await _keyVaultClient.UpdateCertificateAsync(caTempCertIdentifier, null, attr);
-
                 return signedcert;
             }
-            catch
+            catch (KeyVaultErrorException kex)
             {
+                var ex = kex;
                 throw new ServiceResultException(StatusCodes.BadInternalError, "Failed to create new Root CA certificate");
+            }
+            finally
+            {
+                if (caTempCertIdentifier != null)
+                {
+                    try
+                    {
+                        // disable the temp cert for self signing operation
+                        var attr = new CertificateAttributes()
+                        {
+                            Enabled = false
+                        };
+                        await _keyVaultClient.UpdateCertificateAsync(caTempCertIdentifier, null, attr);
+                    }
+                    catch
+                    {
+                        // intentionally ignore error
+                    }
+                }
             }
         }
 
@@ -851,13 +870,15 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         /// <summary>
         /// Purge all CRL and Certificates groups. Use for unit test only!
         /// </summary>
-        public async Task PurgeAsync(CancellationToken ct = default)
+        public async Task PurgeAsync(string configId = null, string groupId = null, CancellationToken ct = default)
         {
             var secretItems = await _keyVaultClient.GetSecretsAsync(_vaultBaseUrl, MaxResults, ct).ConfigureAwait(false);
             while (secretItems != null)
             {
                 foreach (var secretItem in secretItems.Where(s =>
-                    (s.ContentType == ContentTypeCrl || s.ContentType == ContentTypePem || s.ContentType == ContentTypePfx)
+                    ((s.ContentType == ContentTypeCrl || s.ContentType == ContentTypePem || s.ContentType == ContentTypePfx) &&
+                    (groupId == null || s.Identifier.Name.StartsWith(groupId, StringComparison.OrdinalIgnoreCase))) ||
+                    s.Identifier.Name.Equals(configId, StringComparison.OrdinalIgnoreCase)
                     ))
                 {
                     try
@@ -886,16 +907,19 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
             {
                 foreach (var certItem in certItems)
                 {
-                    try
+                    if (groupId == null ||
+                        groupId.Equals(certItem.Identifier.Name, StringComparison.OrdinalIgnoreCase))
                     {
-                        var deletedCertBundle = await _keyVaultClient.DeleteCertificateAsync(_vaultBaseUrl, certItem.Identifier.Name, ct);
-                        await _keyVaultClient.PurgeDeletedCertificateAsync(_vaultBaseUrl, certItem.Identifier.Name, ct);
+                        try
+                        {
+                            var deletedCertBundle = await _keyVaultClient.DeleteCertificateAsync(_vaultBaseUrl, certItem.Identifier.Name, ct);
+                            await _keyVaultClient.PurgeDeletedCertificateAsync(_vaultBaseUrl, certItem.Identifier.Name, ct);
+                        }
+                        catch
+                        {
+                            // intentionally fall through, purge may fail
+                        }
                     }
-                    catch
-                    {
-                        // intentionally fall through, purge may fail
-                    }
-
                 }
                 if (certItems.NextPageLink != null)
                 {
@@ -1033,6 +1057,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
             throw new Exception("Unknown Private Key format.");
         }
 
+        private readonly string _groupSecret;
         private readonly string _vaultBaseUrl;
         private readonly bool _keyStoreHSM;
         private IKeyVaultClient _keyVaultClient;

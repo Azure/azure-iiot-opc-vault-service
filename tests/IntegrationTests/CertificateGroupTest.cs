@@ -33,9 +33,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
         public ApplicationTestDataGenerator RandomGenerator;
         public KeyVaultCertificateGroup KeyVault;
         public bool KeyVaultInitOk;
+        private readonly string _configId;
+        private readonly string _groupId;
 
         const int _randomStart = 3388;
         const int _testSetSize = 10;
+
+
 
         public CertificateGroupTestFixture()
         {
@@ -50,7 +54,14 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
             if (!InvalidConfiguration())
             {
                 RandomGenerator = new ApplicationTestDataGenerator();
-                KeyVault = new KeyVaultCertificateGroup(_serviceConfig, _clientConfig, _logger);
+
+                var timeid = (DateTime.UtcNow.ToFileTimeUtc() / 1000) % 10000;
+                _groupId = "GroupTestIssuerCA" + timeid.ToString();
+                _configId = "GroupTestConfig" + timeid.ToString();
+                var keyVaultServiceClient = KeyVaultServiceClient.Get(_configId, _serviceConfig, _clientConfig, _logger);
+                KeyVault = new KeyVaultCertificateGroup(keyVaultServiceClient, _serviceConfig, _clientConfig, _logger);
+                KeyVault.PurgeAsync(_configId, _groupId).Wait();
+                KeyVault.CreateCertificateGroupConfiguration(_groupId, "CN=OPC Vault Cert Request Test CA, O=Microsoft, OU=Azure IoT", null).Wait();
             }
             KeyVaultInitOk = false;
         }
@@ -71,6 +82,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
 
         public void Dispose()
         {
+            KeyVault?.PurgeAsync(_configId, _groupId).Wait();
         }
     }
 

@@ -8,12 +8,14 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.IIoT.Exceptions;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Models;
+using Microsoft.Azure.KeyVault.Models;
 using Newtonsoft.Json;
 using Opc.Ua;
 using Opc.Ua.Gds;
@@ -32,30 +34,35 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
 
         private KeyVaultCertificateGroupProvider(
             KeyVaultServiceClient keyVaultServiceClient,
-            CertificateGroupConfigurationModel certificateGroupConfiguration
-            )
-            :
+            CertificateGroupConfigurationModel certificateGroupConfiguration,
+            string serviceHost
+            ) :
             base(null, certificateGroupConfiguration.ToGdsServerModel())
         {
             _keyVaultServiceClient = keyVaultServiceClient;
             CertificateGroupConfiguration = certificateGroupConfiguration;
+            _serviceHost = serviceHost ?? "localhost";
             Certificate = null;
             Crl = null;
         }
 
         public static KeyVaultCertificateGroupProvider Create(
                 KeyVaultServiceClient keyVaultServiceClient,
-                CertificateGroupConfigurationModel certificateGroupConfiguration)
+                CertificateGroupConfigurationModel certificateGroupConfiguration,
+                string serviceHost
+            )
         {
-            return new KeyVaultCertificateGroupProvider(keyVaultServiceClient, certificateGroupConfiguration);
+            return new KeyVaultCertificateGroupProvider(keyVaultServiceClient, certificateGroupConfiguration, serviceHost);
         }
 
         public static async Task<KeyVaultCertificateGroupProvider> Create(
             KeyVaultServiceClient keyVaultServiceClient,
-            string id)
+            string id,
+            string serviceHost
+            )
         {
             var certificateGroupConfiguration = await GetCertificateGroupConfiguration(keyVaultServiceClient, id);
-            return new KeyVaultCertificateGroupProvider(keyVaultServiceClient, certificateGroupConfiguration);
+            return new KeyVaultCertificateGroupProvider(keyVaultServiceClient, certificateGroupConfiguration, serviceHost);
         }
 
         public static async Task<string[]> GetCertificateGroupIds(
@@ -122,9 +129,21 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
             {
                 throw new ArgumentException("groupid doesn't match config id");
             }
-            string json = await keyVaultServiceClient.GetCertificateConfigurationGroupsAsync().ConfigureAwait(false);
-            List<CertificateGroupConfigurationModel> certificateGroupCollection =
-                JsonConvert.DeserializeObject<List<CertificateGroupConfigurationModel>>(json);
+            string json;
+            IList<CertificateGroupConfigurationModel> certificateGroupCollection = new List<CertificateGroupConfigurationModel>();
+            try
+            {
+                json = await keyVaultServiceClient.GetCertificateConfigurationGroupsAsync().ConfigureAwait(false);
+                certificateGroupCollection =
+                    JsonConvert.DeserializeObject<List<CertificateGroupConfigurationModel>>(json);
+            }
+            catch (KeyVaultErrorException kex)
+            {
+                if (kex.Response.StatusCode != HttpStatusCode.NotFound)
+                {
+                    throw kex;
+                }
+            }
 
             var original = certificateGroupCollection.SingleOrDefault(cg => String.Equals(cg.Id, id, StringComparison.OrdinalIgnoreCase));
             if (original != null)
@@ -624,15 +643,17 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         {
             var config = new CertificateGroupConfigurationModel()
             {
-                Id = id,
-                SubjectName = subject,
+                Id = id ?? "Default",
+                SubjectName = subject ?? "CN=Azure Industrial IoT CA, O=Microsoft Corp.",
                 CertificateType = CertTypeMap()[Opc.Ua.ObjectTypeIds.RsaSha256ApplicationCertificateType],
                 DefaultCertificateLifetime = 24,
                 DefaultCertificateHashSize = 256,
                 DefaultCertificateKeySize = 2048,
                 IssuerCACertificateLifetime = 60,
                 IssuerCACertificateHashSize = 256,
-                IssuerCACertificateKeySize = 2048
+                IssuerCACertificateKeySize = 2048,
+                IssuerCACrlDistributionPoint = "http://%servicehost%/certs/crl/%serial%/%group%.crl",
+                IssuerCAAuthorityInformationAccess = "http://%servicehost%/certs/issuer/%serial%/%group%.cer"
             };
             if (certType != null)
             {
@@ -708,7 +729,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
                 throw new ArgumentException("Invalid key size, must be 2048, 3072 or 4096");
             }
 
-            if (update.DefaultCertificateKeySize <= update.IssuerCACertificateKeySize)
+            if (update.DefaultCertificateKeySize > update.IssuerCACertificateKeySize)
             {
                 throw new ArgumentException("Invalid key size, Isser CA key must be >= application key");
             }
@@ -859,11 +880,12 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
 
         private string PatchEndpointUrl(string endPointUrl)
         {
-            //var patch1 = endPointUrl.Replace("%servicehost%", serviceHost);
-            return endPointUrl.Replace("%group%", Configuration.Id.ToLower());
+            var patchedServiceHost = endPointUrl.Replace("%servicehost%", _serviceHost);
+            return patchedServiceHost.Replace("%group%", Configuration.Id.ToLower());
         }
 
         private KeyVaultServiceClient _keyVaultServiceClient;
+        private string _serviceHost;
         private string _caCertSecretIdentifier;
         private string _caCertKeyIdentifier;
         private DateTime _lastUpdate;
