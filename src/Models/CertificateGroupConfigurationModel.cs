@@ -75,7 +75,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Models
         /// <summary>
         /// The endpoint URL for the Issuer CA Authority Information Access.
         /// The names %servicehost%, %serial% and %group% are replaced with cert values.
-        /// default: "http://%servicehost%/certs/issuer/%serial%/%group%.cer"
+        /// default: 'http://%servicehost%/certs/issuer/%serial%/%group%.cer'
         /// </summary>
         [JsonProperty(PropertyName = "issuerCAAuthorityInformationAccess", Order = 100)]
         public string IssuerCAAuthorityInformationAccess { get; set; }

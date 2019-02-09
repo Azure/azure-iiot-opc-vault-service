@@ -3,7 +3,7 @@
         //
         // The host name which is used as CRL Distribution Point or for Authority Information
         //
-        // "ServiceHostName": "",
+        "ServiceHost": "test.host.org",
         //
         // KeyVault service uri from Azure portal
         //

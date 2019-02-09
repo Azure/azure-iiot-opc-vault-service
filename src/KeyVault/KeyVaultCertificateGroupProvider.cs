@@ -694,6 +694,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
                 throw new ArgumentException("Invalid Subject, must have a common name entry");
             }
 
+            // enforce proper formatting for the subject name string
+            update.SubjectName = string.Join(", ", subjectList);
+
             try
             {
                 // only allow specific cert types for now
@@ -806,7 +809,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
             {
                 var random = new Org.BouncyCastle.Security.SecureRandom(cfrg);
                 Org.BouncyCastle.X509.X509Certificate x509 = new Org.BouncyCastle.X509.X509CertificateParser().ReadCertificate(certificate.RawData);
-                return CreateCertificateWithPrivateKey(x509, GetPrivateKeyParameter(privatekey), random);
+                return CreateCertificateWithPrivateKey(x509, certificate.FriendlyName, GetPrivateKeyParameter(privatekey), random);
             }
         }
 
@@ -816,6 +819,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         /// </summary>
         private static X509Certificate2 CreateCertificateWithPrivateKey(
             Org.BouncyCastle.X509.X509Certificate certificate,
+            string friendlyName,
             Org.BouncyCastle.Crypto.AsymmetricKeyParameter privateKey,
             Org.BouncyCastle.Security.SecureRandom random)
         {
@@ -828,11 +832,28 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
                 var chain = new Org.BouncyCastle.Pkcs.X509CertificateEntry[1];
                 string passcode = Guid.NewGuid().ToString();
                 chain[0] = new Org.BouncyCastle.Pkcs.X509CertificateEntry(certificate);
-                pkcsStore.SetKeyEntry("PrivateKey", new Org.BouncyCastle.Pkcs.AsymmetricKeyEntry(privateKey), chain);
+                if (string.IsNullOrEmpty(friendlyName))
+                {
+                    friendlyName = GetCertificateCommonName(certificate);
+                }
+                pkcsStore.SetKeyEntry(friendlyName, new Org.BouncyCastle.Pkcs.AsymmetricKeyEntry(privateKey), chain);
                 pkcsStore.Save(pfxData, passcode.ToCharArray(), random);
                 // merge into X509Certificate2
                 return CertificateFactory.CreateCertificateFromPKCS12(pfxData.ToArray(), passcode);
             }
+        }
+
+        /// <summary>
+        /// Read the Common Name from a certificate.
+        /// </summary>
+        private static string GetCertificateCommonName(Org.BouncyCastle.X509.X509Certificate certificate)
+        {
+            var subjectDN = certificate.SubjectDN.GetValueList(Org.BouncyCastle.Asn1.X509.X509Name.CN);
+            if (subjectDN.Count > 0)
+            {
+                return subjectDN[0].ToString();
+            }
+            return string.Empty;
         }
 
         /// <summary>
