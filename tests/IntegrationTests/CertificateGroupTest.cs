@@ -33,13 +33,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
         public ApplicationTestDataGenerator RandomGenerator;
         public KeyVaultCertificateGroup KeyVault;
         public bool KeyVaultInitOk;
-        private readonly string _configId;
-        private readonly string _groupId;
+        public readonly string ConfigId;
+        public readonly string GroupId;
 
         const int _randomStart = 3388;
         const int _testSetSize = 10;
-
-
 
         public CertificateGroupTestFixture()
         {
@@ -56,12 +54,12 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
                 RandomGenerator = new ApplicationTestDataGenerator();
 
                 var timeid = (DateTime.UtcNow.ToFileTimeUtc() / 1000) % 10000;
-                _groupId = "GroupTestIssuerCA" + timeid.ToString();
-                _configId = "GroupTestConfig" + timeid.ToString();
-                var keyVaultServiceClient = KeyVaultServiceClient.Get(_configId, _serviceConfig, _clientConfig, _logger);
+                GroupId = "GroupTestIssuerCA" + timeid.ToString();
+                ConfigId = "GroupTestConfig" + timeid.ToString();
+                var keyVaultServiceClient = KeyVaultServiceClient.Get(ConfigId, _serviceConfig, _clientConfig, _logger);
                 KeyVault = new KeyVaultCertificateGroup(keyVaultServiceClient, _serviceConfig, _clientConfig, _logger);
-                KeyVault.PurgeAsync(_configId, _groupId).Wait();
-                KeyVault.CreateCertificateGroupConfiguration(_groupId, "CN=OPC Vault Cert Request Test CA, O=Microsoft, OU=Azure IoT", null).Wait();
+                KeyVault.PurgeAsync(ConfigId, GroupId).Wait();
+                KeyVault.CreateCertificateGroupConfiguration(GroupId, "CN=OPC Vault Cert Request Test CA, O=Microsoft, OU=Azure IoT", null).Wait();
             }
             KeyVaultInitOk = false;
         }
@@ -82,7 +80,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
 
         public void Dispose()
         {
-            KeyVault?.PurgeAsync(_configId, _groupId).Wait();
+            KeyVault?.PurgeAsync(ConfigId, GroupId).Wait();
         }
     }
 
@@ -117,7 +115,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
         private async Task KeyVaultPurgeCACertificateAsync()
         {
             Skip.If(!_fixture.KeyVaultInitOk);
-            await _keyVault.PurgeAsync();
+            await _keyVault.PurgeAsync(null, _fixture.GroupId);
         }
 
         /// <summary>
