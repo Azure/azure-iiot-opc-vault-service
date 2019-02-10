@@ -155,7 +155,7 @@ The Microservice follows these guidelines in the default implementation.
 - All certificates must include the following X.509 fields as specified below:
   - The content of the version field must be v3. 
   - The contents of the serialNumber field must include at least 8 bytes of entropy obtained from a FIPS 140 approved random number generator.<br>
-    **Important Note:** The OPC Vault serial number is by default 10 byte and obtained from OS cryptographic random number generator. The random number generator is FIPS 140 approved on Windows devices, however not on Linux flavors. This fact needs to be considered when choosing a service deployment which uses Linux VMs or Linux docker containers, on which the underlying technology OpenSSL is usually not FIPS 140 approved.
+    **Important Note:** The OPC Vault serial number is by default 20 byte and obtained from OS cryptographic random number generator. The random number generator is FIPS 140 approved on Windows devices, however not on Linux flavors. This fact needs to be considered when choosing a service deployment which uses Linux VMs or Linux docker containers, on which the underlying technology OpenSSL is usually not FIPS 140 approved.
   - The issuerUniqueID and subjectUniqueID fields must not be present.
   - End-entity certificates must be identified with the Basic Constraints extension in accordance with IETF RFC 5280.
   - The pathLenConstraint field must be set to 0 for the Issuing CA certificate. 
