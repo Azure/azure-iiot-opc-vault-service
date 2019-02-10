@@ -66,6 +66,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
         {
             _servicesConfig = servicesConfig;
             _clientConfig = clientConfig;
+            _serviceHost = _servicesConfig.ServiceHost;
             _keyVaultServiceClient = keyVaultServiceClient;
             _log = logger;
             _log.Debug("Creating new on behalf of instance of `KeyVault` service ", () => { });

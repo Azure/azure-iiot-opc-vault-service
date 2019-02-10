@@ -19,7 +19,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
 {
     public class KeyVaultCertFactory
     {
-        public const int SerialNumberLength = 20;
+        public const int SerialNumberLength = 10;
         public const int DefaultKeySize = 2048;
 
         /// <summary>
