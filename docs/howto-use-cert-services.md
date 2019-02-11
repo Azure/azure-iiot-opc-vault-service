@@ -67,7 +67,7 @@ In general, the CSR method is recommended, because it doesn't require a private 
 ![View Key Pair](ViewKeyPair.png "View Key Pair")
 
 7. The resulting private key (PFX or PEM) and certificate (DER) can be downloaded from here in the format selected as binary file download. A base64 encoded version is also available, e.g. to copy paste the certificate to a command line or text entry. 
-8. Once the private key is downloaded and stored securely, it can be deleted from the service with the `Delete Private Key` button. The certificate with public key remains available for future use.
+8. Once the private key is downloaded and stored securely, it can be deleted from the service with the `Delete Private Key` button. The certificate with the public key remains available for future use.
 9. Due to the use of a CA signed certificate, the CA cert and CRL should be downloaded here as well.
 10. Now it depends on the OPC UA device how to apply the new key pair. Typically, the CA cert and CRL are copied to a `trusted` folder, while the public and private key of the application certificate is applied to a `own` folder in the certificate store. Some devices may already support 'Server Push' for Certificate updates. Please refer to the documentation of your OPC UA device.
 
