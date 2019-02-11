@@ -128,13 +128,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
                 var subjectAltName = BuildSubjectAlternativeName(applicationUri, domainNames);
                 request.CertificateExtensions.Add(new X509Extension(subjectAltName, false));
 
-                if (extensionUrl != null)
+                if (issuerCAKeyCert != null &&
+                    extensionUrl != null)
                 {   // add Authority Information Access, if available
                     request.CertificateExtensions.Add(
-                        BuildX509AuthorityInformationAccess(new string[] { PatchExtensionUrl(extensionUrl, serialNumber) })
+                        BuildX509AuthorityInformationAccess(new string[] { PatchExtensionUrl(extensionUrl, issuerCAKeyCert.SerialNumber) })
                         );
                 }
-
             }
 
             if (issuerCAKeyCert != null)
@@ -671,13 +671,22 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         }
 
         /// <summary>
-        /// Patch serial number in a Url.
+        /// Patch serial number in a Url. byte version.
         /// </summary>
         private static string PatchExtensionUrl(string extensionUrl, byte[] serialNumber)
         {
-            string serial = BitConverter.ToString(serialNumber).Replace("-", "").ToLower();
-            return extensionUrl.Replace("%serial%", serial);
+            string serial = BitConverter.ToString(serialNumber).Replace("-", "");
+            return PatchExtensionUrl(extensionUrl, serial);
         }
+
+        /// <summary>
+        /// Patch serial number in a Url. string version.
+        /// </summary>
+        private static string PatchExtensionUrl(string extensionUrl, string serial)
+        {
+            return extensionUrl.Replace("%serial%", serial.ToLower());
+        }
+
     }
     /// <summary>
     /// The X509 signature generator to sign a digest with a KeyVault key.
