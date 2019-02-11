@@ -6,7 +6,7 @@
 
 ##### An overview of the OPC UA Certificate Management Service is [here](docs/opcvault-services-overview.md).
 
-The certificate management service for OPC UA facilitates the OPC Vault microservice to implement the CA certificate cloud service for OPC UA devices based on Azure Key Vault and CosmosDB, a ASP.Net Core sample web application front end and a OPC UA GDS server based on .Net Standard.
+The certificate management service for OPC UA facilitates the **OPC Vault Microservice** to implement the CA certificate cloud service for OPC UA devices based on Azure Key Vault and CosmosDB, a ASP.Net Core sample web application front end and a **OPC Vault Edge Module** to implement a OPC UA GDS server based on .Net Standard.
 
 ### This repository contains the following:
 
@@ -14,7 +14,7 @@ This repo contains all components required to run a CA in the Azure cloud for yo
 
 * **ASP.Net Core OPC Vault Microservice** to manage certificates with Azure Key Vault and CosmosDB.
 * **ASP.Net Sample Application** as user interface for the OPC Vault microservice.
-* **OPC UA .Net Standard GDS Server** for local OPC UA device connectivity to the OPC Vault microservice.
+* **OPC UA .Net Standard OPC Vault Edge Module**  as GDS server for local OPC UA device connectivity to the OPC Vault microservice.
 
 A Powershell deployment script automatically builds and deploys the services to your subscription. By default, security is configured for a production system. 
 
@@ -47,7 +47,7 @@ A Powershell deployment script automatically builds and deploys the services to 
 - Issues consolidated CRL updates for multiple unregistered applications in a single step, e.g. for weekly updates.
 - Accesses the OPC Vault microservice on behalf of the user to be able to execute protected functions in Azure Key Vault (e.g. signing rights for Approver).
 
-### On premise Global Discovery Server (GDS) with cloud integration
+### On premise OPC Vault Edge Module as Global Discovery Server (GDS) with cloud integration
 - Based on the GDS server common library of the OPC UA .NetStandard SDK.
 - Implements OPC UA Discovery and Certificate management services by connecting to the OPC Vault microservice.
 - Executes in a docker container or as a .Net Core 2.0 application on Windows or Linux.
