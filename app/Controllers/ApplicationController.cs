@@ -306,6 +306,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
             {
                 application.ApplicationNames[0] = new ApplicationNameApiModel(null, application.ApplicationName);
             }
+
             if (application.DiscoveryUrls != null)
             {
                 application.DiscoveryUrls = application.DiscoveryUrls.Where(x => !string.IsNullOrEmpty(x)).ToList();
@@ -313,11 +314,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
             else
             {
                 application.DiscoveryUrls = new List<string>();
-                if (application.DiscoveryUrls.Count == 0)
-                {
-                    application.DiscoveryUrls.Add("");
-                }
             }
+
+            if (application.DiscoveryUrls.Count == 0)
+            {
+                application.DiscoveryUrls.Add("");
+            }
+
         }
 
     }
