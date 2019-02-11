@@ -13,12 +13,14 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.IIoT.Diagnostics;
+using Microsoft.Azure.IIoT.Exceptions;
 using Microsoft.Azure.KeyVault;
 using Microsoft.Azure.KeyVault.Models;
 using Microsoft.Azure.KeyVault.WebKey;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Microsoft.Rest;
+using Microsoft.Rest.Azure;
 using Opc.Ua;
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
@@ -168,29 +170,55 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         /// Read all certificate versions of a CA certificate group.
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="thumbprint">filter for thumbprint</param>
+        /// <param name="nextPageLink"></param>
+        /// <param name="pageSize"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        public async Task<X509Certificate2Collection> GetCertificateVersionsAsync(string id, CancellationToken ct = default)
+        public async Task<(X509Certificate2Collection, string)> GetCertificateVersionsAsync(string id, string thumbprint = null, string nextPageLink = null, int? pageSize = null, CancellationToken ct = default)
         {
             var certificates = new X509Certificate2Collection();
+            pageSize = pageSize ?? MaxResults;
             try
             {
-                var certItems = await _keyVaultClient.GetCertificateVersionsAsync(_vaultBaseUrl, id, MaxResults, ct).ConfigureAwait(false);
+                IPage<CertificateItem> certItems = null;
+                if (nextPageLink != null)
+                {
+                    certItems = await _keyVaultClient.GetCertificateVersionsNextAsync(nextPageLink, ct).ConfigureAwait(false);
+                }
+                else
+                {
+                    certItems = await _keyVaultClient.GetCertificateVersionsAsync(_vaultBaseUrl, id, pageSize, ct).ConfigureAwait(false);
+                }
                 while (certItems != null)
                 {
                     foreach (var certItem in certItems)
                     {
-                        var certBundle = await _keyVaultClient.GetCertificateAsync(certItem.Id, ct).ConfigureAwait(false);
-                        var cert = new X509Certificate2(certBundle.Cer);
-                        certificates.Add(cert);
+                        if (certItem.Attributes.Enabled ?? false)
+                        {
+                            var certBundle = await _keyVaultClient.GetCertificateAsync(certItem.Id, ct).ConfigureAwait(false);
+                            var cert = new X509Certificate2(certBundle.Cer);
+                            if (thumbprint == null ||
+                                cert.Thumbprint.Equals(thumbprint, StringComparison.OrdinalIgnoreCase))
+                            {
+                                certificates.Add(cert);
+                            }
+                        }
                     }
                     if (certItems.NextPageLink != null)
                     {
-                        certItems = await _keyVaultClient.GetCertificateVersionsNextAsync(certItems.NextPageLink, ct).ConfigureAwait(false);
+                        nextPageLink = certItems.NextPageLink;
+                        certItems = null;
+                        if (certificates.Count < pageSize)
+                        {
+                            certItems = await _keyVaultClient.GetCertificateVersionsNextAsync(nextPageLink, ct).ConfigureAwait(false);
+                            nextPageLink = null;
+                        }
                     }
                     else
                     {
                         certItems = null;
+                        nextPageLink = null;
                     }
                 }
             }
@@ -198,7 +226,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
             {
                 _logger.Error("Error while loading the certificate versions for " + id + ".", () => new { ex });
             }
-            return certificates;
+            return (certificates, nextPageLink);
         }
 
         /// <summary>
@@ -611,7 +639,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         {
             try
             {
-                string secretIdentifier = CrlSecretName(id, certificate);
+                string secretIdentifier = CrlSecretName(id, certificate.Thumbprint);
                 SecretAttributes secretAttributes = new SecretAttributes()
                 {
                     Enabled = true,
@@ -641,7 +669,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         /// </summary>
         public async Task<Opc.Ua.X509CRL> LoadIssuerCACrl(string id, X509Certificate2 certificate, CancellationToken ct = default)
         {
-            string secretIdentifier = CrlSecretName(id, certificate);
+            string secretIdentifier = CrlSecretName(id, certificate.Thumbprint);
             var secret = await _keyVaultClient.GetSecretAsync(_vaultBaseUrl, secretIdentifier, ct).ConfigureAwait(false);
             if (secret.ContentType == ContentTypeCrl)
             {
@@ -650,6 +678,29 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
             }
             return null;
         }
+
+        /// <summary>
+        /// Load CRL by ThumbPrint in group.
+        /// </summary>
+        public async Task<Opc.Ua.X509CRL> LoadIssuerCACrl(string id, string thumbPrint, CancellationToken ct = default)
+        {
+            try
+            {
+                string secretIdentifier = CrlSecretName(id, thumbPrint);
+                var secret = await _keyVaultClient.GetSecretAsync(_vaultBaseUrl, secretIdentifier, ct).ConfigureAwait(false);
+                if (secret.ContentType == ContentTypeCrl)
+                {
+                    var crlBlob = Convert.FromBase64String(secret.Value);
+                    return new Opc.Ua.X509CRL(crlBlob);
+                }
+            }
+            catch (KeyVaultErrorException)
+            {
+                // hide KeyVault Exception
+            }
+            throw new ResourceNotFoundException("A CRL for this thumbprint doesn't exist.");
+        }
+
 
         /// <summary>
         /// Imports a Private Key for group id and certificate.
@@ -1017,9 +1068,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         {
             return id + "Key" + requestId;
         }
-        private string CrlSecretName(string id, X509Certificate2 certificate)
+        private string CrlSecretName(string id, string thumbprint)
         {
-            return id + "Crl" + certificate.Thumbprint;
+            return id + "Crl" + thumbprint;
         }
 
         private async Task<X509CRL> LoadCrlSecret(string secretIdentifier, CancellationToken ct = default)

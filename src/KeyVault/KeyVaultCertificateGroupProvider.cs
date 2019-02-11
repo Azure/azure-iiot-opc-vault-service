@@ -62,6 +62,10 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
             )
         {
             var certificateGroupConfiguration = await GetCertificateGroupConfiguration(keyVaultServiceClient, id);
+            if (certificateGroupConfiguration == null)
+            {
+                throw new ResourceNotFoundException("The certificate group doesn't exist.");
+            }
             return new KeyVaultCertificateGroupProvider(keyVaultServiceClient, certificateGroupConfiguration, serviceHost);
         }
 
@@ -601,16 +605,59 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
             }
         }
 
-        public async Task<X509Certificate2> GetIssuerCACertificateAsync(string id)
+        /// <summary>
+        /// Reads the actual Issuer CA cert of the group.
+        /// Or a historical CA cert by thumbprint.
+        /// </summary>
+        /// <param name="id">The group id</param>
+        /// <param name="thumbprint">optional, the thumbprint of the certificate.</param>
+        /// <returns>The issuer certificate</returns>
+        public async Task<X509Certificate2> GetIssuerCACertificateAsync(string id, string thumbprint)
         {
             await LoadPublicAssets().ConfigureAwait(false);
-            return Certificate;
+            if (thumbprint == null ||
+                thumbprint.Equals(Certificate.Thumbprint, StringComparison.OrdinalIgnoreCase))
+            {
+                return Certificate;
+            }
+            else
+            {
+                try
+                {
+                    X509Certificate2Collection collection;
+                    string nextPageLink;
+                    (collection, nextPageLink) = await _keyVaultServiceClient.GetCertificateVersionsAsync(id, thumbprint, pageSize: 1);
+                    if (collection.Count == 1)
+                    {
+                        return collection[0];
+                    }
+                }
+                catch
+                {
+                }
+                throw new ResourceNotFoundException("A Certificate for this thumbprint doesn't exist.");
+            }
         }
 
-        public async Task<X509CRL> GetIssuerCACrlAsync(string id)
+        /// <summary>
+        /// Get the actual Crl of a certificate group.
+        /// Or the Crl of a historical Issuer CA cert by thumbprint.
+        /// </summary>
+        /// <param name="id">The group id</param>
+        /// <param name="thumbprint">optional, the thumbprint of the certificate.</param>
+        /// <returns></returns>
+        public async Task<X509CRL> GetIssuerCACrlAsync(string id, string thumbprint)
         {
             await LoadPublicAssets().ConfigureAwait(false);
-            return Crl;
+            if (thumbprint == null ||
+                thumbprint.Equals(Certificate.Thumbprint, StringComparison.OrdinalIgnoreCase))
+            {
+                return Crl;
+            }
+            else
+            {
+                return await _keyVaultServiceClient.LoadIssuerCACrl(id, thumbprint);
+            }
         }
         #endregion
 

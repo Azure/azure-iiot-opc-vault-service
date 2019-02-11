@@ -240,27 +240,31 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
         }
 
         /// <inheritdoc/>
-        public async Task<X509Certificate2Collection> GetIssuerCACertificateVersionsAsync(string id, bool? withCertificates, string nextPageLink, int? pageSize)
+        public async Task<(X509Certificate2Collection,string)> GetIssuerCACertificateVersionsAsync(string id, bool? withCertificates, string nextPageLink, int? pageSize)
         {
+            // TODO: implement withCertificates
             var certificateGroup = await KeyVaultCertificateGroupProvider.Create(_keyVaultServiceClient, id, _serviceHost).ConfigureAwait(false);
-            return new X509Certificate2Collection(await GetIssuerCACertificateVersionsAsync(id).ConfigureAwait(false));
+            X509Certificate2Collection result = new X509Certificate2Collection();
+            (result, nextPageLink) = await _keyVaultServiceClient.GetCertificateVersionsAsync(id, null, nextPageLink, pageSize);
+            return (result, nextPageLink);
         }
 
         /// <inheritdoc/>
         public async Task<X509Certificate2Collection> GetIssuerCACertificateChainAsync(string id, string thumbPrint = null, string nextPageLink = null, int? pageSize = null)
         {
-            // TODO: implement thumbPrint and paging
+            // TODO: implement paging (low priority, only when long chains are expected)
             var certificateGroup = await KeyVaultCertificateGroupProvider.Create(_keyVaultServiceClient, id, _serviceHost).ConfigureAwait(false);
-            return new X509Certificate2Collection(await certificateGroup.GetIssuerCACertificateAsync(id).ConfigureAwait(false));
+            return new X509Certificate2Collection(await certificateGroup.GetIssuerCACertificateAsync(id, thumbPrint).ConfigureAwait(false));
         }
 
         /// <inheritdoc/>
         public async Task<IList<X509CRL>> GetIssuerCACrlChainAsync(string id, string thumbPrint = null, string nextPageLink = null, int? pageSize = null)
         {
+            // TODO: implement paging (low priority, only when long chains are expected)
             var certificateGroup = await KeyVaultCertificateGroupProvider.Create(_keyVaultServiceClient, id, _serviceHost).ConfigureAwait(false);
             var crlList = new List<Opc.Ua.X509CRL>
             {
-                await certificateGroup.GetIssuerCACrlAsync(id).ConfigureAwait(false)
+                await certificateGroup.GetIssuerCACrlAsync(id, thumbPrint).ConfigureAwait(false)
             };
             return crlList;
         }
@@ -296,12 +300,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
         public async Task PurgeAsync(string configId = null, string groupId = null)
         {
             await _keyVaultServiceClient.PurgeAsync(configId, groupId).ConfigureAwait(false);
-        }
-
-        /// <inheritdoc/>
-        private async Task<X509Certificate2Collection> GetIssuerCACertificateVersionsAsync(string id)
-        {
-            return await _keyVaultServiceClient.GetCertificateVersionsAsync(id).ConfigureAwait(false);
         }
 
     }
