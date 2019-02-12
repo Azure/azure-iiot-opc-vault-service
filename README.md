@@ -2,8 +2,6 @@
 
 ## OPC Unified Architecture (OPC UA) Certificate Management Service
 
-[![Build status](https://msazure.visualstudio.com/One/_apis/build/status/Custom/Azure_IOT/Industrial/Components/ci-azure-iiot-opc-vault-service)](https://msazure.visualstudio.com/One/_build/latest?definitionId=44197)
-
 The certificate management service for OPC UA facilitates the **OPC Vault Microservice** to implement the CA certificate cloud service for OPC UA devices based on Azure Key Vault and Azure Cosmos DB, a ASP.Net Core **Sample Certificate Management Web Application** front end and a **OPC Vault Edge Module** to implement a OPC UA GDS server based on the open source OPC UA .Net Standard Nuget packages.
 
 #### A detailed overview of the OPC UA Certificate Management Service is [here](docs/opcvault-services-overview.md).
@@ -17,6 +15,8 @@ This repo contains all components required to run a CA in the Azure cloud for yo
 * OPC UA .Net Standard **OPC Vault Edge Module**  as GDS server for local OPC UA device connectivity to the OPC Vault microservice.
 
 A Powershell deployment script automatically builds and deploys the services to your subscription. By default, security is configured for a production system. 
+
+[![Build status](https://msazure.visualstudio.com/One/_apis/build/status/Custom/Azure_IOT/Industrial/Components/ci-azure-iiot-opc-vault-service)](https://msazure.visualstudio.com/One/_build/latest?definitionId=44197)
 
 ### OPC Vault Microservice Features
 - Production ready certificate microservice based on C# with ASP.Net Core 2.1.
