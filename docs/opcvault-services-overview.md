@@ -1,10 +1,8 @@
-### Azure Industrial IoT Service
+# Azure Industrial IoT Services
 
-------
+## OPC UA Certificate Management Service
 
-### OPC UA Certificate Management Service
-
-This article gives an overview about the OPC UA Certificate Management Service and the **OPC Vault** microservice.
+This article gives an overview about the OPC UA Certificate Management Service and the **OPC Vault Microservice** and the **OPC Vault Edge Module** and the .
 
 ## Overview
 
@@ -49,7 +47,7 @@ approve or reject these requests.
 
 For compatibility with existing OPC UA GDS based OT solutions the services include
 support for a OPC Vault microservice backed edge module which implements the 
-*OPC UA Global Discovery Server and Certificate Management Services* interface to distribute certificates and trust lists according to the Part 12 of the specification. 
+*OPC UA Global Discovery Server and Certificate Management* interface to distribute certificates and trust lists according to the Part 12 of the specification. 
 However, as of our knowledge, this GDS server interface is not widely 
 used yet and has yet limited functionality (Reader role). [On demand, we will 
 improve the experience on customer request (*)](#Yet-Unsupported-features).
@@ -79,7 +77,7 @@ with all OPC UA specific extensions.
 - The application service is either backed by a CosmosDB 
 database or the [OpcTwin device registry (*)](#Yet-Unsupported-features), depending on the customer configuration.
 
-### CertificateGroup
+### Certificate Group
 - A certificate group is an entity which stores a root CA or a sub CA certificate 
 including the private key to sign certificates. 
 - The RSA key length, the SHA-2 hash length 
@@ -95,7 +93,7 @@ remain still in safe storage due to Key Vault history.
 Once an application is unregistered, the application certificate is also revoked in the CRL by an administrator.
 - Batched and single certificate revocation is supported.
 
-### CertificateRequest
+### Certificate Request
 A certificate request implements the workflow to generate a new key pair or a signed certificate using a CSR for an OPC UA Application. 
 - The request is stored in a database with accompanying information like the Subject or a “Certificate Signing Request” (CSR) and a reference to the OPC UA Application. 
 - The business logic in the service validates the request against the information stored in the application database. 

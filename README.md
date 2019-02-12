@@ -1,8 +1,8 @@
-## Azure Industrial IoT Services
+# Azure Industrial IoT Services
 
 ## OPC Unified Architecture (OPC UA) Certificate Management Service
 
-The certificate management service for OPC UA facilitates the **OPC Vault Microservice** to implement the CA certificate cloud service for OPC UA devices based on Azure Key Vault and Azure Cosmos DB, a ASP.Net Core **Sample Certificate Management Web Application** front end and a **OPC Vault Edge Module** to implement a OPC UA GDS server based on the open source OPC UA .Net Standard Nuget packages.
+The certificate management service for OPC UA includes the **OPC Vault Microservice** to implement the CA certificate cloud service, a ASP.Net Core **Sample Certificate Management Web Application** front end and a **OPC Vault Edge Module** to implement a OPC UA GDS server for local connectivity.
 
 #### A detailed overview of the OPC UA Certificate Management Service is [here](docs/opcvault-services-overview.md).
 
@@ -56,7 +56,7 @@ A Powershell deployment script automatically builds and deploys the services to 
   **Known limitations:** At this time the GDS can only act in a reader role with limited functionality due to the lack of user OAuth2 authentication support in the OPC UA .NetStandard SDK. For development purposes and testing, the Azure AD registration can be enabled for a 'Writer' role to allow to create certificate requests and to update applications, 
   but this configuration is not recommended for use in production deployments.
 
-## For more information please refer to the following pages
+## Documentation
 
 ### [OPC UA Certificate Management Service Overview](docs/opcvault-services-overview.md) 
 
@@ -94,7 +94,7 @@ Please enter issues, bugs, or suggestions for any of the components and services
 
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct).  For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
-If you want/plan to contribute, we ask you to sign a [CLA](https://cla.microsoft.com/) (Contribution License Agreement) and follow the project 's [code submission guidelines](docs/contributing.md). A friendly bot will remind you about it when you submit a pull-request. ​ 
+If you want/plan to contribute, we ask you to sign a [CLA](https://cla.microsoft.com/) (Contribution License Agreement) and follow the project 's [code submission guidelines](contributing.md). A friendly bot will remind you about it when you submit a pull-request. ​ 
 
 ## License
 
