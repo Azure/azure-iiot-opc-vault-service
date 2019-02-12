@@ -10,7 +10,7 @@ The certificate management service for OPC UA includes the **OPC Vault Microserv
 
 This repo contains all components required to run a CA in the Azure cloud for your OPC UA environment:
 
-* ASP.Net Core **OPC Vault Microservice** to manage certificates with [Azure Key Vault][azure-keyvault/] and [Azure Cosmos DB][azure-cosmosdb].
+* ASP.Net Core **OPC Vault Microservice** to manage certificates with [Azure Key Vault][azure-keyvault] and [Azure Cosmos DB][azure-cosmosdb].
 * ASP.Net Core **Sample Certificate Management Web Application** as user interface for the OPC Vault microservice.
 * OPC UA .Net Standard **OPC Vault Edge Module**  as GDS server for local OPC UA device connectivity to the OPC Vault microservice.
 
