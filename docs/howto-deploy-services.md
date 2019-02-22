@@ -1,6 +1,6 @@
 # Azure Industrial IoT Services
 
-## Build and Deploy the OPC UA Certificate Management Service and dependencies
+# Build and Deploy the OPC UA Certificate Management Service and dependencies
 
 This article explains how to deploy the OPC UA Certificate Management Service in Azure.
 

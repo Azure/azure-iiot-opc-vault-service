@@ -1,6 +1,6 @@
 # Azure Industrial IoT Services
 
-## How to build, run and debug the services locally.
+# How to build, run and debug the services locally.
 
 
 
