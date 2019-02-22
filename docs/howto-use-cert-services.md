@@ -2,7 +2,7 @@
 
 # How to use the OPC UA Certificate Management Service
 
-This article explains how to manage the OPC UA Certificate Management Service in Azure, how to register applications and how to issue signed application certificates for your OPC UA devices.
+This article explains how to register applications and how to issue signed application certificates for your OPC UA devices.
 
 ## Prerequisites
 
@@ -57,7 +57,7 @@ In general, the CSR method is recommended, because it doesn't require a private 
 
 ![Approve Certificate](ApproveReject.png "Approve Certificate")
 
-5. The approval step requires a user with 'Approver' role and with signing rights in Azure Key Vault. In the typical workflow the Approver and Requester role should be assigned to different users.
+5. The approval step requires a user with 'Approver' role and with signing permissions in Azure Key Vault. In the typical workflow the Approver and Requester role should be assigned to different users.
 6. Approve or Reject the certificate request to start or cancel the actual creation of the key pair and the signing operation. The new key pair is created and stored securely in Azure Key Vault until downloaded by the certificate requester. The resulting certificate with public key is signed by the CA. These operations may take a few seconds to finish.
 
 ![View Key Pair](ViewKeyPair.png "View Key Pair")
@@ -82,7 +82,7 @@ In general, the CSR method is recommended, because it doesn't require a private 
 
 ![Approve CSR](ApproveRejectCSR.png "Approve CSR")
 
-5. The approval step requires a user with 'Approver' role and with signing rights in Azure Key Vault. Approve or Reject the certificate request to start or cancel the actual signing operation. The resulting certificate with public key is signed by the CA. This operation may take a few seconds to finish.
+5. The approval step requires a user with 'Approver' role and with signing permissions in Azure Key Vault. Approve or Reject the certificate request to start or cancel the actual signing operation. The resulting certificate with public key is signed by the CA. This operation may take a few seconds to finish.
 
 ![View Certificate](ViewCertCSR.png "View Certificate")
 

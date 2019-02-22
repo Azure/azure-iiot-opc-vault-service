@@ -64,7 +64,7 @@ Due to security considerations, build logs are not publicly available.
 - Upload CSR for signing requests as file or base64 PEM format.
 - Binary and base64 download of certificates and keys as PFX, PEM and DER.
 - Issues consolidated CRL updates for multiple unregistered applications in a single step, e.g. for weekly updates.
-- Accesses the OPC Vault microservice on behalf of the user to be able to execute protected functions in Azure Key Vault (e.g. signing rights for Approver).
+- Accesses the OPC Vault microservice on behalf of the user to be able to execute protected functions in Azure Key Vault (e.g. signing permissions for Approver, create certificate for Administrator).
 
 ### On premises OPC Vault Edge Module as OPC UA Global Discovery Server (GDS) with cloud integration
 - Based on the GDS server common library of the [OPC UA .NetStandard][opc-netstandard] Nuget packages.
