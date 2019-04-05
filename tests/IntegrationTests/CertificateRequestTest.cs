@@ -4,13 +4,7 @@
 // ------------------------------------------------------------
 
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Security.Cryptography.X509Certificates;
-using System.Threading.Tasks;
 using Microsoft.Azure.IIoT.Auth.Clients;
-using Microsoft.Azure.IIoT.Diagnostics;
 using Microsoft.Azure.IIoT.Exceptions;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Runtime;
@@ -18,6 +12,13 @@ using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test.Helpers;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Types;
 using Microsoft.Extensions.Configuration;
 using Opc.Ua.Test;
+using Serilog;
+using Serilog.AspNetCore;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Security.Cryptography.X509Certificates;
+using System.Threading.Tasks;
 using TestCaseOrdering;
 using Xunit;
 using Xunit.Abstractions;
@@ -34,7 +35,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
         private readonly string _configId;
         private readonly string _groupId;
         private KeyVaultCertificateGroup _keyVaultCertificateGroup;
-        public TraceLogger Logger = new TraceLogger(new LogConfig());
+        public ILogger Logger;
         public IApplicationsDatabase ApplicationsDatabase;
         public ICertificateGroup CertificateGroup;
         public ICertificateRequest CertificateRequest;
@@ -56,6 +57,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
             _configuration = builder.Build();
             _configuration.Bind("OpcVault", _serviceConfig);
             _configuration.Bind("Auth", _clientConfig);
+            Logger = SerilogTestLogger.Create<CertificateRequestTestFixture>();
             if (!InvalidConfiguration())
             {
                 _documentDBRepository = new OpcVaultDocumentDbRepository(_serviceConfig);
@@ -115,7 +117,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
     public class CertificateRequestTest : IClassFixture<CertificateRequestTestFixture>
     {
         CertificateRequestTestFixture _fixture;
-        private TraceLogger _logger;
+        private ILogger _logger;
         private IApplicationsDatabase _applicationsDatabase;
         private ICertificateGroup _certificateGroup;
         private ICertificateRequest _certificateRequest;
@@ -128,7 +130,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
             _log = log;
             // fixture
             fixture.SkipOnInvalidConfiguration();
-            _logger = fixture.Logger;
+            _logger = SerilogTestLogger.Create<CertificateRequestTest>(log);
             _applicationsDatabase = fixture.ApplicationsDatabase;
             _certificateGroup = fixture.CertificateGroup;
             _certificateRequest = fixture.CertificateRequest;

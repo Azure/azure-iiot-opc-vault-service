@@ -4,18 +4,18 @@
 // ------------------------------------------------------------
 
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
 using Microsoft.Azure.IIoT.Auth.Clients;
-using Microsoft.Azure.IIoT.Diagnostics;
 using Microsoft.Azure.IIoT.Exceptions;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Runtime;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test.Helpers;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Types;
 using Microsoft.Extensions.Configuration;
+using Serilog;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
 using TestCaseOrdering;
 using Xunit;
 using Xunit.Abstractions;
@@ -29,7 +29,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
         private readonly IDocumentDBRepository _documentDBRepository;
         private ServicesConfig _serviceConfig = new ServicesConfig();
         private IConfigurationRoot _configuration;
-        public TraceLogger _logger = new TraceLogger(new LogConfig());
+        public ILogger _logger;
         public IApplicationsDatabase _applicationsDatabase;
         public IList<ApplicationTestData> _applicationTestSet;
         public ApplicationTestDataGenerator _randomGenerator;
@@ -48,6 +48,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
             _configuration = builder.Build();
             _configuration.Bind("OpcVault", _serviceConfig);
             _configuration.Bind("Auth", _clientConfig);
+            _logger = SerilogTestLogger.Create<ApplicationDatabaseTestFixture>();
             if (!InvalidConfiguration())
             {
                 _randomGenerator = new ApplicationTestDataGenerator(_randomStart);
@@ -92,7 +93,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
     {
         ITestOutputHelper _log;
         ApplicationDatabaseTestFixture _fixture;
-        TraceLogger _logger;
+        ILogger _logger;
         IApplicationsDatabase _applicationsDatabase;
         IList<ApplicationTestData> _applicationTestSet;
 
@@ -102,7 +103,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
             _log = log;
             // fixture
             _fixture.SkipOnInvalidConfiguration();
-            _logger = fixture._logger;
+            _logger = SerilogTestLogger.Create<ApplicationDatabaseTest>(log);
             _applicationsDatabase = fixture._applicationsDatabase;
             _applicationTestSet = fixture._applicationTestSet;
         }
