@@ -1,5 +1,4 @@
 language: csharp
-solution: azure-iiot-opc-vault-service.sln
 mono: none
 dotnet: 2.2
 os:
@@ -15,6 +14,6 @@ addons:
 install:
 script: 
   - dotnet restore 
-  - dotnet build -c Debug "azure-iiot-opc-vault.sln"
-  - dotnet build -c Release "azure-iiot-opc-vault.sln"
-  - dotnet test -c Release "azure-iiot-opc-vault.sln"
+  - dotnet build -c Debug "azure-iiot-opc-vault-service.sln"
+  - dotnet build -c Release "azure-iiot-opc-vault-service.sln"
+  - dotnet test -c Release "azure-iiot-opc-vault-service.sln"
