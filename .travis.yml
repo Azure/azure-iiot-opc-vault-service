@@ -1,0 +1,18 @@
+language: csharp
+mono: none
+dotnet: 2.2
+os:
+  - linux
+  - osx
+sudo: false
+dist: trusty
+osx_image: xcode9.1
+addons:
+  apt:
+    sources:
+    packages:
+install:
+script: 
+  - dotnet restore "azure-iiot-opc-vault.sln"
+  - dotnet build -c Debug "azure-iiot-opc-vault.sln"
+  - dotnet build -c Release "azure-iiot-opc-vault.sln"
