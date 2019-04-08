@@ -1,5 +1,5 @@
 language: csharp
-solution: azure-iiot-opc-vault.sln
+solution: azure-iiot-opc-vault-service.sln
 mono: none
 dotnet: 2.2
 os:
