@@ -154,12 +154,12 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
         /// </summary>
         /// <param name="app"></param>
         /// <param name="env"></param>
-        /// <param name="log"></param>
+        /// <param name="logger"></param>
         /// <param name="appLifetime"></param>
         public void Configure(
             IApplicationBuilder app,
             IHostingEnvironment env,
-            ILogger log,
+            ILogger logger,
             IApplicationLifetime appLifetime)
         {
             if (Config.AuthRequired)
@@ -183,7 +183,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             appLifetime.ApplicationStopped.Register(ApplicationContainer.Dispose);
 
             // Print some useful information at bootstrap time
-            log.Information($"{ServiceInfo.NAME} web service started",
+            logger.Information($"{ServiceInfo.NAME} web service started",
                 new { Uptime.ProcessId, env });
         }
 

@@ -13,10 +13,10 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
 
     public class WarmStartDatabase : IStartable
     {
-        IDocumentDBRepository _repository;
-        ICertificateRequest _certificateRequest;
-        IApplicationsDatabase _applicationDatabase;
-        ILogger _logger;
+        private readonly IDocumentDBRepository _repository;
+        private readonly ICertificateRequest _certificateRequest;
+        private readonly IApplicationsDatabase _applicationDatabase;
+        private readonly ILogger _logger;
 
         public WarmStartDatabase(
             IDocumentDBRepository repository,

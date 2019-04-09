@@ -27,12 +27,12 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
     {
         private readonly IClientConfig _clientConfig = new ClientConfig();
         private readonly IDocumentDBRepository _documentDBRepository;
+        private readonly ILogger _logger;
         private ServicesConfig _serviceConfig = new ServicesConfig();
         private IConfigurationRoot _configuration;
-        public ILogger _logger;
-        public IApplicationsDatabase _applicationsDatabase;
-        public IList<ApplicationTestData> _applicationTestSet;
-        public ApplicationTestDataGenerator _randomGenerator;
+        public IApplicationsDatabase ApplicationsDatabase;
+        public IList<ApplicationTestData> ApplicationTestSet;
+        public ApplicationTestDataGenerator RandomGenerator;
         public bool RegistrationOk;
 
         const int _randomStart = 3388;
@@ -51,18 +51,18 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
             _logger = SerilogTestLogger.Create<ApplicationDatabaseTestFixture>();
             if (!InvalidConfiguration())
             {
-                _randomGenerator = new ApplicationTestDataGenerator(_randomStart);
+                RandomGenerator = new ApplicationTestDataGenerator(_randomStart);
                 _documentDBRepository = new OpcVaultDocumentDbRepository(_serviceConfig);
-                _applicationsDatabase = CosmosDBApplicationsDatabaseFactory.Create(null, _serviceConfig, _documentDBRepository, _logger);
+                ApplicationsDatabase = CosmosDBApplicationsDatabaseFactory.Create(null, _serviceConfig, _documentDBRepository, _logger);
                 // create test set
-                _applicationTestSet = new List<ApplicationTestData>();
+                ApplicationTestSet = new List<ApplicationTestData>();
                 for (int i = 0; i < _testSetSize; i++)
                 {
-                    var randomApp = _randomGenerator.RandomApplicationTestData();
-                    _applicationTestSet.Add(randomApp);
+                    var randomApp = RandomGenerator.RandomApplicationTestData();
+                    ApplicationTestSet.Add(randomApp);
                 }
                 // try initialize DB
-                _applicationsDatabase.Initialize().Wait();
+                ApplicationsDatabase.Initialize().Wait();
             }
             RegistrationOk = false;
         }
@@ -104,8 +104,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
             // fixture
             _fixture.SkipOnInvalidConfiguration();
             _logger = SerilogTestLogger.Create<ApplicationDatabaseTest>(log);
-            _applicationsDatabase = fixture._applicationsDatabase;
-            _applicationTestSet = fixture._applicationTestSet;
+            _applicationsDatabase = fixture.ApplicationsDatabase;
+            _applicationTestSet = fixture.ApplicationTestSet;
         }
 
         /// <summary>

@@ -27,10 +27,10 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
 
     public class CertificateGroupTestFixture : IDisposable
     {
-        IConfigurationRoot _configuration;
-        ServicesConfig _serviceConfig = new ServicesConfig();
-        IClientConfig _clientConfig = new ClientConfig();
-        ILogger _logger;
+        private readonly IConfigurationRoot _configuration;
+        private readonly ServicesConfig _serviceConfig = new ServicesConfig();
+        private readonly IClientConfig _clientConfig = new ClientConfig();
+        private readonly ILogger _logger;
         public ApplicationTestDataGenerator RandomGenerator;
         public KeyVaultCertificateGroup KeyVault;
         public bool KeyVaultInitOk;
@@ -88,9 +88,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
     [TestCaseOrderer("TestCaseOrdering.PriorityOrderer", "Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test")]
     public class CertificateGroupTest : IClassFixture<CertificateGroupTestFixture>
     {
-        CertificateGroupTestFixture _fixture;
-        KeyVaultCertificateGroup _keyVault;
-        ILogger _logger;
+        private readonly CertificateGroupTestFixture _fixture;
+        private readonly KeyVaultCertificateGroup _keyVault;
+        private readonly ILogger _logger;
 
         public CertificateGroupTest(CertificateGroupTestFixture fixture, ITestOutputHelper log)
         {

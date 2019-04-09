@@ -14,7 +14,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.TokenStorage
     public class DistributedTokenCache : TokenCache
     {
         private ClaimsPrincipal _claimsPrincipal;
-        private ILogger _logger;
+        private readonly ILogger _logger;
         private IDistributedCache _distributedCache;
         private IDataProtector _protector;
         private string _cacheKey;

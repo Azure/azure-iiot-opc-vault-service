@@ -93,6 +93,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
         }
     }
 
+    /// <summary>
+    /// Testlogger for Serilog.
+    /// </summary>
     public static class SerilogTestLogger
     {
         public static Serilog.ILogger Create<T>()

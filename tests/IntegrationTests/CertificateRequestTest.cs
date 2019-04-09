@@ -30,12 +30,12 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
     {
         private readonly IClientConfig _clientConfig = new ClientConfig();
         private readonly IDocumentDBRepository _documentDBRepository;
-        private ServicesConfig _serviceConfig = new ServicesConfig();
-        private IConfigurationRoot _configuration;
+        private readonly ServicesConfig _serviceConfig = new ServicesConfig();
+        private readonly IConfigurationRoot _configuration;
         private readonly string _configId;
         private readonly string _groupId;
-        private KeyVaultCertificateGroup _keyVaultCertificateGroup;
-        public ILogger Logger;
+        private readonly KeyVaultCertificateGroup _keyVaultCertificateGroup;
+        private readonly ILogger _logger;
         public IApplicationsDatabase ApplicationsDatabase;
         public ICertificateGroup CertificateGroup;
         public ICertificateRequest CertificateRequest;
@@ -57,22 +57,22 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
             _configuration = builder.Build();
             _configuration.Bind("OpcVault", _serviceConfig);
             _configuration.Bind("Auth", _clientConfig);
-            Logger = SerilogTestLogger.Create<CertificateRequestTestFixture>();
+            _logger = SerilogTestLogger.Create<CertificateRequestTestFixture>();
             if (!InvalidConfiguration())
             {
                 _documentDBRepository = new OpcVaultDocumentDbRepository(_serviceConfig);
-                ApplicationsDatabase = CosmosDBApplicationsDatabaseFactory.Create(null, _serviceConfig, _documentDBRepository, Logger);
+                ApplicationsDatabase = CosmosDBApplicationsDatabaseFactory.Create(null, _serviceConfig, _documentDBRepository, _logger);
 
                 var timeid = (DateTime.UtcNow.ToFileTimeUtc() / 1000) % 10000;
                 _groupId = "CertReqIssuerCA" + timeid.ToString();
                 _configId = "CertReqConfig" + timeid.ToString();
-                var keyVaultServiceClient = KeyVaultServiceClient.Get(_configId, _serviceConfig, _clientConfig, Logger);
-                _keyVaultCertificateGroup = new KeyVaultCertificateGroup(keyVaultServiceClient, _serviceConfig, _clientConfig, Logger);
+                var keyVaultServiceClient = KeyVaultServiceClient.Get(_configId, _serviceConfig, _clientConfig, _logger);
+                _keyVaultCertificateGroup = new KeyVaultCertificateGroup(keyVaultServiceClient, _serviceConfig, _clientConfig, _logger);
                 _keyVaultCertificateGroup.PurgeAsync(_configId, _groupId).Wait();
                 CertificateGroup = _keyVaultCertificateGroup;
-                CertificateGroup = new KeyVaultCertificateGroup(keyVaultServiceClient, _serviceConfig, _clientConfig, Logger);
+                CertificateGroup = new KeyVaultCertificateGroup(keyVaultServiceClient, _serviceConfig, _clientConfig, _logger);
                 CertificateGroup.CreateCertificateGroupConfiguration(_groupId, "CN=OPC Vault Cert Request Test CA, O=Microsoft, OU=Azure IoT", null).Wait();
-                CertificateRequest = CosmosDBCertificateRequestFactory.Create(ApplicationsDatabase, CertificateGroup, _serviceConfig, _documentDBRepository, Logger);
+                CertificateRequest = CosmosDBCertificateRequestFactory.Create(ApplicationsDatabase, CertificateGroup, _serviceConfig, _documentDBRepository, _logger);
 
                 // create test set
                 ApplicationTestSet = new List<ApplicationTestData>();
