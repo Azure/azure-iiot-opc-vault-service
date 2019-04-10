@@ -13,7 +13,6 @@ using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Types;
 using Microsoft.Extensions.Configuration;
 using Opc.Ua.Test;
 using Serilog;
-using Serilog.AspNetCore;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -31,7 +30,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
         private readonly IClientConfig _clientConfig = new ClientConfig();
         private readonly IDocumentDBRepository _documentDBRepository;
         private readonly ServicesConfig _serviceConfig = new ServicesConfig();
-        private readonly IConfigurationRoot _configuration;
         private readonly string _configId;
         private readonly string _groupId;
         private readonly KeyVaultCertificateGroup _keyVaultCertificateGroup;
@@ -54,9 +52,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
                 .AddJsonFile("testsettings.json", optional: false, reloadOnChange: true)
                 .AddJsonFile("testsettings.Development.json", optional: true, reloadOnChange: true)
                 .AddEnvironmentVariables();
-            _configuration = builder.Build();
-            _configuration.Bind("OpcVault", _serviceConfig);
-            _configuration.Bind("Auth", _clientConfig);
+            IConfigurationRoot configuration = builder.Build();
+            configuration.Bind("OpcVault", _serviceConfig);
+            configuration.Bind("Auth", _clientConfig);
             _logger = SerilogTestLogger.Create<CertificateRequestTestFixture>();
             if (!InvalidConfiguration())
             {

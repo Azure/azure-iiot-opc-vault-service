@@ -91,11 +91,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
     [TestCaseOrderer("TestCaseOrdering.PriorityOrderer", "Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test")]
     public class ApplicationDatabaseTest : IClassFixture<ApplicationDatabaseTestFixture>
     {
-        ITestOutputHelper _log;
-        ApplicationDatabaseTestFixture _fixture;
-        ILogger _logger;
-        IApplicationsDatabase _applicationsDatabase;
-        IList<ApplicationTestData> _applicationTestSet;
+        private readonly ITestOutputHelper _log;
+        private readonly ApplicationDatabaseTestFixture _fixture;
+        private readonly ILogger _logger;
+        private readonly IApplicationsDatabase _applicationsDatabase;
+        private readonly IList<ApplicationTestData> _applicationTestSet;
 
         public ApplicationDatabaseTest(ApplicationDatabaseTestFixture fixture, ITestOutputHelper log)
         {

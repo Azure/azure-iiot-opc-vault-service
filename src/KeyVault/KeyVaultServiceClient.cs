@@ -1111,8 +1111,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.KeyVault
         private readonly string _groupSecret;
         private readonly string _vaultBaseUrl;
         private readonly bool _keyStoreHSM;
+        private readonly ILogger _logger;
         private IKeyVaultClient _keyVaultClient;
-        private ILogger _logger;
         private ClientAssertionCertificate _assertionCert;
         private ClientCredential _clientCredential;
     }

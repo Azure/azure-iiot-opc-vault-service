@@ -11,8 +11,8 @@ using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Runtime;
 using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test.Helpers;
 using Microsoft.Azure.KeyVault.Models;
 using Microsoft.Extensions.Configuration;
-using Serilog;
 using Opc.Ua;
+using Serilog;
 using System;
 using System.IO;
 using System.Linq;
@@ -27,7 +27,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
 
     public class CertificateGroupTestFixture : IDisposable
     {
-        private readonly IConfigurationRoot _configuration;
         private readonly ServicesConfig _serviceConfig = new ServicesConfig();
         private readonly IClientConfig _clientConfig = new ClientConfig();
         private readonly ILogger _logger;
@@ -47,9 +46,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
                 .AddJsonFile("testsettings.json", optional: false, reloadOnChange: true)
                 .AddJsonFile("testsettings.Development.json", optional: true, reloadOnChange: true)
                 .AddEnvironmentVariables();
-            _configuration = builder.Build();
-            _configuration.Bind("OpcVault", _serviceConfig);
-            _configuration.Bind("Auth", _clientConfig);
+            IConfigurationRoot configuration = builder.Build();
+            configuration.Bind("OpcVault", _serviceConfig);
+            configuration.Bind("Auth", _clientConfig);
             _logger = SerilogTestLogger.Create<CertificateGroupTestFixture>();
             if (!InvalidConfiguration())
             {
