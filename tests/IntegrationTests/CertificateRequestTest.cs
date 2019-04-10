@@ -125,7 +125,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
         public CertificateRequestTest(CertificateRequestTestFixture fixture, ITestOutputHelper log)
         {
             _fixture = fixture;
-            _log = log;
             // fixture
             fixture.SkipOnInvalidConfiguration();
             _logger = SerilogTestLogger.Create<CertificateRequestTest>(log);
@@ -142,6 +141,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
         [SkippableFact, Trait(Constants.Type, Constants.UnitTest), TestPriority(100)]
         private async Task CleanupAllApplications()
         {
+            _logger.Information("Cleanup All Applications");
             foreach (var application in _applicationTestSet)
             {
                 var applicationModelList = await _applicationsDatabase.ListApplicationAsync(application.Model.ApplicationUri);
@@ -678,9 +678,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
                 }
             }
         }
-
-        /// <summary>The test logger</summary>
-        private readonly ITestOutputHelper _log;
     }
 
 

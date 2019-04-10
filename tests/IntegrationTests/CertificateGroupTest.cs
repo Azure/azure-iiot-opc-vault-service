@@ -93,7 +93,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
 
         public CertificateGroupTest(CertificateGroupTestFixture fixture, ITestOutputHelper log)
         {
-            _log = log;
             _logger = SerilogTestLogger.Create<CertificateGroupTest>(log);
             _fixture = fixture;
             _keyVault = _fixture.KeyVault;
@@ -106,6 +105,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
         [SkippableFact, Trait(Constants.Type, Constants.UnitTest), TestPriority(1)]
         public async Task KeyVaultInit()
         {
+            _logger.Information("Initializing KeyVault");
             await _keyVault.Init();
             _fixture.KeyVaultInitOk = true;
         }
@@ -592,9 +592,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
                 }
             }
         }
-
-        /// <summary>The test logger</summary>
-        private readonly ITestOutputHelper _log;
     }
 
 

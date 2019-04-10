@@ -91,7 +91,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
     [TestCaseOrderer("TestCaseOrdering.PriorityOrderer", "Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test")]
     public class ApplicationDatabaseTest : IClassFixture<ApplicationDatabaseTestFixture>
     {
-        private readonly ITestOutputHelper _log;
         private readonly ApplicationDatabaseTestFixture _fixture;
         private readonly ILogger _logger;
         private readonly IApplicationsDatabase _applicationsDatabase;
@@ -100,7 +99,6 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
         public ApplicationDatabaseTest(ApplicationDatabaseTestFixture fixture, ITestOutputHelper log)
         {
             _fixture = fixture;
-            _log = log;
             // fixture
             _fixture.SkipOnInvalidConfiguration();
             _logger = SerilogTestLogger.Create<ApplicationDatabaseTest>(log);
@@ -136,6 +134,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Test
         [SkippableFact, Trait(Constants.Type, Constants.UnitTest), TestPriority(100)]
         private async Task CleanupAllApplications()
         {
+            _logger.Information("Cleanup All Applications");
             foreach (var application in _applicationTestSet)
             {
                 var applicationModelList = await _applicationsDatabase.ListApplicationAsync(application.Model.ApplicationUri);

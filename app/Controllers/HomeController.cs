@@ -15,11 +15,11 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
     [Authorize]
     public class HomeController : Controller
     {
-        private ILogger _log;
+        private readonly ILogger _logger;
 
         public HomeController(ILogger log)
         {
-            _log = log;
+            _logger = log;
         }
 
         [AllowAnonymous]
@@ -70,7 +70,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
-            _log.Error("HomeController::Error: HttpContext.Response.StatusCode = ", HttpContext.Response.StatusCode);
+            _logger.Error("HomeController::Error: HttpContext.Response.StatusCode = ", HttpContext.Response.StatusCode);
             return View(new ErrorViewModel {
                 RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier,
                 StatusCode = HttpContext.Response.StatusCode });
