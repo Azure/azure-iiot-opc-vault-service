@@ -9,7 +9,6 @@
     <Product>Microsoft Azure Industrial IoT OPC Vault Service Api</Product>
     <Description>Microsoft Azure Industrial IoT OPC UA Vault Service Api</Description>
     <PackageLicenseUrl>https://github.com/Azure/azure-iiot-opc-vault-service/blob/master/license.txt</PackageLicenseUrl>
-    <Copyright>Copyright © 2018 Microsoft Corp. All rights reserved.</Copyright>
     <Configurations>Debug;Release;Develop</Configurations>
     <HighEntropyVA>true</HighEntropyVA>
   </PropertyGroup>
