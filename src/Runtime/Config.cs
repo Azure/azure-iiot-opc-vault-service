@@ -7,6 +7,7 @@
 using Microsoft.Azure.IIoT.Auth.Clients;
 using Microsoft.Azure.IIoT.Auth.Runtime;
 using Microsoft.Azure.IIoT.Auth.Server;
+using Microsoft.Azure.IIoT.OpcUa.Api.Registry;
 using Microsoft.Azure.IIoT.Services.Cors;
 using Microsoft.Azure.IIoT.Services.Cors.Runtime;
 using Microsoft.Azure.IIoT.Services.Swagger;
@@ -18,11 +19,13 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Runtime
 {
     /// <summary>Web service configuration</summary>
     public class Config : ConfigBase, IAuthConfig,
-        ICorsConfig, IClientConfig, ISwaggerConfig
+        ICorsConfig, IClientConfig, ISwaggerConfig,
+        IRegistryConfig
     {
         // services config
         private const string _opcVaultKey = "OpcVault";
         private const string _swaggerKey = "Swagger";
+        private const string _registryKey = "Registry";
 
         /// <summary>
         /// Configuration constructor
@@ -47,6 +50,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Runtime
             configuration.Bind(_opcVaultKey, ServicesConfig);
             SwaggerConfig = new SwaggerConfig();
             configuration.Bind(_swaggerKey, SwaggerConfig);
+            RegistryConfig = new RegistryConfig();
+            configuration.Bind(_registryKey, RegistryConfig);
             _auth = new AuthConfig(configuration, serviceId);
             _cors = new CorsConfig(configuration);
         }
@@ -83,10 +88,15 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.Runtime
         public int HttpsRedirectPort => _auth.HttpsRedirectPort;
         /// <inheritdoc/>
         public TimeSpan AllowedClockSkew => _auth.AllowedClockSkew;
+        /// <inheritdoc/>
+        public string OpcUaRegistryServiceUrl => RegistryConfig.ServiceUrl;
+        /// <inheritdoc/>
+        public string OpcUaRegistryServiceResourceId => RegistryConfig.ServiceResourceId;
 
         /// <summary>Service layer configuration</summary>
         public IServicesConfig ServicesConfig { get; }
         public SwaggerConfig SwaggerConfig { get; }
+        public RegistryConfig RegistryConfig { get; }
 
         private readonly AuthConfig _auth;
         private readonly CorsConfig _cors;

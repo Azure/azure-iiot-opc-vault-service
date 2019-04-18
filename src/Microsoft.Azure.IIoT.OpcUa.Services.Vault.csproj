@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Azure.DocumentDB.Core" Version="2.2.3" />
+    <PackageReference Include="Microsoft.Azure.IIoT.OpcUa.Api.Registry" Version="2.0.1" />
     <PackageReference Include="Microsoft.Azure.KeyVault" Version="3.0.3" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.4.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
@@ -91,7 +92,7 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="Microsoft.Azure.IIoT.Services" Version="2.0.0" />
+        <PackageReference Include="Microsoft.Azure.IIoT.Services" Version="2.0.1" />
       </ItemGroup>
     </Otherwise>
   </Choose>

@@ -9,6 +9,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
     using Autofac.Extensions.DependencyInjection;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
+    using Microsoft.Azure.IIoT.Http.Default;
+    using Microsoft.Azure.IIoT.OpcUa.Api.Registry.Clients;
     using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Runtime;
     using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Swagger;
     using Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1;
@@ -225,6 +227,12 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             builder.RegisterType<OpcVaultDocumentDbRepository>()
                 .AsImplementedInterfaces().SingleInstance();
             builder.RegisterType<WarmStartDatabase>()
+                .AsImplementedInterfaces().SingleInstance();
+
+            // Registry (optional)
+            builder.RegisterType<RegistryServiceClient>()
+                .AsImplementedInterfaces().SingleInstance();
+            builder.RegisterType<HttpClient>()
                 .AsImplementedInterfaces().SingleInstance();
 
             return builder.Build();
