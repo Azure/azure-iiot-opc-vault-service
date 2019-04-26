@@ -232,7 +232,9 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             // Registry (optional)
             builder.RegisterType<RegistryServiceClient>()
                 .AsImplementedInterfaces().SingleInstance();
-            builder.RegisterType<HttpClient>()
+            builder.RegisterType<IIoTHttpClient>()
+                .AsImplementedInterfaces().SingleInstance();
+            builder.RegisterType<IIoTTokenProvider>()
                 .AsImplementedInterfaces().SingleInstance();
 
             return builder.Build();

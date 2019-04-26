@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
     <LangVersion>7.2</LangVersion>
     <TargetFramework>netcoreapp2.1</TargetFramework>
@@ -44,7 +44,6 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Azure.DocumentDB.Core" Version="2.2.3" />
-    <PackageReference Include="Microsoft.Azure.IIoT.OpcUa.Api.Registry" Version="2.0.1" />
     <PackageReference Include="Microsoft.Azure.KeyVault" Version="3.0.3" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.4.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
@@ -88,11 +87,13 @@
         <ProjectReference Include="..\..\azure-iiot-common\src\Microsoft.Azure.IIoT.Services\src\Microsoft.Azure.IIoT.Services.csproj" />
         <ProjectReference Include="..\..\azure-iiot-common\src\Microsoft.Azure.IIoT.Abstractions\src\Microsoft.Azure.IIoT.Abstractions.csproj" />
         <ProjectReference Include="..\..\azure-iiot-common\src\Microsoft.Azure.IIoT.Core\src\Microsoft.Azure.IIoT.Core.csproj" />
+        <ProjectReference Include="..\..\azure-iiot-services-api\src\Microsoft.Azure.IIoT.OpcUa.Api.Registry\src\Microsoft.Azure.IIoT.OpcUa.Api.Registry.csproj" />
       </ItemGroup>
     </When>
     <Otherwise>
       <ItemGroup>
         <PackageReference Include="Microsoft.Azure.IIoT.Services" Version="2.0.1" />
+        <PackageReference Include="Microsoft.Azure.IIoT.OpcUa.Api.Registry" Version="2.0.1" />
       </ItemGroup>
     </Otherwise>
   </Choose>

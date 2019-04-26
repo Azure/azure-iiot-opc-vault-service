@@ -44,6 +44,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.CosmosDB.Models
         public string GatewayServerUri { get; set; }
         public string DiscoveryProfileUri { get; set; }
         public string AuthorityId { get; set; }
+        public string RegistryId { get; set; }
         public DateTime? CreateTime { get; set; }
         public DateTime? ApproveTime { get; set; }
         public DateTime? UpdateTime { get; set; }
