@@ -15,6 +15,7 @@ using Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Models;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Controllers
@@ -52,7 +53,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Controllers
         /// </remarks>
         /// <returns>The differing application records</returns>
         [HttpGet("diff")]
-        public async Task<RegistryApplicationStatusResponseApiModel> RegistryApplicationStatusDiffAsync(bool? all)
+        public async Task<RegistryApplicationStatusResponseApiModel> RegistryApplicationStatusDiffAsync(bool? allRecords)
         {
             var modelResult = new List<RegistryApplicationStatusApiModel>();
             var query = new ApplicationRegistrationQueryApiModel()
@@ -61,7 +62,57 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Controllers
             };
             foreach (var record in await _registryServiceApi.QueryAllApplicationsAsync(query))
             {
-                modelResult.Add(await GetApplicationStatusAsync(record));
+                var status = await GetApplicationStatusAsync(record);
+                if ((allRecords != null && (bool)allRecords) ||
+                    status.Status != RegistryApplicationStatusType.Ok)
+                {
+                    modelResult.Add(status);
+                }
+            }
+            return new RegistryApplicationStatusResponseApiModel(modelResult, null);
+        }
+
+        /// <summary>
+        /// Update applications which differ from the actual registry.
+        /// </summary>
+        /// <remarks>
+        /// Update all new and differing applications between the OPC UA registry
+        /// and the security service database.
+        /// </remarks>
+        /// <returns>The differing application records</returns>
+        [HttpPost("update")]
+        public async Task<RegistryApplicationStatusResponseApiModel> UpdateApplicationStatusDiffAsync(
+            string registryId,
+            bool? allRecords)
+        {
+            var modelResult = new List<RegistryApplicationStatusApiModel>();
+            if (registryId == null)
+            {
+                var query = new ApplicationRegistrationQueryApiModel()
+                {
+                    //ApplicationUri = applicationUri
+                };
+                foreach (var record in await _registryServiceApi.QueryAllApplicationsAsync(query))
+                {
+                    var status = await GetApplicationStatusAsync(record);
+                    if ((allRecords != null && (bool)allRecords) ||
+                        status.Status == RegistryApplicationStatusType.New)
+                    {
+                        var newApplication = NewApplicationFromRegistry(record);
+                        var registeredApplication = await _applicationDatabase.RegisterApplicationAsync(newApplication);
+                        status.Application = new ApplicationRecordApiModel(registeredApplication);
+                        modelResult.Add(status);
+                    }
+                }
+            }
+            else
+            {
+                var registryApplication = await _registryServiceApi.GetApplicationAsync(registryId);
+                var status = await GetApplicationStatusAsync(registryApplication.Application);
+                var newApplication = NewApplicationFromRegistry(registryApplication.Application);
+                var registeredApplication = await _applicationDatabase.RegisterApplicationAsync(newApplication);
+                status.Application = new ApplicationRecordApiModel(registeredApplication);
+                modelResult.Add(status);
             }
             return new RegistryApplicationStatusResponseApiModel(modelResult, null);
         }
@@ -108,7 +159,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Controllers
                 if ((int)registry.ApplicationType != (int)application.ApplicationType ||
                     !String.Equals(registry.ApplicationName, application.ApplicationName) ||
                     !String.Equals(registry.ProductUri, application.ProductUri) //||
-                    //!String.Equals(registry.ApplicationId, application.RegistryId)
+                                                                                //!String.Equals(registry.ApplicationId, application.RegistryId)
                     )
                 {
                     return RegistryApplicationStatusType.Update;
@@ -140,6 +191,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Controllers
                         if (status == RegistryApplicationStatusType.Ok ||
                             status == RegistryApplicationStatusType.Update)
                         {
+                            // TODO: check if there are more results?
+                            modelResult.Application = new ApplicationRecordApiModel(application);
                             modelResult.Status = status;
                             break;
                         }
@@ -151,6 +204,43 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Controllers
                 }
             }
             return modelResult;
+        }
+
+        private Application NewApplicationFromRegistry(ApplicationInfoApiModel record)
+        {
+            var applicationNames = new ApplicationName[]
+                            {
+                                new ApplicationName()
+                                {
+                                    Text = record.ApplicationName,
+                                    Locale = record.Locale
+                                }
+                            };
+            var newApplication = new Application()
+            {
+                ApplicationName = record.ApplicationName,
+                ApplicationNames = applicationNames,
+                ApplicationType = (Types.ApplicationType)record.ApplicationType,
+                ApplicationUri = record.ApplicationUri,
+                DiscoveryUrls = record.DiscoveryUrls.ToArray(),
+                AuthorityId = User.Identity.Name,
+                ProductUri = record.ProductUri,
+                RegistryId = record.ApplicationId,
+                ApplicationState = Types.ApplicationState.New,
+                CreateTime = DateTime.UtcNow
+            };
+            if (record.ApplicationType != Api.Registry.Models.ApplicationType.Client)
+            {
+                if (record.Capabilities != null)
+                {
+                    newApplication.ServerCapabilities = String.Join(",", record.Capabilities);
+                }
+                else
+                {
+                    newApplication.ServerCapabilities = "NA";
+                }
+            }
+            return newApplication;
         }
     }
 }
