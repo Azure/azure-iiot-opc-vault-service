@@ -6,7 +6,7 @@
 using System;
 using Serilog;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.TokenStorage
+namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.TokenStorage
 {
     /// <summary>
     /// ILogger extensions for events which occur in the RedisTokenCache

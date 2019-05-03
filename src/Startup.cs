@@ -17,14 +17,14 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Azure.IIoT.OpcUa.Api.Vault;
-using Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Filters;
-using Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.TokenStorage;
+using Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Filters;
+using Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.TokenStorage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Serilog;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App
+namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault
 {
     public class Startup
     {

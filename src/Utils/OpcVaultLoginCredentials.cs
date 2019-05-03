@@ -5,7 +5,7 @@
 
 using Microsoft.AspNetCore.Authentication.AzureAD.UI;
 using Microsoft.Azure.IIoT.OpcUa.Api.Vault;
-using Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.TokenStorage;
+using Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.TokenStorage;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Microsoft.Rest;
 using System;
@@ -15,7 +15,7 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Utils
+namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Utils
 {
     public class OpcVaultLoginCredentials : ServiceClientCredentials
     {

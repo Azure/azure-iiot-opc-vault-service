@@ -6,7 +6,7 @@
 using Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models;
 using Newtonsoft.Json;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Models
+namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Models
 {
     public class CertificateRequestIndexApiModel : CertificateRequestRecordApiModel
     {

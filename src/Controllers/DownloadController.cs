@@ -10,13 +10,14 @@ using Microsoft.AspNetCore.Authentication.AzureAD.UI;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.IIoT.OpcUa.Api.Vault;
-using Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Models;
-using Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.TokenStorage;
-using Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Utils;
+using Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models;
+using Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Models;
+using Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.TokenStorage;
+using Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Utils;
 using Microsoft.Rest;
 using Serilog;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
+namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Controllers
 {
     [Authorize]
     public class DownloadController : Controller
@@ -122,8 +123,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
             try
             {
                 var result = await _opcVault.FetchCertificateRequestResultAsync(requestId, applicationId);
-                if ((result.State == Api.Vault.Models.CertificateRequestState.Approved ||
-                    result.State == Api.Vault.Models.CertificateRequestState.Accepted) &&
+                if ((result.State == CertificateRequestState.Approved ||
+                    result.State == CertificateRequestState.Accepted) &&
                     result.SignedCertificate != null)
                 {
                     var byteArray = Convert.FromBase64String(result.SignedCertificate);
@@ -154,8 +155,8 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
             try
             {
                 var result = await _opcVault.FetchCertificateRequestResultAsync(requestId, applicationId);
-                if ((result.State == Api.Vault.Models.CertificateRequestState.Approved ||
-                    result.State == Api.Vault.Models.CertificateRequestState.Accepted) &&
+                if ((result.State == CertificateRequestState.Approved ||
+                    result.State == CertificateRequestState.Accepted) &&
                     result.SignedCertificate != null)
                 {
                     return RedirectToAction("DownloadCertBase64", new { cert = result.SignedCertificate });
@@ -322,7 +323,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
             try
             {
                 var result = await _opcVault.FetchCertificateRequestResultAsync(requestId, applicationId);
-                if (result.State == Api.Vault.Models.CertificateRequestState.Approved &&
+                if (result.State == CertificateRequestState.Approved &&
                     result.PrivateKey != null)
                 {
                     if (String.Compare(result.PrivateKeyFormat, "PFX", StringComparison.OrdinalIgnoreCase) == 0)
@@ -362,7 +363,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
             try
             {
                 var result = await _opcVault.FetchCertificateRequestResultAsync(requestId, applicationId);
-                if (result.State == Api.Vault.Models.CertificateRequestState.Approved &&
+                if (result.State == CertificateRequestState.Approved &&
                     result.PrivateKey != null)
                 {
                     var model = new KeyDetailsApiModel();
@@ -374,7 +375,7 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
                     else if (String.Compare(result.PrivateKeyFormat, "PEM", StringComparison.OrdinalIgnoreCase) == 0)
                     {
                         // if (false)
-                        // {   
+                        // {
                         //     //to display PEM as text
                         //     var byteArray = Convert.FromBase64String(result.PrivateKey);
                         //     model.EncodedBase64 = System.Text.Encoding.UTF8.GetString(byteArray, 0, byteArray.Length);

@@ -13,11 +13,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.IIoT.OpcUa.Api.Vault;
 using Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models;
-using Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Models;
-using Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.TokenStorage;
+using Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Models;
+using Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.TokenStorage;
 using Serilog;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
+namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Controllers
 {
     [Authorize]
     public class CertificateRequestController : DownloadController

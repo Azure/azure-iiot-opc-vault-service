@@ -9,7 +9,7 @@ using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using System;
 using System.Security.Claims;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.TokenStorage
+namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.TokenStorage
 {
     public class DistributedTokenCache : TokenCache
     {

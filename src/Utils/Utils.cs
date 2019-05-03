@@ -8,7 +8,7 @@ using System;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Utils
+namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Utils
 {
     public class ContentType
     {

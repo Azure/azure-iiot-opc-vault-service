@@ -4,12 +4,12 @@ EXPOSE 80
 
 FROM microsoft/dotnet:2.2-sdk-nanoserver-1809 AS build
 WORKDIR /src
-COPY src/Microsoft.Azure.IIoT.WebApps.OpcUa.Vault/src/Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.csproj src/Microsoft.Azure.IIoT.WebApps.OpcUa.Vault/src/
+COPY src/Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.csproj src/
 COPY NuGet.Config NuGet.Config
 COPY *.props /
-RUN dotnet restore --configfile NuGet.Config -nowarn:msb3202,nu1503 src/Microsoft.Azure.IIoT.WebApps.OpcUa.Vault/src/Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.csproj
+RUN dotnet restore --configfile NuGet.Config -nowarn:msb3202,nu1503 src/Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.csproj
 COPY . .
-WORKDIR /src/src/Microsoft.Azure.IIoT.WebApps.OpcUa.Vault/src
+WORKDIR /src/src
 RUN dotnet build Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.csproj -c Release -o /app
 
 FROM build AS publish

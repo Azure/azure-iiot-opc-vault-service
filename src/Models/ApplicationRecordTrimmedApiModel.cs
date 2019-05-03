@@ -5,7 +5,7 @@
 
 using Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Models
+namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Models
 {
     public class ApplicationRecordTrimmedApiModel : ApplicationRecordApiModel
     {

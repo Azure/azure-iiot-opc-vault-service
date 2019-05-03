@@ -7,10 +7,10 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Models;
+using Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Models;
 using Serilog;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Controllers
+namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Controllers
 {
     [Authorize]
     public class HomeController : Controller

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <UserSecretsId>aspnet-OpcVault.App-5A0E1F7B-A23C-46EF-8EC8-349C434E72BE</UserSecretsId>
@@ -29,6 +29,18 @@
     <Otherwise>
       <ItemGroup>
         <PackageReference Include="OPCFoundation.NetStandard.Opc.Ua.Symbols" Version="1.4.355.25" />
+      </ItemGroup>
+    </Otherwise>
+  </Choose>
+  <Choose>
+    <When Condition="Exists('..\..\..\common')">
+      <ItemGroup>
+        <ProjectReference Include="..\..\..\common\src\Microsoft.Azure.IIoT.Core\src\Microsoft.Azure.IIoT.Core.csproj" />
+      </ItemGroup>
+    </When>
+    <Otherwise>
+      <ItemGroup>
+        <PackageReference Include="Microsoft.Azure.IIoT.Core" Version="$(CommonVersion)" />
       </ItemGroup>
     </Otherwise>
   </Choose>

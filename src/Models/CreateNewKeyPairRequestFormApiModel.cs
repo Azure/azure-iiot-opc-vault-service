@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models;
 using Opc.Ua.Gds.Client;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Models
+namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Models
 {
     /// <summary>
     /// helper for model validation in new keypair request form

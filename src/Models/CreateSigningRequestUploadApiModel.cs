@@ -5,7 +5,7 @@
 
 using Microsoft.AspNetCore.Http;
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault.App.Models
+namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Models
 {
     using System;
     using System.Collections.Generic;
