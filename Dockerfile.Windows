@@ -1,8 +1,8 @@
-FROM microsoft/dotnet:2.2-aspnetcore-runtime AS base
+FROM microsoft/dotnet:2.2-aspnetcore-runtime-nanoserver-1809 AS base
 WORKDIR /app
 EXPOSE 80
 
-FROM microsoft/dotnet:2.2-sdk AS build
+FROM microsoft/dotnet:2.2-sdk-nanoserver-1809 AS build
 WORKDIR /src
 COPY src/Microsoft.Azure.IIoT.WebApps.OpcUa.Vault/src/Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.csproj src/Microsoft.Azure.IIoT.WebApps.OpcUa.Vault/src/
 COPY NuGet.Config NuGet.Config

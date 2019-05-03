@@ -1,0 +1,9 @@
+<Project>
+  <PropertyGroup>
+    <ServicesApiVersion>2.0.2</ServicesApiVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ServicesApiPrereleaseVersion>$(ServicesApiVersion)-*</ServicesApiPrereleaseVersion>
+    <ServicesApiVersion Condition="'$(VersionSuffix)' != ''">$(ServicesApiPrereleaseVersion)</ServicesApiVersion>
+  </PropertyGroup>
+</Project>
