@@ -2,37 +2,29 @@
 // Licensed under the MIT License. See License.txt in the project root for
 // license information.
 //
-using Microsoft.AspNetCore.DataProtection;
-using Microsoft.Extensions.Caching.Distributed;
-using Serilog;
-using Microsoft.IdentityModel.Clients.ActiveDirectory;
-using System;
-using System.Security.Claims;
 
-namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.TokenStorage
-{
-    public class DistributedTokenCache : TokenCache
-    {
-        private ClaimsPrincipal _claimsPrincipal;
-        private readonly ILogger _logger;
-        private IDistributedCache _distributedCache;
-        private IDataProtector _protector;
-        private string _cacheKey;
+namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.TokenStorage {
+    using Microsoft.AspNetCore.DataProtection;
+    using Microsoft.Extensions.Caching.Distributed;
+    using Microsoft.IdentityModel.Clients.ActiveDirectory;
+    using Serilog;
+    using System;
+    using System.Security.Claims;
+
+    public class DistributedTokenCache : TokenCache {
 
         /// <summary>
-        /// Initializes a new instance of <see cref="TokenStorage.DistributedTokenCache"/>
+        /// Initializes a new instance of <see cref="DistributedTokenCache"/>
         /// </summary>
-        /// <param name="claimsPrincipal">A <see cref="System.Security.Claims.ClaimsPrincipal"/> for the signed in user</param>
-        /// <param name="distributedCache">An implementation of <see cref="Microsoft.Extensions.Caching.Distributed.IDistributedCache"/> in which to store the access tokens.</param>
-        /// <param name="logger">A <see cref="Serilog.ILogger"/> instance.</param>
-        /// <param name="dataProtectionProvider">An <see cref="Microsoft.AspNetCore.DataProtection.IDataProtectionProvider"/> for creating a data protector.</param>
+        /// <param name="claimsPrincipal">A <see cref="ClaimsPrincipal"/> for the signed in user</param>
+        /// <param name="distributedCache">An implementation of <see cref="IDistributedCache"/> in which to store the access tokens.</param>
+        /// <param name="logger">A <see cref="ILogger"/> instance.</param>
+        /// <param name="dataProtectionProvider">An <see cref="IDataProtectionProvider"/> for creating a data protector.</param>
         public DistributedTokenCache(
             ClaimsPrincipal claimsPrincipal,
             IDistributedCache distributedCache,
             ILogger logger,
-            IDataProtectionProvider dataProtectionProvider)
-            : base()
-        {
+            IDataProtectionProvider dataProtectionProvider) {
             _claimsPrincipal = claimsPrincipal;
             _cacheKey = BuildCacheKey(_claimsPrincipal);
             _distributedCache = distributedCache;
@@ -45,24 +37,19 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.TokenStorage
         /// <summary>
         /// Builds the cache key to use for this item in the distributed cache.
         /// </summary>
-        /// <param name="claimsPrincipal">A <see cref="System.Security.Claims.ClaimsPrincipal"/> for the signed in user</param>
+        /// <param name="claimsPrincipal">A <see cref="ClaimsPrincipal"/> for the signed in user</param>
         /// <returns>Cache key for this item.</returns>
-        private static string BuildCacheKey(ClaimsPrincipal claimsPrincipal)
-        {
-            return string.Format(
+        private static string BuildCacheKey(ClaimsPrincipal claimsPrincipal) => string.Format(
                 "UserId:{0}",
                 claimsPrincipal.Identity.Name);
-        }
 
         /// <summary>
         /// Attempts to load tokens from distributed cache.
         /// </summary>
-        private void LoadFromCache()
-        {
-            byte[] cacheData = _distributedCache.Get(_cacheKey);
-            if (cacheData != null)
-            {
-                this.Deserialize(_protector.Unprotect(cacheData));
+        private void LoadFromCache() {
+            var cacheData = _distributedCache.Get(_cacheKey);
+            if (cacheData != null) {
+                Deserialize(_protector.Unprotect(cacheData));
                 _logger.TokensRetrievedFromStore(_cacheKey);
             }
         }
@@ -70,34 +57,33 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.TokenStorage
         /// <summary>
         /// Handles the AfterAccessNotification event, which is triggered right after ADAL accesses the cache.
         /// </summary>
-        /// <param name="args">An instance of <see cref="Microsoft.IdentityModel.Clients.ActiveDirectory.TokenCacheNotificationArgs"/> containing information for this event.</param>
-        public void AfterAccessNotification(TokenCacheNotificationArgs args)
-        {
-            if (this.HasStateChanged)
-            {
-                try
-                {
-                    if (this.Count > 0)
-                    {
-                        _distributedCache.Set(_cacheKey, _protector.Protect(this.Serialize()));
+        /// <param name="args">An instance of <see cref="TokenCacheNotificationArgs"/> containing information for this event.</param>
+        public void AfterAccessNotification(TokenCacheNotificationArgs args) {
+            if (HasStateChanged) {
+                try {
+                    if (Count > 0) {
+                        _distributedCache.Set(_cacheKey, _protector.Protect(Serialize()));
                         _logger.TokensWrittenToStore(args.ClientId, args.UniqueId, args.Resource);
                     }
-                    else
-                    {
+                    else {
                         // There are no tokens for this user/client, so remove them from the cache.
                         // This was previously handled in an overridden Clear() method, but the built-in Clear() calls this
                         // after the dictionary is cleared.
                         _distributedCache.Remove(_cacheKey);
                         _logger.TokenCacheCleared(_claimsPrincipal.Identity.Name ?? "<none>");
                     }
-                    this.HasStateChanged = false;
+                    HasStateChanged = false;
                 }
-                catch (Exception exp)
-                {
+                catch (Exception exp) {
                     _logger.WriteToCacheFailed(exp);
                     throw;
                 }
             }
         }
+        private readonly ClaimsPrincipal _claimsPrincipal;
+        private readonly ILogger _logger;
+        private readonly IDistributedCache _distributedCache;
+        private readonly IDataProtector _protector;
+        private readonly string _cacheKey;
     }
 }

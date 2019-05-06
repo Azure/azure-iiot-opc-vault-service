@@ -1,87 +1,80 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for
 // license information.
 //
 
-using Microsoft.AspNetCore.Authentication.AzureAD.UI;
-using Microsoft.Azure.IIoT.OpcUa.Api.Vault;
-using Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.TokenStorage;
-using Microsoft.IdentityModel.Clients.ActiveDirectory;
-using Microsoft.Rest;
-using System;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Security.Claims;
-using System.Threading;
-using System.Threading.Tasks;
+namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Utils {
+    using Microsoft.AspNetCore.Authentication.AzureAD.UI;
+    using Microsoft.Azure.IIoT.OpcUa.Api.Vault;
+    using Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.TokenStorage;
+    using Microsoft.IdentityModel.Clients.ActiveDirectory;
+    using Microsoft.Rest;
+    using System;
+    using System.Net.Http;
+    using System.Net.Http.Headers;
+    using System.Security.Claims;
+    using System.Threading;
+    using System.Threading.Tasks;
 
-namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Utils
-{
-    public class OpcVaultLoginCredentials : ServiceClientCredentials
-    {
-        private OpcVaultApiOptions opcVaultOptions;
-        private AzureADOptions azureADOptions;
-        private ITokenCacheService tokenCacheService;
-        private ClaimsPrincipal claimsPrincipal;
+    public class OpcVaultLoginCredentials : ServiceClientCredentials {
 
         public OpcVaultLoginCredentials(
             OpcVaultApiOptions opcVaultOptions,
             AzureADOptions azureADOptions,
             ITokenCacheService tokenCacheService,
-            ClaimsPrincipal claimsPrincipal)
-        {
-            this.opcVaultOptions = opcVaultOptions;
-            this.azureADOptions = azureADOptions;
-            this.tokenCacheService = tokenCacheService;
-            this.claimsPrincipal = claimsPrincipal;
+            ClaimsPrincipal claimsPrincipal) {
+            _opcVaultOptions = opcVaultOptions;
+            _azureADOptions = azureADOptions;
+            _tokenCacheService = tokenCacheService;
+            _claimsPrincipal = claimsPrincipal;
         }
-        private string AuthenticationToken { get; set; }
-        public override void InitializeServiceClient<T>(ServiceClient<T> client)
-        {
-            var tokenCache = tokenCacheService.GetCacheAsync(claimsPrincipal).Result;
+
+        public override void InitializeServiceClient<T>(ServiceClient<T> client) {
+            var tokenCache = _tokenCacheService.GetCacheAsync(_claimsPrincipal).Result;
 
             var authenticationContext =
-                new AuthenticationContext(azureADOptions.Instance + azureADOptions.TenantId, tokenCache);
+                new AuthenticationContext(_azureADOptions.Instance + _azureADOptions.TenantId, tokenCache);
 
             var credential = new ClientCredential(
-                clientId: azureADOptions.ClientId,
-                clientSecret: azureADOptions.ClientSecret);
+                _azureADOptions.ClientId,
+                _azureADOptions.ClientSecret);
 
-            var name = claimsPrincipal.FindFirstValue(ClaimTypes.Upn) ??
-                claimsPrincipal.FindFirstValue(ClaimTypes.Email);
-            string userObjectId = (claimsPrincipal.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier"))?.Value;
+            var name = _claimsPrincipal.FindFirstValue(ClaimTypes.Upn) ??
+                _claimsPrincipal.FindFirstValue(ClaimTypes.Email);
+            var userObjectId = (_claimsPrincipal.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier"))?.Value;
             var user = new UserIdentifier(userObjectId, UserIdentifierType.UniqueId);
 
             var result = authenticationContext.AcquireTokenSilentAsync(
-                        resource: opcVaultOptions.ResourceId,
-                        clientCredential: credential,
+                        _opcVaultOptions.ResourceId,
+                        credential,
                         userId: user).GetAwaiter().GetResult();
 
-            if (result == null)
-            {
+            if (result == null) {
                 throw new InvalidOperationException("Failed to obtain the JWT token");
             }
 
-            AuthenticationToken = result.AccessToken;
+            _authenticationToken = result.AccessToken;
         }
 
-        public override async Task ProcessHttpRequestAsync(HttpRequestMessage request, CancellationToken cancellationToken)
-        {
-            if (request == null)
-            {
-                throw new ArgumentNullException("request");
+        public override async Task ProcessHttpRequestAsync(HttpRequestMessage request, CancellationToken cancellationToken) {
+            if (request == null) {
+                throw new ArgumentNullException(nameof(request));
             }
 
-            if (AuthenticationToken == null)
-            {
+            if (_authenticationToken == null) {
                 throw new InvalidOperationException("Token Provider Cannot Be Null");
             }
 
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthenticationToken);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _authenticationToken);
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             await base.ProcessHttpRequestAsync(request, cancellationToken);
         }
-    }
 
+        private readonly OpcVaultApiOptions _opcVaultOptions;
+        private readonly AzureADOptions _azureADOptions;
+        private readonly ITokenCacheService _tokenCacheService;
+        private readonly ClaimsPrincipal _claimsPrincipal;
+        private string _authenticationToken;
+    }
 }

@@ -1,27 +1,25 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for
 // license information.
 //
 
-using System.Security.Claims;
-using System.Threading.Tasks;
-using Microsoft.IdentityModel.Clients.ActiveDirectory;
+namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.TokenStorage {
+    using Microsoft.IdentityModel.Clients.ActiveDirectory;
+    using System.Security.Claims;
+    using System.Threading.Tasks;
 
-namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.TokenStorage
-{
-    public interface ITokenCacheService
-    {
+    public interface ITokenCacheService {
         /// <summary>
-        /// Returns an instance of <see cref="Microsoft.IdentityModel.Clients.ActiveDirectory.TokenCache"/>.
+        /// Returns an instance of <see cref="TokenCache"/>.
         /// </summary>
-        /// <param name="claimsPrincipal">Current user's <see cref="System.Security.Claims.ClaimsPrincipal"/>.</param>
-        /// <returns>An instance of <see cref="Microsoft.IdentityModel.Clients.ActiveDirectory.TokenCache"/>.</returns>
+        /// <param name="claimsPrincipal">Current user's <see cref="ClaimsPrincipal"/>.</param>
+        /// <returns>An instance of <see cref="TokenCache"/>.</returns>
         Task<TokenCache> GetCacheAsync(ClaimsPrincipal claimsPrincipal);
 
         /// <summary>
         /// Clears the token cache.
         /// </summary>
-        /// <param name="claimsPrincipal">Current user's <see cref="System.Security.Claims.ClaimsPrincipal"/>.</param>
+        /// <param name="claimsPrincipal">Current user's <see cref="ClaimsPrincipal"/>.</param>
         Task ClearCacheAsync(ClaimsPrincipal claimsPrincipal);
     }
 }

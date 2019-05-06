@@ -4,33 +4,21 @@
 //
 
 
-namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Models
-{
+namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Models {
     using Newtonsoft.Json;
-    using System;
 
-    public partial class CertificateDetailsCollectionApiModel
-    {
+    public class CertificateDetailsCollectionApiModel {
         /// <summary>
         /// Initializes a new instance of the CertificateDetailsCollectionApiModel
         /// class.
         /// </summary>
-        public CertificateDetailsCollectionApiModel(string id)
-        {
-            Name = id;
-            CustomInit();
-        }
-
-        /// <summary>
-        /// An initialization method that performs custom operations like setting defaults
-        /// </summary>
-        partial void CustomInit();
+        public CertificateDetailsCollectionApiModel(string id) => Name = id;
 
         [JsonProperty(PropertyName = "Name")]
         public string Name { get; set; }
 
         [JsonProperty(PropertyName = "Certificates")]
-        public CertificateDetailsApiModel [] Certificates { get; set; }
+        public CertificateDetailsApiModel[] Certificates { get; set; }
 
     }
 }

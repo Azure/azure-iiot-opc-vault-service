@@ -3,28 +3,11 @@
 // license information.
 //
 
-
-namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Models
-{
+namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Models {
     using Newtonsoft.Json;
     using System;
 
-    public partial class CertificateDetailsApiModel
-    {
-        /// <summary>
-        /// Initializes a new instance of the CertificateDetailsCollectionApiModel
-        /// class.
-        /// </summary>
-        public CertificateDetailsApiModel()
-        {
-            CustomInit();
-        }
-
-        /// <summary>
-        /// An initialization method that performs custom operations like setting defaults
-        /// </summary>
-        partial void CustomInit();
-
+    public class CertificateDetailsApiModel {
         [JsonProperty(PropertyName = "Subject")]
         public string Subject { get; set; }
 

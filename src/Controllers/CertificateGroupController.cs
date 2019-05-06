@@ -3,28 +3,26 @@
 // license information.
 //
 
-using System;
-using System.Collections.Generic;
-using System.Security.Cryptography.X509Certificates;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication.AzureAD.UI;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.IIoT.OpcUa.Api.Vault;
-using Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models;
-using Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Models;
-using Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.TokenStorage;
-using Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Utils;
-using Microsoft.Rest;
+namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Controllers {
+    using Microsoft.AspNetCore.Authentication.AzureAD.UI;
+    using Microsoft.AspNetCore.Authorization;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.Azure.IIoT.OpcUa.Api.Vault;
+    using Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models;
+    using Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Models;
+    using Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.TokenStorage;
+    using Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Utils;
+    using Microsoft.Rest;
+    using System;
+    using System.Collections.Generic;
+    using System.Security.Cryptography.X509Certificates;
+    using System.Threading.Tasks;
 
-namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Controllers
-{
     /// <summary>
     /// The certificate group controller.
     /// </summary>
     [Authorize]
-    public class CertificateGroupController : Controller
-    {
+    public class CertificateGroupController : Controller {
         private IOpcVault _opcVault;
         private readonly OpcVaultApiOptions _opcVaultOptions;
         private readonly AzureADOptions _azureADOptions;
@@ -33,28 +31,24 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Controllers
         public CertificateGroupController(
             OpcVaultApiOptions opcVaultOptions,
             AzureADOptions azureADOptions,
-            ITokenCacheService tokenCacheService)
-        {
-            this._opcVaultOptions = opcVaultOptions;
-            this._azureADOptions = azureADOptions;
-            this._tokenCacheService = tokenCacheService;
+            ITokenCacheService tokenCacheService) {
+            _opcVaultOptions = opcVaultOptions;
+            _azureADOptions = azureADOptions;
+            _tokenCacheService = tokenCacheService;
         }
 
         /// <summary>
         /// List all certificate groups.
         /// </summary>
         [ActionName("Index")]
-        public async Task<ActionResult> IndexAsync(string error)
-        {
+        public async Task<ActionResult> IndexAsync(string error) {
             AuthorizeClient();
-            try
-            {
+            try {
                 var requests = await _opcVault.GetCertificateGroupsConfigurationAsync();
                 ViewData["ErrorMessage"] = error;
                 return View(requests.Groups);
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 ViewData["ErrorMessage"] =
                     "Failed to load the certificate groups. " +
                     "Message:" + ex.Message;
@@ -66,16 +60,13 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Controllers
         /// Show the details.
         /// </summary>
         [ActionName("Details")]
-        public async Task<ActionResult> DetailsAsync(string id)
-        {
+        public async Task<ActionResult> DetailsAsync(string id) {
             AuthorizeClient();
-            try
-            {
+            try {
                 var request = await _opcVault.GetCertificateGroupConfigurationAsync(id);
                 return View(request);
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 ViewData["ErrorMessage"] =
                     "Failed to load the certificate group " + id + ". " +
                     "Message:" + ex.Message;
@@ -84,17 +75,14 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Controllers
         }
 
         [ActionName("Renew")]
-        public async Task<ActionResult> Renew(string id)
-        {
+        public async Task<ActionResult> Renew(string id) {
             AuthorizeClient();
-            try
-            {
+            try {
                 var request = await _opcVault.CreateCertificateGroupIssuerCACertAsync(id);
                 return RedirectToAction("IssuerDetails", new { id });
             }
-            catch (Exception ex)
-            {
-                string error =
+            catch (Exception ex) {
+                var error =
                     "Failed to renew the Issuer CA certificate. " +
                     "Message:" + ex.Message;
                 return RedirectToAction("IssuerDetails", new { id, error });
@@ -106,17 +94,14 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Controllers
         /// Revoke all certificates for a group.
         /// </summary>
         [ActionName("Revoke")]
-        public async Task<ActionResult> Revoke(string id)
-        {
+        public async Task<ActionResult> Revoke(string id) {
             AuthorizeClient();
-            try
-            {
+            try {
                 await _opcVault.RevokeCertificateGroupAsync(id);
                 return RedirectToAction("IssuerDetails", new { id });
             }
-            catch (Exception ex)
-            {
-                string error =
+            catch (Exception ex) {
+                var error =
                     "Failed to revoke the certificage group " + id + "." +
                     "Message:" + ex.Message;
                 return RedirectToAction("IssuerDetails", new { id, error });
@@ -130,26 +115,21 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Controllers
         [ActionName("Edit")]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> EditAsync(
-            CertificateGroupConfigurationApiModel newGroup)
-        {
-            if (ModelState.IsValid)
-            {
+            CertificateGroupConfigurationApiModel newGroup) {
+            if (ModelState.IsValid) {
                 AuthorizeClient();
                 CertificateGroupConfigurationApiModel group;
-                try
-                {
+                try {
                     group = await _opcVault.GetCertificateGroupConfigurationAsync(newGroup.Name);
                 }
-                catch (Exception ex)
-                {
+                catch (Exception ex) {
                     var error =
                         "Failed to load the certificate group configuration " + newGroup.Name + ". " +
                         "Message:" + ex.Message;
                     return RedirectToAction("Index", new { error });
                 }
 
-                if (group == null)
-                {
+                if (group == null) {
                     return new NotFoundResult();
                 }
 
@@ -163,12 +143,10 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Controllers
                 //group.IssuerCACertificateHashSize = newGroup.IssuerCACertificateHashSize;
                 //group.IssuerCACRLDistributionPoint = newGroup.IssuerCACRLDistributionPoint;
                 //group.IssuerCAAuthorityInformationAccess = newGroup.IssuerCAAuthorityInformationAccess;
-                try
-                {
+                try {
                     await _opcVault.UpdateCertificateGroupConfigurationAsync(group.Name, group).ConfigureAwait(false);
                 }
-                catch (Exception ex)
-                {
+                catch (Exception ex) {
                     var error =
                         "Failed to update the certificate group configuration " + group.Name + ". " +
                         "Message:" + ex.Message;
@@ -185,16 +163,13 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Controllers
         /// The edit form for a certificate group.
         /// </summary>
         [ActionName("Edit")]
-        public async Task<ActionResult> EditAsync(string id)
-        {
-            if (String.IsNullOrEmpty(id))
-            {
+        public async Task<ActionResult> EditAsync(string id) {
+            if (string.IsNullOrEmpty(id)) {
                 return new BadRequestResult();
             }
             AuthorizeClient();
             var group = await _opcVault.GetCertificateGroupConfigurationAsync(id);
-            if (group == null)
-            {
+            if (group == null) {
                 return new NotFoundResult();
             }
 
@@ -205,19 +180,15 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Controllers
         /// The Issuer Details.
         /// </summary>
         [ActionName("IssuerDetails")]
-        public async Task<ActionResult> IssuerDetailsAsync(string id, string error)
-        {
+        public async Task<ActionResult> IssuerDetailsAsync(string id, string error) {
             AuthorizeClient();
-            try
-            {
+            try {
                 var issuer = await _opcVault.GetCertificateGroupIssuerCAChainAsync(id);
                 var certList = new List<CertificateDetailsApiModel>();
-                foreach (var certificate in issuer.Chain)
-                {
+                foreach (var certificate in issuer.Chain) {
                     var byteArray = Convert.FromBase64String(certificate.Certificate);
-                    X509Certificate2 cert = new X509Certificate2(byteArray);
-                    var model = new CertificateDetailsApiModel()
-                    {
+                    var cert = new X509Certificate2(byteArray);
+                    var model = new CertificateDetailsApiModel {
                         Subject = cert.Subject,
                         Issuer = cert.Issuer,
                         Thumbprint = cert.Thumbprint,
@@ -227,15 +198,13 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Controllers
                     };
                     certList.Add(model);
                 }
-                var modelCollection = new CertificateDetailsCollectionApiModel(id)
-                {
+                var modelCollection = new CertificateDetailsCollectionApiModel(id) {
                     Certificates = certList.ToArray()
                 };
                 ViewData["ErrorMessage"] = error;
                 return View(modelCollection);
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 var exError =
                     "Failed to load the Issuer CA Chain " + id + ". " +
                     "Message:" + ex.Message;
@@ -245,20 +214,16 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Controllers
 
 
         [ActionName("DownloadIssuer")]
-        public async Task<ActionResult> DownloadIssuerAsync(string id)
-        {
+        public async Task<ActionResult> DownloadIssuerAsync(string id) {
             AuthorizeClient();
-            try
-            {
+            try {
                 var issuer = await _opcVault.GetCertificateGroupIssuerCAChainAsync(id);
                 var byteArray = Convert.FromBase64String(issuer.Chain[0].Certificate);
-                return new FileContentResult(byteArray, ContentType.Cert)
-                {
-                    FileDownloadName = Utils.Utils.CertFileName(issuer.Chain[0].Certificate) + ".der"
+                return new FileContentResult(byteArray, ContentEncodings.MimeTypeCert) {
+                    FileDownloadName = Utils.CertFileName(issuer.Chain[0].Certificate) + ".der"
                 };
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 var error =
                     "Failed to load the Issuer CA certificate. " +
                     "Message:" + ex.Message;
@@ -267,21 +232,17 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Controllers
         }
 
         [ActionName("DownloadIssuerCrl")]
-        public async Task<ActionResult> DownloadIssuerCrlAsync(string id)
-        {
+        public async Task<ActionResult> DownloadIssuerCrlAsync(string id) {
             AuthorizeClient();
-            try
-            {
+            try {
                 var issuer = await _opcVault.GetCertificateGroupIssuerCAChainAsync(id);
                 var crl = await _opcVault.GetCertificateGroupIssuerCACrlChainAsync(id);
                 var byteArray = Convert.FromBase64String(crl.Chain[0].Crl);
-                return new FileContentResult(byteArray, ContentType.Crl)
-                {
-                    FileDownloadName = Utils.Utils.CertFileName(issuer.Chain[0].Certificate) + ".crl"
+                return new FileContentResult(byteArray, ContentEncodings.MimeTypeCrl) {
+                    FileDownloadName = Utils.CertFileName(issuer.Chain[0].Certificate) + ".crl"
                 };
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 var error =
                     "Failed to load the Issuer CRL. " +
                     "Message:" + ex.Message;
@@ -289,10 +250,8 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Controllers
             }
         }
 
-        private void AuthorizeClient()
-        {
-            if (_opcVault == null)
-            {
+        private void AuthorizeClient() {
+            if (_opcVault == null) {
                 ServiceClientCredentials serviceClientCredentials =
                     new OpcVaultLoginCredentials(_opcVaultOptions, _azureADOptions, _tokenCacheService, User);
                 _opcVault = new OpcVault(new Uri(_opcVaultOptions.BaseAddress), serviceClientCredentials);

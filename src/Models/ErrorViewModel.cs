@@ -3,10 +3,8 @@
 // license information.
 //
 
-namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Models
-{
-    public class ErrorViewModel
-    {
+namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Models {
+    public class ErrorViewModel {
         public string RequestId { get; set; }
 
         public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);

@@ -3,28 +3,11 @@
 // license information.
 //
 
-
-namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Models
-{
+namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Models {
     using Newtonsoft.Json;
     using System;
 
-    public partial class CrlDetailsApiModel
-    {
-        /// <summary>
-        /// Initializes a new instance of the CrlDetailsApiModel
-        /// class.
-        /// </summary>
-        public CrlDetailsApiModel()
-        {
-            CustomInit();
-        }
-
-        /// <summary>
-        /// An initialization method that performs custom operations like setting defaults
-        /// </summary>
-        partial void CustomInit();
-
+    public class CrlDetailsApiModel {
         [JsonProperty(PropertyName = "Issuer")]
         public string Issuer { get; set; }
 
@@ -36,6 +19,5 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Models
 
         [JsonProperty(PropertyName = "EncodedBase64")]
         public string EncodedBase64 { get; set; }
-
     }
 }

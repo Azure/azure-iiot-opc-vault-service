@@ -18,12 +18,8 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Models
     /// </summary>
     public class CreateNewKeyPairRequestFormApiModelAttribute : ValidationAttribute, IClientModelValidator
     {
-        ServerCapabilities _serverCaps = new ServerCapabilities();
+        readonly ServerCapabilities _serverCaps = new ServerCapabilities();
         const int ApplicationTypeClient = 1;
-
-        public CreateNewKeyPairRequestFormApiModelAttribute()
-        {
-        }
 
         public void AddValidation(ClientModelValidationContext context)
         {
@@ -32,21 +28,21 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Models
 
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
-            CreateNewKeyPairRequestApiModel request = (CreateNewKeyPairRequestApiModel)validationContext.ObjectInstance;
+            var request = (CreateNewKeyPairRequestApiModel)validationContext.ObjectInstance;
             var errorList = new List<string>();
 
-            if (String.IsNullOrWhiteSpace(request.SubjectName)) { errorList.Add(nameof(request.SubjectName)); }
+            if (string.IsNullOrWhiteSpace(request.SubjectName)) { errorList.Add(nameof(request.SubjectName)); }
             if (request.DomainNames != null)
             {
                 if (request.DomainNames.Count > 0)
                 {
-                    if (String.IsNullOrWhiteSpace(request.DomainNames[0]))
+                    if (string.IsNullOrWhiteSpace(request.DomainNames[0]))
                     {
                         errorList.Add("DomainNames[0]");
                     }
                 }
             }
-            if (String.IsNullOrWhiteSpace(request.PrivateKeyFormat)) { errorList.Add(nameof(request.PrivateKeyFormat)); }
+            if (string.IsNullOrWhiteSpace(request.PrivateKeyFormat)) { errorList.Add(nameof(request.PrivateKeyFormat)); }
             if (errorList.Count > 0) { return new ValidationResult("Required Field.", errorList); }
 
             try
@@ -73,12 +69,9 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Models
     [CreateNewKeyPairRequestFormApiModel]
     public class CreateNewKeyPairRequestFormApiModel : CreateNewKeyPairRequestApiModel
     {
-        public CreateNewKeyPairRequestFormApiModel() : base()
-        { }
+        public CreateNewKeyPairRequestFormApiModel()         { }
 
-        public CreateNewKeyPairRequestFormApiModel(CreateNewKeyPairRequestApiModel apiModel) :
-            base()
-        {
+        public CreateNewKeyPairRequestFormApiModel(CreateNewKeyPairRequestApiModel apiModel)         {
             ApplicationId = apiModel.ApplicationId;
             CertificateGroupId = apiModel.CertificateGroupId;
             CertificateTypeId = apiModel.CertificateTypeId;

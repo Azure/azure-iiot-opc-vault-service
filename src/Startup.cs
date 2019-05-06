@@ -3,33 +3,30 @@
 // license information.
 //
 
-using System;
-using System.Threading.Tasks;
-using Autofac;
-using Autofac.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.AzureAD.UI;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Authorization;
-using Microsoft.Azure.IIoT.OpcUa.Api.Vault;
-using Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Filters;
-using Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.TokenStorage;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Clients.ActiveDirectory;
-using Serilog;
+namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault {
+    using Autofac;
+    using Autofac.Extensions.DependencyInjection;
+    using Microsoft.AspNetCore.Authentication;
+    using Microsoft.AspNetCore.Authentication.AzureAD.UI;
+    using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+    using Microsoft.AspNetCore.Authorization;
+    using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.AspNetCore.Http;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc.Authorization;
+    using Microsoft.Azure.IIoT.OpcUa.Api.Vault;
+    using Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Filters;
+    using Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.TokenStorage;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.IdentityModel.Clients.ActiveDirectory;
+    using Serilog;
+    using System;
+    using System.Threading.Tasks;
 
-namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault
-{
-    public class Startup
-    {
-        public Startup(IConfiguration configuration)
-        {
+    public class Startup {
+        public Startup(IConfiguration configuration) {
             Configuration = configuration;
             OpcVaultOptions = new OpcVaultApiOptions();
             Configuration.Bind("OpcVault", OpcVaultOptions);
@@ -47,24 +44,21 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault
         public IContainer ApplicationContainer { get; private set; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public IServiceProvider ConfigureServices(IServiceCollection services)
-        {
+        public IServiceProvider ConfigureServices(IServiceCollection services) {
             services.AddSingleton(OpcVaultOptions);
             services.AddSingleton(AzureADOptions);
 
-            services.Configure<CookiePolicyOptions>(options =>
-            {
+            services.Configure<CookiePolicyOptions>(options => {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
             services.AddAuthentication(AzureADDefaults.AuthenticationScheme)
-                .AddAzureAD(options => Configuration.Bind("AzureAd", options))
-            ;
-            services.Configure<OpenIdConnectOptions>(AzureADDefaults.OpenIdScheme, options =>
-            {
+                .AddAzureAD(options => Configuration.Bind("AzureAd", options));
+
+            services.Configure<OpenIdConnectOptions>(AzureADDefaults.OpenIdScheme, options => {
                 // Without overriding the response type (which by default is id_token), the OnAuthorizationCodeReceived event is not called.
-                // but instead OnTokenValidated event is called. Here we request both so that OnTokenValidated is called first which 
+                // but instead OnTokenValidated event is called. Here we request both so that OnTokenValidated is called first which
                 // ensures that context.Principal has a non-null value when OnAuthorizeationCodeReceived is called
                 options.ResponseType = "id_token code";
                 // set the resource id of the service api which needs to be accessed
@@ -72,10 +66,8 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault
                 // refresh token
                 options.Scope.Add("offline_access");
 
-                options.Events = new OpenIdConnectEvents
-                {
-                    OnTicketReceived = context =>
-                    {
+                options.Events = new OpenIdConnectEvents {
+                    OnTicketReceived = context => {
                         // stop by `/Home/Continue` instead of going directly to the ReturnUri
                         // to work around Safari's issues with SameSite=lax session cookies not being
                         // returned on the final redirect of the authentication flow.
@@ -84,21 +76,19 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault
                         context.ReturnUri = "/Home/Continue?returnUrl=" + System.Net.WebUtility.UrlEncode(context.ReturnUri ?? "/");
                         return Task.CompletedTask;
                     },
-                    OnAuthenticationFailed = context =>
-                    {
+                    OnAuthenticationFailed = context => {
                         context.Response.Redirect("/Error");
                         context.HandleResponse(); // Suppress the exception
                         return Task.CompletedTask;
                     },
                     /// <summary>
                     /// Redeems the authorization code by calling AcquireTokenByAuthorizationCodeAsync in order to ensure
-                    /// that the cache has a token for the signed-in user, which will then enable the controllers 
+                    /// that the cache has a token for the signed-in user, which will then enable the controllers
                     /// to call AcquireTokenSilentAsync successfully.
                     /// </summary>
-                    OnAuthorizationCodeReceived = async context =>
-                    {
+                    OnAuthorizationCodeReceived = async context => {
                         // Acquire a Token for the API and cache it. In the OpcVaultController, we'll use the cache to acquire a token for the API
-                        string userObjectId = (context.Principal.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier"))?.Value;
+                        var userObjectId = (context.Principal.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier"))?.Value;
                         var credential = new ClientCredential(context.Options.ClientId, context.Options.ClientSecret);
 
                         var tokenCacheService = context.HttpContext.RequestServices.GetRequiredService<ITokenCacheService>();
@@ -119,8 +109,7 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault
                 };
             });
 
-            services.AddMvc(options =>
-            {
+            services.AddMvc(options => {
                 options.Filters.Add(typeof(AdalTokenAcquisitionExceptionFilter));
                 var policy = new AuthorizationPolicyBuilder()
                     .RequireAuthenticatedUser()
@@ -149,14 +138,11 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault
         public void Configure(
             IApplicationBuilder app,
             IHostingEnvironment env,
-            IApplicationLifetime appLifetime)
-        {
-            if (env.IsDevelopment())
-            {
+            IApplicationLifetime appLifetime) {
+            if (env.IsDevelopment()) {
                 app.UseDeveloperExceptionPage();
             }
-            else
-            {
+            else {
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
@@ -166,11 +152,10 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault
             app.UseCookiePolicy();
 
             app.UseAuthentication();
-            app.UseMvc(routes =>
-            {
+            app.UseMvc(routes => {
                 routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                    "default",
+                    "{controller=Home}/{action=Index}/{id?}");
             });
 
             // If you want to dispose of resources that have been resolved in the
@@ -183,9 +168,8 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault
         /// Autofac configuration. Find more information here:
         /// @see http://docs.autofac.org/en/latest/integration/aspnetcore.html
         /// </summary>
-        public IContainer ConfigureContainer(IServiceCollection services)
-        {
-            ContainerBuilder builder = new ContainerBuilder();
+        public IContainer ConfigureContainer(IServiceCollection services) {
+            var builder = new ContainerBuilder();
 
             // Populate from services di
             builder.Populate(services);
@@ -200,7 +184,5 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault
 
             return builder.Build();
         }
-
-
     }
 }

@@ -3,19 +3,16 @@
 // license information.
 //
 
-using Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models;
-using Newtonsoft.Json;
+namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Models {
+    using Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models;
+    using Newtonsoft.Json;
 
-namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Models
-{
-    public class CertificateRequestIndexApiModel : CertificateRequestRecordApiModel
-    {
-        public CertificateRequestIndexApiModel() : base()
-        { }
+    public class CertificateRequestIndexApiModel : CertificateRequestRecordApiModel {
+        public CertificateRequestIndexApiModel() {
+        }
 
         public CertificateRequestIndexApiModel(CertificateRequestRecordApiModel apiModel) :
-            base(apiModel.State, apiModel.SigningRequest)
-        {
+            base(apiModel.State, apiModel.SigningRequest) {
             RequestId = apiModel.RequestId;
             ApplicationId = apiModel.ApplicationId;
             CertificateGroupId = apiModel.CertificateGroupId;
@@ -37,17 +34,15 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Models
         public string ApplicationName { get; set; }
 
         public int TrimLength { get; set; }
-        public string ApplicationUriTrimmed { get => Trimmed(ApplicationUri); }
-        public string ApplicationNameTrimmed { get => Trimmed(ApplicationName); }
-        public string SubjectNameTrimmed { get => Trimmed(SubjectName); }
+        public string ApplicationUriTrimmed => Trimmed(ApplicationUri);
+        public string ApplicationNameTrimmed => Trimmed(ApplicationName);
+        public string SubjectNameTrimmed => Trimmed(SubjectName);
 
-        private string Trimmed(string value)
-        {
-            if (value?.Length > TrimLength)
+        private string Trimmed(string value) {
+            if (value?.Length > TrimLength) {
                 return value.Substring(0, TrimLength - 3) + "...";
+            }
             return value;
         }
-
-
     }
 }

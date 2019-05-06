@@ -3,64 +3,54 @@
 // license information.
 //
 
-using System;
-using Microsoft.AspNetCore;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Utils;
-using Microsoft.Azure.KeyVault;
-using Microsoft.Azure.Services.AppAuthentication;
-using Microsoft.Extensions.Configuration;
-using Serilog;
-using Serilog.Events;
+namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault {
+    using Microsoft.AspNetCore;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Utils;
+    using Microsoft.Azure.KeyVault;
+    using Microsoft.Azure.Services.AppAuthentication;
+    using Microsoft.Extensions.Configuration;
+    using Serilog;
+    using Serilog.Events;
+    using System;
 
-namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault
-{
-    public class Program
-    {
-        public static int Main(string[] args)
-        {
+    public class Program {
+        public static int Main(string[] args) {
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
                 .Enrich.FromLogContext()
                 .WriteTo.Console()
                 .CreateLogger();
-            try
-            {
+            try {
                 var host = CreateWebHostBuilder(args).Build();
                 Log.Information("Web Host Ready to run.");
                 host.Run();
                 return 0;
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 Log.Fatal(ex, "Host terminated unexpectedly");
                 return 1;
             }
-            finally
-            {
+            finally {
                 Log.CloseAndFlush();
             }
         }
 
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args)
-        {
-            return WebHost.CreateDefaultBuilder(args)
-                .ConfigureAppConfiguration((context, config) =>
-                {
+        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
+            WebHost.CreateDefaultBuilder(args)
+                .ConfigureAppConfiguration((context, config) => {
                     var builtConfig = config
                         .AddFromDotEnvFile()
                         .AddEnvironmentVariables()
                         .Build();
                     var keyVault = builtConfig["KeyVault"];
-                    if (keyVault != null)
-                    {
+                    if (keyVault != null) {
                         var prefix = new PrefixKeyVaultSecretManager("App");
                         var clientSecret = builtConfig["AzureAD:ClientSecret"];
                         var clientId = builtConfig["AzureAD:ClientId"];
-                        if (String.IsNullOrWhiteSpace(clientSecret) ||
-                            String.IsNullOrWhiteSpace(clientId))
-                        {
+                        if (string.IsNullOrWhiteSpace(clientSecret) ||
+                            string.IsNullOrWhiteSpace(clientId)) {
                             // try managed service identity
                             var azureServiceTokenProvider = new AzureServiceTokenProvider();
                             var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(azureServiceTokenProvider.KeyVaultTokenCallback));
@@ -70,8 +60,7 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault
                                 prefix
                             );
                         }
-                        else
-                        {
+                        else {
                             config.AddAzureKeyVault(
                                 keyVault,
                                 clientId,
@@ -86,6 +75,5 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault
                         .ReadFrom.Configuration(hostingContext.Configuration)
                         .Enrich.FromLogContext()
                         .WriteTo.Console());
-        }
     }
 }

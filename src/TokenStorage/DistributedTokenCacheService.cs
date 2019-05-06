@@ -2,53 +2,43 @@
 // Licensed under the MIT License. See License.txt in the project root for
 // license information.
 //
-using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Caching.Distributed;
-using Serilog;
-using Microsoft.IdentityModel.Clients.ActiveDirectory;
-using System.Security.Claims;
-using System.Threading.Tasks;
 
-namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.TokenStorage
-{
-    public class DistributedTokenCacheService : TokenCacheService
-    {
-        private IHttpContextAccessor _contextAccessor;
-        private IDataProtectionProvider _dataProtectionProvider;
-        private IDistributedCache _distributedCache;
+namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.TokenStorage {
+    using Microsoft.AspNetCore.DataProtection;
+    using Microsoft.Extensions.Caching.Distributed;
+    using Microsoft.IdentityModel.Clients.ActiveDirectory;
+    using Serilog;
+    using System.Security.Claims;
+    using System.Threading.Tasks;
+
+    public class DistributedTokenCacheService : TokenCacheService {
 
         /// <summary>
-        /// Initializes a new instance of <see cref="Tailspin.Surveys.TokenStorage.DistributedTokenCacheService"/>
+        /// Create service
         /// </summary>
-        /// <param name="contextAccessor">An instance of <see cref="Microsoft.AspNetCore.Http.IHttpContextAccessor"/> used to get access to the current HTTP context.</param>
-        /// <param name="logger">A <see cref="Serilog.ILogger"/> instance.</param>
-        /// <param name="dataProtectionProvider">An <see cref="Microsoft.AspNetCore.DataProtection.IDataProtectionProvider"/> for creating a data protector.</param>
-        public DistributedTokenCacheService(
-            IDistributedCache distributedCache,
-            IHttpContextAccessor contextAccessor,
-            ILogger logger,
-            IDataProtectionProvider dataProtectionProvider)
-            : base(logger)
-        {
+        /// <param name="distributedCache"></param>
+        /// <param name="logger"></param>
+        /// <param name="dataProtectionProvider"></param>
+        public DistributedTokenCacheService(IDistributedCache distributedCache,
+            ILogger logger, IDataProtectionProvider dataProtectionProvider)
+            : base(logger) {
             _distributedCache = distributedCache;
-            _contextAccessor = contextAccessor;
             _dataProtectionProvider = dataProtectionProvider;
         }
 
         /// <summary>
-        /// Returns an instance of <see cref="Microsoft.IdentityModel.Clients.ActiveDirectory.TokenCache"/>.
+        /// Returns an instance of <see cref="TokenCache"/>.
         /// </summary>
-        /// <param name="claimsPrincipal">Current user's <see cref="System.Security.Claims.ClaimsPrincipal"/>.</param>
-        /// <returns>An instance of <see cref="Microsoft.IdentityModel.Clients.ActiveDirectory.TokenCache"/>.</returns>
-        public override Task<TokenCache> GetCacheAsync(ClaimsPrincipal claimsPrincipal)
-        {
-            if (_cache == null)
-            {
+        /// <param name="claimsPrincipal">Current user's <see cref="ClaimsPrincipal"/>.</param>
+        /// <returns>An instance of <see cref="TokenCache"/>.</returns>
+        public override Task<TokenCache> GetCacheAsync(ClaimsPrincipal claimsPrincipal) {
+            if (_cache == null) {
                 _cache = new DistributedTokenCache(claimsPrincipal, _distributedCache, _logger, _dataProtectionProvider);
             }
-
             return Task.FromResult(_cache);
         }
+
+        private readonly IDataProtectionProvider _dataProtectionProvider;
+        private readonly IDistributedCache _distributedCache;
     }
 }

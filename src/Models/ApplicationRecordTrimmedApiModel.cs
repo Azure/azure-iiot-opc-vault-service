@@ -5,16 +5,12 @@
 
 using Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models;
 
-namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Models
-{
-    public class ApplicationRecordTrimmedApiModel : ApplicationRecordApiModel
-    {
-        public ApplicationRecordTrimmedApiModel() : base()
-        { }
+namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Models {
+    public class ApplicationRecordTrimmedApiModel : ApplicationRecordApiModel {
+        public ApplicationRecordTrimmedApiModel() { }
 
         public ApplicationRecordTrimmedApiModel(ApplicationRecordApiModel apiModel) :
-            base(apiModel.State, apiModel.ApplicationType, apiModel.ApplicationId, apiModel.Id)
-        {
+            base(apiModel.State, apiModel.ApplicationType, apiModel.ApplicationId, apiModel.Id) {
             ApplicationUri = apiModel.ApplicationUri;
             ApplicationName = apiModel.ApplicationName;
             ApplicationNames = apiModel.ApplicationNames;
@@ -27,13 +23,14 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Models
         }
 
         public int TrimLength { get; set; }
-        public string ApplicationUriTrimmed { get => Trimmed(ApplicationUri); }
-        public string ApplicationNameTrimmed { get => Trimmed(ApplicationName); }
+        public string ApplicationUriTrimmed => Trimmed(ApplicationUri);
+        public string ApplicationNameTrimmed => Trimmed(ApplicationName);
 
-        private string Trimmed(string value)
-        {
-            if (value?.Length > TrimLength)
+        private string Trimmed(string value) {
+            if (value?.Length > TrimLength) {
                 return value.Substring(0, TrimLength - 3) + "...";
+            }
+
             return value;
         }
     }

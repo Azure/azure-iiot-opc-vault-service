@@ -3,51 +3,37 @@
 // license information.
 //
 
-using System.Diagnostics;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.Features;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Models;
-using Serilog;
+namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Controllers {
+    using Microsoft.AspNetCore.Authorization;
+    using Microsoft.AspNetCore.Http.Features;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Models;
+    using Serilog;
+    using System.Diagnostics;
 
-namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Controllers
-{
     [Authorize]
-    public class HomeController : Controller
-    {
+    public class HomeController : Controller {
         private readonly ILogger _logger;
 
-        public HomeController(ILogger log)
-        {
-            _logger = log;
-        }
+        public HomeController(ILogger log) => _logger = log;
 
         [AllowAnonymous]
-        public IActionResult Index()
-        {
-            return View();
-        }
+        public IActionResult Index() => View();
 
-        public IActionResult About()
-        {
+        public IActionResult About() {
             ViewData["Message"] = "Your application description page.";
             return View();
         }
 
-        public IActionResult Contact()
-        {
+        public IActionResult Contact() {
             ViewData["Message"] = "Your contact page.";
             return View();
         }
 
         [AllowAnonymous]
-        public IActionResult Privacy()
-        {
-            return View();
-        }
+        public IActionResult Privacy() => View();
 
-        public IActionResult OnPostWithdraw()
-        {
+        public IActionResult OnPostWithdraw() {
             HttpContext.Features.Get<ITrackingConsentFeature>().WithdrawConsent();
             return RedirectToPage("Index");
         }
@@ -60,20 +46,19 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Controllers
         /// unauthenticated on Safari.
         /// </summary>
         [AllowAnonymous]
-        public IActionResult Continue(string returnUrl = "/")
-        {
+        public IActionResult Continue(string returnUrl = "/") {
             ViewBag.returnUrl = returnUrl;
             return View();
         }
 
         [AllowAnonymous]
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
+        public IActionResult Error() {
             _logger.Error("HomeController::Error: HttpContext.Response.StatusCode = ", HttpContext.Response.StatusCode);
             return View(new ErrorViewModel {
                 RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier,
-                StatusCode = HttpContext.Response.StatusCode });
+                StatusCode = HttpContext.Response.StatusCode
+            });
         }
     }
 }
