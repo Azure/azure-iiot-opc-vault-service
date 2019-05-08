@@ -15,7 +15,9 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Controllers {
     public class HomeController : Controller {
         private readonly ILogger _logger;
 
-        public HomeController(ILogger log) => _logger = log;
+        public HomeController(ILogger logger) {
+            _logger = logger;
+        }
 
         [AllowAnonymous]
         public IActionResult Index() => View();
