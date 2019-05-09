@@ -17,7 +17,9 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.TokenStorage {
         /// <summary>
         /// Initializes a new instance of TokenCacheService
         /// </summary>
-        protected TokenCacheService(ILogger logger) => _logger = logger;
+        protected TokenCacheService(ILogger logger) {
+            _logger = logger;
+        }
 
         /// <summary>
         /// Returns an instance of <see cref="TokenCache"/>.

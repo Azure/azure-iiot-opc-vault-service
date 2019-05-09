@@ -9,9 +9,10 @@ using Microsoft.Extensions.Configuration.AzureKeyVault;
 
 namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Utils {
     public class PrefixKeyVaultSecretManager : IKeyVaultSecretManager {
-        private readonly string _prefix;
 
-        public PrefixKeyVaultSecretManager(string prefix) => _prefix = $"{prefix}-";
+        public PrefixKeyVaultSecretManager(string prefix) {
+            _prefix = $"{prefix}-";
+        }
 
         public bool Load(SecretItem secret) =>
             // Load a vault secret when its secret name starts with the
@@ -26,6 +27,6 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Utils {
             secret.SecretIdentifier.Name
                 .Substring(_prefix.Length)
                 .Replace("--", ConfigurationPath.KeyDelimiter);
+        private readonly string _prefix;
     }
-
 }

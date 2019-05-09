@@ -12,7 +12,9 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Models {
         /// Initializes a new instance of the CertificateDetailsCollectionApiModel
         /// class.
         /// </summary>
-        public CertificateDetailsCollectionApiModel(string id) => Name = id;
+        public CertificateDetailsCollectionApiModel(string id) {
+            Name = id;
+        }
 
         [JsonProperty(PropertyName = "Name")]
         public string Name { get; set; }

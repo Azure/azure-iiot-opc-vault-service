@@ -17,6 +17,7 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Models {
 
     [CreateSigningRequestUploadApiModel]
     public class CreateSigningRequestUploadApiModel {
+
         /// <summary>
         /// Initializes a new instance of the StartSigningRequestUploadModel
         /// class.
@@ -28,7 +29,9 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Models {
         /// Initializes a new instance of the StartSigningRequestUploadModel
         /// class.
         /// </summary>
-        public CreateSigningRequestUploadApiModel(CreateSigningRequestApiModel apiModel) => ApiModel = apiModel;
+        public CreateSigningRequestUploadApiModel(CreateSigningRequestApiModel apiModel) {
+            ApiModel = apiModel;
+        }
 
         [JsonProperty(PropertyName = "ApiModel")]
         public CreateSigningRequestApiModel ApiModel { get; set; }
