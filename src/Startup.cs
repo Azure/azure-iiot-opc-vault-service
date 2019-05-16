@@ -88,7 +88,7 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault {
                     /// </summary>
                     OnAuthorizationCodeReceived = async context => {
                         // Acquire a Token for the API and cache it. In the OpcVaultController, we'll use the cache to acquire a token for the API
-                        var userObjectId = (context.Principal.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier"))?.Value;
+                        var userObjectId = context.Principal.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value;
                         var credential = new ClientCredential(context.Options.ClientId, context.Options.ClientSecret);
 
                         var tokenCacheService = context.HttpContext.RequestServices.GetRequiredService<ITokenCacheService>();
