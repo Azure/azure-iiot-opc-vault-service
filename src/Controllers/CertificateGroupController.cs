@@ -23,7 +23,7 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Controllers {
     /// </summary>
     [Authorize]
     public class CertificateGroupController : Controller {
-        private IOpcVault _opcVault;
+        private IVaultServiceApi _opcVault;
         private readonly OpcVaultApiOptions _opcVaultOptions;
         private readonly AzureADOptions _azureADOptions;
         private readonly ITokenCacheService _tokenCacheService;

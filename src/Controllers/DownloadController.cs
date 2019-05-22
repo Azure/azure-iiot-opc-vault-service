@@ -20,7 +20,7 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Controllers {
 
     [Authorize]
     public class DownloadController : Controller {
-        protected IOpcVault _opcVault;
+        protected IVaultServiceApi _opcVault;
         private readonly OpcVaultApiOptions _opcVaultOptions;
         private readonly AzureADOptions _azureADOptions;
         private readonly ITokenCacheService _tokenCacheService;

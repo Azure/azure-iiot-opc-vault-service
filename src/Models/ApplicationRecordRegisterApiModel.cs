@@ -16,7 +16,6 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Models {
     /// </summary>
     public class ApplicationRecordRegisterApiModelAttribute : ValidationAttribute, IClientModelValidator {
         private readonly ServerCapabilities _serverCaps = new ServerCapabilities();
-        private const int ApplicationTypeClient = 1;
 
         public void AddValidation(ClientModelValidationContext context) => throw new NotImplementedException();
 

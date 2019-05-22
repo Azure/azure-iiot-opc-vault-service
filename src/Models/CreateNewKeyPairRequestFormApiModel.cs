@@ -18,9 +18,6 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Models
     /// </summary>
     public class CreateNewKeyPairRequestFormApiModelAttribute : ValidationAttribute, IClientModelValidator
     {
-        readonly ServerCapabilities _serverCaps = new ServerCapabilities();
-        const int ApplicationTypeClient = 1;
-
         public void AddValidation(ClientModelValidationContext context)
         {
             throw new NotImplementedException();
