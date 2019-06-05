@@ -59,14 +59,14 @@ else
        model => model.ApplicationType,
        new SelectList(
            new List<Object>{
-                                new { value = Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models.ApplicationType.Server ,
-                                    text = Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models.ApplicationType.Server.ToString() },
-                                new { value = Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models.ApplicationType.Client ,
-                                    text = Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models.ApplicationType.Client.ToString() },
-                                new { value = Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models.ApplicationType.ClientAndServer ,
-                                    text = Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models.ApplicationType.ClientAndServer.ToString() },
-                                new { value = Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models.ApplicationType.DiscoveryServer ,
-                                    text = Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models.ApplicationType.DiscoveryServer.ToString() },
+                                new { value = Microsoft.Azure.IIoT.OpcUa.Api.Vault.v1.Models.ApplicationType.Server ,
+                                    text = Microsoft.Azure.IIoT.OpcUa.Api.Vault.v1.Models.ApplicationType.Server.ToString() },
+                                new { value = Microsoft.Azure.IIoT.OpcUa.Api.Vault.v1.Models.ApplicationType.Client ,
+                                    text = Microsoft.Azure.IIoT.OpcUa.Api.Vault.v1.Models.ApplicationType.Client.ToString() },
+                                new { value = Microsoft.Azure.IIoT.OpcUa.Api.Vault.v1.Models.ApplicationType.ClientAndServer ,
+                                    text = Microsoft.Azure.IIoT.OpcUa.Api.Vault.v1.Models.ApplicationType.ClientAndServer.ToString() },
+                                new { value = Microsoft.Azure.IIoT.OpcUa.Api.Vault.v1.Models.ApplicationType.DiscoveryServer ,
+                                    text = Microsoft.Azure.IIoT.OpcUa.Api.Vault.v1.Models.ApplicationType.DiscoveryServer.ToString() },
            },
        "value",
        "text",
@@ -89,7 +89,7 @@ else
             </div>
         </div>
 
-        @if (Model.ApplicationType != Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models.ApplicationType.Client)
+        @if (Model.ApplicationType != Microsoft.Azure.IIoT.OpcUa.Api.Vault.v1.Models.ApplicationType.Client)
         {
             @for (int i = 0; i < Model.DiscoveryUrls.Count(); i++)
             {

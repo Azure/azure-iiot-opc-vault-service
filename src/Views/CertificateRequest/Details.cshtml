@@ -1,9 +1,9 @@
-@model Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models.CertificateRequestRecordApiModel
+@model Microsoft.Azure.IIoT.OpcUa.Api.Vault.v1.Models.CertificateRequestRecordApiModel
 
 @{
     ViewBag.Title = "Start New Key Pair Request";
     Layout = "~/Views/Shared/_Layout.cshtml";
-    Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models.ApplicationRecordApiModel application = (Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models.ApplicationRecordApiModel)ViewBag.Application;
+    Microsoft.Azure.IIoT.OpcUa.Api.Vault.v1.Models.ApplicationRecordApiModel application = (Microsoft.Azure.IIoT.OpcUa.Api.Vault.v1.Models.ApplicationRecordApiModel)ViewBag.Application;
 }
 
 <h2>View Certificate Request Details</h2>
@@ -76,7 +76,7 @@
     <hr />
     <dl class="dl-horizontal">
 
-        @if (Model.State == Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models.CertificateRequestState.New)
+        @if (Model.State == Microsoft.Azure.IIoT.OpcUa.Api.Vault.v1.Models.CertificateRequestState.New)
         {
             <dd>
 
@@ -85,8 +85,8 @@
             </dd>
 
         }
-        @if (Model.State == Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models.CertificateRequestState.Approved ||
-           Model.State == Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models.CertificateRequestState.Accepted)
+        @if (Model.State == Microsoft.Azure.IIoT.OpcUa.Api.Vault.v1.Models.CertificateRequestState.Approved ||
+           Model.State == Microsoft.Azure.IIoT.OpcUa.Api.Vault.v1.Models.CertificateRequestState.Accepted)
         {
             <dt>Download</dt>
             <dd>
@@ -111,7 +111,7 @@
         }
     </dl>
 
-    @if (Model.State == Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models.CertificateRequestState.Approved)
+    @if (Model.State == Microsoft.Azure.IIoT.OpcUa.Api.Vault.v1.Models.CertificateRequestState.Approved)
     {
         <hr />
         <dl class="dl-horizontal">

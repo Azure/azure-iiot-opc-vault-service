@@ -3,7 +3,7 @@
 // license information.
 //
 
-using Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models;
+using Microsoft.Azure.IIoT.OpcUa.Api.Vault.v1.Models;
 
 namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Models {
     public class ApplicationRecordTrimmedApiModel : ApplicationRecordApiModel {

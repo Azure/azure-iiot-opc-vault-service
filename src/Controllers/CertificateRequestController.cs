@@ -7,8 +7,8 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Controllers {
     using Microsoft.AspNetCore.Authentication.AzureAD.UI;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
-    using Microsoft.Azure.IIoT.OpcUa.Api.Vault;
-    using Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models;
+    using Microsoft.Azure.IIoT.OpcUa.Api.Vault.v1;
+    using Microsoft.Azure.IIoT.OpcUa.Api.Vault.v1.Models;
     using Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Models;
     using Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.TokenStorage;
     using Serilog;

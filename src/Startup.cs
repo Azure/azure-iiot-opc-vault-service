@@ -15,7 +15,7 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault {
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Authorization;
-    using Microsoft.Azure.IIoT.OpcUa.Api.Vault;
+    using Microsoft.Azure.IIoT.OpcUa.Api.Vault.v1;
     using Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Filters;
     using Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.TokenStorage;
     using Microsoft.Extensions.Configuration;

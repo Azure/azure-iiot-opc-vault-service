@@ -7,7 +7,7 @@
 namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Models {
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
-    using Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models;
+    using Microsoft.Azure.IIoT.OpcUa.Api.Vault.v1.Models;
     using Newtonsoft.Json;
     using Opc.Ua;
     using System;

@@ -7,8 +7,11 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Controllers {
     using Microsoft.AspNetCore.Authentication.AzureAD.UI;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.Azure.IIoT.Http.Default;
     using Microsoft.Azure.IIoT.OpcUa.Api.Vault;
-    using Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models;
+    using Microsoft.Azure.IIoT.OpcUa.Api.Vault.Clients;
+    using Microsoft.Azure.IIoT.OpcUa.Api.Vault.v1;
+    using Microsoft.Azure.IIoT.OpcUa.Api.Vault.v1.Models;
     using Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Models;
     using Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.TokenStorage;
     using Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Utils;
@@ -243,7 +246,7 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Controllers {
             if (_opcVault == null) {
                 ServiceClientCredentials serviceClientCredentials =
                     new OpcVaultLoginCredentials(_opcVaultOptions, _azureADOptions, _tokenCacheService, User);
-                _opcVault = new OpcVault(new Uri(_opcVaultOptions.BaseAddress), serviceClientCredentials);
+                _opcVault = VaultServiceApiEx.CreateClient(new Uri(_opcVaultOptions.BaseAddress), serviceClientCredentials);
             }
         }
 

@@ -4,7 +4,7 @@
 //
 
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
-using Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models;
+using Microsoft.Azure.IIoT.OpcUa.Api.Vault.v1.Models;
 using Opc.Ua.Gds.Client;
 using System;
 using System.Collections.Generic;

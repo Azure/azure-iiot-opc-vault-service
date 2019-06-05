@@ -41,7 +41,7 @@
             </td>
             <td>
                 @Html.ActionLink("Details", "Details", new { id = request.RequestId })
-                @if (request.State == Microsoft.Azure.IIoT.OpcUa.Api.Vault.Models.CertificateRequestState.New)
+                @if (request.State == Microsoft.Azure.IIoT.OpcUa.Api.Vault.v1.Models.CertificateRequestState.New)
                 {
                     @Html.Raw("&nbsp;|&nbsp;");
                     @Html.ActionLink("Approve", "Approve", new { id = request.RequestId }/*,
