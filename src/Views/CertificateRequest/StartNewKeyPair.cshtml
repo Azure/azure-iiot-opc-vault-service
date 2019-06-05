@@ -17,8 +17,8 @@
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
         @Html.HiddenFor(model => model.ApplicationId)
-        @Html.HiddenFor(model => model.CertificateGroupId)
-        @Html.HiddenFor(model => model.CertificateTypeId)
+        @Html.HiddenFor(model => model.GroupId)
+        @Html.HiddenFor(model => model.CertificateType)
 
         <div class="form-group">
             <div class="col-md-2">
@@ -38,18 +38,18 @@
         </div>
         <div class="form-group">
             <div class="col-md-2">
-                @Html.LabelFor(model => model.CertificateGroupId, htmlAttributes: new { @class = "pull-right" })
+                @Html.LabelFor(model => model.GroupId, htmlAttributes: new { @class = "pull-right" })
             </div>
             <div class="col-md-10">
-                @Html.DisplayFor(model => model.CertificateGroupId)
+                @Html.DisplayFor(model => model.GroupId)
             </div>
         </div>
         <div class="form-group">
             <div class="col-md-2">
-                @Html.LabelFor(model => model.CertificateTypeId, htmlAttributes: new { @class = "pull-right" })
+                @Html.LabelFor(model => model.CertificateType, htmlAttributes: new { @class = "pull-right" })
             </div>
             <div class="col-md-10">
-                @Html.DisplayFor(model => model.CertificateTypeId)
+                @Html.DisplayFor(model => model.CertificateType)
             </div>
         </div>
         <div class="form-group">

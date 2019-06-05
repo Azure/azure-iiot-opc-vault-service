@@ -70,8 +70,8 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Models
 
         public CreateNewKeyPairRequestFormApiModel(CreateNewKeyPairRequestApiModel apiModel)         {
             ApplicationId = apiModel.ApplicationId;
-            CertificateGroupId = apiModel.CertificateGroupId;
-            CertificateTypeId = apiModel.CertificateTypeId;
+            GroupId = apiModel.GroupId;
+            CertificateType = apiModel.CertificateType;
             SubjectName = apiModel.SubjectName;
             DomainNames = apiModel.DomainNames;
             PrivateKeyFormat = apiModel.PrivateKeyFormat;

@@ -20,8 +20,8 @@
         @Html.HiddenFor(model => model.ApiModel.ApplicationId)
         @Html.HiddenFor(model => model.ApplicationUri)
         @Html.HiddenFor(model => model.ApplicationName)
-        @Html.HiddenFor(model => model.ApiModel.CertificateGroupId)
-        @Html.HiddenFor(model => model.ApiModel.CertificateTypeId)
+        @Html.HiddenFor(model => model.ApiModel.GroupId)
+        @Html.HiddenFor(model => model.ApiModel.CertificateType)
 
         <div class="form-group">
             <div class="col-md-2">
@@ -41,18 +41,18 @@
         </div>
         <div class="form-group">
             <div class="col-md-2">
-                @Html.LabelFor(model => model.ApiModel.CertificateGroupId, htmlAttributes: new { @class = "pull-right" })
+                @Html.LabelFor(model => model.ApiModel.GroupId, htmlAttributes: new { @class = "pull-right" })
             </div>
             <div class="col-md-10">
-                @Html.DisplayFor(model => model.ApiModel.CertificateGroupId)
+                @Html.DisplayFor(model => model.ApiModel.GroupId)
             </div>
         </div>
         <div class="form-group">
             <div class="col-md-2">
-                @Html.LabelFor(model => model.ApiModel.CertificateTypeId, htmlAttributes: new { @class = "pull-right" })
+                @Html.LabelFor(model => model.ApiModel.CertificateType, htmlAttributes: new { @class = "pull-right" })
             </div>
             <div class="col-md-10">
-                @Html.DisplayFor(model => model.ApiModel.CertificateTypeId)
+                @Html.DisplayFor(model => model.ApiModel.CertificateType)
             </div>
         </div>
         <div class="form-group">

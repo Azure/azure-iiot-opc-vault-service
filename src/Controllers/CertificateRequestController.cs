@@ -132,8 +132,8 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Controllers {
 
             var request = new CreateNewKeyPairRequestFormApiModel {
                 ApplicationId = id,
-                CertificateGroupId = defaultGroupId,
-                CertificateTypeId = defaultTypeId,
+                GroupId = defaultGroupId,
+                CertificateType = defaultTypeId,
                 DomainNames = domainNames
             };
             UpdateApiModel(request);
@@ -218,8 +218,8 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Controllers {
             var request = new CreateSigningRequestUploadApiModel {
                 ApiModel = new CreateSigningRequestApiModel {
                     ApplicationId = id,
-                    CertificateGroupId = defaultGroupId,
-                    CertificateTypeId = defaultTypeId
+                    GroupId = defaultGroupId,
+                    CertificateType = defaultTypeId
                 },
                 ApplicationUri = application.ApplicationUri,
                 ApplicationName = application.ApplicationName

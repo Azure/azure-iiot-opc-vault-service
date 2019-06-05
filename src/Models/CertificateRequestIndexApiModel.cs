@@ -15,8 +15,8 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Models {
             base(apiModel.State, apiModel.SigningRequest) {
             RequestId = apiModel.RequestId;
             ApplicationId = apiModel.ApplicationId;
-            CertificateGroupId = apiModel.CertificateGroupId;
-            CertificateTypeId = apiModel.CertificateTypeId;
+            GroupId = apiModel.GroupId;
+            CertificateType = apiModel.CertificateType;
             SubjectName = apiModel.SubjectName;
             DomainNames = apiModel.DomainNames;
             PrivateKeyFormat = apiModel.PrivateKeyFormat;

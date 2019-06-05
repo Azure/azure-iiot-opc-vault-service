@@ -158,7 +158,7 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Controllers {
             try {
                 var request = await _opcVault.GetCertificateRequestAsync(requestId);
                 if (request != null) {
-                    var issuer = await _opcVault.GetCertificateGroupIssuerCAChainAsync(request.CertificateGroupId);
+                    var issuer = await _opcVault.GetCertificateGroupIssuerCAChainAsync(request.GroupId);
                     var byteArray = Convert.FromBase64String(issuer.Chain[0].Certificate);
                     return new FileContentResult(byteArray, ContentEncodings.MimeTypeCert) {
                         FileDownloadName = Utils.CertFileName(issuer.Chain[0].Certificate) + ".der"
@@ -183,8 +183,8 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Controllers {
             try {
                 var request = await _opcVault.GetCertificateRequestAsync(requestId);
                 if (request != null) {
-                    var issuer = await _opcVault.GetCertificateGroupIssuerCAChainAsync(request.CertificateGroupId);
-                    var crl = await _opcVault.GetCertificateGroupIssuerCACrlChainAsync(request.CertificateGroupId);
+                    var issuer = await _opcVault.GetCertificateGroupIssuerCAChainAsync(request.GroupId);
+                    var crl = await _opcVault.GetCertificateGroupIssuerCACrlChainAsync(request.GroupId);
                     var byteArray = Convert.FromBase64String(crl.Chain[0].Crl);
                     return new FileContentResult(byteArray, ContentEncodings.MimeTypeCrl) {
                         FileDownloadName = Utils.CertFileName(issuer.Chain[0].Certificate) + ".crl"
@@ -210,7 +210,7 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Controllers {
                 if (groupId == null) {
                     var request = await _opcVault.GetCertificateRequestAsync(requestId);
                     if (request != null) {
-                        groupId = request.CertificateGroupId;
+                        groupId = request.GroupId;
                     }
                     else {
                         return RedirectToAction("Details", new {
@@ -243,7 +243,7 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Controllers {
                 if (groupId == null) {
                     var request = await _opcVault.GetCertificateRequestAsync(requestId);
                     if (request != null) {
-                        groupId = request.CertificateGroupId;
+                        groupId = request.GroupId;
                     }
                 }
 
