@@ -52,7 +52,9 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Models {
     /// </summary>
     public class CreateSigningRequestUploadApiModelAttribute : ValidationAttribute, IClientModelValidator {
 
-        public void AddValidation(ClientModelValidationContext context) => throw new NotImplementedException();
+        public void AddValidation(ClientModelValidationContext context) {
+            throw new NotImplementedException();
+        }
 
         protected override ValidationResult IsValid(object value, ValidationContext validationContext) {
             var request = (CreateSigningRequestUploadApiModel)validationContext.ObjectInstance;

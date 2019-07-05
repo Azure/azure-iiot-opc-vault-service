@@ -37,43 +37,44 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault {
             }
         }
 
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .ConfigureAppConfiguration((context, config) => {
-                    var builtConfig = config
-                        .AddFromDotEnvFile()
-                        .AddEnvironmentVariables()
-                        .Build();
-                    var keyVault = builtConfig["KeyVault"];
-                    if (keyVault != null) {
-                        var prefix = new PrefixKeyVaultSecretManager("App");
-                        var clientSecret = builtConfig["AzureAD:ClientSecret"];
-                        var clientId = builtConfig["AzureAD:ClientId"];
-                        if (string.IsNullOrWhiteSpace(clientSecret) ||
-                            string.IsNullOrWhiteSpace(clientId)) {
-                            // try managed service identity
-                            var azureServiceTokenProvider = new AzureServiceTokenProvider();
-                            var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(azureServiceTokenProvider.KeyVaultTokenCallback));
-                            config.AddAzureKeyVault(
-                                keyVault,
-                                keyVaultClient,
-                                prefix
-                            );
-                        }
-                        else {
-                            config.AddAzureKeyVault(
-                                keyVault,
-                                clientId,
-                                clientSecret,
-                                prefix
-                            );
-                        }
-                    }
-                })
-                .UseStartup<Startup>()
-                .UseSerilog((hostingContext, loggerConfiguration) => loggerConfiguration
-                        .ReadFrom.Configuration(hostingContext.Configuration)
-                        .Enrich.FromLogContext()
-                        .WriteTo.Console());
+        public static IWebHostBuilder CreateWebHostBuilder(string[] args) {
+            return WebHost.CreateDefaultBuilder(args)
+.ConfigureAppConfiguration((context, config) => {
+    var builtConfig = config
+    .AddFromDotEnvFile()
+    .AddEnvironmentVariables()
+    .Build();
+    var keyVault = builtConfig["KeyVault"];
+    if (keyVault != null) {
+        var prefix = new PrefixKeyVaultSecretManager("App");
+        var clientSecret = builtConfig["AzureAD:ClientSecret"];
+        var clientId = builtConfig["AzureAD:ClientId"];
+        if (string.IsNullOrWhiteSpace(clientSecret) ||
+        string.IsNullOrWhiteSpace(clientId)) {
+            // try managed service identity
+            var azureServiceTokenProvider = new AzureServiceTokenProvider();
+            var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(azureServiceTokenProvider.KeyVaultTokenCallback));
+            config.AddAzureKeyVault(
+            keyVault,
+            keyVaultClient,
+            prefix
+            );
+        }
+        else {
+            config.AddAzureKeyVault(
+            keyVault,
+            clientId,
+            clientSecret,
+            prefix
+            );
+        }
+    }
+})
+.UseStartup<Startup>()
+.UseSerilog((hostingContext, loggerConfiguration) => loggerConfiguration
+.ReadFrom.Configuration(hostingContext.Configuration)
+.Enrich.FromLogContext()
+.WriteTo.Console());
+        }
     }
 }

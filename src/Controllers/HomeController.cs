@@ -20,7 +20,9 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Controllers {
         }
 
         [AllowAnonymous]
-        public IActionResult Index() => View();
+        public IActionResult Index() {
+            return View();
+        }
 
         public IActionResult About() {
             ViewData["Message"] = "Your application description page.";
@@ -33,7 +35,9 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Controllers {
         }
 
         [AllowAnonymous]
-        public IActionResult Privacy() => View();
+        public IActionResult Privacy() {
+            return View();
+        }
 
         public IActionResult OnPostWithdraw() {
             HttpContext.Features.Get<ITrackingConsentFeature>().WithdrawConsent();
