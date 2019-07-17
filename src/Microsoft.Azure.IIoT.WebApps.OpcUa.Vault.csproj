@@ -33,18 +33,6 @@
     </Otherwise>
   </Choose>
   <Choose>
-    <When Condition="Exists('..\..\..\common')">
-      <ItemGroup>
-        <ProjectReference Include="..\..\..\common\src\Microsoft.Azure.IIoT.Core\src\Microsoft.Azure.IIoT.Core.csproj" />
-      </ItemGroup>
-    </When>
-    <Otherwise>
-      <ItemGroup>
-        <PackageReference Include="Microsoft.Azure.IIoT.Core" Version="$(CommonVersion)" />
-      </ItemGroup>
-    </Otherwise>
-  </Choose>
-  <Choose>
     <When Condition="Exists('..\..\..\api')">
       <ItemGroup>
         <ProjectReference Include="..\..\..\api\src\Microsoft.Azure.IIoT.OpcUa.Api.Vault\src\Microsoft.Azure.IIoT.OpcUa.Api.Vault.csproj" />

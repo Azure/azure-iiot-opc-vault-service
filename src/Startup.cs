@@ -4,8 +4,6 @@
 //
 
 namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault {
-    using Autofac;
-    using Autofac.Extensions.DependencyInjection;
     using Microsoft.AspNetCore.Authentication;
     using Microsoft.AspNetCore.Authentication.AzureAD.UI;
     using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -21,6 +19,8 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault {
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.IdentityModel.Clients.ActiveDirectory;
+    using Autofac;
+    using Autofac.Extensions.DependencyInjection;
     using Serilog;
     using System;
     using System.Threading.Tasks;
@@ -115,8 +115,7 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault {
                     .RequireAuthenticatedUser()
                     .Build();
                 options.Filters.Add(new AuthorizeFilter(policy));
-            })
-            .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            }).SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddSession();
 
             services.AddApplicationInsightsTelemetry(Configuration);
@@ -124,7 +123,7 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault {
             // This will register IDistributedCache based token cache which ADAL will use for caching access tokens.
             services.AddScoped<ITokenCacheService, DistributedTokenCacheService>();
 
-            //http://stackoverflow.com/questions/37371264/asp-net-core-rc2-invalidoperationexception-unable-to-resolve-service-for-type/37373557
+            // http://stackoverflow.com/questions/37371264/asp-net-core-rc2-invalidoperationexception-unable-to-resolve-service-for-type/37373557
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             // Prepare DI container
@@ -165,9 +164,10 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault {
         }
 
         /// <summary>
-        /// Autofac configuration. Find more information here:
-        /// @see http://docs.autofac.org/en/latest/integration/aspnetcore.html
+        /// Configure container
         /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
         public IContainer ConfigureContainer(IServiceCollection services) {
             var builder = new ContainerBuilder();
 

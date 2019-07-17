@@ -40,9 +40,7 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.TokenStorage {
         /// <param name="claimsPrincipal">A <see cref="ClaimsPrincipal"/> for the signed in user</param>
         /// <returns>Cache key for this item.</returns>
         private static string BuildCacheKey(ClaimsPrincipal claimsPrincipal) {
-            return string.Format(
-"UserId:{0}",
-claimsPrincipal.Identity.Name);
+            return "UserId:" + claimsPrincipal.Identity.Name;
         }
 
         /// <summary>
