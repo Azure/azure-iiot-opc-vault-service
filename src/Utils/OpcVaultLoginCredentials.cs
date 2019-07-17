@@ -39,8 +39,6 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Utils {
                 _azureADOptions.ClientId,
                 _azureADOptions.ClientSecret);
 
-            var name = _claimsPrincipal.FindFirstValue(ClaimTypes.Upn) ??
-                _claimsPrincipal.FindFirstValue(ClaimTypes.Email);
             var userObjectId = _claimsPrincipal.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value;
             var user = new UserIdentifier(userObjectId, UserIdentifierType.UniqueId);
 

@@ -34,7 +34,6 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Controllers {
         public async Task<ActionResult> IndexAsync() {
             var appDictionary = new Dictionary<string, ApplicationRecordApiModel>();
             AuthorizeClient();
-            string nextPageLink = null;
             var indexRequests = new List<CertificateRequestIndexApiModel>();
             try {
                 var requests = await _opcVault.QueryCertificateRequestsAsync(pageSize: PageSize);
@@ -56,7 +55,7 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Controllers {
                     if (requests.NextPageLink == null) {
                         break;
                     }
-                    nextPageLink = requests.NextPageLink;
+                    var nextPageLink = requests.NextPageLink;
                     requests = await _opcVault.QueryCertificateRequestsAsync(nextPageLink, pageSize: PageSize);
                 }
             }
