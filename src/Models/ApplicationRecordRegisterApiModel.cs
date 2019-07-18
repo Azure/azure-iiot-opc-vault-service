@@ -25,9 +25,15 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Models {
             var application = (ApplicationRecordRegisterApiModel)validationContext.ObjectInstance;
             var errorList = new List<string>();
 
-            if (string.IsNullOrWhiteSpace(application.ApplicationUri)) { errorList.Add(nameof(application.ApplicationUri)); }
-            if (string.IsNullOrWhiteSpace(application.ProductUri)) { errorList.Add(nameof(application.ProductUri)); }
-            if (string.IsNullOrWhiteSpace(application.ApplicationName)) { errorList.Add(nameof(application.ApplicationName)); }
+            if (string.IsNullOrWhiteSpace(application.ApplicationUri)) {
+                errorList.Add(nameof(application.ApplicationUri));
+            }
+            if (string.IsNullOrWhiteSpace(application.ProductUri)) {
+                errorList.Add(nameof(application.ProductUri));
+            }
+            if (string.IsNullOrWhiteSpace(application.ApplicationName)) {
+                errorList.Add(nameof(application.ApplicationName));
+            }
             if (application.ApplicationType != ApplicationType.Client) {
                 if (string.IsNullOrWhiteSpace(application.ServerCapabilities)) { errorList.Add(nameof(application.ServerCapabilities)); }
                 if (application.DiscoveryUrls != null) {
