@@ -369,7 +369,7 @@ namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Controllers {
             if (_opcVault == null) {
                 ServiceClientCredentials serviceClientCredentials =
                     new OpcVaultLoginCredentials(_opcVaultOptions, _azureADOptions, _tokenCacheService, User);
-                _opcVault = VaultServiceApiEx.CreateClient(new Uri(_opcVaultOptions.BaseAddress), serviceClientCredentials);
+                _opcVault = IIoT.OpcUa.Api.Vault.v1.VaultServiceApiEx.CreateClient(new Uri(_opcVaultOptions.BaseAddress), serviceClientCredentials);
             }
         }
 
