@@ -1,80 +1,80 @@
-// ------------------------------------------------------------
-//  Copyright (c) Microsoft Corporation.  All rights reserved.
-//  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
-// ------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for
+// license information.
+//
 
+namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault {
+    using Microsoft.AspNetCore;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Utils;
+    using Microsoft.Azure.KeyVault;
+    using Microsoft.Azure.Services.AppAuthentication;
+    using Microsoft.Extensions.Configuration;
+    using Serilog;
+    using Serilog.Events;
+    using System;
 
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Runtime;
-using Microsoft.Extensions.Configuration;
-using Serilog;
-using Serilog.Events;
-using System;
-using System.Collections.Generic;
-using System.IO;
-
-namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
-{
-    /// <summary>Application entry point</summary>
-    public class Program
-    {
-        public static int Main(string[] args)
-        {
+    public class Program {
+        public static int Main(string[] args) {
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
                 .Enrich.FromLogContext()
                 .WriteTo.Console()
                 .CreateLogger();
-
-            try
-            {
-                /*
-                Kestrel is a cross-platform HTTP server based on libuv, a
-                cross-platform asynchronous I/O library.
-                https://docs.microsoft.com/en-us/aspnet/core/fundamentals/servers
-                */
-                // Load hosting configuration
-                var configRoot = new ConfigurationBuilder()
-                    .SetBasePath(Directory.GetCurrentDirectory())
-                    .AddCommandLine(args)
-                    .AddEnvironmentVariables("ASPNETCORE_")
-                    .AddJsonFile("hosting.json", true)
-                    .AddInMemoryCollection(new Dictionary<string, string> {
-                    { "urls", "http://*:58801" }
-                    })
-                    .Build();
-
-                /*
-                Print some information to help development and debugging, like
-                runtime and configuration settings
-                */
-                Console.WriteLine($"[{Uptime.ProcessId}] Starting web service, process ID: " + Uptime.ProcessId);
-
-                var host = new WebHostBuilder()
-                    .UseConfiguration(configRoot)
-                    .UseKestrel(options => { options.AddServerHeader = false; })
-                    .UseIISIntegration()
-                    .UseStartup<Startup>()
-                    .UseSerilog((hostingContext, loggerConfiguration) => loggerConfiguration
-                        .ReadFrom.Configuration(hostingContext.Configuration)
-                        .Enrich.FromLogContext()
-                        .WriteTo.Console())
-                    .Build();
-
+            try {
+                var host = CreateWebHostBuilder(args).Build();
+                Log.Information("Web Host Ready to run.");
                 host.Run();
-
                 return 0;
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 Log.Fatal(ex, "Host terminated unexpectedly");
                 return 1;
             }
-            finally
-            {
+            finally {
                 Log.CloseAndFlush();
             }
+        }
+
+        public static IWebHostBuilder CreateWebHostBuilder(string[] args) {
+            return WebHost.CreateDefaultBuilder(args)
+                .ConfigureAppConfiguration((context, config) => {
+                    var builtConfig = config
+                    .AddFromDotEnvFile()
+                    .AddEnvironmentVariables()
+                    .Build();
+                    var keyVault = builtConfig["KeyVault"];
+                    if (keyVault != null) {
+                        var prefix = new PrefixKeyVaultSecretManager("App");
+                        var clientSecret = builtConfig["AzureAD:ClientSecret"];
+                        var clientId = builtConfig["AzureAD:ClientId"];
+                        if (string.IsNullOrWhiteSpace(clientSecret) ||
+                        string.IsNullOrWhiteSpace(clientId)) {
+                            // try managed service identity
+                            var azureServiceTokenProvider = new AzureServiceTokenProvider();
+                            var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(azureServiceTokenProvider.KeyVaultTokenCallback));
+                            config.AddAzureKeyVault(
+                            keyVault,
+                            keyVaultClient,
+                            prefix
+                            );
+                        }
+                        else {
+                            config.AddAzureKeyVault(
+                            keyVault,
+                            clientId,
+                            clientSecret,
+                            prefix
+                            );
+                        }
+                    }
+                })
+                .UseStartup<Startup>()
+                .UseSerilog((hostingContext, loggerConfiguration) => loggerConfiguration
+                    .ReadFrom.Configuration(hostingContext.Configuration)
+                    .Enrich.FromLogContext()
+                    .WriteTo.Console());
         }
     }
 }

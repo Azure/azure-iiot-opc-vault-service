@@ -71,7 +71,7 @@ The startup batch files with the module configurations are created during deploy
 
  (sample id values must be real guids, urls and secrets)
 
-Right click the project and select `Properties`, then `Debug`. Paste the arguments in the `Application Arguments` field. This will start the OPC Vault edge module with correct parameters to connect to the cloud service. To connect to the OPC Vault microservice running locally replace the `--vault` parameter with the service address at the localhost as below <br>`--vault="http://localhost:58801`.
+Right click the project and select `Properties`, then `Debug`. Paste the arguments in the `Application Arguments` field. This will start the OPC Vault edge module with correct parameters to connect to the cloud service. To connect to the OPC Vault microservice running locally replace the `--vault` parameter with the service address at the localhost as below <br>`--vault="http://localhost:9044`.
 
 ### Run the services in Visual Studio
 

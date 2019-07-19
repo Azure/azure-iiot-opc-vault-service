@@ -1,199 +1,175 @@
-// ------------------------------------------------------------
-//  Copyright (c) Microsoft Corporation.  All rights reserved.
-//  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
-// ------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for
+// license information.
+//
 
-namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
-{
-    using Autofac;
-    using Autofac.Extensions.DependencyInjection;
+namespace Microsoft.Azure.IIoT.WebApps.OpcUa.Vault {
+    using Microsoft.AspNetCore.Authentication;
+    using Microsoft.AspNetCore.Authentication.AzureAD.UI;
+    using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
-    using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Runtime;
-    using Microsoft.Azure.IIoT.OpcUa.Services.Vault.Swagger;
-    using Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1;
-    using Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Auth;
-    using Microsoft.Azure.IIoT.OpcUa.Services.Vault.v1.Filters;
-    using Microsoft.Azure.IIoT.Services;
-    using Microsoft.Azure.IIoT.Services.Auth;
-    using Microsoft.Azure.KeyVault;
-    using Microsoft.Azure.Services.AppAuthentication;
+    using Microsoft.AspNetCore.Http;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc.Authorization;
+    using Microsoft.Azure.IIoT.OpcUa.Api.Vault.v1;
+    using Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.Filters;
+    using Microsoft.Azure.IIoT.WebApps.OpcUa.Vault.TokenStorage;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
-    using Newtonsoft.Json;
+    using Microsoft.IdentityModel.Clients.ActiveDirectory;
+    using Autofac;
+    using Autofac.Extensions.DependencyInjection;
     using Serilog;
-    using Swashbuckle.AspNetCore.Swagger;
     using System;
-    using CorsSetup = IIoT.Services.Cors.CorsSetup;
+    using System.Threading.Tasks;
 
-    /// <summary>
-    /// Webservice startup
-    /// </summary>
-    public class Startup
-    {
+    public class Startup {
+        public Startup(IConfiguration configuration) {
+            Configuration = configuration;
+            OpcVaultOptions = new OpcVaultApiOptions();
+            Configuration.Bind("OpcVault", OpcVaultOptions);
+            AzureADOptions = new AzureADOptions();
+            Configuration.Bind("AzureAD", AzureADOptions);
+        }
 
-        /// <summary>
-        /// Configuration - Initialized in constructor
-        /// </summary>
-        public Config Config { get; }
-
-        /// <summary>
-        /// Current hosting environment - Initialized in constructor
-        /// </summary>
-        public IHostingEnvironment Environment { get; }
+        public IConfiguration Configuration { get; }
+        public AzureADOptions AzureADOptions { get; }
+        public OpcVaultApiOptions OpcVaultOptions { get; }
 
         /// <summary>
         /// Di container - Initialized in `ConfigureServices`
         /// </summary>
         public IContainer ApplicationContainer { get; private set; }
 
-        /// <summary>
-        /// Created through builder
-        /// </summary>
-        /// <param name="env"></param>
-        public Startup(IHostingEnvironment env)
-        {
-            Environment = env;
+        // This method gets called by the runtime. Use this method to add services to the container.
+        public IServiceProvider ConfigureServices(IServiceCollection services) {
+            services.AddSingleton(OpcVaultOptions);
+            services.AddSingleton(AzureADOptions);
 
-            var configBuilder = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", true, true)
-                .AddEnvironmentVariables();
+            services.Configure<CookiePolicyOptions>(options => {
+                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
+                options.CheckConsentNeeded = context => true;
+                options.MinimumSameSitePolicy = SameSiteMode.None;
+            });
+            services.AddAuthentication(AzureADDefaults.AuthenticationScheme)
+                .AddAzureAD(options => Configuration.Bind("AzureAd", options));
 
-            IConfigurationRoot config;
-            try
-            {
-                var builtConfig = configBuilder.Build();
-                var keyVault = builtConfig["KeyVault"];
-                if (!String.IsNullOrWhiteSpace(keyVault))
-                {
-                    var appSecret = builtConfig["Auth:AppSecret"];
-                    if (String.IsNullOrWhiteSpace(appSecret))
-                    {
-                        // try managed service identity
-                        var azureServiceTokenProvider = new AzureServiceTokenProvider();
-                        var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(azureServiceTokenProvider.KeyVaultTokenCallback));
-                        configBuilder.AddAzureKeyVault(
-                            keyVault,
-                            keyVaultClient,
-                            new PrefixKeyVaultSecretManager("Service")
-                            );
-                    }
-                    else
-                    {
-                        // use AzureAD token
-                        configBuilder.AddAzureKeyVault(
-                            keyVault,
-                            builtConfig["Auth:AppId"],
-                            appSecret,
-                            new PrefixKeyVaultSecretManager("Service")
-                            );
-                    }
-                }
-            }
-            catch
-            {
-            }
-            config = configBuilder.Build();
-            Config = new Config(config);
-        }
+            services.Configure<OpenIdConnectOptions>(AzureADDefaults.OpenIdScheme, options => {
+                // Without overriding the response type (which by default is id_token), the OnAuthorizationCodeReceived event is not called.
+                // but instead OnTokenValidated event is called. Here we request both so that OnTokenValidated is called first which
+                // ensures that context.Principal has a non-null value when OnAuthorizeationCodeReceived is called
+                options.ResponseType = "id_token code";
+                // set the resource id of the service api which needs to be accessed
+                options.Resource = OpcVaultOptions.ResourceId;
+                // refresh token
+                options.Scope.Add("offline_access");
 
-        /// <summary>
-        /// This is where you register dependencies, add services to the
-        /// container. This method is called by the runtime, before the
-        /// Configure method below.
-        /// </summary>
-        /// <param name="services"></param>
-        /// <returns></returns>
-        public IServiceProvider ConfigureServices(IServiceCollection services)
-        {
-            // Setup (not enabling yet) CORS
-            services.AddCors();
+                options.Events = new OpenIdConnectEvents {
+                    OnTicketReceived = context => {
+                        // stop by `/Home/Continue` instead of going directly to the ReturnUri
+                        // to work around Safari's issues with SameSite=lax session cookies not being
+                        // returned on the final redirect of the authentication flow.
+                        // credits:
+                        // https://community.auth0.com/t/authentication-broken-on-asp-net-core-and-safari-on-ios-12-mojave-take-2/19104
+                        context.ReturnUri = "/Home/Continue?returnUrl=" + System.Net.WebUtility.UrlEncode(context.ReturnUri ?? "/");
+                        return Task.CompletedTask;
+                    },
+                    OnAuthenticationFailed = context => {
+                        context.Response.Redirect("/Error");
+                        context.HandleResponse(); // Suppress the exception
+                        return Task.CompletedTask;
+                    },
+                    /// <summary>
+                    /// Redeems the authorization code by calling AcquireTokenByAuthorizationCodeAsync in order to ensure
+                    /// that the cache has a token for the signed-in user, which will then enable the controllers
+                    /// to call AcquireTokenSilentAsync successfully.
+                    /// </summary>
+                    OnAuthorizationCodeReceived = async context => {
+                        // Acquire a Token for the API and cache it. In the OpcVaultController, we'll use the cache to acquire a token for the API
+                        var userObjectId = context.Principal.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value;
+                        var credential = new ClientCredential(context.Options.ClientId, context.Options.ClientSecret);
 
-            // Add authentication
-            services.AddJwtBearerAuthentication(Config, Environment.IsDevelopment());
+                        var tokenCacheService = context.HttpContext.RequestServices.GetRequiredService<ITokenCacheService>();
+                        var tokenCache = await tokenCacheService.GetCacheAsync(context.Principal);
+                        var authContext = new AuthenticationContext(context.Options.Authority, tokenCache);
 
-            // Add authorization
-            services.AddAuthorization(options =>
-            {
-                options.AddV1Policies(Config, Config.ServicesConfig);
+                        var authResult = await authContext.AcquireTokenByAuthorizationCodeAsync(context.TokenEndpointRequest.Code,
+                            new Uri(context.TokenEndpointRequest.RedirectUri, UriKind.RelativeOrAbsolute), credential, context.Options.Resource);
+
+                        // Notify the OIDC middleware that we already took care of code redemption.
+                        context.HandleCodeRedemption(authResult.AccessToken, context.ProtocolMessage.IdToken);
+                    },
+                    // If your application needs to do authenticate single users, add your user validation below.
+                    //OnTokenValidated = context =>
+                    //{
+                    //    return myUserValidationLogic(context.Ticket.Principal);
+                    //}
+                };
             });
 
-            // Add controllers as services so they'll be resolved.
-            services.AddMvc(options =>
-                options.Filters.Add(typeof(ExceptionsFilterAttribute))
-                )
-                .AddControllersAsServices()
-                .AddJsonOptions(options =>
-                {
-                    options.SerializerSettings.Formatting = Formatting.Indented;
-                    options.SerializerSettings.Converters.Add(new ExceptionConverter(
-                        Environment.IsDevelopment()));
-                    options.SerializerSettings.MaxDepth = 10;
-                });
+            services.AddMvc(options => {
+                options.Filters.Add(typeof(AdalTokenAcquisitionExceptionFilter));
+                var policy = new AuthorizationPolicyBuilder()
+                    .RequireAuthenticatedUser()
+                    .Build();
+                options.Filters.Add(new AuthorizeFilter(policy));
+            }).SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddSession();
 
-            services.AddApplicationInsightsTelemetry(Config.Configuration);
+            services.AddApplicationInsightsTelemetry(Configuration);
 
-            services.AddSwaggerEx(Config, new Info
-            {
-                Title = ServiceInfo.NAME,
-                Version = VersionInfo.PATH,
-                Description = ServiceInfo.DESCRIPTION,
-            });
+            // This will register IDistributedCache based token cache which ADAL will use for caching access tokens.
+            services.AddScoped<ITokenCacheService, DistributedTokenCacheService>();
+
+            // http://stackoverflow.com/questions/37371264/asp-net-core-rc2-invalidoperationexception-unable-to-resolve-service-for-type/37373557
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             // Prepare DI container
             ApplicationContainer = ConfigureContainer(services);
+
             // Create the IServiceProvider based on the container
             return new AutofacServiceProvider(ApplicationContainer);
         }
 
-        /// <summary>
-        /// This method is called by the runtime, after the ConfigureServices
-        /// method above and used to add middleware
-        /// </summary>
-        /// <param name="app"></param>
-        /// <param name="env"></param>
-        /// <param name="logger"></param>
-        /// <param name="appLifetime"></param>
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(
             IApplicationBuilder app,
             IHostingEnvironment env,
-            ILogger logger,
-            IApplicationLifetime appLifetime)
-        {
-            if (Config.AuthRequired)
-            {
-                app.UseAuthentication();
+            IApplicationLifetime appLifetime) {
+            if (env.IsDevelopment()) {
+                app.UseDeveloperExceptionPage();
+            }
+            else {
+                app.UseExceptionHandler("/Home/Error");
+                app.UseHsts();
             }
 
-            app.EnableCors();
+            app.UseHttpsRedirection();
+            app.UseStaticFiles();
+            app.UseCookiePolicy();
 
-            app.UseSwaggerEx(Config, new Info
-            {
-                Title = ServiceInfo.NAME,
-                Version = VersionInfo.PATH,
-                Description = ServiceInfo.DESCRIPTION,
+            app.UseAuthentication();
+            app.UseMvc(routes => {
+                routes.MapRoute(
+                    "default",
+                    "{controller=Home}/{action=Index}/{id?}");
             });
-
-            app.UseMvc();
 
             // If you want to dispose of resources that have been resolved in the
             // application container, register for the "ApplicationStopped" event.
             appLifetime.ApplicationStopped.Register(ApplicationContainer.Dispose);
 
-            // Print some useful information at bootstrap time
-            logger.Information($"{ServiceInfo.NAME} web service started",
-                new { Uptime.ProcessId, env });
         }
 
         /// <summary>
-        /// Autofac configuration. Find more information here:
-        /// @see http://docs.autofac.org/en/latest/integration/aspnetcore.html
+        /// Configure container
         /// </summary>
-        public IContainer ConfigureContainer(IServiceCollection services)
-        {
-            ContainerBuilder builder = new ContainerBuilder();
+        /// <param name="services"></param>
+        /// <returns></returns>
+        public IContainer ConfigureContainer(IServiceCollection services) {
+            var builder = new ContainerBuilder();
 
             // Populate from services di
             builder.Populate(services);
@@ -201,31 +177,10 @@ namespace Microsoft.Azure.IIoT.OpcUa.Services.Vault
             // By default Autofac uses a request lifetime, creating new objects
             // for each request, which is good to reduce the risk of memory
             // leaks, but not so good for the overall performance.
-
             // Register configuration interfaces
-            builder.RegisterInstance(Config)
-                .AsImplementedInterfaces().SingleInstance();
-            builder.RegisterInstance(Config.ServicesConfig)
-                .AsImplementedInterfaces().SingleInstance();
 
             // register the serilog logger
             builder.RegisterInstance(Log.Logger).As<ILogger>();
-
-            // CORS setup
-            builder.RegisterType<CorsSetup>()
-                .AsImplementedInterfaces().SingleInstance();
-
-            // Register endpoint services and ...
-            builder.RegisterType<KeyVaultCertificateGroup>()
-                .AsImplementedInterfaces().SingleInstance();
-            builder.RegisterType<CosmosDBApplicationsDatabase>()
-                .AsImplementedInterfaces().SingleInstance();
-            builder.RegisterType<CosmosDBCertificateRequest>()
-                .AsImplementedInterfaces().SingleInstance();
-            builder.RegisterType<OpcVaultDocumentDbRepository>()
-                .AsImplementedInterfaces().SingleInstance();
-            builder.RegisterType<WarmStartDatabase>()
-                .AsImplementedInterfaces().SingleInstance();
 
             return builder.Build();
         }

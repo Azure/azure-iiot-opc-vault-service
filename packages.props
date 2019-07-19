@@ -1,0 +1,12 @@
+<Project>
+  <PropertyGroup>
+    <CommonVersion>2.0.2</CommonVersion>
+    <ServicesApiVersion>2.0.2</ServicesApiVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <CommonPrereleaseVersion>$(CommonVersion)-*</CommonPrereleaseVersion>
+    <CommonVersion Condition="'$(VersionSuffix)' != ''">$(CommonPrereleaseVersion)</CommonVersion>
+    <ServicesApiPrereleaseVersion>$(ServicesApiVersion)-*</ServicesApiPrereleaseVersion>
+    <ServicesApiVersion Condition="'$(VersionSuffix)' != ''">$(ServicesApiPrereleaseVersion)</ServicesApiVersion>
+  </PropertyGroup>
+</Project>
